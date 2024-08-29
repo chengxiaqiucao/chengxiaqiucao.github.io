@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="测亦有道">
+<title>提 Bug 的艺术</title>
+
+<link rel='canonical' href='http://localhost:1313/post/bug-art/'>
+
+<link rel="stylesheet" href="/scss/style.min.afc04e201e26111368df0fa482ffbcd8ad0a7779bfdcc0c73b0c9eac35357cdd.css"><meta property='og:title' content="提 Bug 的艺术">
+<meta property='og:description' content="测亦有道">
+<meta property='og:url' content='http://localhost:1313/post/bug-art/'>
+<meta property='og:site_name' content='秋 草 观 “测” 台'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='测试流程' /><meta property='article:tag' content='测试规范' /><meta property='article:published_time' content='2023-08-19T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2023-08-19T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="提 Bug 的艺术">
+<meta name="twitter:description" content="测亦有道">
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0SZVJZGMHX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0SZVJZGMHX');
+</script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/automnGrass_hu7204715396109996112.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">秋 草 观 “测” 台</a></h1>
+            <h2 class="site-description">Testing is not just checking...</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/chengxiaqiucao'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/472272606'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162803093" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10312" xmlns:xlink="http://www.w3.org/1999/xlink" width="211.71875" height="200"><path d="M896.43834 165.698h-62.34l54.57-54.57c23.43-23.37 23.43-70.17 0-93.54-23.37-23.37-70.17-23.37-93.54 0l-155.88 148.17H452.17034l-155.94-148.23c-23.43-23.37-70.17-23.37-93.54 0-23.37 23.43-23.43 70.17 0 93.54l54.57 54.57h-62.34A192.983 192.983 0 0 0 0.00934 360.607v420.899c0 116.97 85.71 202.68 194.91 202.68h693.75a192.983 192.983 0 0 0 194.85-194.85v-428.73c7.83-109.14-77.94-194.91-187.08-194.91z m54.63 615.809a69.869 69.869 0 0 1-70.17 70.17h-678.27a69.869 69.869 0 0 1-70.109-70.17v-413.13a69.869 69.869 0 0 1 70.17-70.17h678.21a69.869 69.869 0 0 1 70.17 70.17v413.19z m-608.039-342.96a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.23-70.17z m405.36 0a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.17-70.17z" p-id="10313" fill="#8a8a8a"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.zhihu.com/people/qiucao'
+                        target="_blank"
+                        title="zhihu"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162502588" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4642" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M540.95908203 555.43730469s0-62.74248047-30.56748047-65.96191407c-30.56748047-3.21943359-125.48583984 0-125.48583984 1e-8v-193.05527344h141.57246094s-1.60839844-64.35263672-28.95908203-64.35263672h-230.05810547l38.61035156-102.96210938s-57.91728516 3.21943359-78.83085938 40.21962891-86.87460938 222.01523438-86.87460937 222.01523438 22.52373047 9.65302734 59.52480469-17.69589844c37.00283203-27.34804688 49.87177734-75.61494141 49.87177734-75.61494141l67.56943359-3.21943359 1.60839844 196.27382812s-117.44033203-1.60839844-141.57246094 0c-24.13212891 1.60839844-37.00283203 65.96191406-37.00283203 65.96191407h178.57792969s-16.09013672 109.39746094-61.13408203 188.23007812c-46.65673828 78.83085938-133.53134766 141.57246094-133.53134766 141.57246094s62.74248047 25.74052734 123.87919922-9.65302735c61.13408203-37.00283203 106.18154297-196.27382812 106.18154297-196.27382812l143.184375 178.57792969s12.86982422-85.26533203-1.60839844-109.39746094c-16.09013672-24.13212891-99.74707031-120.65888672-99.74707031-120.65888672l-37.00283203 32.17412109 25.74052734-106.18154297h156.0515625zM577.96191406 227.24316406l-1.60839843 580.77509766h57.91728515l20.91357422 72.39550781 101.35634766-72.39550781h143.184375v-580.77509766h-321.75966797zM835.3671875 743.665625h-67.56943359l-85.26533203 65.96191406-19.30517579-65.96191406h-17.69589843v-450.46318359h189.83583984v450.46318359z" fill="#8a8a8a" p-id="4643"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='mailto:%20danmyw@qq.com'
+                        target="_blank"
+                        title="e-mail"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162879016" class="icon" viewBox="0 0 1451 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12462" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z" fill="#8a8a8a" p-id="12463"></path></svg>
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>检索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/releases/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+                
+                <span>热门开源</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="http://localhost:1313/en/" >English</option>
+                                
+                                    <option value="http://localhost:1313/" selected>中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li>
+      <ol>
+        <li><a href="#前言">前言</a></li>
+        <li><a href="#何为bug-bug的历史">何为Bug？ Bug的历史</a></li>
+        <li><a href="#bug-report-问题单是什么">Bug Report （问题单）是什么?</a></li>
+        <li><a href="#问题单的作用和重要性">问题单的作用和重要性</a></li>
+        <li><a href="#问题单的要素">问题单的要素</a></li>
+        <li><a href="#测试小白的错误做法">测试小白的错误做法</a></li>
+        <li><a href="#提-bug-与说故事">提 Bug 与说故事</a></li>
+        <li><a href="#提-bug-的艺术">提 Bug 的艺术</a></li>
+        <li><a href="#结语">结语</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E6%B5%8B%E8%AF%95%E6%8A%80%E6%9C%AF/" style="background-color: #2a9d8f; color: #fff;">
+                测试技术
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/bug-art/">提 Bug 的艺术</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            测亦有道
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Aug 19, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 11 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h3 id="前言">前言
+</h3><p>作为测试工程师最重要的工作产出，Bug Report（或者故障单、问题单）是测试工程师工作成果的直接体现，也是最能呈现测试工程师价值和能力的输出物。但项目干系人甚至测试工程师本身对Bug Report的重要性往往认识不足，Bug 单的内容及其提交方式、处理流程对项目推进、运作效率甚至团队士气都有重要影响。</p>
+<p>行业针对 Bug Report 的讨论和总结还比较少，本篇我们希望以笔者多年的从业观察出发，对 Bug report 的要素及专业测试工程师的处理方式给出一些总结和建议，意在抛砖引玉，错漏之处还请多多指正。</p>
+<p>主要包含以下内容：</p>
+<ul>
+<li>Bug 是什么，Bug 报告单是什么</li>
+<li>开发或项目团队看到 Bug 实际希望获取的信息是什么</li>
+<li>测试小白在提 Bug 时的常见错误做法</li>
+<li>提 Bug 与说故事</li>
+<li>专业测试工程师如何高质量地提交 Bug</li>
+</ul>
+<h3 id="何为bug-bug的历史">何为Bug？ Bug的历史
+</h3><p>Bug 一词在英文中本是虫子，臭虫之意，现在 IT 行业用它来代指软件中存在的缺陷，其实这个历史还比较有意思：</p>
+<p>早在 1878 年，大发明家爱迪生就在给朋友的信中就用 bug 一词代指过电子电路中的故障（或可能导致故障的原因），但是真正在计算机行业载入史册还要到 1947 年 9 月 9 日。</p>
+<p>这时第一批写程序的程序员们正在哈佛大学研发 markII 计算机，其中 [Grace Murray Hopper][1] 在查找一个问题时，在中继器触点旁发现了一个飞蛾，用日志本拍死了它，并标记它为“第一个找到 bug 的真实案例”。由此 bug 一词便被用来代指计算机中的缺陷或故障。相应地 debug 则被用来指代去除故障的调测行为。</p>
+<p>下图即保存在美国管家博物馆的史上第一个 bug 实物：
+<img src="/post/bug-art/20240820134227.png"
+	width="743"
+	height="599"
+	srcset="/post/bug-art/20240820134227_hu7731760855887928179.png 480w, /post/bug-art/20240820134227_hu12376935102095913911.png 1024w"
+	loading="lazy"
+	
+		alt="first bug"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="124"
+		data-flex-basis="297px"
+	
+></p>
+<p>史上第一批程序员，其中唯一的女性就是“虫”母：
+<img src="/post/bug-art/20240820134247.png"
+	width="888"
+	height="588"
+	srcset="/post/bug-art/20240820134247_hu3518387679237872046.png 480w, /post/bug-art/20240820134247_hu5403263373265826113.png 1024w"
+	loading="lazy"
+	
+		alt="bug mother"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="151"
+		data-flex-basis="362px"
+	
+></p>
+<p>总之，现在 Bug 一词可以代指软件或程序中存在的缺陷或者故障。但对于项目团队来说，建议不要简单地将 Bug 定义成<code>故障</code>，因为<code>故障</code>一词定性上有否定的意味，而将 Bug 视作<code>缺陷</code>、或者<code>问题</code>，强调<strong>可改进空间</strong>对项目团队更加有积极的引导作用。</p>
+<h3 id="bug-report-问题单是什么">Bug Report （问题单）是什么?
+</h3><p>report 这个词在英文中既可作动词也可作名词。所以 <code>Bug report</code> 既可表示发现问题并报告的这个动作，也可以指问题发现后提交的报告内容。 这里我们一般还是将它看作是问题报告(名词)，即 <code>问题单</code>，那么<code>问题单</code>到底是什么呢？</p>
+<p>测试大神 Cem Kaner 曾指出:</p>
+<blockquote>
+<p>The purpose of testing is not to find bugs. The purpose is to get bugs fixed.</p>
+<p>测试的目的不是发现 Bug, 而是使 Bug 被修复。</p>
+</blockquote>
+<p>这个观点其实指出了很多测试人员认识上的一个误区，就是觉得测试工作就是尽可能多地发现 Bug。 其实对团队来说，发现的 Bug 再多，最终还是要解决掉才能体现这些 Bug 被发现的价值。</p>
+<p>而从发现到被解决， <code>问题单</code> 是其中的主要媒介，既是测试人员测试工作的输出，又是开发人员解决问题的输入，重要性不言而喻。</p>
+<p>另外，虽然将发现的问题知会给开发人员有各种形式：口头告知、实际演示、电子邮件、IM聊天等等都可以起到知会的作用。但在现代软件研发过程中，一般还会有专门的系统来进行缺陷追踪，如 JIRA、禅道、bugfree、QC（HP quality center） 等软件都能进行缺陷的提交和跟踪。通过这些专门的系统，不仅能够起到记录和反馈的作用，还能够通过统计和分析更好地反映出项目整体的质量状况和研发进展。</p>
+<p>因此：</p>
+<ul>
+<li>
+<p><code>问题单</code> 是测试人员测试活动中发现缺陷后的输出</p>
+</li>
+<li>
+<p><code>问题单</code> 是开发人员解决缺陷的输入</p>
+</li>
+<li>
+<p><code>问题单</code> 是测试人员和开发人员之间针对 Bug 的沟通媒介</p>
+</li>
+<li>
+<p><code>问题单</code> 还是项目团队评估当前研发状态和产品成熟度的指示器。</p>
+</li>
+</ul>
+<h3 id="问题单的作用和重要性">问题单的作用和重要性
+</h3><p>相信很多测试工程师在提交问题单后，都有得到如下一些反馈或抱怨的经历：</p>
+<ul>
+<li>
+<p>你这个问题单到底想说明啥？</p>
+</li>
+<li>
+<p>在我这里运行没有这个问题</p>
+</li>
+<li>
+<p>为什么你提交的这个算是缺陷？</p>
+</li>
+<li>
+<p>一般人不会像问题单那样使用软件，脑子有问题的人才会那样用</p>
+</li>
+<li>
+<p>这个确实是问题，但是修复成本太大，而且也可以换种操作方式来规避</p>
+</li>
+<li>
+<p>你虽然认为这是个问题，但是实际用户不会觉得不好</p>
+</li>
+<li>
+<p>你提交的虽然确实是问题，但是影响用户很小。那些影响用户更大的部分为什么看不到多少问题单？</p>
+<p>&hellip;&hellip;</p>
+</li>
+</ul>
+<p>测试人员当然不希望得到这样的反馈。但这些问题也从侧面反映出在对待 Bug 这件事上，开发人员或项目团队更加注重的其实是 Bug 如何解决（包括是否<strong>需要</strong>解决的判断），他们更希望从<code>问题单</code>中获知的是如下的一些信息：</p>
+<ul>
+<li>
+<p>所发现的什么问题？</p>
+<ul>
+<li>问题现象是什么？</li>
+<li>总是会出现吗？</li>
+<li>发现这个问题时的背景、上下文是什么？</li>
+<li>除了看到的现象，系统同时还发生了什么？</li>
+<li>有没有截图、日志、录屏？</li>
+</ul>
+</li>
+<li>
+<p>为什么它是个问题？</p>
+<ul>
+<li>这个问题有什么影响？</li>
+<li>不解决它会怎么样？</li>
+<li>发生概率怎么样？</li>
+<li>有没有和其他问题重复？</li>
+</ul>
+</li>
+<li>
+<p>是做了什么操作，暴露出的这个问题？</p>
+<ul>
+<li>输入是什么？</li>
+<li>用了什么测试路径？测试数据？</li>
+<li>所在测试环境、软件版本如何？</li>
+</ul>
+</li>
+</ul>
+<p>所以，作为测试，不应把<code>问题单</code>看作是一个简单的问题记录，它是测试和开发之间的重要沟通媒介，好的问题单可以极大减少双方的沟通成本，既极大减轻开发人员解决问题的工作量，同时也减少测试人员澄清、重复验证等的工作量。对项目来说，<code>问题单</code>的提交质量，影响的就是团队的生产力以及交付速度，不容小觑。</p>
+<h3 id="问题单的要素">问题单的要素
+</h3><p>了解了<code>问题单</code>的作用，那么<code>问题单</code>中应该包含的要素也就比较清楚了，一般有以下方面：</p>
+<ul>
+<li>
+<p><strong>方便初步判断的标题</strong></p>
+<p>标题应该能够比较清楚地概要说明问题，以及这个问题所处的模块。便于开发人员作一个初步的判断</p>
+</li>
+<li>
+<p><strong>上下文及必要的关联信息</strong></p>
+<p>发生问题时的上下文背景，关联的信息如软件版本、测试环境、配置情况、资源状态等</p>
+</li>
+<li>
+<p><strong>准确合理的详细描述信息</strong></p>
+<p>详细描述问题发现的步骤，操作预期，实际发生的状况。问题发生频率，所使用的测试输入、数据、文件等</p>
+</li>
+<li>
+<p><strong>帮助问题解决的补充信息</strong></p>
+<p>能够帮助开发人员加快解决问题进度的补充信息，比如截图、录屏、操作日志、系统日志等</p>
+</li>
+<li>
+<p><strong>帮助项目决策的辅助信息</strong></p>
+<p>测试人员作为 Bug 的第一判断者，应给出问题的严重程度、解决优先级建议。初步指派解决问题的开发人员，以及便于统计、追踪的关联信息标识。</p>
+</li>
+</ul>
+<h3 id="测试小白的错误做法">测试小白的错误做法
+</h3><p>那么结合<code>问题单</code>的要素，我们可以初步总结一些测试小白或者不专业测试在提交 Bug 时常见的一些错误做法：</p>
+<ul>
+<li>
+<p>标题不够明确</p>
+<p>标题非常简单，不便于初步判断问题。比如简单地写 “系统 crash”，太过笼统，而且过于简单的标题很容易产生雷同，对问题的集中回顾、评审都带来很多不便。</p>
+<p>或者过于复杂。太长的标题，容易导致阅读疲劳，没有重点。比如标题中详细描写操作步骤就没什么必要</p>
+</li>
+<li>
+<p>脱离实际，偏离需求场景。</p>
+<p>有时候测试小白会从个人偏好角度出发，想当然地提出一些问题。“我觉得”、“感觉上不好” 是这类小白问题中出现的高频词汇。</p>
+</li>
+<li>
+<p>不是问题</p>
+<p>测试小白，往往因为对系统实现原理理解上的错误或技能水平上的不足，提交出不是 bug 的问题单。</p>
+<p>还有因为测试小白的测试方法或者环境配置本身就是不正确的，由此导致的问题</p>
+</li>
+<li>
+<p>描述信息不足</p>
+<p>典型的，通过问题单的描述信息，开发人员不足以确认问题现象或自行复现。测试小白往往觉得发现问题就完成工作，没有把充分的信息提供给开发人员，比如截图、日志等。</p>
+</li>
+<li>
+<p>无关信息过多、格式杂乱</p>
+<p>有时小白的问题单中会包含太多冗余的嘈杂信息，很难看到重点。比如不分青红皂白把几万行的 log 贴到问题单中</p>
+<p>或者完全不进行排版，一大堆信息杂乱地混杂在一起，阅读难度极高</p>
+</li>
+<li>
+<p>问题过多</p>
+<p>问题单应该聚焦，有时测试小白会在同一个问题单中包含很多个不同的问题。这对于问题追踪和聚焦都非常不利</p>
+</li>
+<li>
+<p>只看现象不考虑本质</p>
+<p>有时候简单的问题现象，往往是一些严重问题的体现或线索。小白往往会忽视重要的风险，对一些看似蛛丝马迹的问题视而不见，将潜藏在现象之下的 Bug 轻易漏过。比如有些预期外的提示信息，往往是后台计算、统计准确性等 Bug 的体现。</p>
+</li>
+</ul>
+<h3 id="提-bug-与说故事">提 Bug 与说故事
+</h3><p>再回到 <code>提交 Bug</code> 这件事，本质上，这其实是一个沟通的过程，<code>问题单</code> 承载了这个沟通媒介的作用，通过<code>问题单</code>，测试人员将自己在测试过程中看到的、发现到的问题描述出来，开发人员通过阅读<code>问题单</code>，掌握到对应信息并相应地去解决问题。</p>
+<p>所以<code>提 Bug</code> 其实和写一个小短文，说一个小故事一样，测试人员是作者，而开发人员是读者。</p>
+<p>我们在提<code>问题单</code>时，其实也是写作的一种。写作的 <strong>5W</strong> 要求也一样适用：</p>
+<ul>
+<li>
+<p>What 内容&ndash;具体的问题是什么？</p>
+</li>
+<li>
+<p>Why 目的&ndash;为什么要提出这个问题？为什么它是个问题？</p>
+</li>
+<li>
+<p>Who 主体-问题主体是谁？关联方有谁？？</p>
+</li>
+<li>
+<p>Where 地点&ndash;问题发生在哪？</p>
+</li>
+<li>
+<p>When 时间&ndash;在什么时间和频率下发生？</p>
+</li>
+</ul>
+<p>提 Bug 时思考这 <strong>5W</strong>，再结合上文提到问题单要素，一般就不会犯很多测试新手在提问题单时常犯的错误了。</p>
+<h3 id="提-bug-的艺术">提 Bug 的艺术
+</h3><p>上文阐述问题单的要素以及 提Bug 时应注意的一些细节，但是为什么我们还要说提 Bug 其实是一件艺术性的工作？</p>
+<p>我们来举几个问题单的例子：</p>
+<p>假设有一个商品管理系统，用户在某个特定商品分类下（水果）新增商品时会发生crash</p>
+<p><strong>问题单 例一：</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">用户新增商品，发生Crash
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">如图所示（crash界面截图）
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个问题单通过提供截图其实基本描述了问题现象。但是对开发人员来说，信息量太少，而且很有可能并不能第一时间复现问题（水果分类）。问题单中包含的信息太过于简单，可以说是非常糟糕的问题单案例。</p>
+<p><strong>问题单 例二：</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">用户在新增商品时，会发生Crash
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">操作步骤：
+</span></span><span class="line"><span class="cl">1. 打开App
+</span></span><span class="line"><span class="cl">2. 用户登录系统，输入正确的用户名、密码并登录
+</span></span><span class="line"><span class="cl">3. 进入商品管理页面
+</span></span><span class="line"><span class="cl">4. 选择分类：水果
+</span></span><span class="line"><span class="cl">5. 点击新建商品按钮
+</span></span><span class="line"><span class="cl">6. 输入商品信息：*********
+</span></span><span class="line"><span class="cl">7. 点击提交按钮
+</span></span><span class="line"><span class="cl">预期结果：商品创建成功App
+</span></span><span class="line"><span class="cl">实际结果：发生 crash
+</span></span><span class="line"><span class="cl">使用的设备机型：xiaomi 8
+</span></span><span class="line"><span class="cl">操作系统版本：android 8.0
+</span></span><span class="line"><span class="cl">软件版本 V1.1
+</span></span><span class="line"><span class="cl">附件：crash截图
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个问题单，是很多测试小白常见的提单形式，包含了非常详细的操作步骤和相关辅助信息。但是这也是一个非常糟糕的问题单。
+首先，这样的步骤描述毫无必要，开发人员不会连打开app、登录、提交这样的操作也不了解需要在问题单中交代
+其次，辅助信息虽多，但是基本和问题原因无关，并不利于开发人员定位，反而引入了一些干扰信息。
+这样的问题单，无法体现测试人员的专业价值，对问题的快速解决也没有好处</p>
+<p><strong>问题单 例三：</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">用户在水果分类下进行新增商品操作时，会发生Crash
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">操作步骤：
+</span></span><span class="line"><span class="cl">1. 选择水果分类，创建商品，发生crash
+</span></span><span class="line"><span class="cl">2. 选择非水果分类，创建商品，商品创建成功
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">已验证机型：xiaomi 8，huawei mate 7 等现象一致，应和机型、操作系统、版本无关
+</span></span><span class="line"><span class="cl">附件：错误截图、系统 crash 时的 logcat 日志
+</span></span><span class="line"><span class="cl">影响：用户无法新增水果分类商品，直接影戏用户使用。需高优先级解决
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此问题单已经可以算比较合格的问题单了，比较明确地指明了问题发生的场景，并将一些无关信息进行了初步排除。开发人员可以聚焦在水果这个类别下的商品创建进行问题分析。
+同时指出了问题对软件的影响和解决优先级建议，使项目团队明确知道这个问题的影响所在</p>
+<p><strong>问题单 例四：</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">用户在水果分类下进行新增商品操作时，会发生空指针Crash
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">操作步骤：
+</span></span><span class="line"><span class="cl">1. 选择水果分类，创建商品，发生crash
+</span></span><span class="line"><span class="cl">2. 选择非水果分类，创建商品，商品创建成功
+</span></span><span class="line"><span class="cl">3. 对已有水果分类下的商品进行编辑操作，可以编辑成功
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">后台数据库对水果分类因字段缺失insert操作出错，update操作正常。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">已验证机型：xiaomi 8，huawei mate 7 等现象一致，应和机型、操作系统、版本无关
+</span></span><span class="line"><span class="cl">附件：错误截图、系统 crash 时的 logcat 日志
+</span></span><span class="line"><span class="cl">影响：用户无法新增水果分类商品，直接影戏用户使用。需高优先级解决
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个问题单，则在上一个问题单基础上更进一步，初步分析出了问题原因，新增操作时，有一个关键字段信息未包含，所以导致的crash。开发人员已经可以很明确地对问题进行修复了</p>
+<p><strong>问题单 例五：</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">用户在水果分类下进行新增商品操作时，会发生空指针Crash。导入商品操作旧模板也同样存在问题。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">操作步骤：
+</span></span><span class="line"><span class="cl">1. 选择水果分类，创建商品，发生crash
+</span></span><span class="line"><span class="cl">2. 选择非水果分类，创建商品，商品创建成功
+</span></span><span class="line"><span class="cl">3. 对已有水果分类下的商品进行编辑操作，可以编辑成功
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">后台数据库对水果分类因字段缺失insert操作出错，update操作正常。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">在商品管理导入商品功能中，新模板水果商品导入成功，使用旧模板（未包含新增字段）导入水果数据，也会发生失败。需一并修复。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">已验证机型：xiaomi 8，huawei mate 7 等现象一致，应和机型、操作系统、版本无关
+</span></span><span class="line"><span class="cl">附件：错误截图、系统 crash 时的 logcat 日志、新旧模板导入日志
+</span></span><span class="line"><span class="cl">影响：用户无法新增水果分类商品，直接影戏用户使用。需高优先级解决
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个问题单，则在上一个例子的基础上，根据测试人员的经验，推理出有类似逻辑的导入功能，可能存在同样问题并进行了验证。很好体现了测试人员专业能力。</p>
+<p>通过以上这个简单的案例，我们可以看到，不同的问题单提法，对问题解决效果却有很大差距。</p>
+<ul>
+<li>
+<p>包含的信息太少，开发人员难以确定产生 Bug 的根本原因，Debug 的工作量成倍上升。</p>
+</li>
+<li>
+<p>包含的信息过多，开发人员又会耗费额外的精力去分析那些冗余的信息，甚至干扰调试、解决的方向，同样造成很大的工作量浪费</p>
+</li>
+<li>
+<p>越是能清晰、明确地反映问题的根本原因，开发人员解决问题就越是高效。</p>
+</li>
+<li>
+<p>测试人员的经验和判断推理能力，通过问题单能够很好地得到体现</p>
+</li>
+</ul>
+<p>所以为什么说提 Bug 是个艺术性的工作？问题单既不能太过简单，也不应太过冗杂，还要能够将信息尽可能准确、全面地传递给开发，这真的是一件非常艺术性的事情。</p>
+<h3 id="结语">结语
+</h3><p>总而言之，提 Bug 在软件研发过程中，是一件相当重要的活动，<code>问题单</code>的质量直接影响团队的效率和产出。作为专业的测试人员，掌握提 Bug 的艺术，<code>问题单</code>不在是个简单的问题记录，更是测试和开发间的沟通桥梁，是帮助开发高效修复 Bug 的支撑。</p>
+<p>欢迎大家在读者圈留言反馈，也可加微信进测试交流群交流分享： <strong>chengxiaqiucaohuang</strong></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B/">测试流程</a>
+        
+            <a href="/tags/%E6%B5%8B%E8%AF%95%E8%A7%84%E8%8C%83/">测试规范</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2023 - 
+        
+        2024 |by 城下秋草（公众号： 秋草说测试）
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

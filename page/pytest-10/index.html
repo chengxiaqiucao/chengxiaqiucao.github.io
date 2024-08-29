@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Pytest 发布历史 (latest 10) pytest 8.3.2 (2024-07-24) Bug fixes #12652: Resolve regression [conda]{.title-ref} environments where no longer being automatically detected. -- by RonnyPfannschmidt{.interpreted-text role=&ldquo;user&rdquo;} ======================================== pytest 8.3.1 (2024-07-20) The 8.3.0 release failed to include the change notes and docs for the release. This patch release remedies this. There are no other changes. ======================================== pytest 8.3.0 (2024-07-20) New features #12231: Added [--xfail-tb]{.title-ref} flag, which turns on traceback output">
+<title>Pytest 发布历史 (latest 10)</title>
+
+<link rel='canonical' href='http://localhost:1313/page/pytest-10/'>
+
+<link rel="stylesheet" href="/scss/style.min.afc04e201e26111368df0fa482ffbcd8ad0a7779bfdcc0c73b0c9eac35357cdd.css"><meta property='og:title' content="Pytest 发布历史 (latest 10)">
+<meta property='og:description' content="Pytest 发布历史 (latest 10) pytest 8.3.2 (2024-07-24) Bug fixes #12652: Resolve regression [conda]{.title-ref} environments where no longer being automatically detected. -- by RonnyPfannschmidt{.interpreted-text role=&ldquo;user&rdquo;} ======================================== pytest 8.3.1 (2024-07-20) The 8.3.0 release failed to include the change notes and docs for the release. This patch release remedies this. There are no other changes. ======================================== pytest 8.3.0 (2024-07-20) New features #12231: Added [--xfail-tb]{.title-ref} flag, which turns on traceback output">
+<meta property='og:url' content='http://localhost:1313/page/pytest-10/'>
+<meta property='og:site_name' content='秋 草 观 “测” 台'>
+<meta property='og:type' content='article'><meta property='article:section' content='Page' /><meta property='article:tag' content='开源项目' /><meta property='article:published_time' content='2024-08-27T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-08-27T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="Pytest 发布历史 (latest 10)">
+<meta name="twitter:description" content="Pytest 发布历史 (latest 10) pytest 8.3.2 (2024-07-24) Bug fixes #12652: Resolve regression [conda]{.title-ref} environments where no longer being automatically detected. -- by RonnyPfannschmidt{.interpreted-text role=&ldquo;user&rdquo;} ======================================== pytest 8.3.1 (2024-07-20) The 8.3.0 release failed to include the change notes and docs for the release. This patch release remedies this. There are no other changes. ======================================== pytest 8.3.0 (2024-07-20) New features #12231: Added [--xfail-tb]{.title-ref} flag, which turns on traceback output">
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0SZVJZGMHX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0SZVJZGMHX');
+</script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/automnGrass_hu7204715396109996112.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">秋 草 观 “测” 台</a></h1>
+            <h2 class="site-description">Testing is not just checking...</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/chengxiaqiucao'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/472272606'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162803093" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10312" xmlns:xlink="http://www.w3.org/1999/xlink" width="211.71875" height="200"><path d="M896.43834 165.698h-62.34l54.57-54.57c23.43-23.37 23.43-70.17 0-93.54-23.37-23.37-70.17-23.37-93.54 0l-155.88 148.17H452.17034l-155.94-148.23c-23.43-23.37-70.17-23.37-93.54 0-23.37 23.43-23.43 70.17 0 93.54l54.57 54.57h-62.34A192.983 192.983 0 0 0 0.00934 360.607v420.899c0 116.97 85.71 202.68 194.91 202.68h693.75a192.983 192.983 0 0 0 194.85-194.85v-428.73c7.83-109.14-77.94-194.91-187.08-194.91z m54.63 615.809a69.869 69.869 0 0 1-70.17 70.17h-678.27a69.869 69.869 0 0 1-70.109-70.17v-413.13a69.869 69.869 0 0 1 70.17-70.17h678.21a69.869 69.869 0 0 1 70.17 70.17v413.19z m-608.039-342.96a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.23-70.17z m405.36 0a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.17-70.17z" p-id="10313" fill="#8a8a8a"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.zhihu.com/people/qiucao'
+                        target="_blank"
+                        title="zhihu"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162502588" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4642" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M540.95908203 555.43730469s0-62.74248047-30.56748047-65.96191407c-30.56748047-3.21943359-125.48583984 0-125.48583984 1e-8v-193.05527344h141.57246094s-1.60839844-64.35263672-28.95908203-64.35263672h-230.05810547l38.61035156-102.96210938s-57.91728516 3.21943359-78.83085938 40.21962891-86.87460938 222.01523438-86.87460937 222.01523438 22.52373047 9.65302734 59.52480469-17.69589844c37.00283203-27.34804688 49.87177734-75.61494141 49.87177734-75.61494141l67.56943359-3.21943359 1.60839844 196.27382812s-117.44033203-1.60839844-141.57246094 0c-24.13212891 1.60839844-37.00283203 65.96191406-37.00283203 65.96191407h178.57792969s-16.09013672 109.39746094-61.13408203 188.23007812c-46.65673828 78.83085938-133.53134766 141.57246094-133.53134766 141.57246094s62.74248047 25.74052734 123.87919922-9.65302735c61.13408203-37.00283203 106.18154297-196.27382812 106.18154297-196.27382812l143.184375 178.57792969s12.86982422-85.26533203-1.60839844-109.39746094c-16.09013672-24.13212891-99.74707031-120.65888672-99.74707031-120.65888672l-37.00283203 32.17412109 25.74052734-106.18154297h156.0515625zM577.96191406 227.24316406l-1.60839843 580.77509766h57.91728515l20.91357422 72.39550781 101.35634766-72.39550781h143.184375v-580.77509766h-321.75966797zM835.3671875 743.665625h-67.56943359l-85.26533203 65.96191406-19.30517579-65.96191406h-17.69589843v-450.46318359h189.83583984v450.46318359z" fill="#8a8a8a" p-id="4643"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='mailto:%20danmyw@qq.com'
+                        target="_blank"
+                        title="e-mail"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162879016" class="icon" viewBox="0 0 1451 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12462" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z" fill="#8a8a8a" p-id="12463"></path></svg>
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>检索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/releases/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+                
+                <span>热门开源</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="http://localhost:1313/en/" >English</option>
+                                
+                                    <option value="http://localhost:1313/" selected>中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#bug-fixes">Bug fixes</a></li>
+  </ol>
+
+  <ol>
+    <li><a href="#pytest-830-2024-07-20">pytest 8.3.0 (2024-07-20)</a>
+      <ol>
+        <li><a href="#new-features">New features</a></li>
+        <li><a href="#improvements-in-existing-functionality">Improvements in existing functionality</a></li>
+        <li><a href="#bug-fixes-1">Bug fixes</a></li>
+        <li><a href="#improved-documentation">Improved documentation</a></li>
+        <li><a href="#contributor-facing-changes">Contributor-facing changes</a></li>
+      </ol>
+    </li>
+  </ol>
+
+  <ol>
+    <li><a href="#bug-fixes-2">Bug Fixes</a></li>
+    <li><a href="#improved-documentation-1">Improved Documentation</a></li>
+  </ol>
+
+  <ol>
+    <li><a href="#deprecations">Deprecations</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#improvements">Improvements</a></li>
+    <li><a href="#bug-fixes-3">Bug Fixes</a></li>
+    <li><a href="#trivialinternal-changes">Trivial/Internal Changes</a></li>
+  </ol>
+
+  <ol>
+    <li><a href="#bug-fixes-4">Bug Fixes</a></li>
+  </ol>
+
+  <ol>
+    <li><a href="#features-1">Features</a></li>
+    <li><a href="#improvements-1">Improvements</a></li>
+    <li><a href="#bug-fixes-5">Bug Fixes</a></li>
+    <li><a href="#improved-documentation-2">Improved Documentation</a></li>
+    <li><a href="#trivialinternal-changes-1">Trivial/Internal Changes</a></li>
+  </ol>
+
+  <ol>
+    <li><a href="#bug-fixes-6">Bug Fixes</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7/" style="background-color: #c6fad2; color: #000;">
+                测试工具
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/page/pytest-10/">Pytest 发布历史 (latest 10)</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Aug 27, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 7 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="pytest-发布历史-latest-10">Pytest 发布历史 (latest 10)
+</h1><hr>
+<h1 id="pytest-832-2024-07-24">pytest 8.3.2 (2024-07-24)
+</h1><h2 id="bug-fixes">Bug fixes
+</h2><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12652"  target="_blank" rel="noopener"
+    >#12652</a>: Resolve regression [conda]{.title-ref} environments where no longer being automatically detected.</p>
+<p>-- by <code>RonnyPfannschmidt</code>{.interpreted-text role=&ldquo;user&rdquo;}</p>
+</li>
+</ul>
+<p>========================================</p>
+<h1 id="pytest-831-2024-07-20">pytest 8.3.1 (2024-07-20)
+</h1><p>The 8.3.0 release failed to include the change notes and docs for the release. This patch release remedies this. There are no other changes.</p>
+<p>========================================</p>
+<h2 id="pytest-830-2024-07-20">pytest 8.3.0 (2024-07-20)
+</h2><h3 id="new-features">New features
+</h3><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12231"  target="_blank" rel="noopener"
+    >#12231</a>: Added [--xfail-tb]{.title-ref} flag, which turns on traceback output for XFAIL results.</p>
+<ul>
+<li>
+<p>If the [--xfail-tb]{.title-ref} flag is not given, tracebacks for XFAIL results are NOT shown.</p>
+</li>
+<li>
+<p>The style of traceback for XFAIL is set with [--tb]{.title-ref}, and can be [auto|long|short|line|native|no]{.title-ref}.</p>
+</li>
+<li>
+<p>Note: Even if you have [--xfail-tb]{.title-ref} set, you won't see them if [--tb=no]{.title-ref}.</p>
+</li>
+</ul>
+<p>Some history:</p>
+<p>With pytest 8.0, [-rx]{.title-ref} or [-ra]{.title-ref} would not only turn on summary reports for xfail, but also report the tracebacks for xfail results. This caused issues with some projects that utilize xfail, but don't want to see all of the xfail tracebacks.</p>
+<p>This change detaches xfail tracebacks from [-rx]{.title-ref}, and now we turn on xfail tracebacks with [--xfail-tb]{.title-ref}. With this, the default [-rx]{.title-ref}/ [-ra]{.title-ref} behavior is identical to pre-8.0 with respect to xfail tracebacks. While this is a behavior change, it brings default behavior back to pre-8.0.0 behavior, which ultimately was considered the better course of action.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12281"  target="_blank" rel="noopener"
+    >#12281</a>: Added support for keyword matching in marker expressions.</p>
+<p>Now tests can be selected by marker keyword arguments.</p>
+<p>Supported values are <code>int</code>{.interpreted-text role=&ldquo;class&rdquo;}, (unescaped) <code>str</code>{.interpreted-text role=&ldquo;class&rdquo;}, <code>bool</code>{.interpreted-text role=&ldquo;class&rdquo;} &amp; <code>None</code>{.interpreted-text role=&ldquo;data&rdquo;}.</p>
+<p>See <code>marker examples &lt;marker_keyword_expression_example&gt;</code>{.interpreted-text role=&ldquo;ref&rdquo;} for more information.</p>
+<p>-- by <code>lovetheguitar</code>{.interpreted-text role=&ldquo;user&rdquo;}</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12567"  target="_blank" rel="noopener"
+    >#12567</a>: Added <code>--no-fold-skipped</code> command line option.</p>
+<p>If this option is set, then skipped tests in short summary are no longer grouped</p>
+<p>by reason but all tests are printed individually with their nodeid in the same</p>
+<p>way as other statuses.</p>
+<p>-- by <code>pbrezina</code>{.interpreted-text role=&ldquo;user&rdquo;}</p>
+</li>
+</ul>
+<h3 id="improvements-in-existing-functionality">Improvements in existing functionality
+</h3><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12469"  target="_blank" rel="noopener"
+    >#12469</a>: The console output now uses the &quot;third-party plugins&quot; terminology,</p>
+<p>replacing the previously established but confusing and outdated</p>
+<p>reference to <code>setuptools &lt;setuptools:index&gt;</code>{.interpreted-text role=&ldquo;std:doc&rdquo;}</p>
+<p>-- by <code>webknjaz</code>{.interpreted-text role=&ldquo;user&rdquo;}.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12544"  target="_blank" rel="noopener"
+    >#12544</a>, <a class="link" href="https://github.com/pytest-dev/pytest/issues/12545"  target="_blank" rel="noopener"
+    >#12545</a>: Python virtual environment detection was improved by</p>
+<p>checking for a <code>pyvenv.cfg</code>{.interpreted-text role=&ldquo;file&rdquo;} file, ensuring reliable detection on</p>
+<p>various platforms -- by <code>zachsnickers</code>{.interpreted-text role=&ldquo;user&rdquo;}.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/2871"  target="_blank" rel="noopener"
+    >#2871</a>: Do not truncate arguments to functions in output when running with [-vvv]{.title-ref}.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/389"  target="_blank" rel="noopener"
+    >#389</a>: The readability of assertion introspection of bound methods has been enhanced</p>
+<p>-- by <code>farbodahm</code>{.interpreted-text role=&ldquo;user&rdquo;}, <code>webknjaz</code>{.interpreted-text role=&ldquo;user&rdquo;}, <code>obestwalter</code>{.interpreted-text role=&ldquo;user&rdquo;}, <code>flub</code>{.interpreted-text role=&ldquo;user&rdquo;}</p>
+<p>and <code>glyphack</code>{.interpreted-text role=&ldquo;user&rdquo;}.</p>
+<p>Earlier, it was like:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">=================================== FAILURES ===================================
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">_____________________________________ test _____________________________________
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">    def test():
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="gp">&gt;</span>       assert Help<span class="o">()</span>.fun<span class="o">()</span> <span class="o">==</span> <span class="m">2</span>
+</span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">E       assert 1 == 2
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">E        +  where 1 = &lt;bound method Help.fun of &lt;example.Help instance at 0x256a830&gt;&gt;()
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">E        +    where &lt;bound method Help.fun of &lt;example.Help instance at 0x256a830&gt;&gt; = &lt;example.Help instance at 0x256a830&gt;.fun
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">E        +      where &lt;example.Help instance at 0x256a830&gt; = Help()
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">example.py:7: AssertionError
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">=========================== 1 failed in 0.03 seconds ===========================
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>And now it's like:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">=================================== FAILURES ===================================
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">_____________________________________ test _____________________________________
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">    def test():
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="gp">&gt;</span>       assert Help<span class="o">()</span>.fun<span class="o">()</span> <span class="o">==</span> <span class="m">2</span>
+</span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">E       assert 1 == 2
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">E        +  where 1 = fun()
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">E        +    where fun = &lt;test_local.Help object at 0x1074be230&gt;.fun
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">E        +      where &lt;test_local.Help object at 0x1074be230&gt; = Help()
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">test_local.py:13: AssertionError
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">=========================== 1 failed in 0.03 seconds ===========================
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/7662"  target="_blank" rel="noopener"
+    >#7662</a>: Added timezone information to the testsuite timestamp in the JUnit XML report.</p>
+</li>
+</ul>
+<h3 id="bug-fixes-1">Bug fixes
+</h3><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11706"  target="_blank" rel="noopener"
+    >#11706</a>: Fixed reporting of teardown errors in higher-scoped fixtures when using [--maxfail]{.title-ref} or [--stepwise]{.title-ref}.</p>
+<p>Originally added in pytest 8.0.0, but reverted in 8.0.2 due to a regression in pytest-xdist.</p>
+<p>This regression was fixed in pytest-xdist 3.6.1.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11797"  target="_blank" rel="noopener"
+    >#11797</a>: <code>pytest.approx</code>{.interpreted-text role=&ldquo;func&rdquo;} now correctly handles <code>Sequence &lt;collections.abc.Sequence&gt;</code>{.interpreted-text role=&ldquo;class&rdquo;}-like objects.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12204"  target="_blank" rel="noopener"
+    >#12204</a>, <a class="link" href="https://github.com/pytest-dev/pytest/issues/12264"  target="_blank" rel="noopener"
+    >#12264</a>: Fixed a regression in pytest 8.0 where tracebacks get longer and longer when multiple</p>
+<p>tests fail due to a shared higher-scope fixture which raised -- by <code>bluetech</code>{.interpreted-text role=&ldquo;user&rdquo;}.</p>
+<p>Also fixed a similar regression in pytest 5.4 for collectors which raise during setup.</p>
+<p>The fix necessitated internal changes which may affect some plugins:</p>
+<ul>
+<li>
+<p><code>FixtureDef.cached_result[2]</code> is now a tuple <code>(exc, tb)</code></p>
+<p>instead of <code>exc</code>.</p>
+</li>
+<li>
+<p><code>SetupState.stack</code> failures are now a tuple <code>(exc, tb)</code></p>
+<p>instead of <code>exc</code>.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12275"  target="_blank" rel="noopener"
+    >#12275</a>: Fixed collection error upon encountering an <code>abstract &lt;abc&gt;</code>{.interpreted-text role=&ldquo;mod&rdquo;} class, including abstract [unittest.TestCase]{.title-ref} subclasses.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12328"  target="_blank" rel="noopener"
+    >#12328</a>: Fixed a regression in pytest 8.0.0 where package-scoped parameterized items were not correctly reordered to minimize setups/teardowns in some cases.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12424"  target="_blank" rel="noopener"
+    >#12424</a>: Fixed crash with [assert testcase is not None]{.title-ref} assertion failure when re-running unittest tests using plugins like pytest-rerunfailures. Regressed in 8.2.2.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12472"  target="_blank" rel="noopener"
+    >#12472</a>: Fixed a crash when returning category <code>&quot;error&quot;</code> or <code>&quot;failed&quot;</code> with a custom test status from <code>pytest_report_teststatus</code>{.interpreted-text role=&ldquo;hook&rdquo;} hook -- <code>pbrezina</code>{.interpreted-text role=&ldquo;user&rdquo;}.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12505"  target="_blank" rel="noopener"
+    >#12505</a>: Improved handling of invalid regex patterns in <code>pytest.raises(match=r'...') &lt;pytest.raises&gt;</code>{.interpreted-text role=&ldquo;func&rdquo;} by providing a clear error message.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12580"  target="_blank" rel="noopener"
+    >#12580</a>: Fixed a crash when using the cache class on Windows and the cache directory was created concurrently.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/6962"  target="_blank" rel="noopener"
+    >#6962</a>: Parametrization parameters are now compared using [==]{.title-ref} instead of [is]{.title-ref} ([is]{.title-ref} is still used as a fallback if the parameter does not support [==]{.title-ref}).</p>
+<p>This fixes use of parameters such as lists, which have a different [id]{.title-ref} but compare equal, causing fixtures to be re-computed instead of being cached.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/7166"  target="_blank" rel="noopener"
+    >#7166</a>: Fixed progress percentages (the <code>[ 87%]</code> at the edge of the screen) sometimes not aligning correctly when running with pytest-xdist <code>-n</code>.</p>
+</li>
+</ul>
+<h3 id="improved-documentation">Improved documentation
+</h3><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12153"  target="_blank" rel="noopener"
+    >#12153</a>: Documented using <code>PYTEST_VERSION</code>{.interpreted-text role=&ldquo;envvar&rdquo;} to detect if code is running from within a pytest run.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12469"  target="_blank" rel="noopener"
+    >#12469</a>: The external plugin mentions in the documentation now avoid mentioning</p>
+<p><code>setuptools entry-points &lt;setuptools:index&gt;</code>{.interpreted-text role=&ldquo;std:doc&rdquo;} as the concept is</p>
+<p>much more generic nowadays. Instead, the terminology of &quot;external&quot;,</p>
+<p>&quot;installed&quot;, or &quot;third-party&quot; plugins (or packages) replaces that.</p>
+<p>-- by <code>webknjaz</code>{.interpreted-text role=&ldquo;user&rdquo;}</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12577"  target="_blank" rel="noopener"
+    >#12577</a>: [CI]{.title-ref} and [BUILD_NUMBER]{.title-ref} environment variables role is discribed in</p>
+<p>the reference doc. They now also appear when doing [pytest -h]{.title-ref}</p>
+<p>-- by <code>MarcBresson</code>{.interpreted-text role=&ldquo;user&rdquo;}.</p>
+</li>
+</ul>
+<h3 id="contributor-facing-changes">Contributor-facing changes
+</h3><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12467"  target="_blank" rel="noopener"
+    >#12467</a>: Migrated all internal type-annotations to the python3.10+ style by using the [annotations]{.title-ref} future import.</p>
+<p>-- by <code>RonnyPfannschmidt</code>{.interpreted-text role=&ldquo;user&rdquo;}</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11771"  target="_blank" rel="noopener"
+    >#11771</a>, <a class="link" href="https://github.com/pytest-dev/pytest/issues/12557"  target="_blank" rel="noopener"
+    >#12557</a>: The PyPy runtime version has been updated to 3.9 from 3.8 that introduced</p>
+<p>a flaky bug at the garbage collector which was not expected to fix there</p>
+<p>as the 3.8 is EoL.</p>
+<p>-- by <code>x612skm</code>{.interpreted-text role=&ldquo;user&rdquo;}</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12493"  target="_blank" rel="noopener"
+    >#12493</a>: The change log draft preview integration has been refactored to use a</p>
+<p>third party extension <code>sphinxcontib-towncrier</code>. The previous in-repo</p>
+<p>script was putting the change log preview file at</p>
+<p><code>doc/en/_changelog_towncrier_draft.rst</code>{.interpreted-text role=&ldquo;file&rdquo;}. Said file is no longer</p>
+<p>ignored in Git and might show up among untracked files in the</p>
+<p>development environments of the contributors. To address that, the</p>
+<p>contributors can run the following command that will clean it up:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="gp">$</span> git clean -x -i -- doc/en/_changelog_towncrier_draft.rst
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>-- by <code>webknjaz</code>{.interpreted-text role=&ldquo;user&rdquo;}</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12498"  target="_blank" rel="noopener"
+    >#12498</a>: All the undocumented <code>tox</code> environments now have descriptions.</p>
+<p>They can be listed in one's development environment by invoking</p>
+<p><code>tox -av</code> in a terminal.</p>
+<p>-- by <code>webknjaz</code>{.interpreted-text role=&ldquo;user&rdquo;}</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12501"  target="_blank" rel="noopener"
+    >#12501</a>: The changelog configuration has been updated to introduce more accurate</p>
+<p>audience-tailored categories. Previously, there was a <code>trivial</code></p>
+<p>change log fragment type with an unclear and broad meaning. It was</p>
+<p>removed and we now have <code>contrib</code>, <code>misc</code> and <code>packaging</code> in</p>
+<p>place of it.</p>
+<p>The new change note types target the readers who are downstream</p>
+<p>packagers and project contributors. Additionally, the miscellaneous</p>
+<p>section is kept for unspecified updates that do not fit anywhere else.</p>
+<p>-- by <code>webknjaz</code>{.interpreted-text role=&ldquo;user&rdquo;}</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12502"  target="_blank" rel="noopener"
+    >#12502</a>: The UX of the GitHub automation making pull requests to update the</p>
+<p>plugin list has been updated. Previously, the maintainers had to close</p>
+<p>the automatically created pull requests and re-open them to trigger the</p>
+<p>CI runs. From now on, they only need to click the [Ready for review]{.title-ref}</p>
+<p>button instead.</p>
+<p>-- by <code>webknjaz</code>{.interpreted-text role=&ldquo;user&rdquo;}</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12522"  target="_blank" rel="noopener"
+    >#12522</a>: The <code>:pull:</code> RST role has been replaced with a shorter</p>
+<p><code>:pr:</code> due to starting to use the implementation from</p>
+<p>the third-party <code>sphinx-issues</code>{.interpreted-text role=&ldquo;pypi&rdquo;} Sphinx extension</p>
+<p>-- by <code>webknjaz</code>{.interpreted-text role=&ldquo;user&rdquo;}.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12531"  target="_blank" rel="noopener"
+    >#12531</a>: The coverage reporting configuration has been updated to exclude</p>
+<p>pytest's own tests marked as expected to fail from the coverage</p>
+<p>report. This has an effect of reducing the influence of flaky</p>
+<p>tests on the resulting number.</p>
+<p>-- by <code>webknjaz</code>{.interpreted-text role=&ldquo;user&rdquo;}</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12533"  target="_blank" rel="noopener"
+    >#12533</a>: The <code>extlinks</code> Sphinx extension is no longer enabled. The <code>:bpo:</code></p>
+<p>role it used to declare has been removed with that. BPO itself has</p>
+<p>migrated to GitHub some years ago and it is possible to link the</p>
+<p>respective issues by using their GitHub issue numbers and the</p>
+<p><code>:issue:</code> role that the <code>sphinx-issues</code> extension implements.</p>
+<p>-- by <code>webknjaz</code>{.interpreted-text role=&ldquo;user&rdquo;}</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12562"  target="_blank" rel="noopener"
+    >#12562</a>: Possible typos in using the <code>:user:</code> RST role is now being linted</p>
+<p>through the pre-commit tool integration -- by <code>webknjaz</code>{.interpreted-text role=&ldquo;user&rdquo;}.</p>
+</li>
+</ul>
+<p>========================================</p>
+<h1 id="pytest-822-2024-06-04">pytest 8.2.2 (2024-06-04)
+</h1><h2 id="bug-fixes-2">Bug Fixes
+</h2><ul>
+<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12355"  target="_blank" rel="noopener"
+    >#12355</a>: Fix possible catastrophic performance slowdown on a certain parametrization pattern involving many higher-scoped parameters.</li>
+<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12367"  target="_blank" rel="noopener"
+    >#12367</a>: Fix a regression in pytest 8.2.0 where unittest class instances (a fresh one is created for each test) were not released promptly on test teardown but only on session teardown.</li>
+<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12381"  target="_blank" rel="noopener"
+    >#12381</a>: Fix possible &quot;Directory not empty&quot; crashes arising from concurent cache dir (<code>.pytest_cache</code>) creation. Regressed in pytest 8.2.0.</li>
+</ul>
+<h2 id="improved-documentation-1">Improved Documentation
+</h2><ul>
+<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12290"  target="_blank" rel="noopener"
+    >#12290</a>: Updated Sphinx theme to use Furo instead of Flask, enabling Dark mode theme.</li>
+<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12356"  target="_blank" rel="noopener"
+    >#12356</a>: Added a subsection to the documentation for debugging flaky tests to mention
+lack of thread safety in pytest as a possible source of flakyness.</li>
+<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12363"  target="_blank" rel="noopener"
+    >#12363</a>: The documentation webpages now links to a canonical version to reduce outdated documentation in search engine results.</li>
+</ul>
+<p>========================================</p>
+<p>pytest 8.2.1 (2024-05-19)</p>
+<p>=========================</p>
+<p>Improvements</p>
+<hr>
+<ul>
+<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12334"  target="_blank" rel="noopener"
+    >#12334</a>: Support for Python 3.13 (beta1 at the time of writing).</li>
+</ul>
+<p>Bug Fixes</p>
+<hr>
+<ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12120"  target="_blank" rel="noopener"
+    >#12120</a>: Fix [PermissionError]{.title-ref} crashes arising from directories which are not selected on the command-line.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12191"  target="_blank" rel="noopener"
+    >#12191</a>: Keyboard interrupts and system exits are now properly handled during the test collection.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12300"  target="_blank" rel="noopener"
+    >#12300</a>: Fixed handling of 'Function not implemented' error under squashfuse_ll, which is a different way to say that the mountpoint is read-only.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12308"  target="_blank" rel="noopener"
+    >#12308</a>: Fix a regression in pytest 8.2.0 where the permissions of automatically-created <code>.pytest_cache</code> directories became <code>rwx------</code> instead of the expected <code>rwxr-xr-x</code>.</p>
+</li>
+</ul>
+<p>Trivial/Internal Changes</p>
+<hr>
+<ul>
+<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12333"  target="_blank" rel="noopener"
+    >#12333</a>: pytest releases are now attested using the recent <a class="link" href="https://github.blog/2024-05-02-introducing-artifact-attestations-now-in-public-beta/"  target="_blank" rel="noopener"
+    >Artifact Attestation</a> support from GitHub, allowing users to verify the provenance of pytest's sdist and wheel artifacts.</li>
+</ul>
+<p>========================================</p>
+<h1 id="pytest-820-2024-04-27">pytest 8.2.0 (2024-04-27)
+</h1><h2 id="deprecations">Deprecations
+</h2><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12069"  target="_blank" rel="noopener"
+    >#12069</a>: A deprecation warning is now raised when implementations of one of the following hooks request a deprecated <code>py.path.local</code> parameter instead of the <code>pathlib.Path</code> parameter which replaced it:</p>
+<ul>
+<li><code>pytest_ignore_collect</code>{.interpreted-text role=&ldquo;hook&rdquo;} - the <code>path</code> parameter - use <code>collection_path</code> instead.</li>
+<li><code>pytest_collect_file</code>{.interpreted-text role=&ldquo;hook&rdquo;} - the <code>path</code> parameter - use <code>file_path</code> instead.</li>
+<li><code>pytest_pycollect_makemodule</code>{.interpreted-text role=&ldquo;hook&rdquo;} - the <code>path</code> parameter - use <code>module_path</code> instead.</li>
+<li><code>pytest_report_header</code>{.interpreted-text role=&ldquo;hook&rdquo;} - the <code>startdir</code> parameter - use <code>start_path</code> instead.</li>
+<li><code>pytest_report_collectionfinish</code>{.interpreted-text role=&ldquo;hook&rdquo;} - the <code>startdir</code> parameter - use <code>start_path</code> instead.</li>
+</ul>
+<p>The replacement parameters are available since pytest 7.0.0.
+The old parameters will be removed in pytest 9.0.0.</p>
+<p>See <code>legacy-path-hooks-deprecated</code>{.interpreted-text role=&ldquo;ref&rdquo;} for more details.</p>
+</li>
+</ul>
+<h2 id="features">Features
+</h2><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11871"  target="_blank" rel="noopener"
+    >#11871</a>: Added support for reading command line arguments from a file using the prefix character <code>@</code>, like e.g.: <code>pytest @tests.txt</code>. The file must have one argument per line.</p>
+<p>See <code>Read arguments from file &lt;args-from-file&gt;</code>{.interpreted-text role=&ldquo;ref&rdquo;} for details.</p>
+</li>
+</ul>
+<h2 id="improvements">Improvements
+</h2><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11523"  target="_blank" rel="noopener"
+    >#11523</a>: <code>pytest.importorskip</code>{.interpreted-text role=&ldquo;func&rdquo;} will now issue a warning if the module could be found, but raised <code>ImportError</code>{.interpreted-text role=&ldquo;class&rdquo;} instead of <code>ModuleNotFoundError</code>{.interpreted-text role=&ldquo;class&rdquo;}.</p>
+<p>The warning can be suppressed by passing <code>exc_type=ImportError</code> to <code>pytest.importorskip</code>{.interpreted-text role=&ldquo;func&rdquo;}.</p>
+<p>See <code>import-or-skip-import-error</code>{.interpreted-text role=&ldquo;ref&rdquo;} for details.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11728"  target="_blank" rel="noopener"
+    >#11728</a>: For <code>unittest</code>-based tests, exceptions during class cleanup (as raised by functions registered with <code>TestCase.addClassCleanup &lt;unittest.TestCase.addClassCleanup&gt;</code>{.interpreted-text role=&ldquo;meth&rdquo;}) are now reported instead of silently failing.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11777"  target="_blank" rel="noopener"
+    >#11777</a>: Text is no longer truncated in the <code>short test summary info</code> section when <code>-vv</code> is given.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12112"  target="_blank" rel="noopener"
+    >#12112</a>: Improved namespace packages detection when <code>consider_namespace_packages</code>{.interpreted-text role=&ldquo;confval&rdquo;} is enabled, covering more situations (like editable installs).</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/9502"  target="_blank" rel="noopener"
+    >#9502</a>: Added <code>PYTEST_VERSION</code>{.interpreted-text role=&ldquo;envvar&rdquo;} environment variable which is defined at the start of the pytest session and undefined afterwards. It contains the value of <code>pytest.__version__</code>, and among other things can be used to easily check if code is running from within a pytest run.</p>
+</li>
+</ul>
+<h2 id="bug-fixes-3">Bug Fixes
+</h2><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12065"  target="_blank" rel="noopener"
+    >#12065</a>: Fixed a regression in pytest 8.0.0 where test classes containing <code>setup_method</code> and tests using <code>@staticmethod</code> or <code>@classmethod</code> would crash with <code>AttributeError: 'NoneType' object has no attribute 'setup_method'</code>.</p>
+<p>Now the <code>request.instance &lt;pytest.FixtureRequest.instance&gt;</code>{.interpreted-text role=&ldquo;attr&rdquo;} attribute of tests using <code>@staticmethod</code> and <code>@classmethod</code> is no longer <code>None</code>, but a fresh instance of the class, like in non-static methods.
+Previously it was <code>None</code>, and all fixtures of such tests would share a single <code>self</code>.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12135"  target="_blank" rel="noopener"
+    >#12135</a>: Fixed issue where fixtures adding their finalizer multiple times to fixtures they request would cause unreliable and non-intuitive teardown ordering in some instances.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12194"  target="_blank" rel="noopener"
+    >#12194</a>: Fixed a bug with <code>--importmode=importlib</code> and <code>--doctest-modules</code> where child modules did not appear as attributes in parent modules.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/1489"  target="_blank" rel="noopener"
+    >#1489</a>: Fixed some instances where teardown of higher-scoped fixtures was not happening in the reverse order they were initialized in.</p>
+</li>
+</ul>
+<h2 id="trivialinternal-changes">Trivial/Internal Changes
+</h2><ul>
+<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12069"  target="_blank" rel="noopener"
+    >#12069</a>: <code>pluggy&gt;=1.5.0</code> is now required.</li>
+<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12167"  target="_blank" rel="noopener"
+    >#12167</a>: <code>cache &lt;cache&gt;</code>{.interpreted-text role=&ldquo;ref&rdquo;}: create supporting files (<code>CACHEDIR.TAG</code>, <code>.gitignore</code>, etc.) in a temporary directory to provide atomic semantics.</li>
+</ul>
+<p>========================================</p>
+<h1 id="pytest-812-2024-04-26">pytest 8.1.2 (2024-04-26)
+</h1><h2 id="bug-fixes-4">Bug Fixes
+</h2><ul>
+<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12114"  target="_blank" rel="noopener"
+    >#12114</a>: Fixed error in <code>pytest.approx</code>{.interpreted-text role=&ldquo;func&rdquo;} when used with [numpy]{.title-ref} arrays and comparing with other types.</li>
+</ul>
+<p>========================================</p>
+<h1 id="pytest-811-2024-03-08">pytest 8.1.1 (2024-03-08)
+</h1><p>::: {.note}
+::: {.title}
+Note
+:::</p>
+<p>This release is not a usual bug fix release -- it contains features and improvements, being a follow up
+to <code>8.1.0</code>, which has been yanked from PyPI.
+:::</p>
+<h2 id="features-1">Features
+</h2><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11475"  target="_blank" rel="noopener"
+    >#11475</a>: Added the new <code>consider_namespace_packages</code>{.interpreted-text role=&ldquo;confval&rdquo;} configuration option, defaulting to <code>False</code>.</p>
+<p>If set to <code>True</code>, pytest will attempt to identify modules that are part of <a class="link" href="https://packaging.python.org/en/latest/guides/packaging-namespace-packages"  target="_blank" rel="noopener"
+    >namespace packages</a> when importing modules.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11653"  target="_blank" rel="noopener"
+    >#11653</a>: Added the new <code>verbosity_test_cases</code>{.interpreted-text role=&ldquo;confval&rdquo;} configuration option for fine-grained control of test execution verbosity.
+See <code>Fine-grained verbosity &lt;pytest.fine_grained_verbosity&gt;</code>{.interpreted-text role=&ldquo;ref&rdquo;} for more details.</p>
+</li>
+</ul>
+<h2 id="improvements-1">Improvements
+</h2><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/10865"  target="_blank" rel="noopener"
+    >#10865</a>: <code>pytest.warns</code>{.interpreted-text role=&ldquo;func&rdquo;} now validates that <code>warnings.warn</code>{.interpreted-text role=&ldquo;func&rdquo;} was called with a [str]{.title-ref} or a [Warning]{.title-ref}.
+Currently in Python it is possible to use other types, however this causes an exception when <code>warnings.filterwarnings</code>{.interpreted-text role=&ldquo;func&rdquo;} is used to filter those warnings (see <a class="link" href="https://github.com/python/cpython/issues/103577"  target="_blank" rel="noopener"
+    >CPython #103577</a> for a discussion).
+While this can be considered a bug in CPython, we decided to put guards in pytest as the error message produced without this check in place is confusing.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11311"  target="_blank" rel="noopener"
+    >#11311</a>: When using <code>--override-ini</code> for paths in invocations without a configuration file defined, the current working directory is used
+as the relative directory.</p>
+<p>Previoulsy this would raise an <code>AssertionError</code>{.interpreted-text role=&ldquo;class&rdquo;}.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11475"  target="_blank" rel="noopener"
+    >#11475</a>: <code>--import-mode=importlib &lt;import-mode-importlib&gt;</code>{.interpreted-text role=&ldquo;ref&rdquo;} now tries to import modules using the standard import mechanism (but still without changing :py<code>sys.path</code>{.interpreted-text role=&ldquo;data&rdquo;}), falling back to importing modules directly only if that fails.</p>
+<p>This means that installed packages will be imported under their canonical name if possible first, for example <code>app.core.models</code>, instead of having the module name always be derived from their path (for example <code>.env310.lib.site_packages.app.core.models</code>).</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11801"  target="_blank" rel="noopener"
+    >#11801</a>: Added the <code>iter_parents() &lt;_pytest.nodes.Node.iter_parents&gt;</code>{.interpreted-text role=&ldquo;func&rdquo;} helper method on nodes.
+It is similar to <code>listchain &lt;_pytest.nodes.Node.listchain&gt;</code>{.interpreted-text role=&ldquo;func&rdquo;}, but goes from bottom to top, and returns an iterator, not a list.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11850"  target="_blank" rel="noopener"
+    >#11850</a>: Added support for <code>sys.last_exc</code>{.interpreted-text role=&ldquo;data&rdquo;} for post-mortem debugging on Python&gt;=3.12.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11962"  target="_blank" rel="noopener"
+    >#11962</a>: In case no other suitable candidates for configuration file are found, a <code>pyproject.toml</code> (even without a <code>[tool.pytest.ini_options]</code> table) will be considered as the configuration file and define the <code>rootdir</code>.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11978"  target="_blank" rel="noopener"
+    >#11978</a>: Add <code>--log-file-mode</code> option to the logging plugin, enabling appending to log-files. This option accepts either <code>&quot;w&quot;</code> or <code>&quot;a&quot;</code> and defaults to <code>&quot;w&quot;</code>.</p>
+<p>Previously, the mode was hard-coded to be <code>&quot;w&quot;</code> which truncates the file before logging.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12047"  target="_blank" rel="noopener"
+    >#12047</a>: When multiple finalizers of a fixture raise an exception, now all exceptions are reported as an exception group.
+Previously, only the first exception was reported.</p>
+</li>
+</ul>
+<h2 id="bug-fixes-5">Bug Fixes
+</h2><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11475"  target="_blank" rel="noopener"
+    >#11475</a>: Fixed regression where <code>--importmode=importlib</code> would import non-test modules more than once.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11904"  target="_blank" rel="noopener"
+    >#11904</a>: Fixed a regression in pytest 8.0.0 that would cause test collection to fail due to permission errors when using <code>--pyargs</code>.</p>
+<p>This change improves the collection tree for tests specified using <code>--pyargs</code>, see <code>12043</code>{.interpreted-text role=&ldquo;pull&rdquo;} for a comparison with pytest 8.0 and &lt;8.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12011"  target="_blank" rel="noopener"
+    >#12011</a>: Fixed a regression in 8.0.1 whereby <code>setup_module</code> xunit-style fixtures are not executed when <code>--doctest-modules</code> is passed.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12014"  target="_blank" rel="noopener"
+    >#12014</a>: Fix the <code>stacklevel</code> used when warning about marks used on fixtures.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12039"  target="_blank" rel="noopener"
+    >#12039</a>: Fixed a regression in <code>8.0.2</code> where tests created using <code>tmp_path</code>{.interpreted-text role=&ldquo;fixture&rdquo;} have been collected multiple times in CI under Windows.</p>
+</li>
+</ul>
+<h2 id="improved-documentation-2">Improved Documentation
+</h2><ul>
+<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/11790"  target="_blank" rel="noopener"
+    >#11790</a>: Documented the retention of temporary directories created using the <code>tmp_path</code> fixture in more detail.</li>
+</ul>
+<h2 id="trivialinternal-changes-1">Trivial/Internal Changes
+</h2><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11785"  target="_blank" rel="noopener"
+    >#11785</a>: Some changes were made to private functions which may affect plugins which access them:</p>
+<ul>
+<li><code>FixtureManager._getautousenames()</code> now takes a <code>Node</code> itself instead of the nodeid.</li>
+<li><code>FixtureManager.getfixturedefs()</code> now takes the <code>Node</code> itself instead of the nodeid.</li>
+<li>The <code>_pytest.nodes.iterparentnodeids()</code> function is removed without replacement.
+Prefer to traverse the node hierarchy itself instead.
+If you really need to, copy the function from the previous pytest release.</li>
+</ul>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12069"  target="_blank" rel="noopener"
+    >#12069</a>: Delayed the deprecation of the following features to <code>9.0.0</code>:</p>
+<ul>
+<li><code>node-ctor-fspath-deprecation</code>{.interpreted-text role=&ldquo;ref&rdquo;}.</li>
+<li><code>legacy-path-hooks-deprecated</code>{.interpreted-text role=&ldquo;ref&rdquo;}.</li>
+</ul>
+<p>It was discovered after <code>8.1.0</code> was released that the warnings about the impeding removal were not being displayed, so the team decided to revert the removal.</p>
+<p>This is the reason for <code>8.1.0</code> being yanked.</p>
+</li>
+</ul>
+<h1 id="pytest-810-yanked">pytest 8.1.0 (YANKED)
+</h1><p>::: {.note}
+::: {.title}
+Note
+:::</p>
+<p>This release has been <strong>yanked</strong>: it broke some plugins without the proper warning period, due to
+some warnings not showing up as expected.</p>
+<p>See <a class="link" href="https://github.com/pytest-dev/pytest/issues/12069"  target="_blank" rel="noopener"
+    >#12069</a>.
+:::</p>
+<p>========================================</p>
+<p>pytest 8.1.0 (YANKED)</p>
+<p>=========================</p>
+<blockquote>
+<p>[!IMPORTANT]</p>
+</blockquote>
+<blockquote>
+<p>This release has been <strong>yanked</strong>: it broke some plugins without the proper warning period, due to some warnings not showing up as expected. See #12069.</p>
+</blockquote>
+<p>Features</p>
+<hr>
+<ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11475"  target="_blank" rel="noopener"
+    >#11475</a>: Added the new <code>consider_namespace_packages</code>{.interpreted-text role=&ldquo;confval&rdquo;} configuration option, defaulting to <code>False</code>.</p>
+<p>If set to <code>True</code>, pytest will attempt to identify modules that are part of <a class="link" href="https://packaging.python.org/en/latest/guides/packaging-namespace-packages"  target="_blank" rel="noopener"
+    >namespace packages</a> when importing modules.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11653"  target="_blank" rel="noopener"
+    >#11653</a>: Added the new <code>verbosity_test_cases</code>{.interpreted-text role=&ldquo;confval&rdquo;} configuration option for fine-grained control of test execution verbosity.</p>
+<p>See <code>Fine-grained verbosity &lt;pytest.fine_grained_verbosity&gt;</code>{.interpreted-text role=&ldquo;ref&rdquo;} for more details.</p>
+</li>
+</ul>
+<p>Improvements</p>
+<hr>
+<ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/10865"  target="_blank" rel="noopener"
+    >#10865</a>: <code>pytest.warns</code>{.interpreted-text role=&ldquo;func&rdquo;} now validates that <code>warnings.warn</code>{.interpreted-text role=&ldquo;func&rdquo;} was called with a [str]{.title-ref} or a [Warning]{.title-ref}.</p>
+<p>Currently in Python it is possible to use other types, however this causes an exception when <code>warnings.filterwarnings</code>{.interpreted-text role=&ldquo;func&rdquo;} is used to filter those warnings (see <a class="link" href="https://github.com/python/cpython/issues/103577"  target="_blank" rel="noopener"
+    >CPython #103577</a> for a discussion).</p>
+<p>While this can be considered a bug in CPython, we decided to put guards in pytest as the error message produced without this check in place is confusing.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11311"  target="_blank" rel="noopener"
+    >#11311</a>: When using <code>--override-ini</code> for paths in invocations without a configuration file defined, the current working directory is used</p>
+<p>as the relative directory.</p>
+<p>Previoulsy this would raise an <code>AssertionError</code>{.interpreted-text role=&ldquo;class&rdquo;}.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11475"  target="_blank" rel="noopener"
+    >#11475</a>: <code>--import-mode=importlib &lt;import-mode-importlib&gt;</code>{.interpreted-text role=&ldquo;ref&rdquo;} now tries to import modules using the standard import mechanism (but still without changing :py<code>sys.path</code>{.interpreted-text role=&ldquo;data&rdquo;}), falling back to importing modules directly only if that fails.</p>
+<p>This means that installed packages will be imported under their canonical name if possible first, for example <code>app.core.models</code>, instead of having the module name always be derived from their path (for example <code>.env310.lib.site_packages.app.core.models</code>).</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11801"  target="_blank" rel="noopener"
+    >#11801</a>: Added the <code>iter_parents() &lt;_pytest.nodes.Node.iter_parents&gt;</code>{.interpreted-text role=&ldquo;func&rdquo;} helper method on nodes.</p>
+<p>It is similar to <code>listchain &lt;_pytest.nodes.Node.listchain&gt;</code>{.interpreted-text role=&ldquo;func&rdquo;}, but goes from bottom to top, and returns an iterator, not a list.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11850"  target="_blank" rel="noopener"
+    >#11850</a>: Added support for <code>sys.last_exc</code>{.interpreted-text role=&ldquo;data&rdquo;} for post-mortem debugging on Python&gt;=3.12.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11962"  target="_blank" rel="noopener"
+    >#11962</a>: In case no other suitable candidates for configuration file are found, a <code>pyproject.toml</code> (even without a <code>[tool.pytest.ini_options]</code> table) will be considered as the configuration file and define the <code>rootdir</code>.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11978"  target="_blank" rel="noopener"
+    >#11978</a>: Add <code>--log-file-mode</code> option to the logging plugin, enabling appending to log-files. This option accepts either <code>&quot;w&quot;</code> or <code>&quot;a&quot;</code> and defaults to <code>&quot;w&quot;</code>.</p>
+<p>Previously, the mode was hard-coded to be <code>&quot;w&quot;</code> which truncates the file before logging.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12047"  target="_blank" rel="noopener"
+    >#12047</a>: When multiple finalizers of a fixture raise an exception, now all exceptions are reported as an exception group.</p>
+<p>Previously, only the first exception was reported.</p>
+</li>
+</ul>
+<p>Bug Fixes</p>
+<hr>
+<ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11904"  target="_blank" rel="noopener"
+    >#11904</a>: Fixed a regression in pytest 8.0.0 that would cause test collection to fail due to permission errors when using <code>--pyargs</code>.</p>
+<p>This change improves the collection tree for tests specified using <code>--pyargs</code>, see <code>12043</code>{.interpreted-text role=&ldquo;pull&rdquo;} for a comparison with pytest 8.0 and &lt;8.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12011"  target="_blank" rel="noopener"
+    >#12011</a>: Fixed a regression in 8.0.1 whereby <code>setup_module</code> xunit-style fixtures are not executed when <code>--doctest-modules</code> is passed.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12014"  target="_blank" rel="noopener"
+    >#12014</a>: Fix the <code>stacklevel</code> used when warning about marks used on fixtures.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12039"  target="_blank" rel="noopener"
+    >#12039</a>: Fixed a regression in <code>8.0.2</code> where tests created using <code>tmp_path</code>{.interpreted-text role=&ldquo;fixture&rdquo;} have been collected multiple times in CI under Windows.</p>
+</li>
+</ul>
+<p>Improved Documentation</p>
+<hr>
+<ul>
+<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/11790"  target="_blank" rel="noopener"
+    >#11790</a>: Documented the retention of temporary directories created using the <code>tmp_path</code> fixture in more detail.</li>
+</ul>
+<p>Trivial/Internal Changes</p>
+<hr>
+<ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11785"  target="_blank" rel="noopener"
+    >#11785</a>: Some changes were made to private functions which may affect plugins which access them:</p>
+<ul>
+<li>
+<p><code>FixtureManager._getautousenames()</code> now takes a <code>Node</code> itself instead of the nodeid.</p>
+</li>
+<li>
+<p><code>FixtureManager.getfixturedefs()</code> now takes the <code>Node</code> itself instead of the nodeid.</p>
+</li>
+<li>
+<p>The <code>_pytest.nodes.iterparentnodeids()</code> function is removed without replacement.</p>
+<p>Prefer to traverse the node hierarchy itself instead.</p>
+<p>If you really need to, copy the function from the previous pytest release.</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>========================================</p>
+<h1 id="pytest-802-2024-02-24">pytest 8.0.2 (2024-02-24)
+</h1><h2 id="bug-fixes-6">Bug Fixes
+</h2><ul>
+<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/11895"  target="_blank" rel="noopener"
+    >#11895</a>: Fix collection on Windows where initial paths contain the short version of a path (for example <code>c:\PROGRA~1\tests</code>).</li>
+<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/11953"  target="_blank" rel="noopener"
+    >#11953</a>: Fix an <code>IndexError</code> crash raising from <code>getstatementrange_ast</code>.</li>
+<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12021"  target="_blank" rel="noopener"
+    >#12021</a>: Reverted a fix to [--maxfail]{.title-ref} handling in pytest 8.0.0 because it caused a regression in pytest-xdist whereby session fixture teardowns may get executed multiple times when the max-fails is reached.</li>
+</ul>
+<p>========================================</p>
+<blockquote>
+<p>完整清单，请访问官方列表: <a class="link" href="https://github.com/pytest-dev/pytest/releases"  target="_blank" rel="noopener"
+    > Pytest 发布清单</a></p>
+</blockquote>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE/">开源项目</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/page/appium-10/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Appium 发布历史 (latest 10)</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/page/grafana-10/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Grafana 发布历史 (latest 10)</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/page/jmeter-10/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">JMeter 发布历史 (latest 10)</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/page/jenkins-10/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Jenkins 发布历史 (latest 10)</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/page/junit5-10/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Junit5 发布历史 (latest 10)</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2023 - 
+        
+        2024 |by 城下秋草（公众号： 秋草说测试）
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
