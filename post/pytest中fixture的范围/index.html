@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="pytest作为Python技术栈下最主流的测试框架，功能极为强大和灵活。其中Fixture夹具是它的核心。而且pytest中对Fixtur">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Pytest中不同fixture的作用范围示例">
 <title>Pytest中fixture的范围</title>
 
 <link rel='canonical' href='https://chengxiaqiucao.github.io/post/pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/'>
 
 <link rel="stylesheet" href="/scss/style.min.afc04e201e26111368df0fa482ffbcd8ad0a7779bfdcc0c73b0c9eac35357cdd.css"><meta property='og:title' content="Pytest中fixture的范围">
-<meta property='og:description' content="pytest作为Python技术栈下最主流的测试框架，功能极为强大和灵活。其中Fixture夹具是它的核心。而且pytest中对Fixtur">
+<meta property='og:description' content="Pytest中不同fixture的作用范围示例">
 <meta property='og:url' content='https://chengxiaqiucao.github.io/post/pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/'>
 <meta property='og:site_name' content='秋 草 观 “测” 台'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='pytest' /><meta property='article:tag' content='自动化测试' /><meta property='article:published_time' content='2024-08-28T20:33:52&#43;08:00'/><meta property='article:modified_time' content='2024-08-28T20:33:52&#43;08:00'/>
 <meta name="twitter:title" content="Pytest中fixture的范围">
-<meta name="twitter:description" content="pytest作为Python技术栈下最主流的测试框架，功能极为强大和灵活。其中Fixture夹具是它的核心。而且pytest中对Fixtur">
+<meta name="twitter:description" content="Pytest中不同fixture的作用范围示例">
   
 
 
@@ -315,7 +315,48 @@
     </ol>
 </aside>
 
-    
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#fixture的scope定义">fixture的scope定义</a>
+      <ol>
+        <li><a href="#function">function</a></li>
+        <li><a href="#class">class</a></li>
+        <li><a href="#module">module</a></li>
+        <li><a href="#package">package</a></li>
+        <li><a href="#session">session</a></li>
+      </ol>
+    </li>
+    <li><a href="#复杂fixture的scope灵活定义">复杂fixture的scope灵活定义</a></li>
+    <li><a href="#不同scope的执行顺序">不同scope的执行顺序</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
 
             <main class="main full-width">
     <article class="main-article">
@@ -337,6 +378,10 @@
             <a href="/post/pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/">Pytest中fixture的范围</a>
         </h2>
     
+        
+        <h3 class="article-subtitle">
+            Pytest中不同fixture的作用范围示例
+        </h3>
         
     </div>
 
@@ -371,7 +416,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 1 分钟
+                    阅读时长: 8 分钟
                 </time>
             </div>
         
@@ -388,24 +433,655 @@
     
     <p>pytest作为Python技术栈下最主流的测试框架，功能极为强大和灵活。其中Fixture夹具是它的核心。而且pytest中对Fixture的作用范围也做了不同区分，能为我们利用fixture带来很好地灵活性。</p>
 <p>下面我们就来了解下这里不同scope的作用</p>
-<p>Fixtures are created when first requested by a test, and are destroyed based on their <code>scope</code>:</p>
-<ul>
-<li>
-<p><code>function</code>: the default scope, the fixture is destroyed at the end of the test.</p>
-</li>
-<li>
-<p><code>class</code>: the fixture is destroyed during teardown of the last test in the class.</p>
-</li>
-<li>
-<p><code>module</code>: the fixture is destroyed during teardown of the last test in the module.</p>
-</li>
-<li>
-<p><code>package</code>: the fixture is destroyed during teardown of the last test in the package where the fixture is defined, including sub-packages and sub-directories within it.</p>
-</li>
-<li>
-<p><code>session</code>: the fixture is destroyed at the end of the test session.</p>
-</li>
-</ul>
+<h2 id="fixture的scope定义">fixture的scope定义
+</h2><p>首先根据官网的说明，Pytest中fixture的作用范围支持5种设定，分别是<code>function</code>(默认值), <code>classs</code>, <code>module</code>, <code>package</code>, <code>session</code></p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>作用范围</strong></th>
+<th style="text-align:left"><strong>说明</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><strong>function</strong></td>
+<td style="text-align:left">默认值，对每个测试方法（函数）生效，生命周期在测试方法级别</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>class</strong></td>
+<td style="text-align:left">对测试类生效，生命周期在测试类级别</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>module</strong></td>
+<td style="text-align:left">对测试模块生效，生命周期在模块（文件）级别</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>package</strong></td>
+<td style="text-align:left">对测试包生效，生命周期在测试包（目录）级别</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>session</strong></td>
+<td style="text-align:left">对测试会话生效，生命周期在会话（一次pytest运行）级别</td>
+</tr>
+</tbody>
+</table></div>
+<p>下面结合代码来说明，假设目前有这样的代码结构</p>
+<p><img src="/post/pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/Pasted-20240901.png"
+	width="421"
+	height="401"
+	srcset="/post/pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/Pasted-20240901_hu6463406299743170217.png 480w, /post/pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/Pasted-20240901_hu16268989314827633149.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="104"
+		data-flex-basis="251px"
+	
+></p>
+<p><code>run_params</code>是被测方法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">deal_params</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>  
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;input :</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>  
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">p</span><span class="o">*</span><span class="mi">10</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>  
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">p</span><span class="o">*</span><span class="mi">3</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>  
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="s2">&#34;_&#34;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>  
+</span></span><span class="line"><span class="cl">        <span class="k">raise</span> <span class="ne">TypeError</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>test_ch_param</code>, <code>test_fixture_scope</code>中分别定义了参数化和在测试类中的不同测试方法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pytest</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@pytest.mark.parametrize</span><span class="p">(</span><span class="s2">&#34;param&#34;</span><span class="p">,[</span><span class="mi">10</span><span class="p">,</span> <span class="s2">&#34;城下秋草&#34;</span><span class="p">,</span> <span class="s2">&#34;软件测试&#34;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&#34;示例&#34;</span><span class="p">,</span> <span class="s2">&#34;代码&#34;</span><span class="p">)])</span>  
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">test_params_mark</span><span class="p">(</span><span class="n">param</span><span class="p">):</span>  
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="n">deal_params</span><span class="p">(</span><span class="n">param</span><span class="p">))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pytest</span>  
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">TestFixtureScope1</span><span class="p">:</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">test_int</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  
+</span></span><span class="line"><span class="cl">        <span class="k">assert</span> <span class="n">deal_params</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">20</span>  
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">test_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  
+</span></span><span class="line"><span class="cl">        <span class="k">assert</span> <span class="n">deal_params</span><span class="p">(</span><span class="s2">&#34;秋草&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&#34;秋草秋草秋草&#34;</span>  
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">TestFixtureScope2</span><span class="p">:</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">test_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  
+</span></span><span class="line"><span class="cl">        <span class="k">assert</span> <span class="n">deal_params</span><span class="p">([</span><span class="s2">&#34;城下&#34;</span><span class="p">,</span><span class="s2">&#34;秋草&#34;</span><span class="p">])</span> <span class="o">==</span> <span class="s2">&#34;城下_秋草&#34;</span>  
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">test_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  
+</span></span><span class="line"><span class="cl">        <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">):</span>  
+</span></span><span class="line"><span class="cl">            <span class="n">deal_params</span><span class="p">({</span><span class="s2">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;秋草&#34;</span><span class="p">})</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在公共方法文件<code>conftest.py</code>中定义fixture:  <code>prepare</code>， 设置了<code>autouse=True</code>，即会根据fixture的设置范围自动应用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nd">@pytest.fixture</span><span class="p">(</span><span class="n">autouse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s1">&#39;function&#39;</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">prepare</span><span class="p">():</span>  
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-----some setup actions.....&#39;</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">yield</span>  
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-----some teardown actions!!&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里我们分别调整<code>prepare</code>的scope为不同取值，然后得到对应的输出</p>
+<h3 id="function">function
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">(.venv) C:\Chengxiaqiucao
+</span></span></span><span class="line"><span class="cl"><span class="go">pytest
+</span></span></span><span class="line"><span class="cl"><span class="go">======================================== test session starts =========================================
+</span></span></span><span class="line"><span class="cl"><span class="go">collected 8 items                                                                                     
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[10] -----some setup actions.....
+</span></span></span><span class="line"><span class="cl"><span class="go">input :10
+</span></span></span><span class="line"><span class="cl"><span class="go">100
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[城下秋草] -----some setup actions.....
+</span></span></span><span class="line"><span class="cl"><span class="go">input :城下秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">城下秋草城下秋草城下秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[软件测试] -----some setup actions.....
+</span></span></span><span class="line"><span class="cl"><span class="go">input :软件测试
+</span></span></span><span class="line"><span class="cl"><span class="go">软件测试软件测试软件测试
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[param3] -----some setup actions.....
+</span></span></span><span class="line"><span class="cl"><span class="go">input :(&#39;示例&#39;, &#39;代码&#39;)
+</span></span></span><span class="line"><span class="cl"><span class="go">示例_代码
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_int -----some setup actions.....
+</span></span></span><span class="line"><span class="cl"><span class="go">input :2
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_str -----some setup actions.....      
+</span></span></span><span class="line"><span class="cl"><span class="go">input :秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_list -----some setup actions.....     
+</span></span></span><span class="line"><span class="cl"><span class="go">input :[&#39;城下&#39;, &#39;秋草&#39;]
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_dict -----some setup actions.....     
+</span></span></span><span class="line"><span class="cl"><span class="go">input :{&#39;name&#39;: &#39;秋草&#39;}
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">========================================= 8 passed in 0.27s ========================================== 
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>fixture运行了8次</p>
+<h3 id="class">class
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">(.venv) C:\Chengxiaqiucao
+</span></span></span><span class="line"><span class="cl"><span class="go">pytest
+</span></span></span><span class="line"><span class="cl"><span class="go">======================================== test session starts =========================================
+</span></span></span><span class="line"><span class="cl"><span class="go">collected 8 items                                                                                     
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[10] -----some setup actions.....
+</span></span></span><span class="line"><span class="cl"><span class="go">input :10
+</span></span></span><span class="line"><span class="cl"><span class="go">100
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[城下秋草] -----some setup actions.....
+</span></span></span><span class="line"><span class="cl"><span class="go">input :城下秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">城下秋草城下秋草城下秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[软件测试] -----some setup actions.....
+</span></span></span><span class="line"><span class="cl"><span class="go">input :软件测试
+</span></span></span><span class="line"><span class="cl"><span class="go">软件测试软件测试软件测试
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[param3] -----some setup actions.....
+</span></span></span><span class="line"><span class="cl"><span class="go">input :(&#39;示例&#39;, &#39;代码&#39;)
+</span></span></span><span class="line"><span class="cl"><span class="go">示例_代码
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_int -----some setup actions.....
+</span></span></span><span class="line"><span class="cl"><span class="go">input :2
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_str input :秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_list -----some setup actions.....     
+</span></span></span><span class="line"><span class="cl"><span class="go">input :[&#39;城下&#39;, &#39;秋草&#39;]
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_dict input :{&#39;name&#39;: &#39;秋草&#39;}
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">========================================= 8 passed in 0.27s ========================================== 
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>test_ch_param</code>中的测试方法，因为直接定义在文件中，也属于类级别，所以每次赋值参数，fixture也被调用。 而 <code>test_fixture_scope</code>中明确定义了两个测试类，所以运行了2次</p>
+<h3 id="module">module
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">(.venv) C:\Chengxiaqiucao
+</span></span></span><span class="line"><span class="cl"><span class="go">pytest
+</span></span></span><span class="line"><span class="cl"><span class="go">======================================== test session starts =========================================
+</span></span></span><span class="line"><span class="cl"><span class="go">collected 8 items                                                                                     
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[10] -----some setup actions.....
+</span></span></span><span class="line"><span class="cl"><span class="go">input :10
+</span></span></span><span class="line"><span class="cl"><span class="go">100
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[城下秋草] input :城下秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">城下秋草城下秋草城下秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[软件测试] input :软件测试
+</span></span></span><span class="line"><span class="cl"><span class="go">软件测试软件测试软件测试
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[param3] input :(&#39;示例&#39;, &#39;代码&#39;)
+</span></span></span><span class="line"><span class="cl"><span class="go">示例_代码
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_int -----some setup actions.....
+</span></span></span><span class="line"><span class="cl"><span class="go">input :2
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_str input :秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_list input :[&#39;城下&#39;, &#39;秋草&#39;]
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_dict input :{&#39;name&#39;: &#39;秋草&#39;}
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">========================================= 8 passed in 0.27s ========================================== 
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>修改为module范围后，可以看到，每个模块文件调用了一次fixture</p>
+<h3 id="package">package
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">(.venv) C:\Chengxiaqiucao
+</span></span></span><span class="line"><span class="cl"><span class="go">pytest
+</span></span></span><span class="line"><span class="cl"><span class="go">======================================== test session starts =========================================
+</span></span></span><span class="line"><span class="cl"><span class="go">collected 8 items                                                                                     
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[10] -----some setup actions.....
+</span></span></span><span class="line"><span class="cl"><span class="go">input :10
+</span></span></span><span class="line"><span class="cl"><span class="go">100
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[城下秋草] input :城下秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">城下秋草城下秋草城下秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[软件测试] input :软件测试
+</span></span></span><span class="line"><span class="cl"><span class="go">软件测试软件测试软件测试
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[param3] input :(&#39;示例&#39;, &#39;代码&#39;)
+</span></span></span><span class="line"><span class="cl"><span class="go">示例_代码
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_int input :2
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_str input :秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_list input :[&#39;城下&#39;, &#39;秋草&#39;]
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_dict input :{&#39;name&#39;: &#39;秋草&#39;}
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">========================================= 8 passed in 0.27s ========================================== 
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>修改为package， 这是因为两个测试文件位于同一个package内， 所以运行了一次</p>
+<h3 id="session">session
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">(.venv) C:\Chengxiaqiucao
+</span></span></span><span class="line"><span class="cl"><span class="go">pytest
+</span></span></span><span class="line"><span class="cl"><span class="go">======================================== test session starts =========================================
+</span></span></span><span class="line"><span class="cl"><span class="go">collected 8 items                                                                                     
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[10] -----some setup actions.....
+</span></span></span><span class="line"><span class="cl"><span class="go">input :10
+</span></span></span><span class="line"><span class="cl"><span class="go">100
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[城下秋草] input :城下秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">城下秋草城下秋草城下秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[软件测试] input :软件测试
+</span></span></span><span class="line"><span class="cl"><span class="go">软件测试软件测试软件测试
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[param3] input :(&#39;示例&#39;, &#39;代码&#39;)
+</span></span></span><span class="line"><span class="cl"><span class="go">示例_代码
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_int input :2
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_str input :秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_list input :[&#39;城下&#39;, &#39;秋草&#39;]
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_dict input :{&#39;name&#39;: &#39;秋草&#39;}
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">========================================= 8 passed in 0.27s ========================================== 
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>最后，当设置为session时，也就是运行pytest的一次执行会话，才会触发一次fixture调用</p>
+<p>所以可以看到，我们通过fixture的不同scope定义，可以根据需要，来确定我们编写的fixture夹具的作用范围。有很好的灵活性</p>
+<h2 id="复杂fixture的scope灵活定义">复杂fixture的scope灵活定义
+</h2><p>有时在实际使用的时候，特别是我们的一些fixture初始化工作比较复杂但同时在不同作用范围下都可能会用到，这时如果仅仅因为针对不同的作用范围，就要编写多个不同的fixture，代码就显得比较冗余。这时可以怎么处理呢？ 其实可以利用上下文contextmanager来灵活实现</p>
+<p>比如我们再编写一个fixture的基本代码上下文:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nd">@contextmanager</span>  
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">fixture_base</span><span class="p">():</span>  
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;~~~~~base fixture setup actions.....&#39;</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">yield</span>  
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;~~~~~base fixture teardown actions!!&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后针对不同的fixture，我们就可以根据不同的scope来定义不同的fixture并调用这里的context实现。 比如我们再定义一个scope为package的fixture</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nd">@pytest.fixture</span><span class="p">(</span><span class="n">autouse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s1">&#39;package&#39;</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">fixture_module</span><span class="p">():</span>  
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;  
+</span></span></span><span class="line"><span class="cl"><span class="s2">    对于复杂的fixture但希望灵活处理scope，可以将公共代码放到一个contextmanager中，  
+</span></span></span><span class="line"><span class="cl"><span class="s2">    再针对不同scope定义相关对应fixture  
+</span></span></span><span class="line"><span class="cl"><span class="s2">    &#34;&#34;&#34;</span>    <span class="k">with</span> <span class="n">fixture_base</span><span class="p">()</span> <span class="k">as</span> <span class="n">result</span><span class="p">:</span>  
+</span></span><span class="line"><span class="cl">        <span class="k">yield</span> <span class="n">result</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>👍👍这个方法来自pytest的社区总结，<a class="link" href="https://github.com/pytest-dev/pytest/issues/3425"  target="_blank" rel="noopener"
+    >原始问题链接</a></p>
+<h2 id="不同scope的执行顺序">不同scope的执行顺序
+</h2><p>上面例子中我们其实看到package和session的执行效果，因为测试方法都在同一个package中，所以效果上没什么差异。但其实不同scope也是有执行顺序的</p>
+<p>顺序总结如下：</p>
+<p><code>session</code> &gt; <code>package</code> &gt; <code>module</code> &gt; <code>class</code> &gt; <code>function</code></p>
+<p>这里增加到两个fixture以后，执行的结果：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">(.venv) C:\Chengxiaqiucao
+</span></span></span><span class="line"><span class="cl"><span class="go">pytest
+</span></span></span><span class="line"><span class="cl"><span class="go">======================================== test session starts =========================================
+</span></span></span><span class="line"><span class="cl"><span class="go">collected 8 items                                                                                     
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[10] -----some setup actions.....
+</span></span></span><span class="line"><span class="cl"><span class="go">~~~~~base fixture setup actions.....
+</span></span></span><span class="line"><span class="cl"><span class="go">input :10
+</span></span></span><span class="line"><span class="cl"><span class="go">100
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[城下秋草] input :城下秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">城下秋草城下秋草城下秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[软件测试] input :软件测试
+</span></span></span><span class="line"><span class="cl"><span class="go">软件测试软件测试软件测试
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[param3] input :(&#39;示例&#39;, &#39;代码&#39;)
+</span></span></span><span class="line"><span class="cl"><span class="go">示例_代码
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_int input :2
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_str input :秋草
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_list input :[&#39;城下&#39;, &#39;秋草&#39;]
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED
+</span></span></span><span class="line"><span class="cl"><span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_dict input :{&#39;name&#39;: &#39;秋草&#39;}
+</span></span></span><span class="line"><span class="cl"><span class="go">PASSED~~~~~base fixture teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go">-----some teardown actions!!
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">========================================= 8 passed in 0.27s ========================================== 
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>可以看到 <code>session</code> 比 <code>package</code> 更早执行，同时更晚被销毁。</p>
+<p>那么以上就是关于pytest scope作用范围的总结</p>
+<hr>
+<p>推广下我的测试课程，感兴趣的小伙伴可以通过以下链接了解下哦</p>
+<p>❤️❤️❤️❤️  <a class="link" href="https://coding.imooc.com/class/chapter/885.html#Anchor"  target="_blank" rel="noopener"
+    >城下秋草的测试职业进阶提升课</a> ❤️❤️❤️❤️</p>
 
 </section>
 
