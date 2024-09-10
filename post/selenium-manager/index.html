@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Selenium在V4版本增加了一个Selenium manager工具，它有何作用？">
+<title>Selenium Manager用法详解</title>
+
+<link rel='canonical' href='https://chengxiaqiucao.github.io/post/selenium-manager/'>
+
+<link rel="stylesheet" href="/scss/style.min.afc04e201e26111368df0fa482ffbcd8ad0a7779bfdcc0c73b0c9eac35357cdd.css"><meta property='og:title' content="Selenium Manager用法详解">
+<meta property='og:description' content="Selenium在V4版本增加了一个Selenium manager工具，它有何作用？">
+<meta property='og:url' content='https://chengxiaqiucao.github.io/post/selenium-manager/'>
+<meta property='og:site_name' content='秋 草 观 “测” 台'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='自动化测试' /><meta property='article:tag' content='Selenium' /><meta property='article:published_time' content='2024-09-07T18:03:04&#43;08:00'/><meta property='article:modified_time' content='2024-09-07T18:03:04&#43;08:00'/><meta property='og:image' content='https://chengxiaqiucao.github.io/post/selenium-manager/Se-m.png' />
+<meta name="twitter:title" content="Selenium Manager用法详解">
+<meta name="twitter:description" content="Selenium在V4版本增加了一个Selenium manager工具，它有何作用？"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://chengxiaqiucao.github.io/post/selenium-manager/Se-m.png' />
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0SZVJZGMHX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0SZVJZGMHX');
+</script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/automnGrass_hu7204715396109996112.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">秋 草 观 “测” 台</a></h1>
+            <h2 class="site-description">Testing is not just checking...</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/chengxiaqiucao'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/472272606'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162803093" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10312" xmlns:xlink="http://www.w3.org/1999/xlink" width="211.71875" height="200"><path d="M896.43834 165.698h-62.34l54.57-54.57c23.43-23.37 23.43-70.17 0-93.54-23.37-23.37-70.17-23.37-93.54 0l-155.88 148.17H452.17034l-155.94-148.23c-23.43-23.37-70.17-23.37-93.54 0-23.37 23.43-23.43 70.17 0 93.54l54.57 54.57h-62.34A192.983 192.983 0 0 0 0.00934 360.607v420.899c0 116.97 85.71 202.68 194.91 202.68h693.75a192.983 192.983 0 0 0 194.85-194.85v-428.73c7.83-109.14-77.94-194.91-187.08-194.91z m54.63 615.809a69.869 69.869 0 0 1-70.17 70.17h-678.27a69.869 69.869 0 0 1-70.109-70.17v-413.13a69.869 69.869 0 0 1 70.17-70.17h678.21a69.869 69.869 0 0 1 70.17 70.17v413.19z m-608.039-342.96a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.23-70.17z m405.36 0a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.17-70.17z" p-id="10313" fill="#8a8a8a"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.zhihu.com/people/qiucao'
+                        target="_blank"
+                        title="zhihu"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162502588" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4642" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M540.95908203 555.43730469s0-62.74248047-30.56748047-65.96191407c-30.56748047-3.21943359-125.48583984 0-125.48583984 1e-8v-193.05527344h141.57246094s-1.60839844-64.35263672-28.95908203-64.35263672h-230.05810547l38.61035156-102.96210938s-57.91728516 3.21943359-78.83085938 40.21962891-86.87460938 222.01523438-86.87460937 222.01523438 22.52373047 9.65302734 59.52480469-17.69589844c37.00283203-27.34804688 49.87177734-75.61494141 49.87177734-75.61494141l67.56943359-3.21943359 1.60839844 196.27382812s-117.44033203-1.60839844-141.57246094 0c-24.13212891 1.60839844-37.00283203 65.96191406-37.00283203 65.96191407h178.57792969s-16.09013672 109.39746094-61.13408203 188.23007812c-46.65673828 78.83085938-133.53134766 141.57246094-133.53134766 141.57246094s62.74248047 25.74052734 123.87919922-9.65302735c61.13408203-37.00283203 106.18154297-196.27382812 106.18154297-196.27382812l143.184375 178.57792969s12.86982422-85.26533203-1.60839844-109.39746094c-16.09013672-24.13212891-99.74707031-120.65888672-99.74707031-120.65888672l-37.00283203 32.17412109 25.74052734-106.18154297h156.0515625zM577.96191406 227.24316406l-1.60839843 580.77509766h57.91728515l20.91357422 72.39550781 101.35634766-72.39550781h143.184375v-580.77509766h-321.75966797zM835.3671875 743.665625h-67.56943359l-85.26533203 65.96191406-19.30517579-65.96191406h-17.69589843v-450.46318359h189.83583984v450.46318359z" fill="#8a8a8a" p-id="4643"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='mailto:%20danmyw@qq.com'
+                        target="_blank"
+                        title="e-mail"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162879016" class="icon" viewBox="0 0 1451 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12462" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z" fill="#8a8a8a" p-id="12463"></path></svg>
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>检索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/releases/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+                
+                <span>热门开源</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="https://chengxiaqiucao.github.io/en/" >English</option>
+                                
+                                    <option value="https://chengxiaqiucao.github.io/" selected>中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#selenium-4带来的变化">Selenium 4带来的变化</a></li>
+    <li><a href="#原先的浏览器驱动方式带来的问题">原先的浏览器驱动方式带来的问题</a>
+      <ol>
+        <li><a href="#selenium工作原理">Selenium工作原理</a></li>
+        <li><a href="#导致的问题">导致的问题</a></li>
+        <li><a href="#chrome对驱动问题的应对">Chrome对驱动问题的应对</a></li>
+        <li><a href="#selenium应对驱动匹配问题的解决方案">Selenium应对驱动匹配问题的解决方案</a></li>
+      </ol>
+    </li>
+    <li><a href="#selenium-4-启动自动化执行源码分析">Selenium 4 启动自动化执行源码分析</a></li>
+    <li><a href="#selenium-manager-命令行程序">Selenium Manager 命令行程序</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/post/selenium-manager/">
+                <img src="/post/selenium-manager/Se-m_hu10081833273948934532.png"
+                        srcset="/post/selenium-manager/Se-m_hu10081833273948934532.png 800w, /post/selenium-manager/Se-m_hu5081796757702025974.png 1600w"
+                        width="800" 
+                        height="423" 
+                        loading="lazy"
+                        alt="Featured image of post Selenium Manager用法详解" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7/" style="background-color: #c6fad2; color: #000;">
+                测试工具
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/selenium-manager/">Selenium Manager用法详解</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            Selenium在V4版本增加了一个Selenium manager工具，它有何作用？
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Sep 07, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 8 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>Selenium诞生于2004年，以其开源、功能全面长期以来长期排名Web 自动化测试工具领域的Top1，是目前最主流的Web自动化测试工具，而Selenium的核心Webdriver 更是作为W3C的通行标准，被各类工具广泛参照。可以说是目前web自动化测试的事实标准。</p>
+<h2 id="selenium-4带来的变化">Selenium 4带来的变化
+</h2><p>Selenium本身经过多年的演进，目前已经发布到V4.24版本。 虽然目前网上还广泛流传V3版本相关的用法和资料，但Selenium 4 其实是一个非常大的更新版本。它的几个核心组件都进行的极大程度的重构。</p>
+<ul>
+<li>WebDriver 从原先的Json Wire Protocol 切换为了W3C的标准定义</li>
+<li>Selenium IDE 完成重构和功能优化</li>
+<li>Selenium Grid 完成重构，支持更灵活的云服务架构</li>
+</ul>
+<p>此外Selenium 4中还引入了一个很重要的工具，也就是本篇我们要重点来介绍的Selenium Manager（实际是V4.6才引入，到V4.12 功能才基本完备</p>
+<h2 id="原先的浏览器驱动方式带来的问题">原先的浏览器驱动方式带来的问题
+</h2><p>要了解Selenium Manager，我们还是要先了解下Selenium的工作原理。</p>
+<h3 id="selenium工作原理">Selenium工作原理
+</h3><p>下图是官网给的Selenium本地运行的基本架构。
+<img src="/post/selenium-manager/Pasted-20240908.png"
+	width="895"
+	height="426"
+	srcset="/post/selenium-manager/Pasted-20240908_hu13227185974333149166.png 480w, /post/selenium-manager/Pasted-20240908_hu12381085848425339710.png 1024w"
+	loading="lazy"
+	
+		alt="Selenium工作原理"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="210"
+		data-flex-basis="504px"
+	
+></p>
+<p>可以看到，Selenium实际上完成自动化，是通过webdriver协议驱动不同类型的浏览器（Chrome、Firefox、IE、Edge、Safari等）完成指定的动作，以此达到自动化执行的目的。</p>
+<p>而驱动浏览器的关键，是和浏览器对应的浏览器Driver驱动，比如Chrome对应的ChromeDriver， FireFox对应的GecoDriver等。</p>
+<p>而Selenium本身，则是基于WebDriver协议和浏览器Driver完成交互。</p>
+<h3 id="导致的问题">导致的问题
+</h3><p>这个架构和工作原理虽然清晰，但是有一个问题，就是浏览器的版本是不断更新的。而<strong>浏览器驱动版本需要和浏览器版本匹配</strong>，不匹配的驱动和浏览器版本，共同工作可能存在各种预期外的异常，所以Selenium要正常工作，再用Selenium库完成编码前，首先就是要保证浏览器驱动和浏览器版本的部署和匹配。</p>
+<p>但浏览器版本和对应的驱动，通常都是由浏览器厂商维护的。</p>
+<p>所以这里的自动化测试环境准备就会变得比较复杂，要安装对应被测版本的浏览器，同时还要找到对应这个版本的驱动，再把相关路径配置给Selenium，然后Selenium才能完成正常的驱动。</p>
+<p>此外，浏览器的版本，一般还有<strong>自动更新功能</strong>，可能在用户没感知的情况，其实版本已经变化了，但此时驱动版本并不会同步更新，所以也<strong>导致驱动和浏览器版本不匹配</strong>的潜在问题。</p>
+<p>这个问题，其实长期没有得到很好地解决，Selenium 3和Selenium 4的早期版本，我们部署Selenium 自动化环境，浏览器版本和驱动版本的获取和匹配一直是一个比较麻烦的工作，也因此劝退了不少自动化测试小白。</p>
+<h3 id="chrome对驱动问题的应对">Chrome对驱动问题的应对
+</h3><p>既然这个问题由来已久，浏览器厂商其实也意识到驱动和浏览器版本不匹配，给自动化测试带来的困扰。</p>
+<p>以Chrome为例，我们去到 <a class="link" href="https://developer.chrome.com/docs/chromedriver/downloads"  target="_blank" rel="noopener"
+    >ChromeDriver官方下载</a>  网址的话，会看到这样的页面</p>
+<p><img src="/post/selenium-manager/Pasted-20240910.png"
+	width="1414"
+	height="850"
+	srcset="/post/selenium-manager/Pasted-20240910_hu5724162091603531267.png 480w, /post/selenium-manager/Pasted-20240910_hu17616114122145533867.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="166"
+		data-flex-basis="399px"
+	
+></p>
+<p>可以看到，这里对Chrome Driver的下载只提供到了114版本，而最新的Chrome其实已经到了128版本。
+对于115版本以后，Chrome浏览器其实调整了driver的发布策略，也就是Chrome driver会跟随 Chrome for Testing 版本同步发布。严格保证driver和浏览器版本的同步匹配。</p>
+<p>那这里为什么有一个Chrome for Testing版本呢？</p>
+<p><img src="/post/selenium-manager/Pasted-20240910-1.png"
+	width="1325"
+	height="1054"
+	srcset="/post/selenium-manager/Pasted-20240910-1_hu14428106396979902189.png 480w, /post/selenium-manager/Pasted-20240910-1_hu7787818710469860217.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="125"
+		data-flex-basis="301px"
+	
+>
+我们之前提到，浏览器版本，会有自动更新，如果进行自动更新，driver版本不会同步更新，所以导致dirver和浏览器的不匹配。</p>
+<p>所以Chrome for Testing与正式版本的主要区别，其实就是 <strong>for Testing版本是不会进行自动更新</strong>的。</p>
+<p>这样，再加上版本号和浏览器版本的共用，就能很方便地保证浏览器和驱动的一致。</p>
+<h3 id="selenium应对驱动匹配问题的解决方案">Selenium应对驱动匹配问题的解决方案
+</h3><p>那上面是浏览器对驱动匹配问题给出的解决方法，但其实还是没有完全解决浏览器、Driver需要分别获取和指定的问题。那么Selenium官方对这个问题的解决方案，就是Selenium Manager。它其实是一个包含在Selenium库中，无需额外安装的可执行程序。</p>
+<p><img src="/post/selenium-manager/Pasted-20240910-2.png"
+	width="569"
+	height="685"
+	srcset="/post/selenium-manager/Pasted-20240910-2_hu8447291414850455275.png 480w, /post/selenium-manager/Pasted-20240910-2_hu10422254456594308963.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="83"
+		data-flex-basis="199px"
+	
+></p>
+<p>我们目前使用Selenium V4来执行一个简单的自动化测试脚本的话:</p>
+<p>比如通过百度，搜索<code>城下秋草 测试</code>, 代码如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>  
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>  
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">test_baidu_search</span><span class="p">():</span>  
+</span></span><span class="line"><span class="cl">    <span class="n">option</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">ChromeOptions</span><span class="p">()</span>  
+</span></span><span class="line"><span class="cl">    <span class="n">option</span><span class="o">.</span><span class="n">browser_version</span> <span class="o">=</span> <span class="s1">&#39;117&#39;</span>  
+</span></span><span class="line"><span class="cl">    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">option</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">    <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&#34;https://www.baidu.com&#34;</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">    <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span><span class="s1">&#39;kw&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s1">&#39;城下秋草 测试&#39;</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">    <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">    <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span><span class="s1">&#39;su&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>  
+</span></span><span class="line"><span class="cl">    <span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">    <span class="n">driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>只要安装了Selenium库，执行的时候，就可以正常地驱动, 并不需要特别地去获取驱动和配置。</p>
+<p><img src="/post/selenium-manager/run.gif"
+	width="1554"
+	height="935"
+	srcset="/post/selenium-manager/run_hu16654001849519801082.gif 480w, /post/selenium-manager/run_hu8903193728433408626.gif 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="166"
+		data-flex-basis="398px"
+	
+></p>
+<h2 id="selenium-4-启动自动化执行源码分析">Selenium 4 启动自动化执行源码分析
+</h2><p>这里我们从Selenium的Python源码来分析下它的启动过程：</p>
+<p><code>driver = webdriver.Chrome(options=option) </code></p>
+<p>这行代码其实会调用Slenium库中Chromium基础浏览器的webdriver初始化代码，位置在<code>.venv/Lib/site-packages/selenium/webdriver/chromium/webdriver.py</code></p>
+<p>初始化时，可以看到，会通过DriverFinder方法来获取浏览器和Driver的路径</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">finder</span> <span class="o">=</span> <span class="n">DriverFinder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="n">finder</span><span class="o">.</span><span class="n">get_browser_path</span><span class="p">():</span>  
+</span></span><span class="line"><span class="cl">    <span class="n">options</span><span class="o">.</span><span class="n">binary_location</span> <span class="o">=</span> <span class="n">finder</span><span class="o">.</span><span class="n">get_browser_path</span><span class="p">()</span>  
+</span></span><span class="line"><span class="cl">    <span class="n">options</span><span class="o">.</span><span class="n">browser_version</span> <span class="o">=</span> <span class="kc">None</span>  
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl"><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">finder</span><span class="o">.</span><span class="n">get_driver_path</span><span class="p">()</span>  
+</span></span><span class="line"><span class="cl"><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>而获取路径的方法，其实就是调用了SeleniumManager模块的binary_paths方法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">get_browser_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_paths</span><span class="p">()[</span><span class="s2">&#34;browser_path&#34;</span><span class="p">]</span>  
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">get_driver_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_paths</span><span class="p">()[</span><span class="s2">&#34;driver_path&#34;</span><span class="p">]</span>  
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">_binary_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span><span class="p">[</span><span class="s2">&#34;driver_path&#34;</span><span class="p">]:</span>  
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span>  
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl"><span class="o">.</span>
+</span></span><span class="line"><span class="cl"><span class="o">.</span>
+</span></span><span class="line"><span class="cl"><span class="o">.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="n">output</span> <span class="o">=</span> <span class="n">SeleniumManager</span><span class="p">()</span><span class="o">.</span><span class="n">binary_paths</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_to_args</span><span class="p">())</span>  
+</span></span><span class="line"><span class="cl"><span class="o">.</span>
+</span></span><span class="line"><span class="cl"><span class="o">.</span>
+</span></span><span class="line"><span class="cl"><span class="o">.</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>而SeleniumManager模块，则会执行SeleniumManager的二进制程序，根据相关参数，获取浏览器和驱动版本。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>  
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;Executes the Selenium Manager Binary.  
+</span></span></span><span class="line"><span class="cl"><span class="s2">  
+</span></span></span><span class="line"><span class="cl"><span class="s2">    :Args:     - args: the components of the command being executed.    :Returns: The log string containing the driver location.    &#34;&#34;&#34;</span>    <span class="n">command</span> <span class="o">=</span> <span class="s2">&#34; &#34;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&#34;Executing process: </span><span class="si">%s</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">command</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">try</span><span class="p">:</span>  
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">&#34;win32&#34;</span><span class="p">:</span>  
+</span></span><span class="line"><span class="cl">            <span class="n">completed_proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">creationflags</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">CREATE_NO_WINDOW</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>  
+</span></span><span class="line"><span class="cl">            <span class="n">completed_proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">        <span class="n">stdout</span> <span class="o">=</span> <span class="n">completed_proc</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">        <span class="n">stderr</span> <span class="o">=</span> <span class="n">completed_proc</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">        <span class="n">output</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">stdout</span><span class="p">)</span> <span class="k">if</span> <span class="n">stdout</span> <span class="o">!=</span> <span class="s2">&#34;&#34;</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&#34;logs&#34;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&#34;result&#34;</span><span class="p">:</span> <span class="p">{}}</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>  
+</span></span><span class="line"><span class="cl">        <span class="k">raise</span> <span class="n">WebDriverException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Unsuccessful command executed: </span><span class="si">{</span><span class="n">command</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>  
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">    <span class="n">SeleniumManager</span><span class="o">.</span><span class="n">_process_logs</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&#34;logs&#34;</span><span class="p">])</span>  
+</span></span><span class="line"><span class="cl">    <span class="n">result</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&#34;result&#34;</span><span class="p">]</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">completed_proc</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>  
+</span></span><span class="line"><span class="cl">        <span class="k">raise</span> <span class="n">WebDriverException</span><span class="p">(</span>  
+</span></span><span class="line"><span class="cl">            <span class="sa">f</span><span class="s2">&#34;Unsuccessful command executed: </span><span class="si">{</span><span class="n">command</span><span class="si">}</span><span class="s2">; code: </span><span class="si">{</span><span class="n">completed_proc</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">stderr</span><span class="si">}</span><span class="s2">&#34;</span>  
+</span></span><span class="line"><span class="cl">        <span class="p">)</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">result</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>所以，目前的Selenium 4版本执行时，会通过SeleniumManager程序来确定需要的浏览器和对应的driver版本。</p>
+<h2 id="selenium-manager-命令行程序">Selenium Manager 命令行程序
+</h2><p>而通过SeleniumManager，根据我们配置的浏览器类型和版本，它可以自动的匹配相关的driver版本，并自行联网，获取相关驱动和浏览器版本的文件，供Selenium调用。
+比如上例中，我们指定了浏览器版本为 <code>117</code>, 执行以后，在用户目录的 <code>.cache\selenium</code>目录下其实就会保存下载的浏览器和对应的驱动版本。下图是当前执行更新的117 版本的驱动。</p>
+<p><img src="/post/selenium-manager/Pasted-20240910-3.png"
+	width="1135"
+	height="395"
+	srcset="/post/selenium-manager/Pasted-20240910-3_hu521294048585086754.png 480w, /post/selenium-manager/Pasted-20240910-3_hu4517486098114330906.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="287"
+		data-flex-basis="689px"
+	
+></p>
+<p>这里Selenium调用的是Selenium-manager这个命令行程序</p>
+<p>我们可以直接执行这个程序，加上<code>--help</code>看一下支持的参数</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">selenium</span><span class="o">-</span><span class="n">manager</span> <span class="mf">0.4</span><span class="o">.</span><span class="mi">24</span>
+</span></span><span class="line"><span class="cl"><span class="n">Selenium</span> <span class="n">Manager</span> <span class="n">is</span> <span class="n">a</span> <span class="n">CLI</span> <span class="k">tool</span> <span class="n">that</span> <span class="n">automatically</span> <span class="n">manages</span> <span class="n">the</span> <span class="n">browser</span><span class="o">/</span><span class="n">driver</span> <span class="n">infrastructure</span> <span class="n">required</span> <span class="n">by</span> <span class="n">Selenium</span><span class="o">.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Usage</span><span class="p">:</span> <span class="n">selenium</span><span class="o">-</span><span class="n">manager</span> <span class="p">[</span><span class="n">OPTIONS</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">Options</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">browser</span> <span class="o">&lt;</span><span class="n">BROWSER</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Browser</span> <span class="n">name</span> <span class="p">(</span><span class="n">chrome</span><span class="p">,</span> <span class="n">firefox</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">iexplorer</span><span class="p">,</span> <span class="n">safari</span><span class="p">,</span> <span class="n">safaritp</span><span class="p">,</span> <span class="ow">or</span> <span class="n">webview2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">driver</span> <span class="o">&lt;</span><span class="n">DRIVER</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Driver</span> <span class="n">name</span> <span class="p">(</span><span class="n">chromedriver</span><span class="p">,</span> <span class="n">geckodriver</span><span class="p">,</span> <span class="n">msedgedriver</span><span class="p">,</span> <span class="n">IEDriverServer</span><span class="p">,</span> <span class="ow">or</span> <span class="n">safaridriver</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">grid</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">GRID_VERSION</span><span class="o">&gt;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Selenium</span> <span class="n">Grid</span><span class="o">.</span> <span class="n">If</span> <span class="n">version</span> <span class="n">is</span> <span class="ow">not</span> <span class="n">provided</span><span class="p">,</span> <span class="n">the</span> <span class="n">latest</span> <span class="n">version</span> <span class="n">is</span> <span class="n">downloaded</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">driver</span><span class="o">-</span><span class="n">version</span> <span class="o">&lt;</span><span class="n">DRIVER_VERSION</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Driver</span> <span class="n">version</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="p">,</span> <span class="mf">106.0</span><span class="o">.</span><span class="mf">5249.61</span><span class="p">,</span> <span class="mf">0.31</span><span class="o">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">etc</span><span class="o">.</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">browser</span><span class="o">-</span><span class="n">version</span> <span class="o">&lt;</span><span class="n">BROWSER_VERSION</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Major</span> <span class="n">browser</span> <span class="n">version</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="p">,</span> <span class="mi">105</span><span class="p">,</span> <span class="mi">106</span><span class="p">,</span> <span class="n">etc</span><span class="o">.</span> <span class="n">Also</span><span class="p">:</span> <span class="n">beta</span><span class="p">,</span> <span class="n">dev</span><span class="p">,</span> <span class="n">canary</span> <span class="o">-</span><span class="ow">or</span> <span class="n">nightly</span><span class="o">-</span><span class="p">,</span> <span class="ow">and</span> <span class="n">esr</span> <span class="o">-</span><span class="ow">in</span> <span class="n">Firefox</span><span class="o">-</span> <span class="n">are</span> <span class="n">accepted</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">browser</span><span class="o">-</span><span class="n">path</span> <span class="o">&lt;</span><span class="n">BROWSER_PATH</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Browser</span> <span class="n">path</span> <span class="p">(</span><span class="n">absolute</span><span class="p">)</span> <span class="k">for</span> <span class="n">browser</span> <span class="n">version</span> <span class="n">detection</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="p">,</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">google</span><span class="o">-</span><span class="n">chrome</span><span class="p">,</span> <span class="s2">&#34;/Applications/Google Chrome.app/Contents/MacOS/Google Chrome&#34;</span><span class="p">,</span> <span class="s2">&#34;C:\Program Files\Google\Chrome\Application\chrome.exe&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">driver</span><span class="o">-</span><span class="n">mirror</span><span class="o">-</span><span class="n">url</span> <span class="o">&lt;</span><span class="n">DRIVER_MIRROR_URL</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Mirror</span> <span class="k">for</span> <span class="n">driver</span> <span class="n">repositories</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="p">,</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">registry</span><span class="o">.</span><span class="n">npmmirror</span><span class="o">.</span><span class="n">com</span><span class="o">/-/</span><span class="n">binary</span><span class="o">/</span><span class="n">chromedriver</span><span class="o">/</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">browser</span><span class="o">-</span><span class="n">mirror</span><span class="o">-</span><span class="n">url</span> <span class="o">&lt;</span><span class="n">BROWSER_MIRROR_URL</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Mirror</span> <span class="k">for</span> <span class="n">browser</span> <span class="n">repositories</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">output</span> <span class="o">&lt;</span><span class="n">OUTPUT</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Output</span> <span class="n">type</span><span class="p">:</span> <span class="n">LOGGER</span> <span class="p">(</span><span class="n">using</span> <span class="n">INFO</span><span class="p">,</span> <span class="n">WARN</span><span class="p">,</span> <span class="n">etc</span><span class="o">.</span><span class="p">),</span> <span class="n">JSON</span> <span class="p">(</span><span class="n">custom</span> <span class="n">JSON</span> <span class="n">notation</span><span class="p">),</span> <span class="n">SHELL</span> <span class="p">(</span><span class="n">Unix</span><span class="o">-</span><span class="n">like</span><span class="p">),</span> <span class="ow">or</span> <span class="n">MIXED</span> <span class="p">(</span><span class="n">INFO</span><span class="p">,</span> <span class="n">WARN</span><span class="p">,</span> <span class="n">DEBUG</span><span class="p">,</span> <span class="n">etc</span><span class="o">.</span> <span class="n">to</span> <span class="n">stderr</span> <span class="ow">and</span> <span class="n">minimal</span> <span class="n">JSON</span> <span class="n">to</span> <span class="n">stdout</span><span class="p">)</span> <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="n">LOGGER</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">os</span> <span class="o">&lt;</span><span class="ne">OS</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Operating</span> <span class="n">system</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="p">,</span> <span class="n">windows</span><span class="p">,</span> <span class="n">linux</span><span class="p">,</span> <span class="ow">or</span> <span class="n">macos</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">arch</span> <span class="o">&lt;</span><span class="n">ARCH</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">System</span> <span class="n">architecture</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="p">,</span> <span class="n">x32</span><span class="p">,</span> <span class="n">x64</span><span class="p">,</span> <span class="ow">or</span> <span class="n">arm64</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">proxy</span> <span class="o">&lt;</span><span class="n">PROXY</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">HTTP</span> <span class="n">proxy</span> <span class="k">for</span> <span class="n">network</span> <span class="n">connection</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="p">,</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">myproxy</span><span class="o">.</span><span class="n">net</span><span class="p">:</span><span class="mi">8080</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">timeout</span> <span class="o">&lt;</span><span class="n">TIMEOUT</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Timeout</span> <span class="k">for</span> <span class="n">network</span> <span class="n">requests</span> <span class="p">(</span><span class="ow">in</span> <span class="n">seconds</span><span class="p">)</span> <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="mi">300</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">ttl</span> <span class="o">&lt;</span><span class="n">TTL</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">TTL</span> <span class="p">(</span><span class="n">time</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">live</span><span class="p">)</span> <span class="k">for</span> <span class="n">discovered</span> <span class="n">versions</span> <span class="p">(</span><span class="n">online</span><span class="p">)</span> <span class="n">of</span> <span class="n">drivers</span> <span class="ow">and</span> <span class="n">browsers</span> <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="mi">3600</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">cache</span><span class="o">-</span><span class="n">path</span> <span class="o">&lt;</span><span class="n">CACHE_PATH</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Local</span> <span class="n">folder</span> <span class="n">used</span> <span class="n">to</span> <span class="n">store</span> <span class="n">downloaded</span> <span class="n">assets</span> <span class="p">(</span><span class="n">drivers</span> <span class="ow">and</span> <span class="n">browsers</span><span class="p">),</span> <span class="n">local</span> <span class="n">metadata</span><span class="p">,</span> <span class="ow">and</span> <span class="n">configuration</span> <span class="n">file</span> <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="o">~/.</span><span class="n">cache</span><span class="o">/</span><span class="n">selenium</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">clear</span><span class="o">-</span><span class="n">cache</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Clear</span> <span class="n">cache</span> <span class="n">folder</span> <span class="p">(</span><span class="o">~/.</span><span class="n">cache</span><span class="o">/</span><span class="n">selenium</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">clear</span><span class="o">-</span><span class="n">metadata</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Clear</span> <span class="n">metadata</span> <span class="n">file</span> <span class="p">(</span><span class="o">~/.</span><span class="n">cache</span><span class="o">/</span><span class="n">selenium</span><span class="o">/</span><span class="n">selenium</span><span class="o">-</span><span class="n">manager</span><span class="o">.</span><span class="n">json</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">debug</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Display</span> <span class="n">DEBUG</span> <span class="n">messages</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">trace</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Display</span> <span class="n">TRACE</span> <span class="n">messages</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="nb">log</span><span class="o">-</span><span class="n">level</span> <span class="o">&lt;</span><span class="n">LOG_LEVEL</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Level</span> <span class="k">for</span> <span class="n">output</span> <span class="n">messages</span><span class="o">.</span> <span class="n">The</span> <span class="n">possible</span> <span class="n">values</span> <span class="n">are</span><span class="p">:</span> <span class="n">info</span><span class="p">,</span> <span class="n">debug</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">warn</span><span class="p">,</span> <span class="n">error</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">offline</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Offline</span> <span class="n">mode</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="p">,</span> <span class="n">disabling</span> <span class="n">network</span> <span class="n">requests</span> <span class="ow">and</span> <span class="n">downloads</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">force</span><span class="o">-</span><span class="n">browser</span><span class="o">-</span><span class="n">download</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Force</span> <span class="n">to</span> <span class="n">download</span> <span class="n">browser</span> <span class="p">(</span><span class="n">even</span> <span class="n">when</span> <span class="n">browser</span> <span class="n">is</span> <span class="n">already</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">system</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">avoid</span><span class="o">-</span><span class="n">browser</span><span class="o">-</span><span class="n">download</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Avoid</span> <span class="n">to</span> <span class="n">download</span> <span class="n">browser</span> <span class="p">(</span><span class="n">even</span> <span class="n">when</span> <span class="n">browser</span><span class="o">-</span><span class="n">version</span> <span class="n">is</span> <span class="n">specified</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">language</span><span class="o">-</span><span class="n">binding</span> <span class="o">&lt;</span><span class="n">LANGUAGE_BINDING</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Selenium</span> <span class="n">language</span> <span class="n">bindings</span> <span class="n">that</span> <span class="n">invokes</span> <span class="n">Selenium</span> <span class="n">Manager</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="p">,</span> <span class="n">Java</span><span class="p">,</span> <span class="n">JavaScript</span><span class="p">,</span> <span class="n">Python</span><span class="p">,</span> <span class="n">DotNet</span><span class="p">,</span> <span class="n">Ruby</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">--</span><span class="n">avoid</span><span class="o">-</span><span class="n">stats</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Avoid</span> <span class="n">sends</span> <span class="n">usage</span> <span class="n">statistics</span> <span class="n">to</span> <span class="n">plausible</span><span class="o">.</span><span class="n">io</span>
+</span></span><span class="line"><span class="cl">  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Print</span> <span class="n">help</span>
+</span></span><span class="line"><span class="cl">  <span class="o">-</span><span class="n">V</span><span class="p">,</span> <span class="o">--</span><span class="n">version</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Print</span> <span class="n">version</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们可以执行看一下这里输出信息，其实selenium在执行时就是调用的这个命令行程序</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="o">&gt;</span><span class="n">selenium</span><span class="o">-</span><span class="n">manager</span><span class="o">.</span><span class="n">exe</span> <span class="o">--</span><span class="n">browser</span> <span class="n">firefox</span> <span class="o">--</span><span class="n">debug</span>    <span class="c1">#debug参数显示详细输出</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">35</span><span class="p">:</span><span class="mf">56.007</span><span class="n">Z</span> <span class="n">DEBUG</span><span class="p">]</span> <span class="n">geckodriver</span> <span class="ow">not</span> <span class="n">found</span> <span class="ow">in</span> <span class="n">PATH</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 首先在系统Path路径中根据指定的浏览器判断是否存在驱动</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">35</span><span class="p">:</span><span class="mf">56.010</span><span class="n">Z</span> <span class="n">DEBUG</span><span class="p">]</span> <span class="n">firefox</span> <span class="ow">not</span> <span class="n">found</span> <span class="ow">in</span> <span class="n">PATH</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 同样根据Path路径中是否包含firefox浏览器安装路径</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">35</span><span class="p">:</span><span class="mf">56.010</span><span class="n">Z</span> <span class="n">DEBUG</span><span class="p">]</span> <span class="n">Running</span> <span class="n">command</span><span class="p">:</span> <span class="n">REG</span> <span class="n">QUERY</span> <span class="n">HKCU</span>\<span class="n">Software</span>\<span class="n">Mozilla</span>\<span class="n">Mozilla</span> <span class="n">Firefox</span> <span class="o">/</span><span class="n">v</span> <span class="n">CurrentVersion</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">35</span><span class="p">:</span><span class="mf">56.034</span><span class="n">Z</span> <span class="n">DEBUG</span><span class="p">]</span> <span class="n">Output</span><span class="p">:</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">35</span><span class="p">:</span><span class="mf">56.036</span><span class="n">Z</span> <span class="n">DEBUG</span><span class="p">]</span> <span class="n">firefox</span> <span class="ow">not</span> <span class="n">found</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">system</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 通过注册表查找firefox浏览器安装路径</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">35</span><span class="p">:</span><span class="mf">56.037</span><span class="n">Z</span> <span class="n">DEBUG</span><span class="p">]</span> <span class="n">Required</span> <span class="n">browser</span><span class="p">:</span> <span class="n">firefox</span> <span class="mf">130.0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">--</span> <span class="err">未指定浏览器版本，根据联网信息获取最新版本</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">35</span><span class="p">:</span><span class="mf">56.037</span><span class="n">Z</span> <span class="n">DEBUG</span><span class="p">]</span> <span class="n">Downloading</span> <span class="n">firefox</span> <span class="mf">130.0</span> <span class="n">from</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">ftp</span><span class="o">.</span><span class="n">mozilla</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">pub</span><span class="o">/</span><span class="n">firefox</span><span class="o">/</span><span class="n">releases</span><span class="o">/</span><span class="mf">130.0</span><span class="o">/</span><span class="n">win64</span><span class="o">/</span><span class="n">en</span><span class="o">-</span><span class="n">US</span><span class="o">/</span><span class="n">Firefox</span><span class="o">%</span><span class="mi">20</span><span class="n">Setup</span><span class="o">%</span><span class="mf">20130.0</span><span class="o">.</span><span class="n">exe</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 从官网下载</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">36</span><span class="p">:</span><span class="mf">13.320</span><span class="n">Z</span> <span class="n">DEBUG</span><span class="p">]</span> <span class="n">firefox</span> <span class="mf">130.0</span> <span class="n">is</span> <span class="n">available</span> <span class="n">at</span> <span class="n">C</span><span class="p">:</span>\<span class="n">Users</span>\<span class="n">Administrator</span>\<span class="o">.</span><span class="n">cache</span>\<span class="n">selenium</span>\<span class="n">firefox</span>\<span class="n">win64</span>\<span class="mf">130.0</span>\<span class="n">firefox</span><span class="o">.</span><span class="n">exe</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 完成下载</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">36</span><span class="p">:</span><span class="mf">14.367</span><span class="n">Z</span> <span class="n">DEBUG</span><span class="p">]</span> <span class="n">Valid</span> <span class="n">geckodriver</span> <span class="n">versions</span> <span class="k">for</span> <span class="n">firefox</span> <span class="mi">130</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;0.35.0&#34;</span><span class="p">,</span> <span class="s2">&#34;0.34.0&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 获取可用driver 版本</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">36</span><span class="p">:</span><span class="mf">14.369</span><span class="n">Z</span> <span class="n">DEBUG</span><span class="p">]</span> <span class="n">Required</span> <span class="n">driver</span><span class="p">:</span> <span class="n">geckodriver</span> <span class="mf">0.35</span><span class="o">.</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">36</span><span class="p">:</span><span class="mf">14.372</span><span class="n">Z</span> <span class="n">DEBUG</span><span class="p">]</span> <span class="n">Downloading</span> <span class="n">geckodriver</span> <span class="mf">0.35</span><span class="o">.</span><span class="mi">0</span> <span class="n">from</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">mozilla</span><span class="o">/</span><span class="n">geckodriver</span><span class="o">/</span><span class="n">releases</span><span class="o">/</span><span class="n">download</span><span class="o">/</span><span class="n">v0</span><span class="o">.</span><span class="mf">35.0</span><span class="o">/</span><span class="n">geckodriver</span><span class="o">-</span><span class="n">v0</span><span class="o">.</span><span class="mf">35.0</span><span class="o">-</span><span class="n">win64</span><span class="o">.</span><span class="n">zip</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 下载对应driver</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">36</span><span class="p">:</span><span class="mf">18.238</span><span class="n">Z</span> <span class="n">INFO</span> <span class="p">]</span> <span class="n">Driver</span> <span class="n">path</span><span class="p">:</span> <span class="n">C</span><span class="p">:</span>\<span class="n">Users</span>\<span class="n">Administrator</span>\<span class="o">.</span><span class="n">cache</span>\<span class="n">selenium</span>\<span class="n">geckodriver</span>\<span class="n">win64</span>\<span class="mf">0.35</span><span class="o">.</span><span class="mi">0</span>\<span class="n">geckodriver</span><span class="o">.</span><span class="n">exe</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">36</span><span class="p">:</span><span class="mf">18.239</span><span class="n">Z</span> <span class="n">INFO</span> <span class="p">]</span> <span class="n">Browser</span> <span class="n">path</span><span class="p">:</span> <span class="n">C</span><span class="p">:</span>\<span class="n">Users</span>\<span class="n">Administrator</span>\<span class="o">.</span><span class="n">cache</span>\<span class="n">selenium</span>\<span class="n">firefox</span>\<span class="n">win64</span>\<span class="mf">130.0</span>\<span class="n">firefox</span><span class="o">.</span><span class="n">exe</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 输出browser和driver路径，其实selenium调用时的返回值就是这个信息</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>而除了Browser和Driver外，Selenium-manager其实还支持grid版本的下载。通过<code>--grid</code>  参数就可以直接下载grid的最新版本。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="o">&gt;</span> <span class="n">selenium</span><span class="o">-</span><span class="n">manager</span><span class="o">.</span><span class="n">exe</span> <span class="o">--</span><span class="n">grid</span> <span class="o">--</span><span class="n">debug</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mf">41.793</span><span class="n">Z</span> <span class="n">DEBUG</span><span class="p">]</span> <span class="n">Sending</span> <span class="n">stats</span> <span class="n">to</span> <span class="n">Plausible</span><span class="p">:</span> <span class="n">Props</span> <span class="p">{</span> <span class="n">browser</span><span class="p">:</span> <span class="s2">&#34;grid&#34;</span><span class="p">,</span> <span class="n">browser_version</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span> <span class="n">os</span><span class="p">:</span> <span class="s2">&#34;windows&#34;</span><span class="p">,</span> <span class="n">arch</span><span class="p">:</span> <span class="s2">&#34;amd64&#34;</span><span class="p">,</span> <span class="n">lang</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span> <span class="n">selenium_version</span><span class="p">:</span> <span class="s2">&#34;4.24&#34;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mf">41.795</span><span class="n">Z</span> <span class="n">DEBUG</span><span class="p">]</span> <span class="n">grid</span> <span class="ow">not</span> <span class="n">found</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">system</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mf">43.667</span><span class="n">Z</span> <span class="n">DEBUG</span><span class="p">]</span> <span class="n">Required</span> <span class="n">driver</span><span class="p">:</span> <span class="n">selenium</span><span class="o">-</span><span class="n">server</span> <span class="mf">4.24</span><span class="o">.</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mf">43.669</span><span class="n">Z</span> <span class="n">DEBUG</span><span class="p">]</span> <span class="n">Downloading</span> <span class="n">selenium</span><span class="o">-</span><span class="n">server</span> <span class="mf">4.24</span><span class="o">.</span><span class="mi">0</span> <span class="n">from</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">SeleniumHQ</span><span class="o">/</span><span class="n">selenium</span><span class="o">/</span><span class="n">releases</span><span class="o">/</span><span class="n">download</span><span class="o">/</span><span class="n">selenium</span><span class="o">-</span><span class="mf">4.24</span><span class="o">.</span><span class="mi">0</span><span class="o">/</span><span class="n">selenium</span><span class="o">-</span><span class="n">server</span><span class="o">-</span><span class="mf">4.24</span><span class="o">.</span><span class="mf">0.j</span><span class="n">ar</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">2024</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">10</span><span class="n">T13</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mf">51.547</span><span class="n">Z</span> <span class="n">INFO</span> <span class="p">]</span> <span class="n">Driver</span> <span class="n">path</span><span class="p">:</span> <span class="n">C</span><span class="p">:</span>\<span class="n">Users</span>\<span class="n">Administrator</span>\<span class="o">.</span><span class="n">cache</span>\<span class="n">selenium</span>\<span class="n">grid</span>\<span class="mf">4.24</span><span class="o">.</span><span class="mi">0</span>\<span class="n">selenium</span><span class="o">-</span><span class="n">server</span><span class="o">-</span><span class="mf">4.24</span><span class="o">.</span><span class="mf">0.j</span><span class="n">ar</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>通过以上介绍，可以看出，通过引入Selenium-manager，Selenium在环境准备时已经可以非常灵活地实现对浏览器、驱动包括grid server等资源的自动获取和配置，极大提升了使用Selenium的便利性。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95/">自动化测试</a>
+        
+            <a href="/tags/selenium/">Selenium</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Pytest中fixture的范围</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/">
+        
+        
+            <div class="article-image">
+                <img src="/post/pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824.8ad2b7dc12f6690b38b6e4de63399c9e_hu18202621623117351727.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post Pytest使用Fixture进行参数化及中文乱码问题"
+                        
+                        data-hash="md5-itK33BL2aQs4tuTeYzmcng==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Pytest使用Fixture进行参数化及中文乱码问题</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/page/appium-10/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Appium 发布历史 (latest 10)</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/page/grafana-10/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Grafana 发布历史 (latest 10)</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/page/jmeter-10/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">JMeter 发布历史 (latest 10)</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2023 - 
+        
+        2024 |by 城下秋草（公众号： 秋草说测试）
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
