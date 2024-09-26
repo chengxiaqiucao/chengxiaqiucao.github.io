@@ -7,13 +7,178 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>|by 城下秋草（公众号： 秋草说测试）</copyright>
-        <lastBuildDate>Tue, 24 Sep 2024 13:16:16 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 26 Sep 2024 15:57:47 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Git工作原理和常用指令</title>
+        <link>https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/</link>
+        <pubDate>Thu, 26 Sep 2024 15:57:47 +0800</pubDate>
+        
+        <guid>https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/git.png" alt="Featured image of post Git工作原理和常用指令" /&gt;&lt;h2 id=&#34;序言&#34;&gt;序言
+&lt;/h2&gt;&lt;p&gt;作为一个有追求的测试工程师，现如今敏捷起来，需要和开发人员紧密配合，像配合单元测试、集成测试，都是需要直接面对开发代码的。而且自己做的自动化测试，本身也是代码，因此代码管理其实也是现在做测试绕不过的一个技能。&lt;/p&gt;
+&lt;p&gt;而在和开发人员相爱相杀的过程中，直接冲进代码库，看看都写了什么见不得测试的勾当，也是咱们深度测试的高阶招数。&lt;/p&gt;
+&lt;p&gt;不过这里首要一关，就是跟代码库打交道。所以本文我们来了解下现在最主流的 &lt;code&gt;Git&lt;/code&gt; 代码分支管理工具， 如何用正确的姿势操作代码库。&lt;/p&gt;
+&lt;h2 id=&#34;git是什么&#34;&gt;Git是什么？
+&lt;/h2&gt;&lt;p&gt;Git的作者是大名鼎鼎的Linus Torvalds, 众所周知，著名的 Linux 之父。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-1.png&#34;
+	width=&#34;1338&#34;
+	height=&#34;747&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-1_hu6313430552960781951.png 480w, https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-1_hu16387613031358074904.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;179&#34;
+		data-flex-basis=&#34;429px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;Linux虽然获得了极大的成功，吸引了众多的开发者参与项目，但在早期，作为Linux项目的管理者，Linus主要还是通过手工方式来合并大家的代码。并没有借助任何代码管理工具。&lt;/p&gt;
+&lt;p&gt;倒不是说 Linus 喜欢这种方式，而是因为他对代码版本管理工具非常挑剔，商用的 clearcase，开源的 CVS、SVN等等都不符合他对代码分支管理的预期。&lt;/p&gt;
+&lt;p&gt;直到 2002 年，Linus 才相中了一款商用的分布式版本控制系统 BitKeeper，而基于Linux极大的号召力，BitKeeper也愿意让 Linux 社区免费使用。但到2005年，一位社区开发者在未经允许的情况下逆向了BitKeeper并利用了它未公开的接口，导致 BitKeeper 收回了社区的免费使用权。&lt;/p&gt;
+&lt;p&gt;回到原点的Linus这时就决定自己开发一个代码的版本控制系统，对这个系统的基本诉求是：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;速度&lt;/li&gt;
+&lt;li&gt;设计简单&lt;/li&gt;
+&lt;li&gt;允许大量并行开发的分支&lt;/li&gt;
+&lt;li&gt;完全分布式&lt;/li&gt;
+&lt;li&gt;有能力高效管理类似 Linux 内核一样的超大规模项目&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;然后，大神的效率，Linus 只用了 10 天时间就推出了 Git 的第一个版本。并且给这个版本起了一个略带嘲讽意味的名字——Git（英语俚语中表示“不愉快的人”）。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The name &amp;ldquo;git&amp;rdquo; was given by Linus Torvalds when he wrote the very first version. He described the tool as &amp;ldquo;the stupid content tracker&amp;rdquo; and the name as (depending on your way)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;当然，在 Linus 推出 Git 的第一个版本后，社区中开始有其他感兴趣的成员(Junio Hamano)开始参与并逐渐接手了 Git 的日常维护，Linus 则继续将主要精力放回到了 Linux 内核的维护上。&lt;/p&gt;
+&lt;h2 id=&#34;git-vs-svn&#34;&gt;Git vs SVN
+&lt;/h2&gt;&lt;p&gt;在 Git 之前，最流行的代码版本管理用工具应该是 SVN。&lt;/p&gt;
+&lt;p&gt;不能说 SVN 有很大缺点，但 Git 和 SVN 的应用场景确实有较大区别，这里列表做个比较&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:center&#34;&gt;特性&lt;/th&gt;
+&lt;th style=&#34;text-align:center&#34;&gt;Git&lt;/th&gt;
+&lt;th style=&#34;text-align:center&#34;&gt;SVN&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;分支&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;轻量级分支，创建快速&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;分支是代码库的完整拷贝&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;分支合并&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;快进式合并，合并快速&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;需要手动合并修改&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;分布式&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;是，设计为分布式&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;不是，不支持完全分布式&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;快照&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;保存更改的快照&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;保存文件的差异&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;速度&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;快，分布式设计&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;慢，中心化设计&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;权限控制&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;通过Git Hooks和Gitolite控制&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;通过钩子脚本控制&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;学习曲线&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;较高，需要理解命令和概念&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;较低，容易上手&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;标签&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;轻量级标签，可以后续修改&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;不可变的静态标签&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;历史记录&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;保留所有历史记录&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;只保留最近的历史记录&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;合并冲突&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;需要手动解决&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;自动尝试解决，有冲突时需手动介入&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;命令行工具&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;是，Git命令行强大灵活&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;较为简单，主要用于管理和操作仓库&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;总体来说，现在 Git 更为流行，围绕 Git 的生态更加健全，因此逐渐成为了目前最主流的版本控制工具&lt;/p&gt;
+&lt;h2 id=&#34;git的工作原理&#34;&gt;Git的工作原理
+&lt;/h2&gt;&lt;p&gt;那 Git 到底是如何进行工作的呢？&lt;/p&gt;
+&lt;p&gt;git 在架构上其实是一个三层架构，&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;工作目录（working directory）&lt;/strong&gt;： 这是项目文件所在的实际目录。对工作目录中的文件所做的修改被认为是“未跟踪”状态，直到显式地进行 commit 操作。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;暂存区（staging area）&lt;/strong&gt;：暂存区充当工作目录和 &lt;code&gt;.git&lt;/code&gt; 目录之间的缓冲地带。暂存区域中的文件处于“暂存”状态，以便在下一次 commit 时包含。是允许选择和控制更改的手段。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;本地库（local repository）&lt;/strong&gt;：也就是 &lt;code&gt;.git&lt;/code&gt; 目录， 它是Git版本控制系统的核心容器，包含各种元数据、对象数据库和配置信息。&lt;code&gt;.git&lt;/code&gt; 目录存储 commit 的快照，并管理项目的历史记录，接受git的各种操作指令。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;而除了本地代码管理的这三层，还存在一个&lt;code&gt;远程库&lt;/code&gt;的概念，用于不同成员间对同一个项目代码进行协作。&lt;/p&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;&lt;strong&gt;远程仓库（remote repository）：&lt;/strong&gt; 远程仓库是一个中心仓库，用于团队成员协作，通过push、pull、merge等方式确保代码的同步和协同。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/git-architechture.gif&#34;
+	width=&#34;1600&#34;
+	height=&#34;900&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/git-architechture_hu8501936044035969288.gif 480w, https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/git-architechture_hu12417624834176210852.gif 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;177&#34;
+		data-flex-basis=&#34;426px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;结合上面这个架构和主要的Git操作命令，我们理解一下 git 的运作过程：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;首先我们通过 &lt;code&gt;git init&lt;/code&gt; 或者 &lt;code&gt;git clone&lt;/code&gt; 建立起本地的git仓库，也就是会包含 &lt;code&gt;.git&lt;/code&gt; 这个本地库目录。&lt;/li&gt;
+&lt;li&gt;本地新增或修改的代码，这时其实是处于 &lt;code&gt;未跟踪(untracked)&lt;/code&gt; 状态&lt;/li&gt;
+&lt;li&gt;执行 &lt;code&gt;git add .&lt;/code&gt;指令，这时相关变更会进入 &lt;code&gt;暂存区&lt;/code&gt;， 对应的状态是 &lt;code&gt;已缓存(staged)&lt;/code&gt; 或者 &lt;code&gt;已修改(modified)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;这时再执行 &lt;code&gt;git commit&lt;/code&gt;指令， 作用是从暂存区将变更提交到本地库中，对应状态是&lt;code&gt;已提交(committed)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git diff&lt;/code&gt; 是查看变更的命令，可以看到，它其实比较的是工作目录和暂存区的区别，而 &lt;code&gt;git diff HEAD&lt;/code&gt; 则比较本地库和工作目录&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git push&lt;/code&gt; 会将本地库中的内容，提交到远程库&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git fetch&lt;/code&gt; 用于将远程库同步到本地库&lt;/li&gt;
+&lt;li&gt;我们常用的&lt;code&gt;git pull&lt;/code&gt;则是将远程库直接拉取到本地的工作目录下&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;常用-git-命令&#34;&gt;常用 Git 命令
+&lt;/h2&gt;&lt;p&gt;借用一个中文的Git cheatsheet，便于速查。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-2.png&#34;
+	width=&#34;990&#34;
+	height=&#34;699&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-2_hu15818470663841126765.png 480w, https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-2_hu448642655580809983.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;141&#34;
+		data-flex-basis=&#34;339px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;详细的命令用法这里就不再罗列了，核心命令主要也就是上面原理图中提及到的几个。&lt;/p&gt;
+&lt;p&gt;进一步学习的话，也可以利用在线的学习工具，这里推荐一个：&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://learngitbranching.js.org/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://learngitbranching.js.org/&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>Pytest中自动指定可引用fixture</title>
-        <link>https://chengxiaqiucao.github.io/post/pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/</link>
+        <link>https://chengxiaqiucao.github.io/post/17-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/</link>
         <pubDate>Tue, 24 Sep 2024 13:16:16 +0800</pubDate>
         
-        <guid>https://chengxiaqiucao.github.io/post/pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/</guid>
-        <description>&lt;img src="https://chengxiaqiucao.github.io/post/pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/pytest.png" alt="Featured image of post Pytest中自动指定可引用fixture" /&gt;&lt;p&gt;在我们使用 Pytest 框架进行自动化测试时，强大的 fixture 夹具为框架的灵活应用提供了极大的便利。比如我们可以利用 fixture 的&lt;code&gt;autouse&lt;/code&gt;属性，使它在测试方法的不同范围层级上自动生效。但如果要引用fixture的返回，我们通常还是要明确指定，稍显麻烦&lt;/p&gt;
+        <guid>https://chengxiaqiucao.github.io/post/17-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/post/17-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/pytest.png" alt="Featured image of post Pytest中自动指定可引用fixture" /&gt;&lt;p&gt;在我们使用 Pytest 框架进行自动化测试时，强大的 fixture 夹具为框架的灵活应用提供了极大的便利。比如我们可以利用 fixture 的&lt;code&gt;autouse&lt;/code&gt;属性，使它在测试方法的不同范围层级上自动生效。但如果要引用fixture的返回，我们通常还是要明确指定，稍显麻烦&lt;/p&gt;
 &lt;h2 id=&#34;autouse指定fixture但还是需要显式携带为参数才可调用&#34;&gt;autouse指定fixture，但还是需要显式携带为参数才可调用
 &lt;/h2&gt;&lt;p&gt;以&lt;code&gt;Selenium&lt;/code&gt; 自动化时最常用的&lt;code&gt;webdriver&lt;/code&gt;为例， 实现自动化时，因为&lt;code&gt;webdriver&lt;/code&gt; 对象通常会在整个执行期间都生效，而且会频繁地进行调用。&lt;/p&gt;
 &lt;p&gt;通常的做法是可以在 &lt;code&gt;conftest.py&lt;/code&gt; 文件中编写一个session层级的通用&lt;code&gt;driver&lt;/code&gt;夹具，设置 &lt;code&gt;autouse&lt;/code&gt;为启用：&lt;/p&gt;
@@ -59,10 +224,10 @@
 &lt;/h2&gt;&lt;p&gt;其实大家学习过通过Fixture来参数化的方法的话，应该知道通过Fixture进行参数化，是通过pytest的一个内部fixture &lt;code&gt;request&lt;/code&gt;来完成的。 &lt;code&gt;request&lt;/code&gt;应该是pytest中最为重要的一个内置夹具了。而利用这个fixture，我们其实可以实现隐式地将一些通用fixture默认地传递给各个测试类&lt;/p&gt;
 &lt;h3 id=&#34;request简介&#34;&gt;request简介
 &lt;/h3&gt;&lt;p&gt;通过官方文档的介绍：&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-3.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/17-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-3.png&#34;
 	width=&#34;1213&#34;
 	height=&#34;1095&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-3_hu17192933400527519138.png 480w, https://chengxiaqiucao.github.io/post/pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-3_hu15904382590048979725.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/17-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-3_hu17192933400527519138.png 480w, https://chengxiaqiucao.github.io/post/17-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-3_hu15904382590048979725.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -76,10 +241,10 @@
 &lt;/blockquote&gt;
 &lt;p&gt;利用request，我们可以在运行过程中获取当前fixture的诸多上下文信息。比如夹具名称、路径、当前的session、模块、类信息等。&lt;/p&gt;
 &lt;p&gt;下图是引用fixture时，断点得到的request对象属性&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/17-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924.png&#34;
 	width=&#34;1355&#34;
 	height=&#34;691&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924_hu11028318599091337281.png 480w, https://chengxiaqiucao.github.io/post/pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924_hu2946472734473144841.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/17-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924_hu11028318599091337281.png 480w, https://chengxiaqiucao.github.io/post/17-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924_hu2946472734473144841.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -88,10 +253,10 @@
 		data-flex-basis=&#34;470px&#34;
 	
 &gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-1.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/17-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-1.png&#34;
 	width=&#34;1319&#34;
 	height=&#34;852&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-1_hu3484233660236892202.png 480w, https://chengxiaqiucao.github.io/post/pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-1_hu6154508383218295034.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/17-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-1_hu3484233660236892202.png 480w, https://chengxiaqiucao.github.io/post/17-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-1_hu6154508383218295034.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -158,10 +323,10 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;执行效果, 用例同样正确完成执行。
-&lt;img src=&#34;https://chengxiaqiucao.github.io/post/pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-2.png&#34;
+&lt;img src=&#34;https://chengxiaqiucao.github.io/post/17-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-2.png&#34;
 	width=&#34;1945&#34;
 	height=&#34;651&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-2_hu18141093191625415024.png 480w, https://chengxiaqiucao.github.io/post/pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-2_hu8525223947236665858.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/17-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-2_hu18141093191625415024.png 480w, https://chengxiaqiucao.github.io/post/17-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-2_hu8525223947236665858.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -175,11 +340,11 @@
         </item>
         <item>
         <title>用SeleniumBase制作产品Demo</title>
-        <link>https://chengxiaqiucao.github.io/post/%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/</link>
+        <link>https://chengxiaqiucao.github.io/post/19-%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/</link>
         <pubDate>Mon, 23 Sep 2024 00:00:00 +0000</pubDate>
         
-        <guid>https://chengxiaqiucao.github.io/post/%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/</guid>
-        <description>&lt;img src="https://chengxiaqiucao.github.io/post/%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/seleniumBase.png" alt="Featured image of post 用SeleniumBase制作产品Demo" /&gt;&lt;p&gt;Selenium作为目前最为流程的开源Web自动化测试框架，已经发展了20年。功能强大，它的webdriver协议也已经成为自动化测试领域的一个事实标准。而基于Selenium这个框架，又诞生出很多基于它封装的拓展框架。比如本文我们介绍的SeleniumBase&lt;/p&gt;
+        <guid>https://chengxiaqiucao.github.io/post/19-%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/post/19-%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/seleniumBase.png" alt="Featured image of post 用SeleniumBase制作产品Demo" /&gt;&lt;p&gt;Selenium作为目前最为流程的开源Web自动化测试框架，已经发展了20年。功能强大，它的webdriver协议也已经成为自动化测试领域的一个事实标准。而基于Selenium这个框架，又诞生出很多基于它封装的拓展框架。比如本文我们介绍的SeleniumBase&lt;/p&gt;
 &lt;h2 id=&#34;seleniumbase是什么&#34;&gt;SeleniumBase是什么？
 &lt;/h2&gt;&lt;p&gt;SeleniumBase是一个基于Selenium框架基础上，进一步进行了脚本增强的Python库。
 在Selenium原有的功能基础上，简化了自动化脚本的编写和调用方式，并且和&lt;code&gt;pytest&lt;/code&gt;框架进行了深度集成。最主要的是它提供了多种不同的脚本模式, 包括脚本录制、运行慢放、运行中Debug，以及我们本文要介绍的演示功能。&lt;/p&gt;
@@ -192,10 +357,10 @@
 &lt;p&gt;所以SeleniumBase的这个功能就能在这里发挥优势了&lt;/p&gt;
 &lt;h2 id=&#34;用seleniumbase制作产品演示流程&#34;&gt;用SeleniumBase制作产品演示流程
 &lt;/h2&gt;&lt;p&gt;先看一下用SeleniumBase完成的我的博客网站的中一个开源更新信息的演示&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/demo.gif&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/19-%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/demo.gif&#34;
 	width=&#34;1677&#34;
 	height=&#34;968&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/demo_hu10314435148184512165.gif 480w, https://chengxiaqiucao.github.io/post/%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/demo_hu7251197786291639944.gif 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/19-%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/demo_hu10314435148184512165.gif 480w, https://chengxiaqiucao.github.io/post/19-%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/demo_hu7251197786291639944.gif 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -289,18 +454,18 @@
         </item>
         <item>
         <title>适合用来自动化测试练手的项目</title>
-        <link>https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/</link>
+        <link>https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/</link>
         <pubDate>Fri, 20 Sep 2024 15:24:19 +0800</pubDate>
         
-        <guid>https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/</guid>
-        <description>&lt;img src="https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/autotest.png" alt="Featured image of post 适合用来自动化测试练手的项目" /&gt;&lt;p&gt;很多初学自动化测试的朋友，看过很多教程，但是苦恼于没有合适的项目用来进行练习，这里就分享下笔者收集的一些不错的练习项目&lt;/p&gt;
+        <guid>https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/autotest.png" alt="Featured image of post 适合用来自动化测试练手的项目" /&gt;&lt;p&gt;很多初学自动化测试的朋友，看过很多教程，但是苦恼于没有合适的项目用来进行练习，这里就分享下笔者收集的一些不错的练习项目&lt;/p&gt;
 &lt;h2 id=&#34;demoqa&#34;&gt;DemoQA
 &lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://demoqa.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;DemoQA&lt;/a&gt; 是一个专门的用于练习如Selenium这样的web自动化测试的练习网站。
-&lt;img src=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-1.png&#34;
+&lt;img src=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-1.png&#34;
 	width=&#34;1167&#34;
 	height=&#34;911&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-1_hu9127758916443554278.png 480w, https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-1_hu16386492157178997161.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-1_hu9127758916443554278.png 480w, https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-1_hu16386492157178997161.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -310,10 +475,10 @@
 	
 &gt;
 针对Web自动化学习过程中的各种常用元素、控件都有覆盖，可以比较全面地学习对页面的处理
-&lt;img src=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-2.png&#34;
+&lt;img src=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-2.png&#34;
 	width=&#34;897&#34;
 	height=&#34;902&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-2_hu13346562935159791222.png 480w, https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-2_hu18261334579522064187.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-2_hu13346562935159791222.png 480w, https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-2_hu18261334579522064187.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -325,10 +490,10 @@
 &lt;h2 id=&#34;the-internet&#34;&gt;The-internet
 &lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://the-internet.herokuapp.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;The-Internet&lt;/a&gt; 也是一个面向初学者的专门用于自动化测试练习的项目，和DemoQA比较类似。场景上可以用来互补。 除了在线使用，也可以通过它的github项目下载源码自行部署（基于Ruby）。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-3.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-3.png&#34;
 	width=&#34;1206&#34;
 	height=&#34;1027&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-3_hu14999633446172234887.png 480w, https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-3_hu10912827031052312149.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-3_hu14999633446172234887.png 480w, https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-3_hu10912827031052312149.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -340,10 +505,10 @@
 &lt;h2 id=&#34;saucelab-app&#34;&gt;SauceLab App
 &lt;/h2&gt;&lt;p&gt;SauceLab 是一个测试服务提供商，&lt;a class=&#34;link&#34; href=&#34;https://www.saucedemo.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;SauceDemo&lt;/a&gt; 这个站点是它提供于自动化测试练习的一个项目&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-4.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-4.png&#34;
 	width=&#34;1880&#34;
 	height=&#34;1016&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-4_hu8148863849483488403.png 480w, https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-4_hu6354309247450880881.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-4_hu8148863849483488403.png 480w, https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-4_hu6354309247450880881.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -357,10 +522,10 @@
     &gt;https://github.com/saucelabs/my-demo-app-android&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/saucelabs/my-demo-app-ios&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;https://github.com/saucelabs/my-demo-app-ios&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-5.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-5.png&#34;
 	width=&#34;679&#34;
 	height=&#34;1174&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-5_hu8965479950831090819.png 480w, https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-5_hu72046281636342500.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-5_hu8965479950831090819.png 480w, https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-5_hu72046281636342500.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -372,10 +537,10 @@
 &lt;h2 id=&#34;sahi-test&#34;&gt;Sahi Test
 &lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://sahitest.com/demo/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;Sahi Test&lt;/a&gt; 是一个测试博主自建的用于自动化测试练习的一个项目，包含了非常丰富的场景&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-6.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-6.png&#34;
 	width=&#34;1820&#34;
 	height=&#34;845&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-6_hu363750509686732339.png 480w, https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-6_hu4821399036653744460.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-6_hu363750509686732339.png 480w, https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-6_hu4821399036653744460.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -387,10 +552,10 @@
 &lt;h2 id=&#34;guru99-demo&#34;&gt;GURU99 Demo
 &lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://demo.guru99.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;Demo Guru99&lt;/a&gt; 是Guru99 网站集成的用于自动化测试练习的多个项目集成，包括保险、银行、电信以及传统自动化测试工具QTP自带的Tour项目&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-7.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-7.png&#34;
 	width=&#34;1635&#34;
 	height=&#34;932&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-7_hu16141801669240581132.png 480w, https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-7_hu2660214866775669608.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-7_hu16141801669240581132.png 480w, https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-7_hu2660214866775669608.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -399,10 +564,10 @@
 		data-flex-basis=&#34;421px&#34;
 	
 &gt;
-&lt;img src=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-8.png&#34;
+&lt;img src=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-8.png&#34;
 	width=&#34;852&#34;
 	height=&#34;1022&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-8_hu17479030392754943674.png 480w, https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-8_hu10830810817373383622.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-8_hu17479030392754943674.png 480w, https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-8_hu10830810817373383622.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -414,10 +579,10 @@
 &lt;h2 id=&#34;jpetstore&#34;&gt;JpetStore
 &lt;/h2&gt;&lt;p&gt;&lt;strong&gt;JpetStore&lt;/strong&gt;是由mybatis 提供的一个宠物商店应用。项目地址：&lt;a class=&#34;link&#34; href=&#34;https://github.com/mybatis/jpetstore-6&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;https://github.com/mybatis/jpetstore-6&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-10.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-10.png&#34;
 	width=&#34;1663&#34;
 	height=&#34;662&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-10_hu744131364626313220.png 480w, https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-10_hu4529008238033515561.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-10_hu744131364626313220.png 480w, https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-10_hu4529008238033515561.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -430,10 +595,10 @@
 &lt;/h2&gt;&lt;p&gt;除了上面这些专门提供给自动化测试练习的项目外，我们练习时也可以找一些功能更齐全的开源免费站点来使用。&lt;/p&gt;
 &lt;p&gt;比如&lt;a class=&#34;link&#34; href=&#34;https://demo.opencart.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;OpenCart&lt;/a&gt; 就是一个开源的电商网站，可以基于它的Demo站点来练习&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920.png&#34;
 	width=&#34;1645&#34;
 	height=&#34;1263&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920_hu829495909311074331.png 480w, https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920_hu13637713217340434640.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920_hu829495909311074331.png 480w, https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920_hu13637713217340434640.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -445,10 +610,10 @@
 &lt;h2 id=&#34;orangehrm&#34;&gt;OrangeHRM
 &lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://opensource-demo.orangehrmlive.com/web/index.php/auth/login&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;OrangeHRM&lt;/a&gt; 是一个功能强大的开源人事管理系统，作为自动化测试的练习网站同样是一个很好的选择&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-9.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-9.png&#34;
 	width=&#34;1876&#34;
 	height=&#34;1007&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-9_hu5953875434707125413.png 480w, https://chengxiaqiucao.github.io/post/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-9_hu13542038813385622083.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-9_hu5953875434707125413.png 480w, https://chengxiaqiucao.github.io/post/12-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE%E6%94%B6%E9%9B%86/Pasted-20240920-9_hu13542038813385622083.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -462,11 +627,11 @@
         </item>
         <item>
         <title>Selenium Manager用法详解</title>
-        <link>https://chengxiaqiucao.github.io/post/selenium-manager/</link>
+        <link>https://chengxiaqiucao.github.io/post/13-selenium-manager/</link>
         <pubDate>Sat, 07 Sep 2024 18:03:04 +0800</pubDate>
         
-        <guid>https://chengxiaqiucao.github.io/post/selenium-manager/</guid>
-        <description>&lt;img src="https://chengxiaqiucao.github.io/post/selenium-manager/Se-m.png" alt="Featured image of post Selenium Manager用法详解" /&gt;&lt;p&gt;Selenium诞生于2004年，以其开源、功能全面长期以来长期排名Web 自动化测试工具领域的Top1，是目前最主流的Web自动化测试工具，而Selenium的核心Webdriver 更是作为W3C的通行标准，被各类工具广泛参照。可以说是目前web自动化测试的事实标准。&lt;/p&gt;
+        <guid>https://chengxiaqiucao.github.io/post/13-selenium-manager/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/post/13-selenium-manager/Se-m.png" alt="Featured image of post Selenium Manager用法详解" /&gt;&lt;p&gt;Selenium诞生于2004年，以其开源、功能全面长期以来长期排名Web 自动化测试工具领域的Top1，是目前最主流的Web自动化测试工具，而Selenium的核心Webdriver 更是作为W3C的通行标准，被各类工具广泛参照。可以说是目前web自动化测试的事实标准。&lt;/p&gt;
 &lt;h2 id=&#34;selenium-4带来的变化&#34;&gt;Selenium 4带来的变化
 &lt;/h2&gt;&lt;p&gt;Selenium本身经过多年的演进，目前已经发布到V4.24版本。 虽然目前网上还广泛流传V3版本相关的用法和资料，但Selenium 4 其实是一个非常大的更新版本。它的几个核心组件都进行的极大程度的重构。&lt;/p&gt;
 &lt;ul&gt;
@@ -479,10 +644,10 @@
 &lt;/h2&gt;&lt;p&gt;要了解Selenium Manager，我们还是要先了解下Selenium的工作原理。&lt;/p&gt;
 &lt;h3 id=&#34;selenium工作原理&#34;&gt;Selenium工作原理
 &lt;/h3&gt;&lt;p&gt;下图是官网给的Selenium本地运行的基本架构。
-&lt;img src=&#34;https://chengxiaqiucao.github.io/post/selenium-manager/Pasted-20240908.png&#34;
+&lt;img src=&#34;https://chengxiaqiucao.github.io/post/13-selenium-manager/Pasted-20240908.png&#34;
 	width=&#34;895&#34;
 	height=&#34;426&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/selenium-manager/Pasted-20240908_hu13227185974333149166.png 480w, https://chengxiaqiucao.github.io/post/selenium-manager/Pasted-20240908_hu12381085848425339710.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/13-selenium-manager/Pasted-20240908_hu13227185974333149166.png 480w, https://chengxiaqiucao.github.io/post/13-selenium-manager/Pasted-20240908_hu12381085848425339710.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;Selenium工作原理&#34;
@@ -506,10 +671,10 @@
 &lt;/h3&gt;&lt;p&gt;既然这个问题由来已久，浏览器厂商其实也意识到驱动和浏览器版本不匹配，给自动化测试带来的困扰。&lt;/p&gt;
 &lt;p&gt;以Chrome为例，我们去到 &lt;a class=&#34;link&#34; href=&#34;https://developer.chrome.com/docs/chromedriver/downloads&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;ChromeDriver官方下载&lt;/a&gt;  网址的话，会看到这样的页面&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/selenium-manager/Pasted-20240910.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/13-selenium-manager/Pasted-20240910.png&#34;
 	width=&#34;1414&#34;
 	height=&#34;850&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/selenium-manager/Pasted-20240910_hu5724162091603531267.png 480w, https://chengxiaqiucao.github.io/post/selenium-manager/Pasted-20240910_hu17616114122145533867.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/13-selenium-manager/Pasted-20240910_hu5724162091603531267.png 480w, https://chengxiaqiucao.github.io/post/13-selenium-manager/Pasted-20240910_hu17616114122145533867.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -521,10 +686,10 @@
 &lt;p&gt;可以看到，这里对Chrome Driver的下载只提供到了114版本，而最新的Chrome其实已经到了128版本。
 对于115版本以后，Chrome浏览器其实调整了driver的发布策略，也就是Chrome driver会跟随 Chrome for Testing 版本同步发布。严格保证driver和浏览器版本的同步匹配。&lt;/p&gt;
 &lt;p&gt;那这里为什么有一个Chrome for Testing版本呢？&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/selenium-manager/Pasted-20240910-1.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/13-selenium-manager/Pasted-20240910-1.png&#34;
 	width=&#34;1325&#34;
 	height=&#34;1054&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/selenium-manager/Pasted-20240910-1_hu14428106396979902189.png 480w, https://chengxiaqiucao.github.io/post/selenium-manager/Pasted-20240910-1_hu7787818710469860217.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/13-selenium-manager/Pasted-20240910-1_hu14428106396979902189.png 480w, https://chengxiaqiucao.github.io/post/13-selenium-manager/Pasted-20240910-1_hu7787818710469860217.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -538,10 +703,10 @@
 &lt;p&gt;这样，再加上版本号和浏览器版本的共用，就能很方便地保证浏览器和驱动的一致。&lt;/p&gt;
 &lt;h3 id=&#34;selenium应对驱动匹配问题的解决方案&#34;&gt;Selenium应对驱动匹配问题的解决方案
 &lt;/h3&gt;&lt;p&gt;那上面是浏览器对驱动匹配问题给出的解决方法，但其实还是没有完全解决浏览器、Driver需要分别获取和指定的问题。那么Selenium官方对这个问题的解决方案，就是Selenium Manager。它其实是一个包含在Selenium库中，无需额外安装的可执行程序。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/selenium-manager/Pasted-20240910-2.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/13-selenium-manager/Pasted-20240910-2.png&#34;
 	width=&#34;569&#34;
 	height=&#34;685&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/selenium-manager/Pasted-20240910-2_hu8447291414850455275.png 480w, https://chengxiaqiucao.github.io/post/selenium-manager/Pasted-20240910-2_hu10422254456594308963.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/13-selenium-manager/Pasted-20240910-2_hu8447291414850455275.png 480w, https://chengxiaqiucao.github.io/post/13-selenium-manager/Pasted-20240910-2_hu10422254456594308963.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -589,10 +754,10 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;只要安装了Selenium库，执行的时候，就可以正常地驱动, 并不需要特别地去获取驱动和配置。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/selenium-manager/run.gif&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/13-selenium-manager/run.gif&#34;
 	width=&#34;1554&#34;
 	height=&#34;935&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/selenium-manager/run_hu16654001849519801082.gif 480w, https://chengxiaqiucao.github.io/post/selenium-manager/run_hu8903193728433408626.gif 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/13-selenium-manager/run_hu16654001849519801082.gif 480w, https://chengxiaqiucao.github.io/post/13-selenium-manager/run_hu8903193728433408626.gif 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -730,10 +895,10 @@
 &lt;h2 id=&#34;selenium-manager-命令行程序&#34;&gt;Selenium Manager 命令行程序
 &lt;/h2&gt;&lt;p&gt;而通过SeleniumManager，根据我们配置的浏览器类型和版本，它可以自动的匹配相关的driver版本，并自行联网，获取相关驱动和浏览器版本的文件，供Selenium调用。
 比如上例中，我们指定了浏览器版本为 &lt;code&gt;117&lt;/code&gt;, 执行以后，在用户目录的 &lt;code&gt;.cache\selenium&lt;/code&gt;目录下其实就会保存下载的浏览器和对应的驱动版本。下图是当前执行更新的117 版本的驱动。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/selenium-manager/Pasted-20240910-3.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/13-selenium-manager/Pasted-20240910-3.png&#34;
 	width=&#34;1135&#34;
 	height=&#34;395&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/selenium-manager/Pasted-20240910-3_hu521294048585086754.png 480w, https://chengxiaqiucao.github.io/post/selenium-manager/Pasted-20240910-3_hu4517486098114330906.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/13-selenium-manager/Pasted-20240910-3_hu521294048585086754.png 480w, https://chengxiaqiucao.github.io/post/13-selenium-manager/Pasted-20240910-3_hu4517486098114330906.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -983,10 +1148,10 @@
         </item>
         <item>
         <title>Pytest中fixture的范围</title>
-        <link>https://chengxiaqiucao.github.io/post/pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/</link>
+        <link>https://chengxiaqiucao.github.io/post/18-pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/</link>
         <pubDate>Wed, 28 Aug 2024 20:33:52 +0800</pubDate>
         
-        <guid>https://chengxiaqiucao.github.io/post/pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/</guid>
+        <guid>https://chengxiaqiucao.github.io/post/18-pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/</guid>
         <description>&lt;p&gt;pytest作为Python技术栈下最主流的测试框架，功能极为强大和灵活。其中Fixture夹具是它的核心。而且pytest中对Fixture的作用范围也做了不同区分，能为我们利用fixture带来很好地灵活性。&lt;/p&gt;
 &lt;p&gt;下面我们就来了解下这里不同scope的作用&lt;/p&gt;
 &lt;h2 id=&#34;fixture的scope定义&#34;&gt;fixture的scope定义
@@ -1022,10 +1187,10 @@
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;下面结合代码来说明，假设目前有这样的代码结构&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/Pasted-20240901.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/18-pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/Pasted-20240901.png&#34;
 	width=&#34;421&#34;
 	height=&#34;401&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/Pasted-20240901_hu6463406299743170217.png 480w, https://chengxiaqiucao.github.io/post/pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/Pasted-20240901_hu16268989314827633149.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/18-pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/Pasted-20240901_hu6463406299743170217.png 480w, https://chengxiaqiucao.github.io/post/18-pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/Pasted-20240901_hu16268989314827633149.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -1642,11 +1807,11 @@
         </item>
         <item>
         <title>Pytest使用Fixture进行参数化及中文乱码问题</title>
-        <link>https://chengxiaqiucao.github.io/post/pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/</link>
+        <link>https://chengxiaqiucao.github.io/post/16-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/</link>
         <pubDate>Sat, 24 Aug 2024 00:11:46 +0800</pubDate>
         
-        <guid>https://chengxiaqiucao.github.io/post/pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/</guid>
-        <description>&lt;img src="https://chengxiaqiucao.github.io/post/pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824.png" alt="Featured image of post Pytest使用Fixture进行参数化及中文乱码问题" /&gt;&lt;p&gt;我们知道，Pytest是Python技术栈下进行自动化测试的主流测试框架。支持灵活的测试发现、执行策略，强大的Fixture夹具和丰富的插件支持。&lt;/p&gt;
+        <guid>https://chengxiaqiucao.github.io/post/16-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/post/16-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824.png" alt="Featured image of post Pytest使用Fixture进行参数化及中文乱码问题" /&gt;&lt;p&gt;我们知道，Pytest是Python技术栈下进行自动化测试的主流测试框架。支持灵活的测试发现、执行策略，强大的Fixture夹具和丰富的插件支持。&lt;/p&gt;
 &lt;p&gt;除了通过pytest的parametrize标签进行参数化外，我们通过fixture的param参数也可以比较方便地实现参数化测试的功能&lt;/p&gt;
 &lt;h2 id=&#34;fixture参数化实现&#34;&gt;fixture参数化实现
 &lt;/h2&gt;&lt;p&gt;假设我们有如下一段待测代码，根据传入参数的不同类型得到不同的输出&lt;/p&gt;
@@ -1694,10 +1859,10 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;运行得到如下输出：
-&lt;img src=&#34;https://chengxiaqiucao.github.io/post/pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824.png&#34;
+&lt;img src=&#34;https://chengxiaqiucao.github.io/post/16-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824.png&#34;
 	width=&#34;1662&#34;
 	height=&#34;651&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824_hu11949774451865426471.png 480w, https://chengxiaqiucao.github.io/post/pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824_hu8690318924872336495.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/16-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824_hu11949774451865426471.png 480w, https://chengxiaqiucao.github.io/post/16-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824_hu8690318924872336495.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	
@@ -1729,10 +1894,10 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;再次执行，可以看到已经正常显示了中文
-&lt;img src=&#34;https://chengxiaqiucao.github.io/post/pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824-1.png&#34;
+&lt;img src=&#34;https://chengxiaqiucao.github.io/post/16-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824-1.png&#34;
 	width=&#34;1489&#34;
 	height=&#34;637&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824-1_hu10100520808769769772.png 480w, https://chengxiaqiucao.github.io/post/pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824-1_hu17622052956983562824.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/16-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824-1_hu10100520808769769772.png 480w, https://chengxiaqiucao.github.io/post/16-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824-1_hu17622052956983562824.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 	

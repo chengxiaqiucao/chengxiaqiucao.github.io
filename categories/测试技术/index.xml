@@ -7,13 +7,178 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>|by 城下秋草（公众号： 秋草说测试）</copyright>
-        <lastBuildDate>Fri, 30 Aug 2024 20:35:21 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/categories/%E6%B5%8B%E8%AF%95%E6%8A%80%E6%9C%AF/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 26 Sep 2024 15:57:47 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/categories/%E6%B5%8B%E8%AF%95%E6%8A%80%E6%9C%AF/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Git工作原理和常用指令</title>
+        <link>https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/</link>
+        <pubDate>Thu, 26 Sep 2024 15:57:47 +0800</pubDate>
+        
+        <guid>https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/git.png" alt="Featured image of post Git工作原理和常用指令" /&gt;&lt;h2 id=&#34;序言&#34;&gt;序言
+&lt;/h2&gt;&lt;p&gt;作为一个有追求的测试工程师，现如今敏捷起来，需要和开发人员紧密配合，像配合单元测试、集成测试，都是需要直接面对开发代码的。而且自己做的自动化测试，本身也是代码，因此代码管理其实也是现在做测试绕不过的一个技能。&lt;/p&gt;
+&lt;p&gt;而在和开发人员相爱相杀的过程中，直接冲进代码库，看看都写了什么见不得测试的勾当，也是咱们深度测试的高阶招数。&lt;/p&gt;
+&lt;p&gt;不过这里首要一关，就是跟代码库打交道。所以本文我们来了解下现在最主流的 &lt;code&gt;Git&lt;/code&gt; 代码分支管理工具， 如何用正确的姿势操作代码库。&lt;/p&gt;
+&lt;h2 id=&#34;git是什么&#34;&gt;Git是什么？
+&lt;/h2&gt;&lt;p&gt;Git的作者是大名鼎鼎的Linus Torvalds, 众所周知，著名的 Linux 之父。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-1.png&#34;
+	width=&#34;1338&#34;
+	height=&#34;747&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-1_hu6313430552960781951.png 480w, https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-1_hu16387613031358074904.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;179&#34;
+		data-flex-basis=&#34;429px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;Linux虽然获得了极大的成功，吸引了众多的开发者参与项目，但在早期，作为Linux项目的管理者，Linus主要还是通过手工方式来合并大家的代码。并没有借助任何代码管理工具。&lt;/p&gt;
+&lt;p&gt;倒不是说 Linus 喜欢这种方式，而是因为他对代码版本管理工具非常挑剔，商用的 clearcase，开源的 CVS、SVN等等都不符合他对代码分支管理的预期。&lt;/p&gt;
+&lt;p&gt;直到 2002 年，Linus 才相中了一款商用的分布式版本控制系统 BitKeeper，而基于Linux极大的号召力，BitKeeper也愿意让 Linux 社区免费使用。但到2005年，一位社区开发者在未经允许的情况下逆向了BitKeeper并利用了它未公开的接口，导致 BitKeeper 收回了社区的免费使用权。&lt;/p&gt;
+&lt;p&gt;回到原点的Linus这时就决定自己开发一个代码的版本控制系统，对这个系统的基本诉求是：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;速度&lt;/li&gt;
+&lt;li&gt;设计简单&lt;/li&gt;
+&lt;li&gt;允许大量并行开发的分支&lt;/li&gt;
+&lt;li&gt;完全分布式&lt;/li&gt;
+&lt;li&gt;有能力高效管理类似 Linux 内核一样的超大规模项目&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;然后，大神的效率，Linus 只用了 10 天时间就推出了 Git 的第一个版本。并且给这个版本起了一个略带嘲讽意味的名字——Git（英语俚语中表示“不愉快的人”）。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The name &amp;ldquo;git&amp;rdquo; was given by Linus Torvalds when he wrote the very first version. He described the tool as &amp;ldquo;the stupid content tracker&amp;rdquo; and the name as (depending on your way)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;当然，在 Linus 推出 Git 的第一个版本后，社区中开始有其他感兴趣的成员(Junio Hamano)开始参与并逐渐接手了 Git 的日常维护，Linus 则继续将主要精力放回到了 Linux 内核的维护上。&lt;/p&gt;
+&lt;h2 id=&#34;git-vs-svn&#34;&gt;Git vs SVN
+&lt;/h2&gt;&lt;p&gt;在 Git 之前，最流行的代码版本管理用工具应该是 SVN。&lt;/p&gt;
+&lt;p&gt;不能说 SVN 有很大缺点，但 Git 和 SVN 的应用场景确实有较大区别，这里列表做个比较&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:center&#34;&gt;特性&lt;/th&gt;
+&lt;th style=&#34;text-align:center&#34;&gt;Git&lt;/th&gt;
+&lt;th style=&#34;text-align:center&#34;&gt;SVN&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;分支&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;轻量级分支，创建快速&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;分支是代码库的完整拷贝&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;分支合并&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;快进式合并，合并快速&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;需要手动合并修改&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;分布式&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;是，设计为分布式&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;不是，不支持完全分布式&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;快照&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;保存更改的快照&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;保存文件的差异&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;速度&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;快，分布式设计&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;慢，中心化设计&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;权限控制&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;通过Git Hooks和Gitolite控制&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;通过钩子脚本控制&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;学习曲线&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;较高，需要理解命令和概念&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;较低，容易上手&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;标签&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;轻量级标签，可以后续修改&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;不可变的静态标签&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;历史记录&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;保留所有历史记录&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;只保留最近的历史记录&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;合并冲突&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;需要手动解决&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;自动尝试解决，有冲突时需手动介入&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;strong&gt;命令行工具&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;是，Git命令行强大灵活&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;较为简单，主要用于管理和操作仓库&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;总体来说，现在 Git 更为流行，围绕 Git 的生态更加健全，因此逐渐成为了目前最主流的版本控制工具&lt;/p&gt;
+&lt;h2 id=&#34;git的工作原理&#34;&gt;Git的工作原理
+&lt;/h2&gt;&lt;p&gt;那 Git 到底是如何进行工作的呢？&lt;/p&gt;
+&lt;p&gt;git 在架构上其实是一个三层架构，&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;工作目录（working directory）&lt;/strong&gt;： 这是项目文件所在的实际目录。对工作目录中的文件所做的修改被认为是“未跟踪”状态，直到显式地进行 commit 操作。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;暂存区（staging area）&lt;/strong&gt;：暂存区充当工作目录和 &lt;code&gt;.git&lt;/code&gt; 目录之间的缓冲地带。暂存区域中的文件处于“暂存”状态，以便在下一次 commit 时包含。是允许选择和控制更改的手段。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;本地库（local repository）&lt;/strong&gt;：也就是 &lt;code&gt;.git&lt;/code&gt; 目录， 它是Git版本控制系统的核心容器，包含各种元数据、对象数据库和配置信息。&lt;code&gt;.git&lt;/code&gt; 目录存储 commit 的快照，并管理项目的历史记录，接受git的各种操作指令。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;而除了本地代码管理的这三层，还存在一个&lt;code&gt;远程库&lt;/code&gt;的概念，用于不同成员间对同一个项目代码进行协作。&lt;/p&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;&lt;strong&gt;远程仓库（remote repository）：&lt;/strong&gt; 远程仓库是一个中心仓库，用于团队成员协作，通过push、pull、merge等方式确保代码的同步和协同。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/git-architechture.gif&#34;
+	width=&#34;1600&#34;
+	height=&#34;900&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/git-architechture_hu8501936044035969288.gif 480w, https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/git-architechture_hu12417624834176210852.gif 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;177&#34;
+		data-flex-basis=&#34;426px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;结合上面这个架构和主要的Git操作命令，我们理解一下 git 的运作过程：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;首先我们通过 &lt;code&gt;git init&lt;/code&gt; 或者 &lt;code&gt;git clone&lt;/code&gt; 建立起本地的git仓库，也就是会包含 &lt;code&gt;.git&lt;/code&gt; 这个本地库目录。&lt;/li&gt;
+&lt;li&gt;本地新增或修改的代码，这时其实是处于 &lt;code&gt;未跟踪(untracked)&lt;/code&gt; 状态&lt;/li&gt;
+&lt;li&gt;执行 &lt;code&gt;git add .&lt;/code&gt;指令，这时相关变更会进入 &lt;code&gt;暂存区&lt;/code&gt;， 对应的状态是 &lt;code&gt;已缓存(staged)&lt;/code&gt; 或者 &lt;code&gt;已修改(modified)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;这时再执行 &lt;code&gt;git commit&lt;/code&gt;指令， 作用是从暂存区将变更提交到本地库中，对应状态是&lt;code&gt;已提交(committed)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git diff&lt;/code&gt; 是查看变更的命令，可以看到，它其实比较的是工作目录和暂存区的区别，而 &lt;code&gt;git diff HEAD&lt;/code&gt; 则比较本地库和工作目录&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git push&lt;/code&gt; 会将本地库中的内容，提交到远程库&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git fetch&lt;/code&gt; 用于将远程库同步到本地库&lt;/li&gt;
+&lt;li&gt;我们常用的&lt;code&gt;git pull&lt;/code&gt;则是将远程库直接拉取到本地的工作目录下&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;常用-git-命令&#34;&gt;常用 Git 命令
+&lt;/h2&gt;&lt;p&gt;借用一个中文的Git cheatsheet，便于速查。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-2.png&#34;
+	width=&#34;990&#34;
+	height=&#34;699&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-2_hu15818470663841126765.png 480w, https://chengxiaqiucao.github.io/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-2_hu448642655580809983.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;141&#34;
+		data-flex-basis=&#34;339px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;详细的命令用法这里就不再罗列了，核心命令主要也就是上面原理图中提及到的几个。&lt;/p&gt;
+&lt;p&gt;进一步学习的话，也可以利用在线的学习工具，这里推荐一个：&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://learngitbranching.js.org/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://learngitbranching.js.org/&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>软件测试的目的到底是什么？</title>
-        <link>https://chengxiaqiucao.github.io/post/%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E7%9A%84%E7%9B%AE%E7%9A%84/</link>
+        <link>https://chengxiaqiucao.github.io/post/07-%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E7%9A%84%E7%9B%AE%E7%9A%84/</link>
         <pubDate>Fri, 30 Aug 2024 20:35:21 +0800</pubDate>
         
-        <guid>https://chengxiaqiucao.github.io/post/%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E7%9A%84%E7%9B%AE%E7%9A%84/</guid>
-        <description>&lt;img src="https://chengxiaqiucao.github.io/post/%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E7%9A%84%E7%9B%AE%E7%9A%84/testing.png" alt="Featured image of post 软件测试的目的到底是什么？" /&gt;&lt;h2 id=&#34;对测试工作目的的认识误区&#34;&gt;对测试工作目的的认识误区
+        <guid>https://chengxiaqiucao.github.io/post/07-%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E7%9A%84%E7%9B%AE%E7%9A%84/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/post/07-%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E7%9A%84%E7%9B%AE%E7%9A%84/testing.png" alt="Featured image of post 软件测试的目的到底是什么？" /&gt;&lt;h2 id=&#34;对测试工作目的的认识误区&#34;&gt;对测试工作目的的认识误区
 &lt;/h2&gt;&lt;p&gt;在IT行业，其实一直对软件测试，测试这个工作的目的，一直有着不太准确的认识。&lt;/p&gt;
 &lt;p&gt;各种说法都有，比较流行，被很多IT工作甚至测试从业者认可的有下面两种：&lt;/p&gt;
 &lt;ul&gt;
@@ -41,10 +206,10 @@
 &lt;/h3&gt;&lt;p&gt;第二个对测试工作目的的认识误区，就是认为测试工作就是为了验证产品的需求。这其实是另一个被广泛接受的错误认识。甚至我们当今流传广泛的很多软件工程实践，都是建立在这个错误认识之上的。&lt;/p&gt;
 &lt;p&gt;测试大牛James Bach有篇著名的论文，探讨了Testing跟Checking的区别。&lt;/p&gt;
 &lt;p&gt;也就是测试工作远远不止是checking。而验证需求，这样的checking只是测试工作的一部分。测试要深入产品、发现潜在的深层问题，还需要除了checking之外的更多其他能力支撑，包括探索、试验、设问、推理等等&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E7%9A%84%E7%9B%AE%E7%9A%84/Pasted-20240830.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/07-%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E7%9A%84%E7%9B%AE%E7%9A%84/Pasted-20240830.png&#34;
 	width=&#34;833&#34;
 	height=&#34;582&#34;
-	srcset=&#34;https://chengxiaqiucao.github.io/post/%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E7%9A%84%E7%9B%AE%E7%9A%84/Pasted-20240830_hu675217128331915240.png 480w, https://chengxiaqiucao.github.io/post/%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E7%9A%84%E7%9B%AE%E7%9A%84/Pasted-20240830_hu12281083274483132999.png 1024w&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/07-%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E7%9A%84%E7%9B%AE%E7%9A%84/Pasted-20240830_hu675217128331915240.png 480w, https://chengxiaqiucao.github.io/post/07-%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E7%9A%84%E7%9B%AE%E7%9A%84/Pasted-20240830_hu12281083274483132999.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;Testing vs Checking&#34;
