@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name="msvalidate.01" content="03BBDF6AC26BCA2F36ADC5DC579B84AA" /><meta name='description' content="WebDriver和CDP是web自动化测试两个经常提及的协议，现在又提出了BiDi协议，是何关系？">
+<title>WebDriver将退出历史？BIDI登场</title>
+
+<link rel='canonical' href='https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/'>
+
+<link rel="stylesheet" href="/scss/style.min.afc04e201e26111368df0fa482ffbcd8ad0a7779bfdcc0c73b0c9eac35357cdd.css"><meta property='og:title' content="WebDriver将退出历史？BIDI登场">
+<meta property='og:description' content="WebDriver和CDP是web自动化测试两个经常提及的协议，现在又提出了BiDi协议，是何关系？">
+<meta property='og:url' content='https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/'>
+<meta property='og:site_name' content='秋 草 观 “测” 台'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='测试工具' /><meta property='article:tag' content='自动化测试' /><meta property='article:published_time' content='2024-10-03T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-10-03T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="WebDriver将退出历史？BIDI登场">
+<meta name="twitter:description" content="WebDriver和CDP是web自动化测试两个经常提及的协议，现在又提出了BiDi协议，是何关系？">
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0SZVJZGMHX"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8076532964743402"
+     crossorigin="anonymous"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0SZVJZGMHX');
+</script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/automnGrass_hu7204715396109996112.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">秋 草 观 “测” 台</a></h1>
+            <h2 class="site-description">Testing is not just checking...</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/chengxiaqiucao'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/472272606'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162803093" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10312" xmlns:xlink="http://www.w3.org/1999/xlink" width="211.71875" height="200"><path d="M896.43834 165.698h-62.34l54.57-54.57c23.43-23.37 23.43-70.17 0-93.54-23.37-23.37-70.17-23.37-93.54 0l-155.88 148.17H452.17034l-155.94-148.23c-23.43-23.37-70.17-23.37-93.54 0-23.37 23.43-23.43 70.17 0 93.54l54.57 54.57h-62.34A192.983 192.983 0 0 0 0.00934 360.607v420.899c0 116.97 85.71 202.68 194.91 202.68h693.75a192.983 192.983 0 0 0 194.85-194.85v-428.73c7.83-109.14-77.94-194.91-187.08-194.91z m54.63 615.809a69.869 69.869 0 0 1-70.17 70.17h-678.27a69.869 69.869 0 0 1-70.109-70.17v-413.13a69.869 69.869 0 0 1 70.17-70.17h678.21a69.869 69.869 0 0 1 70.17 70.17v413.19z m-608.039-342.96a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.23-70.17z m405.36 0a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.17-70.17z" p-id="10313" fill="#8a8a8a"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.zhihu.com/people/qiucao'
+                        target="_blank"
+                        title="zhihu"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162502588" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4642" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M540.95908203 555.43730469s0-62.74248047-30.56748047-65.96191407c-30.56748047-3.21943359-125.48583984 0-125.48583984 1e-8v-193.05527344h141.57246094s-1.60839844-64.35263672-28.95908203-64.35263672h-230.05810547l38.61035156-102.96210938s-57.91728516 3.21943359-78.83085938 40.21962891-86.87460938 222.01523438-86.87460937 222.01523438 22.52373047 9.65302734 59.52480469-17.69589844c37.00283203-27.34804688 49.87177734-75.61494141 49.87177734-75.61494141l67.56943359-3.21943359 1.60839844 196.27382812s-117.44033203-1.60839844-141.57246094 0c-24.13212891 1.60839844-37.00283203 65.96191406-37.00283203 65.96191407h178.57792969s-16.09013672 109.39746094-61.13408203 188.23007812c-46.65673828 78.83085938-133.53134766 141.57246094-133.53134766 141.57246094s62.74248047 25.74052734 123.87919922-9.65302735c61.13408203-37.00283203 106.18154297-196.27382812 106.18154297-196.27382812l143.184375 178.57792969s12.86982422-85.26533203-1.60839844-109.39746094c-16.09013672-24.13212891-99.74707031-120.65888672-99.74707031-120.65888672l-37.00283203 32.17412109 25.74052734-106.18154297h156.0515625zM577.96191406 227.24316406l-1.60839843 580.77509766h57.91728515l20.91357422 72.39550781 101.35634766-72.39550781h143.184375v-580.77509766h-321.75966797zM835.3671875 743.665625h-67.56943359l-85.26533203 65.96191406-19.30517579-65.96191406h-17.69589843v-450.46318359h189.83583984v450.46318359z" fill="#8a8a8a" p-id="4643"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='mailto:%20danmyw@qq.com'
+                        target="_blank"
+                        title="e-mail"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162879016" class="icon" viewBox="0 0 1451 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12462" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z" fill="#8a8a8a" p-id="12463"></path></svg>
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>检索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/releases/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+                
+                <span>热门开源</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="https://chengxiaqiucao.github.io/en/" >English</option>
+                                
+                                    <option value="https://chengxiaqiucao.github.io/" selected>中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#webdriver的发展历程">WebDriver的发展历程</a></li>
+    <li><a href="#javascript和nodejs壮大-自动化测试百花齐放">JavaScript和Node.js壮大， 自动化测试百花齐放</a></li>
+    <li><a href="#自动化工具的两大流派">自动化工具的两大流派</a></li>
+    <li><a href="#webdriver-和-cdp-的对比">WebDriver 和 CDP 的对比</a>
+      <ol>
+        <li><a href="#webdriver-工作原理">webDriver 工作原理</a></li>
+        <li><a href="#cdp工作原理">CDP工作原理</a></li>
+      </ol>
+    </li>
+    <li><a href="#何为webdriver-bidi">何为WebDriver BiDi？</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E6%B5%8B%E8%AF%95%E6%8A%80%E6%9C%AF/" style="background-color: #2a9d8f; color: #fff;">
+                测试技术
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/">WebDriver将退出历史？BIDI登场</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            WebDriver和CDP是web自动化测试两个经常提及的协议，现在又提出了BiDi协议，是何关系？
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Oct 03, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 4 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p><img src="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/BiDi.png"
+	width="1039"
+	height="325"
+	srcset="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/BiDi_hu2914905227179793038.png 480w, /post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/BiDi_hu14280790059174385535.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="319"
+		data-flex-basis="767px"
+	
+></p>
+<h2 id="前言">前言
+</h2><p>web自动化测试领域，最核心的其实是浏览器的驱动方法。现在最流行的是已经被W3C标准化的webDriver，而占据浏览器垄断地位的Chrome其实也有自己的一个标准协议，也就是CDP（chrome devTools protocol），它可以提供更比WebDriver更底层的对浏览器的控制。google 自己的自动化测试工具 puppeteer 其实就是基于 CDP 进行的自动化实现。</p>
+<h2 id="webdriver的发展历程">WebDriver的发展历程
+</h2><p>跟随 Selenium 发展起来的 webDriver 协议是目前 Web 自动化测试领域的事实标准。而这一历程也是逐步发展而来的。</p>
+<p><img src="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003.png"
+	width="1200"
+	height="353"
+	srcset="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003_hu5644322580595616157.png 480w, /post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003_hu12422079367228404162.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="339"
+		data-flex-basis="815px"
+	
+></p>
+<ul>
+<li>2004 Selenium 诞生</li>
+<li>2006 WebDriver 作为一款工具诞生</li>
+<li>2009 google自动化测试大会，Seleium 和 WebDriver 合并为一个项目，发布Selenium 2.0</li>
+<li>2016 Selenium3 发布，彻底抛弃1.0中的Selenium RC</li>
+<li>2018 W3C标准组织吸纳了WebDriver为标准协议</li>
+<li>2021 Selnium 4.0发布，取消了WebDriver原先的Json Wire协议，全面采用W3C webDriver</li>
+</ul>
+<h2 id="javascript和nodejs壮大-自动化测试百花齐放">JavaScript和Node.js壮大， 自动化测试百花齐放
+</h2><p>而随着 Web 页面的前端开发越来越依赖 JavaScript，一批新的自动化测试工作也逐渐推出，包括WebdriverIO、Appium、Nightwatch、Protractor（已废弃）、Testcafe、Cypress、Puppeteer 和 Playwright 等新的自动化解决方案应运而生。</p>
+<p><img src="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-1.png"
+	width="1200"
+	height="370"
+	srcset="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-1_hu1346718317576460448.png 480w, /post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-1_hu1666844833022308263.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="324"
+		data-flex-basis="778px"
+	
+></p>
+<h2 id="自动化工具的两大流派">自动化工具的两大流派
+</h2><p>以上这些自动化工具，根据它们运行的层级，可以分为下面两大流派</p>
+<ul>
+<li><strong>上层控制</strong>：<strong>在浏览器中</strong>执行 JavaScript 的工具。例如，<a class="link" href="https://bit.ly/cypress-architecture"  target="_blank" rel="noopener"
+    >Cypress</a> 和 <a class="link" href="https://bit.ly/testcafe-architecture"  target="_blank" rel="noopener"
+    >TestCafe</a> 利用 Web API 和 Node.js 来直接在浏览器中运行测试。</li>
+<li><strong>底层控制</strong>：通过在<strong>浏览器之外</strong>执行远程命令的工具。当工具需要更强的控制力时（例如打开多个标签页或模拟设备模式），此时它们需要执行远程命令，以通过协议控制浏览器。 两种主要的自动化协议为 <strong>WebDriver（W3C）</strong> 和 <strong>Chrome 开发者工具协议 (CDP)</strong>。分别以 <code>Selenium</code> 和 <code>puppeteer</code> 为代表</li>
+</ul>
+<p><img src="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-2.png"
+	width="1200"
+	height="682"
+	srcset="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-2_hu9558468310680341779.png 480w, /post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-2_hu5965758212558090171.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="175"
+		data-flex-basis="422px"
+	
+></p>
+<h2 id="webdriver-和-cdp-的对比">WebDriver 和 CDP 的对比
+</h2><h3 id="webdriver-工作原理">webDriver 工作原理
+</h3><p>基于 WebDriver 协议的自动化测试工具，需要一个专门的浏览器驱动，通过浏览器驱动来实现跨不同浏览器的标准协议。工具和驱动之间通过 http 协议交互。</p>
+<p><img src="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-3.png"
+	width="1200"
+	height="516"
+	srcset="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-3_hu15525543644304309278.png 480w, /post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-3_hu4907423729430999350.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="232"
+		data-flex-basis="558px"
+	
+></p>
+<p>也就是说，我们在web页面上完成的相关操作，实际上是自动化工具将其转换为了一个符合 webDriver 协议的 http 请求，再通过具体的driver驱动浏览器完成动作。</p>
+<p>比如一个页面点击操作，实际是向对应浏览器驱动发出如下请求：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># WebDriver: Click on a coffee element</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">POST</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">127.0.0.1</span><span class="p">:</span><span class="mi">4444</span><span class="o">/</span><span class="n">session</span><span class="o">/</span><span class="p">:</span><span class="n">element_id</span><span class="o">/</span><span class="n">element</span><span class="o">/</span><span class="n">click</span>
+</span></span><span class="line"><span class="cl">   <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Content-Type: application/json&#39;</span>
+</span></span><span class="line"><span class="cl">   <span class="o">-</span><span class="n">d</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>但对于一些底层的控制，如浏览器本身的一些事件如新开窗口等，因为 webDriver 协议基于 http 请求，就很难处理。</p>
+<h3 id="cdp工作原理">CDP工作原理
+</h3><p>而 CDP，它原先并不是专门应用于自动化测试目的，是为 chrome 浏览器的开发者工具的调试功能设计，只是后来被 <strong>puppeteer</strong> 用于了自动化测试。相比 Webdriver ，它是基于 WebSocket 直接和基于 chromium 的浏览器实现底层通信，可以双向传递，能提供更快速和更底层的控制。完成一些 webDriver协议 无法处理的动作。</p>
+<p><strong>底层控制：</strong></p>
+<ul>
+<li>捕获控制台消息</li>
+<li>拦截网络请求</li>
+<li>模拟 Device Mode</li>
+<li>模拟地理定位</li>
+<li>&hellip;..</li>
+</ul>
+<p><img src="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-4.png"
+	width="1200"
+	height="366"
+	srcset="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-4_hu17401956816387190868.png 480w, /post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-4_hu9825121145890927523.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="327"
+		data-flex-basis="786px"
+	
+></p>
+<p>页面操作，实际上是转换为了一系列 CDP 命令：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="o">//</span> <span class="n">CDP</span><span class="p">:</span> <span class="n">Click</span> <span class="n">on</span> <span class="n">a</span> <span class="n">coffee</span> <span class="n">element</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">//</span> <span class="n">Mouse</span> <span class="n">pressed</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span> 
+</span></span><span class="line"><span class="cl">  <span class="n">command</span><span class="p">:</span> <span class="s1">&#39;Input.dispatchMouseEvent&#39;</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">  <span class="n">parameters</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">type</span><span class="p">:</span> <span class="s1">&#39;mousePressed&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mf">10.34</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mf">27.1</span><span class="p">,</span> <span class="n">clickCount</span><span class="p">:</span> <span class="mi">1</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">//</span> <span class="n">Mouse</span> <span class="n">released</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span> 
+</span></span><span class="line"><span class="cl">  <span class="n">command</span><span class="p">:</span> <span class="s1">&#39;Input.dispatchMouseEvent&#39;</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">  <span class="n">parameters</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">type</span><span class="p">:</span> <span class="s1">&#39;mouseReleased&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mf">10.34</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mf">27.1</span><span class="p">,</span> <span class="n">clickCount</span><span class="p">:</span> <span class="mi">1</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>但是，虽然提供了底层支持，但 CDP 协议最大的问题就是只能支持 Chromium 内核浏览器，并不是一个开放标准。 此外 CDP 协议也设计的比较复杂，不太适合直接从编码层面调用。</p>
+<h2 id="何为webdriver-bidi">何为WebDriver BiDi？
+</h2><p>基于 WebDriver 协议和 CDP 协议各自的优缺点，自动化测试领域目前正在讨论推出全新的标准。也就是 WebDriver BiDi。</p>
+<p>这个协议的目标是兼顾 WebDriver 和 CDP 协议的优点，提供如下特性（愿景）：</p>
+<ul>
+<li>跨浏览器支持</li>
+<li>双向信息传递</li>
+<li>作为通用标准，纳入W3C</li>
+<li>提供底层控制</li>
+<li>以自动化测试为目的，更简洁方便地通过API调用</li>
+<li>支持各种工具和浏览器</li>
+</ul>
+<p>目前这个协议还在协商、开发阶段。但已经引入了各大主流浏览器厂商、测试工具和服务提供商的参与，可以预见，将会是 Web 自动化测试领域下一个重大更新！</p>
+<p>参与厂商：</p>
+<p><img src="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/BiDi.png"
+	width="1039"
+	height="325"
+	srcset="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/BiDi_hu2914905227179793038.png 480w, /post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/BiDi_hu14280790059174385535.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="319"
+		data-flex-basis="767px"
+	
+></p>
+<p>目前的最新的进展是 2024-09-23 推出的草案版本。
+<img src="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-6.png"
+	width="1471"
+	height="208"
+	srcset="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-6_hu14745524017998824551.png 480w, /post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-6_hu9271953287704700411.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="707"
+		data-flex-basis="1697px"
+	
+></p>
+<p>从草案内容来看，目前还处于相对早期阶段，短期内应该不会正式推出，所以相当长时间内， WebDriver 依然会是web自动化测试工具的事实标准，但相信BiDi将会是后续的主要发展方向。</p>
+<p>其实从 近期 Selenium 4的更新源码中，已经可以看到对BiDi协议的支持扩展方法了</p>
+<p><img src="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-7.png"
+	width="1540"
+	height="819"
+	srcset="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-7_hu11425111211098118377.png 480w, /post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-7_hu13478595203325011043.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="188"
+		data-flex-basis="451px"
+	
+></p>
+<p>我们将长期关注这一标准的发展趋势和对目前自动化测试技术的影响。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7/">测试工具</a>
+        
+            <a href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95/">自动化测试</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">自动化测试奇技淫巧之保存网页为PDF</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/">
+        
+        
+            <div class="article-image">
+                <img src="/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/git.aed62b4f27f28298d2cede822085dd8a_hu4104698228300076604.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post Git工作原理和常用指令"
+                        
+                        data-hash="md5-rtYrTyfygpjSzt6CIIXdig==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Git工作原理和常用指令</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/21-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/">
+        
+        
+            <div class="article-image">
+                <img src="/post/21-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-1.bc4704aed9429c019cf5e506c20e0e6c_hu7548395935021992726.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 大话Https协议"
+                        
+                        data-hash="md5-vEcErtlCnAGc9eUGwg4ObA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">大话Https协议</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/20-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/">
+        
+        
+            <div class="article-image">
+                <img src="/post/20-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/branch.eba279f891f21207c25effce2befa727_hu6331466558873077882.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 软件分支策略和集成模式梳理"
+                        
+                        data-hash="md5-66J5&#43;JHyEgfCXv/OK&#43;&#43;nJw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">软件分支策略和集成模式梳理</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/07-%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E7%9A%84%E7%9B%AE%E7%9A%84/">
+        
+        
+            <div class="article-image">
+                <img src="/post/07-%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E7%9A%84%E7%9B%AE%E7%9A%84/testing.f53d6bb0c16aa06f813349fb63e6c30e_hu7540309765319369871.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 软件测试的目的到底是什么？"
+                        
+                        data-hash="md5-9T1rsMFqoG&#43;BM0n7Y&#43;bDDg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">软件测试的目的到底是什么？</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2023 - 
+        
+        2024 |by 城下秋草（公众号： 秋草说测试）
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

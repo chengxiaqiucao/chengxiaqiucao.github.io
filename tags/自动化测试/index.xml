@@ -7,7 +7,548 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>|by 城下秋草（公众号： 秋草说测试）</copyright>
-        <lastBuildDate>Mon, 30 Sep 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 03 Oct 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>WebDriver将退出历史？BIDI登场</title>
+        <link>https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/</link>
+        <pubDate>Thu, 03 Oct 2024 00:00:00 +0000</pubDate>
+        
+        <guid>https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/</guid>
+        <description>&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/BiDi.png&#34;
+	width=&#34;1039&#34;
+	height=&#34;325&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/BiDi_hu2914905227179793038.png 480w, https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/BiDi_hu14280790059174385535.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;319&#34;
+		data-flex-basis=&#34;767px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;前言&#34;&gt;前言
+&lt;/h2&gt;&lt;p&gt;web自动化测试领域，最核心的其实是浏览器的驱动方法。现在最流行的是已经被W3C标准化的webDriver，而占据浏览器垄断地位的Chrome其实也有自己的一个标准协议，也就是CDP（chrome devTools protocol），它可以提供更比WebDriver更底层的对浏览器的控制。google 自己的自动化测试工具 puppeteer 其实就是基于 CDP 进行的自动化实现。&lt;/p&gt;
+&lt;h2 id=&#34;webdriver的发展历程&#34;&gt;WebDriver的发展历程
+&lt;/h2&gt;&lt;p&gt;跟随 Selenium 发展起来的 webDriver 协议是目前 Web 自动化测试领域的事实标准。而这一历程也是逐步发展而来的。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003.png&#34;
+	width=&#34;1200&#34;
+	height=&#34;353&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003_hu5644322580595616157.png 480w, https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003_hu12422079367228404162.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;339&#34;
+		data-flex-basis=&#34;815px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;2004 Selenium 诞生&lt;/li&gt;
+&lt;li&gt;2006 WebDriver 作为一款工具诞生&lt;/li&gt;
+&lt;li&gt;2009 google自动化测试大会，Seleium 和 WebDriver 合并为一个项目，发布Selenium 2.0&lt;/li&gt;
+&lt;li&gt;2016 Selenium3 发布，彻底抛弃1.0中的Selenium RC&lt;/li&gt;
+&lt;li&gt;2018 W3C标准组织吸纳了WebDriver为标准协议&lt;/li&gt;
+&lt;li&gt;2021 Selnium 4.0发布，取消了WebDriver原先的Json Wire协议，全面采用W3C webDriver&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;javascript和nodejs壮大-自动化测试百花齐放&#34;&gt;JavaScript和Node.js壮大， 自动化测试百花齐放
+&lt;/h2&gt;&lt;p&gt;而随着 Web 页面的前端开发越来越依赖 JavaScript，一批新的自动化测试工作也逐渐推出，包括WebdriverIO、Appium、Nightwatch、Protractor（已废弃）、Testcafe、Cypress、Puppeteer 和 Playwright 等新的自动化解决方案应运而生。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-1.png&#34;
+	width=&#34;1200&#34;
+	height=&#34;370&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-1_hu1346718317576460448.png 480w, https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-1_hu1666844833022308263.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;324&#34;
+		data-flex-basis=&#34;778px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;自动化工具的两大流派&#34;&gt;自动化工具的两大流派
+&lt;/h2&gt;&lt;p&gt;以上这些自动化工具，根据它们运行的层级，可以分为下面两大流派&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;上层控制&lt;/strong&gt;：&lt;strong&gt;在浏览器中&lt;/strong&gt;执行 JavaScript 的工具。例如，&lt;a class=&#34;link&#34; href=&#34;https://bit.ly/cypress-architecture&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Cypress&lt;/a&gt; 和 &lt;a class=&#34;link&#34; href=&#34;https://bit.ly/testcafe-architecture&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;TestCafe&lt;/a&gt; 利用 Web API 和 Node.js 来直接在浏览器中运行测试。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;底层控制&lt;/strong&gt;：通过在&lt;strong&gt;浏览器之外&lt;/strong&gt;执行远程命令的工具。当工具需要更强的控制力时（例如打开多个标签页或模拟设备模式），此时它们需要执行远程命令，以通过协议控制浏览器。 两种主要的自动化协议为 &lt;strong&gt;WebDriver（W3C）&lt;/strong&gt; 和 &lt;strong&gt;Chrome 开发者工具协议 (CDP)&lt;/strong&gt;。分别以 &lt;code&gt;Selenium&lt;/code&gt; 和 &lt;code&gt;puppeteer&lt;/code&gt; 为代表&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-2.png&#34;
+	width=&#34;1200&#34;
+	height=&#34;682&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-2_hu9558468310680341779.png 480w, https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-2_hu5965758212558090171.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;175&#34;
+		data-flex-basis=&#34;422px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;webdriver-和-cdp-的对比&#34;&gt;WebDriver 和 CDP 的对比
+&lt;/h2&gt;&lt;h3 id=&#34;webdriver-工作原理&#34;&gt;webDriver 工作原理
+&lt;/h3&gt;&lt;p&gt;基于 WebDriver 协议的自动化测试工具，需要一个专门的浏览器驱动，通过浏览器驱动来实现跨不同浏览器的标准协议。工具和驱动之间通过 http 协议交互。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-3.png&#34;
+	width=&#34;1200&#34;
+	height=&#34;516&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-3_hu15525543644304309278.png 480w, https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-3_hu4907423729430999350.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;232&#34;
+		data-flex-basis=&#34;558px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;也就是说，我们在web页面上完成的相关操作，实际上是自动化工具将其转换为了一个符合 webDriver 协议的 http 请求，再通过具体的driver驱动浏览器完成动作。&lt;/p&gt;
+&lt;p&gt;比如一个页面点击操作，实际是向对应浏览器驱动发出如下请求：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# WebDriver: Click on a coffee element&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;curl&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;X&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;POST&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;http&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;//&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;127.0.0.1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;4444&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;session&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;element_id&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;element&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;click&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;H&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;Content-Type: application/json&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;d&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;{}&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;但对于一些底层的控制，如浏览器本身的一些事件如新开窗口等，因为 webDriver 协议基于 http 请求，就很难处理。&lt;/p&gt;
+&lt;h3 id=&#34;cdp工作原理&#34;&gt;CDP工作原理
+&lt;/h3&gt;&lt;p&gt;而 CDP，它原先并不是专门应用于自动化测试目的，是为 chrome 浏览器的开发者工具的调试功能设计，只是后来被 &lt;strong&gt;puppeteer&lt;/strong&gt; 用于了自动化测试。相比 Webdriver ，它是基于 WebSocket 直接和基于 chromium 的浏览器实现底层通信，可以双向传递，能提供更快速和更底层的控制。完成一些 webDriver协议 无法处理的动作。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;底层控制：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;捕获控制台消息&lt;/li&gt;
+&lt;li&gt;拦截网络请求&lt;/li&gt;
+&lt;li&gt;模拟 Device Mode&lt;/li&gt;
+&lt;li&gt;模拟地理定位&lt;/li&gt;
+&lt;li&gt;&amp;hellip;..&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-4.png&#34;
+	width=&#34;1200&#34;
+	height=&#34;366&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-4_hu17401956816387190868.png 480w, https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-4_hu9825121145890927523.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;327&#34;
+		data-flex-basis=&#34;786px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;页面操作，实际上是转换为了一系列 CDP 命令：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;//&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;CDP&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Click&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;on&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;coffee&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;element&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;//&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Mouse&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pressed&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;command&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;Input.dispatchMouseEvent&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;parameters&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nb&#34;&gt;type&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;mousePressed&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;10.34&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;y&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;27.1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;clickCount&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;//&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Mouse&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;released&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;command&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;Input.dispatchMouseEvent&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;parameters&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nb&#34;&gt;type&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;mouseReleased&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;10.34&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;y&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;27.1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;clickCount&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;但是，虽然提供了底层支持，但 CDP 协议最大的问题就是只能支持 Chromium 内核浏览器，并不是一个开放标准。 此外 CDP 协议也设计的比较复杂，不太适合直接从编码层面调用。&lt;/p&gt;
+&lt;h2 id=&#34;何为webdriver-bidi&#34;&gt;何为WebDriver BiDi？
+&lt;/h2&gt;&lt;p&gt;基于 WebDriver 协议和 CDP 协议各自的优缺点，自动化测试领域目前正在讨论推出全新的标准。也就是 WebDriver BiDi。&lt;/p&gt;
+&lt;p&gt;这个协议的目标是兼顾 WebDriver 和 CDP 协议的优点，提供如下特性（愿景）：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;跨浏览器支持&lt;/li&gt;
+&lt;li&gt;双向信息传递&lt;/li&gt;
+&lt;li&gt;作为通用标准，纳入W3C&lt;/li&gt;
+&lt;li&gt;提供底层控制&lt;/li&gt;
+&lt;li&gt;以自动化测试为目的，更简洁方便地通过API调用&lt;/li&gt;
+&lt;li&gt;支持各种工具和浏览器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;目前这个协议还在协商、开发阶段。但已经引入了各大主流浏览器厂商、测试工具和服务提供商的参与，可以预见，将会是 Web 自动化测试领域下一个重大更新！&lt;/p&gt;
+&lt;p&gt;参与厂商：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/BiDi.png&#34;
+	width=&#34;1039&#34;
+	height=&#34;325&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/BiDi_hu2914905227179793038.png 480w, https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/BiDi_hu14280790059174385535.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;319&#34;
+		data-flex-basis=&#34;767px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;目前的最新的进展是 2024-09-23 推出的草案版本。
+&lt;img src=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-6.png&#34;
+	width=&#34;1471&#34;
+	height=&#34;208&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-6_hu14745524017998824551.png 480w, https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-6_hu9271953287704700411.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;707&#34;
+		data-flex-basis=&#34;1697px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;从草案内容来看，目前还处于相对早期阶段，短期内应该不会正式推出，所以相当长时间内， WebDriver 依然会是web自动化测试工具的事实标准，但相信BiDi将会是后续的主要发展方向。&lt;/p&gt;
+&lt;p&gt;其实从 近期 Selenium 4的更新源码中，已经可以看到对BiDi协议的支持扩展方法了&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-7.png&#34;
+	width=&#34;1540&#34;
+	height=&#34;819&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-7_hu11425111211098118377.png 480w, https://chengxiaqiucao.github.io/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/Pasted-20241003-7_hu13478595203325011043.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;188&#34;
+		data-flex-basis=&#34;451px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;我们将长期关注这一标准的发展趋势和对目前自动化测试技术的影响。&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>自动化测试奇技淫巧之保存网页为PDF</title>
+        <link>https://chengxiaqiucao.github.io/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/</link>
+        <pubDate>Thu, 03 Oct 2024 00:00:00 +0000</pubDate>
+        
+        <guid>https://chengxiaqiucao.github.io/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/</guid>
+        <description>&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-3.png&#34;
+	width=&#34;734&#34;
+	height=&#34;369&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-3_hu12622256033521511608.png 480w, https://chengxiaqiucao.github.io/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-3_hu5578094763851489210.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;198&#34;
+		data-flex-basis=&#34;477px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;我们浏览网站资料的时候，发现有价值的文档，经常需要把材料保存下来。直接复制其实比较麻烦，况且有的网站还做了限制，不方便直接保存。这时将页面直接保存为 PDF 格式的文件是一个很好的需求。&lt;/p&gt;
+&lt;p&gt;通常的做法是需要借助一些浏览器插件或者打印扩展来实现，这里我们学习自动化的话，其实利用 puppeteer 就可以方便地实现这个目的。再加上工具的自动化加持，绝对是爬取并保存重要资料的利器。&lt;/p&gt;
+&lt;h2 id=&#34;puppeteer用法&#34;&gt;Puppeteer用法
+&lt;/h2&gt;&lt;p&gt;关于 Puppeteer 工具的基本用法，在我之前的博文 &lt;a class=&#34;link&#34; href=&#34;https://chengxiaqiucao.github.io/post/28-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;自动化测试工具Puppeteer简介&lt;/a&gt; 中已有较全面介绍，大家可以参考。&lt;/p&gt;
+&lt;h2 id=&#34;pdf-的基本用法&#34;&gt;pdf() 的基本用法
+&lt;/h2&gt;&lt;p&gt;在 Puppeteer 中保存 pdf 文件其实非常简单，通过调用 puppeteer 内置的 pdf() 方法就可以将当前页面保存为一个pdf文件&lt;/p&gt;
+&lt;p&gt;官方给的案例：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;async&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;browser&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;puppeteer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;launch&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;page&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;browser&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;newPage&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;page&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;goto&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;https://news.ycombinator.com&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nx&#34;&gt;waitUntil&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;networkidle2&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;page&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;pdf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;({&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nx&#34;&gt;path&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;hn.pdf&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nx&#34;&gt;format&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;letter&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;browser&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;close&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;})();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;用来访问一个技术新闻聚合网站，并将页面保存到 &lt;code&gt;hn.pdf&lt;/code&gt; 文件中&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003.png&#34;
+	width=&#34;650&#34;
+	height=&#34;848&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003_hu15013180034991548556.png 480w, https://chengxiaqiucao.github.io/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003_hu12192916129795210891.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;76&#34;
+		data-flex-basis=&#34;183px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;paperformat&#34;&gt;PaperFormat
+&lt;/h3&gt;&lt;p&gt;上面的例子中有个参数 &lt;code&gt;format&lt;/code&gt;， 这个参数其实是指定保存的页面大小，可以取值为一些默认的打印页面大小，取值清单和对应的大小如下(单位英寸)：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Letter&lt;/code&gt;: 8.5in x 11in&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Legal&lt;/code&gt;: 8.5in x 14in&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Tabloid&lt;/code&gt;: 11in x 17in&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Ledger&lt;/code&gt;: 17in x 11in&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;A0&lt;/code&gt;: 33.1102in x 46.811in&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;A1&lt;/code&gt;: 23.3858in x 33.1102in&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;A2&lt;/code&gt;: 16.5354in x 23.3858in&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;A3&lt;/code&gt;: 11.6929in x 16.5354in&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;A4&lt;/code&gt;: 8.2677in x 11.6929in&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;A5&lt;/code&gt;: 5.8268in x 8.2677in&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;A6&lt;/code&gt;: 4.1339in x 5.8268in&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;pdfmargin&#34;&gt;PDFMargin
+&lt;/h3&gt;&lt;p&gt;除了 &lt;code&gt;format&lt;/code&gt;， 还可以像打印时设置页边距，设置 &lt;code&gt;margin&lt;/code&gt; 属性,  对应取值&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Property&lt;/th&gt;
+&lt;th&gt;Modifiers&lt;/th&gt;
+&lt;th&gt;Type&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;bottom&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;string | number&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;left&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;string | number&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;right&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;string | number&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;top&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;string | number&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;上面的代码加上页边距设置：&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;page&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;pdf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;({&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nx&#34;&gt;path&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;hn.pdf&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nx&#34;&gt;format&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;A4&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nx&#34;&gt;margin&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;left&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;80&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;top&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;40&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;可以看到页边距也进行了调整
+&lt;img src=&#34;https://chengxiaqiucao.github.io/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-1.png&#34;
+	width=&#34;657&#34;
+	height=&#34;843&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-1_hu6631492286924840099.png 480w, https://chengxiaqiucao.github.io/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-1_hu4528104784330937774.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;77&#34;
+		data-flex-basis=&#34;187px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;pdfoption&#34;&gt;PDFOption
+&lt;/h3&gt;&lt;p&gt;除了上面两个常用的调整参数外，这个方法其实也提供了其他更丰富的设置，基本可以实现我们保存 pdf 文档时的各种样式设置需要。&lt;/p&gt;
+&lt;p&gt;比如 &lt;code&gt;scale&lt;/code&gt; 参数可以设置页面缩放，取值为0.1 ~ 2:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;scale: 0.5,&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-2.png&#34;
+	width=&#34;1050&#34;
+	height=&#34;817&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-2_hu10358756397773000467.png 480w, https://chengxiaqiucao.github.io/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-2_hu17052780441850382900.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;128&#34;
+		data-flex-basis=&#34;308px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;其更多的设置参数，这里不再验证，清单如下：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Property&lt;/th&gt;
+&lt;th&gt;Modifiers&lt;/th&gt;
+&lt;th&gt;Type&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;th&gt;Default&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;displayHeaderFooter&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;boolean&lt;/td&gt;
+&lt;td&gt;Whether to show the header and footer.&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;false&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;footerTemplate&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;string&lt;/td&gt;
+&lt;td&gt;HTML template for the print footer. Has the same constraints and support for special classes as &lt;a class=&#34;link&#34; href=&#34;https://pptr.dev/api/puppeteer.pdfoptions#headertemplate&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;PDFOptions.headerTemplate&lt;/a&gt;.&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;format&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://pptr.dev/api/puppeteer.paperformat&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;PaperFormat&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;Remarks:&lt;/strong&gt;&lt;br&gt;&lt;br&gt;If set, this takes priority over the &lt;code&gt;width&lt;/code&gt; and &lt;code&gt;height&lt;/code&gt; options.&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;letter&lt;/code&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;headerTemplate&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;string&lt;/td&gt;
+&lt;td&gt;HTML template for the print header. Should be valid HTML with the following classes used to inject values into them:&lt;br&gt;&lt;br&gt;- &lt;code&gt;date&lt;/code&gt; formatted print date&lt;br&gt;    &lt;br&gt;- &lt;code&gt;title&lt;/code&gt; document title&lt;br&gt;    &lt;br&gt;- &lt;code&gt;url&lt;/code&gt; document location&lt;br&gt;    &lt;br&gt;- &lt;code&gt;pageNumber&lt;/code&gt; current page number&lt;br&gt;    &lt;br&gt;- &lt;code&gt;totalPages&lt;/code&gt; total pages in the document&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;height&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;string | number&lt;/td&gt;
+&lt;td&gt;Sets the height of paper. You can pass in a number or a string with a unit.&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;landscape&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;boolean&lt;/td&gt;
+&lt;td&gt;Whether to print in landscape orientation.&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;false&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;margin&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://pptr.dev/api/puppeteer.pdfmargin&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;PDFMargin&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;Set the PDF margins.&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;undefined&lt;/code&gt; no margins are set.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;omitBackground&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;boolean&lt;/td&gt;
+&lt;td&gt;Hides default white background and allows generating pdfs with transparency.&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;false&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;outline&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;boolean&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;&lt;em&gt;(Experimental)&lt;/em&gt;&lt;/strong&gt; Generate document outline.&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;false&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;pageRanges&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;string&lt;/td&gt;
+&lt;td&gt;Paper ranges to print, e.g. &lt;code&gt;1-5, 8, 11-13&lt;/code&gt;.&lt;/td&gt;
+&lt;td&gt;The empty string, which means all pages are printed.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;path&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;string&lt;/td&gt;
+&lt;td&gt;The path to save the file to.&lt;br&gt;&lt;br&gt;&lt;strong&gt;Remarks:&lt;/strong&gt;&lt;br&gt;&lt;br&gt;If the path is relative, it&amp;rsquo;s resolved relative to the current working directory.&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;undefined&lt;/code&gt;, which means the PDF will not be written to disk.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;preferCSSPageSize&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;boolean&lt;/td&gt;
+&lt;td&gt;Give any CSS &lt;code&gt;@page&lt;/code&gt; size declared in the page priority over what is declared in the &lt;code&gt;width&lt;/code&gt; or &lt;code&gt;height&lt;/code&gt; or &lt;code&gt;format&lt;/code&gt; option.&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;false&lt;/code&gt;, which will scale the content to fit the paper size.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;printBackground&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;boolean&lt;/td&gt;
+&lt;td&gt;Set to &lt;code&gt;true&lt;/code&gt; to print background graphics.&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;false&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;scale&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;number&lt;/td&gt;
+&lt;td&gt;Scales the rendering of the web page. Amount must be between &lt;code&gt;0.1&lt;/code&gt; and &lt;code&gt;2&lt;/code&gt;.&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;1&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tagged&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;boolean&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;&lt;em&gt;(Experimental)&lt;/em&gt;&lt;/strong&gt; Generate tagged (accessible) PDF.&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;true&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;timeout&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;number&lt;/td&gt;
+&lt;td&gt;Timeout in milliseconds. Pass &lt;code&gt;0&lt;/code&gt; to disable timeout.&lt;br&gt;&lt;br&gt;The default value can be changed by using &lt;a class=&#34;link&#34; href=&#34;https://pptr.dev/api/puppeteer.page.setdefaulttimeout&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Page.setDefaultTimeout()&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;30_000&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;waitForFonts&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;boolean&lt;/td&gt;
+&lt;td&gt;If true, waits for &lt;code&gt;document.fonts.ready&lt;/code&gt; to resolve. This might require activating the page using &lt;a class=&#34;link&#34; href=&#34;https://pptr.dev/api/puppeteer.page.bringtofront&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Page.bringToFront()&lt;/a&gt; if the page is in the background.&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;true&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;width&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;string | number&lt;/td&gt;
+&lt;td&gt;Sets the width of paper. You can pass in a number or a string with a unit.&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+</description>
+        </item>
+        <item>
         <title>自动化测试工具Puppeteer简介</title>
         <link>https://chengxiaqiucao.github.io/post/28-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/</link>
         <pubDate>Mon, 30 Sep 2024 00:00:00 +0000</pubDate>

@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name="msvalidate.01" content="03BBDF6AC26BCA2F36ADC5DC579B84AA" /><meta name='description' content="浏览网站资料的时候，经常发现有一些有价值的内容希望保存，这里介绍一个利用puppeteer把页面保存成PDF的简单方法">
+<title>自动化测试奇技淫巧之保存网页为PDF</title>
+
+<link rel='canonical' href='https://chengxiaqiucao.github.io/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/'>
+
+<link rel="stylesheet" href="/scss/style.min.afc04e201e26111368df0fa482ffbcd8ad0a7779bfdcc0c73b0c9eac35357cdd.css"><meta property='og:title' content="自动化测试奇技淫巧之保存网页为PDF">
+<meta property='og:description' content="浏览网站资料的时候，经常发现有一些有价值的内容希望保存，这里介绍一个利用puppeteer把页面保存成PDF的简单方法">
+<meta property='og:url' content='https://chengxiaqiucao.github.io/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/'>
+<meta property='og:site_name' content='秋 草 观 “测” 台'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='自动化测试' /><meta property='article:tag' content='测试工具' /><meta property='article:published_time' content='2024-10-03T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-10-03T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="自动化测试奇技淫巧之保存网页为PDF">
+<meta name="twitter:description" content="浏览网站资料的时候，经常发现有一些有价值的内容希望保存，这里介绍一个利用puppeteer把页面保存成PDF的简单方法">
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0SZVJZGMHX"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8076532964743402"
+     crossorigin="anonymous"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0SZVJZGMHX');
+</script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/automnGrass_hu7204715396109996112.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">秋 草 观 “测” 台</a></h1>
+            <h2 class="site-description">Testing is not just checking...</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/chengxiaqiucao'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/472272606'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162803093" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10312" xmlns:xlink="http://www.w3.org/1999/xlink" width="211.71875" height="200"><path d="M896.43834 165.698h-62.34l54.57-54.57c23.43-23.37 23.43-70.17 0-93.54-23.37-23.37-70.17-23.37-93.54 0l-155.88 148.17H452.17034l-155.94-148.23c-23.43-23.37-70.17-23.37-93.54 0-23.37 23.43-23.43 70.17 0 93.54l54.57 54.57h-62.34A192.983 192.983 0 0 0 0.00934 360.607v420.899c0 116.97 85.71 202.68 194.91 202.68h693.75a192.983 192.983 0 0 0 194.85-194.85v-428.73c7.83-109.14-77.94-194.91-187.08-194.91z m54.63 615.809a69.869 69.869 0 0 1-70.17 70.17h-678.27a69.869 69.869 0 0 1-70.109-70.17v-413.13a69.869 69.869 0 0 1 70.17-70.17h678.21a69.869 69.869 0 0 1 70.17 70.17v413.19z m-608.039-342.96a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.23-70.17z m405.36 0a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.17-70.17z" p-id="10313" fill="#8a8a8a"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.zhihu.com/people/qiucao'
+                        target="_blank"
+                        title="zhihu"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162502588" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4642" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M540.95908203 555.43730469s0-62.74248047-30.56748047-65.96191407c-30.56748047-3.21943359-125.48583984 0-125.48583984 1e-8v-193.05527344h141.57246094s-1.60839844-64.35263672-28.95908203-64.35263672h-230.05810547l38.61035156-102.96210938s-57.91728516 3.21943359-78.83085938 40.21962891-86.87460938 222.01523438-86.87460937 222.01523438 22.52373047 9.65302734 59.52480469-17.69589844c37.00283203-27.34804688 49.87177734-75.61494141 49.87177734-75.61494141l67.56943359-3.21943359 1.60839844 196.27382812s-117.44033203-1.60839844-141.57246094 0c-24.13212891 1.60839844-37.00283203 65.96191406-37.00283203 65.96191407h178.57792969s-16.09013672 109.39746094-61.13408203 188.23007812c-46.65673828 78.83085938-133.53134766 141.57246094-133.53134766 141.57246094s62.74248047 25.74052734 123.87919922-9.65302735c61.13408203-37.00283203 106.18154297-196.27382812 106.18154297-196.27382812l143.184375 178.57792969s12.86982422-85.26533203-1.60839844-109.39746094c-16.09013672-24.13212891-99.74707031-120.65888672-99.74707031-120.65888672l-37.00283203 32.17412109 25.74052734-106.18154297h156.0515625zM577.96191406 227.24316406l-1.60839843 580.77509766h57.91728515l20.91357422 72.39550781 101.35634766-72.39550781h143.184375v-580.77509766h-321.75966797zM835.3671875 743.665625h-67.56943359l-85.26533203 65.96191406-19.30517579-65.96191406h-17.69589843v-450.46318359h189.83583984v450.46318359z" fill="#8a8a8a" p-id="4643"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='mailto:%20danmyw@qq.com'
+                        target="_blank"
+                        title="e-mail"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162879016" class="icon" viewBox="0 0 1451 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12462" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z" fill="#8a8a8a" p-id="12463"></path></svg>
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>检索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/releases/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+                
+                <span>热门开源</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="https://chengxiaqiucao.github.io/en/" >English</option>
+                                
+                                    <option value="https://chengxiaqiucao.github.io/" selected>中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#puppeteer用法">Puppeteer用法</a></li>
+    <li><a href="#pdf-的基本用法">pdf() 的基本用法</a>
+      <ol>
+        <li><a href="#paperformat">PaperFormat</a></li>
+        <li><a href="#pdfmargin">PDFMargin</a></li>
+        <li><a href="#pdfoption">PDFOption</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E6%B5%8B%E8%AF%95%E6%8A%80%E6%9C%AF/" style="background-color: #2a9d8f; color: #fff;">
+                测试技术
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/">自动化测试奇技淫巧之保存网页为PDF</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            浏览网站资料的时候，经常发现有一些有价值的内容希望保存，这里介绍一个利用puppeteer把页面保存成PDF的简单方法
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Oct 03, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 3 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p><img src="/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-3.png"
+	width="734"
+	height="369"
+	srcset="/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-3_hu12622256033521511608.png 480w, /post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-3_hu5578094763851489210.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="198"
+		data-flex-basis="477px"
+	
+></p>
+<p>我们浏览网站资料的时候，发现有价值的文档，经常需要把材料保存下来。直接复制其实比较麻烦，况且有的网站还做了限制，不方便直接保存。这时将页面直接保存为 PDF 格式的文件是一个很好的需求。</p>
+<p>通常的做法是需要借助一些浏览器插件或者打印扩展来实现，这里我们学习自动化的话，其实利用 puppeteer 就可以方便地实现这个目的。再加上工具的自动化加持，绝对是爬取并保存重要资料的利器。</p>
+<h2 id="puppeteer用法">Puppeteer用法
+</h2><p>关于 Puppeteer 工具的基本用法，在我之前的博文 <a class="link" href="https://chengxiaqiucao.github.io/post/28-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/"  target="_blank" rel="noopener"
+    >自动化测试工具Puppeteer简介</a> 中已有较全面介绍，大家可以参考。</p>
+<h2 id="pdf-的基本用法">pdf() 的基本用法
+</h2><p>在 Puppeteer 中保存 pdf 文件其实非常简单，通过调用 puppeteer 内置的 pdf() 方法就可以将当前页面保存为一个pdf文件</p>
+<p>官方给的案例：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="p">(</span><span class="kr">async</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">const</span> <span class="nx">browser</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">puppeteer</span><span class="p">.</span><span class="nx">launch</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">const</span> <span class="nx">page</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">browser</span><span class="p">.</span><span class="nx">newPage</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">await</span> <span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="s1">&#39;https://news.ycombinator.com&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">waitUntil</span><span class="o">:</span> <span class="s1">&#39;networkidle2&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">await</span> <span class="nx">page</span><span class="p">.</span><span class="nx">pdf</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;hn.pdf&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">format</span><span class="o">:</span> <span class="s1">&#39;letter&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="p">});</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kr">await</span> <span class="nx">browser</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">})();</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>用来访问一个技术新闻聚合网站，并将页面保存到 <code>hn.pdf</code> 文件中</p>
+<p><img src="/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003.png"
+	width="650"
+	height="848"
+	srcset="/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003_hu15013180034991548556.png 480w, /post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003_hu12192916129795210891.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="76"
+		data-flex-basis="183px"
+	
+></p>
+<h3 id="paperformat">PaperFormat
+</h3><p>上面的例子中有个参数 <code>format</code>， 这个参数其实是指定保存的页面大小，可以取值为一些默认的打印页面大小，取值清单和对应的大小如下(单位英寸)：</p>
+<ul>
+<li><code>Letter</code>: 8.5in x 11in</li>
+<li><code>Legal</code>: 8.5in x 14in</li>
+<li><code>Tabloid</code>: 11in x 17in</li>
+<li><code>Ledger</code>: 17in x 11in</li>
+<li><code>A0</code>: 33.1102in x 46.811in</li>
+<li><code>A1</code>: 23.3858in x 33.1102in</li>
+<li><code>A2</code>: 16.5354in x 23.3858in</li>
+<li><code>A3</code>: 11.6929in x 16.5354in</li>
+<li><code>A4</code>: 8.2677in x 11.6929in</li>
+<li><code>A5</code>: 5.8268in x 8.2677in</li>
+<li><code>A6</code>: 4.1339in x 5.8268in</li>
+</ul>
+<h3 id="pdfmargin">PDFMargin
+</h3><p>除了 <code>format</code>， 还可以像打印时设置页边距，设置 <code>margin</code> 属性,  对应取值</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Modifiers</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bottom</td>
+<td><code>optional</code></td>
+<td>string | number</td>
+</tr>
+<tr>
+<td>left</td>
+<td><code>optional</code></td>
+<td>string | number</td>
+</tr>
+<tr>
+<td>right</td>
+<td><code>optional</code></td>
+<td>string | number</td>
+</tr>
+<tr>
+<td>top</td>
+<td><code>optional</code></td>
+<td>string | number</td>
+</tr>
+<tr>
+<td>上面的代码加上页边距设置：</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl">  <span class="kr">await</span> <span class="nx">page</span><span class="p">.</span><span class="nx">pdf</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;hn.pdf&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">format</span><span class="o">:</span> <span class="s1">&#39;A4&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">margin</span><span class="o">:</span> <span class="p">{</span><span class="s1">&#39;left&#39;</span><span class="o">:</span> <span class="mi">80</span><span class="p">,</span> <span class="s1">&#39;top&#39;</span><span class="o">:</span> <span class="mi">40</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="p">});</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>可以看到页边距也进行了调整
+<img src="/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-1.png"
+	width="657"
+	height="843"
+	srcset="/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-1_hu6631492286924840099.png 480w, /post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-1_hu4528104784330937774.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="77"
+		data-flex-basis="187px"
+	
+></p>
+<h3 id="pdfoption">PDFOption
+</h3><p>除了上面两个常用的调整参数外，这个方法其实也提供了其他更丰富的设置，基本可以实现我们保存 pdf 文档时的各种样式设置需要。</p>
+<p>比如 <code>scale</code> 参数可以设置页面缩放，取值为0.1 ~ 2:</p>
+<p><code>scale: 0.5,</code></p>
+<p><img src="/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-2.png"
+	width="1050"
+	height="817"
+	srcset="/post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-2_hu10358756397773000467.png 480w, /post/29-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7%E4%B9%8B%E4%BF%9D%E5%AD%98%E7%BD%91%E9%A1%B5%E4%B8%BApdf/Pasted-20241003-2_hu17052780441850382900.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="128"
+		data-flex-basis="308px"
+	
+></p>
+<p>其更多的设置参数，这里不再验证，清单如下：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Modifiers</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>displayHeaderFooter</td>
+<td><code>optional</code></td>
+<td>boolean</td>
+<td>Whether to show the header and footer.</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>footerTemplate</td>
+<td><code>optional</code></td>
+<td>string</td>
+<td>HTML template for the print footer. Has the same constraints and support for special classes as <a class="link" href="https://pptr.dev/api/puppeteer.pdfoptions#headertemplate"  target="_blank" rel="noopener"
+    >PDFOptions.headerTemplate</a>.</td>
+<td></td>
+</tr>
+<tr>
+<td>format</td>
+<td><code>optional</code></td>
+<td><a class="link" href="https://pptr.dev/api/puppeteer.paperformat"  target="_blank" rel="noopener"
+    >PaperFormat</a></td>
+<td><strong>Remarks:</strong><br><br>If set, this takes priority over the <code>width</code> and <code>height</code> options.</td>
+<td><code>letter</code>.</td>
+</tr>
+<tr>
+<td>headerTemplate</td>
+<td><code>optional</code></td>
+<td>string</td>
+<td>HTML template for the print header. Should be valid HTML with the following classes used to inject values into them:<br><br>- <code>date</code> formatted print date<br>    <br>- <code>title</code> document title<br>    <br>- <code>url</code> document location<br>    <br>- <code>pageNumber</code> current page number<br>    <br>- <code>totalPages</code> total pages in the document</td>
+<td></td>
+</tr>
+<tr>
+<td>height</td>
+<td><code>optional</code></td>
+<td>string | number</td>
+<td>Sets the height of paper. You can pass in a number or a string with a unit.</td>
+<td></td>
+</tr>
+<tr>
+<td>landscape</td>
+<td><code>optional</code></td>
+<td>boolean</td>
+<td>Whether to print in landscape orientation.</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>margin</td>
+<td><code>optional</code></td>
+<td><a class="link" href="https://pptr.dev/api/puppeteer.pdfmargin"  target="_blank" rel="noopener"
+    >PDFMargin</a></td>
+<td>Set the PDF margins.</td>
+<td><code>undefined</code> no margins are set.</td>
+</tr>
+<tr>
+<td>omitBackground</td>
+<td><code>optional</code></td>
+<td>boolean</td>
+<td>Hides default white background and allows generating pdfs with transparency.</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>outline</td>
+<td><code>optional</code></td>
+<td>boolean</td>
+<td><strong><em>(Experimental)</em></strong> Generate document outline.</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>pageRanges</td>
+<td><code>optional</code></td>
+<td>string</td>
+<td>Paper ranges to print, e.g. <code>1-5, 8, 11-13</code>.</td>
+<td>The empty string, which means all pages are printed.</td>
+</tr>
+<tr>
+<td>path</td>
+<td><code>optional</code></td>
+<td>string</td>
+<td>The path to save the file to.<br><br><strong>Remarks:</strong><br><br>If the path is relative, it&rsquo;s resolved relative to the current working directory.</td>
+<td><code>undefined</code>, which means the PDF will not be written to disk.</td>
+</tr>
+<tr>
+<td>preferCSSPageSize</td>
+<td><code>optional</code></td>
+<td>boolean</td>
+<td>Give any CSS <code>@page</code> size declared in the page priority over what is declared in the <code>width</code> or <code>height</code> or <code>format</code> option.</td>
+<td><code>false</code>, which will scale the content to fit the paper size.</td>
+</tr>
+<tr>
+<td>printBackground</td>
+<td><code>optional</code></td>
+<td>boolean</td>
+<td>Set to <code>true</code> to print background graphics.</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>scale</td>
+<td><code>optional</code></td>
+<td>number</td>
+<td>Scales the rendering of the web page. Amount must be between <code>0.1</code> and <code>2</code>.</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>tagged</td>
+<td><code>optional</code></td>
+<td>boolean</td>
+<td><strong><em>(Experimental)</em></strong> Generate tagged (accessible) PDF.</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td>timeout</td>
+<td><code>optional</code></td>
+<td>number</td>
+<td>Timeout in milliseconds. Pass <code>0</code> to disable timeout.<br><br>The default value can be changed by using <a class="link" href="https://pptr.dev/api/puppeteer.page.setdefaulttimeout"  target="_blank" rel="noopener"
+    >Page.setDefaultTimeout()</a></td>
+<td><code>30_000</code></td>
+</tr>
+<tr>
+<td>waitForFonts</td>
+<td><code>optional</code></td>
+<td>boolean</td>
+<td>If true, waits for <code>document.fonts.ready</code> to resolve. This might require activating the page using <a class="link" href="https://pptr.dev/api/puppeteer.page.bringtofront"  target="_blank" rel="noopener"
+    >Page.bringToFront()</a> if the page is in the background.</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td>width</td>
+<td><code>optional</code></td>
+<td>string | number</td>
+<td>Sets the width of paper. You can pass in a number or a string with a unit.</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95/">自动化测试</a>
+        
+            <a href="/tags/%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7/">测试工具</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/26-%E5%A4%A7%E8%AF%9Dchrom%E5%BC%80%E5%8F%91%E8%80%85%E5%8D%8F%E8%AE%AEcdp/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">WebDriver将退出历史？BIDI登场</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/">
+        
+        
+            <div class="article-image">
+                <img src="/post/24-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/git.aed62b4f27f28298d2cede822085dd8a_hu4104698228300076604.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post Git工作原理和常用指令"
+                        
+                        data-hash="md5-rtYrTyfygpjSzt6CIIXdig==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Git工作原理和常用指令</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/21-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/">
+        
+        
+            <div class="article-image">
+                <img src="/post/21-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-1.bc4704aed9429c019cf5e506c20e0e6c_hu7548395935021992726.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 大话Https协议"
+                        
+                        data-hash="md5-vEcErtlCnAGc9eUGwg4ObA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">大话Https协议</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/20-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/">
+        
+        
+            <div class="article-image">
+                <img src="/post/20-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/branch.eba279f891f21207c25effce2befa727_hu6331466558873077882.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 软件分支策略和集成模式梳理"
+                        
+                        data-hash="md5-66J5&#43;JHyEgfCXv/OK&#43;&#43;nJw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">软件分支策略和集成模式梳理</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/07-%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E7%9A%84%E7%9B%AE%E7%9A%84/">
+        
+        
+            <div class="article-image">
+                <img src="/post/07-%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E7%9A%84%E7%9B%AE%E7%9A%84/testing.f53d6bb0c16aa06f813349fb63e6c30e_hu7540309765319369871.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 软件测试的目的到底是什么？"
+                        
+                        data-hash="md5-9T1rsMFqoG&#43;BM0n7Y&#43;bDDg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">软件测试的目的到底是什么？</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2023 - 
+        
+        2024 |by 城下秋草（公众号： 秋草说测试）
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
