@@ -7,7 +7,168 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>|by 城下秋草（公众号： 秋草说测试）</copyright>
-        <lastBuildDate>Sun, 03 Nov 2024 23:54:39 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Sat, 16 Nov 2024 16:28:04 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>安装部署测试怎么做</title>
+        <link>https://chengxiaqiucao.github.io/post/47-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/</link>
+        <pubDate>Sat, 16 Nov 2024 16:28:04 +0800</pubDate>
+        
+        <guid>https://chengxiaqiucao.github.io/post/47-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/post/47-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-3.png" alt="Featured image of post 安装部署测试怎么做" /&gt;&lt;p&gt;知乎上看到的问题：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;各位专业的IT或是测试大牛能告诉我环境部署怎么做吗？每次我都是说根据测试文档安装相应软件，环境变量设置！准备相关材料！总觉得回答不够好！求解正确答案？&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;作为一个专业的测试人员，这个回答不能说不好，而是基本等同于不会测试。&lt;/p&gt;
+&lt;p&gt;这个问题虽然是直接问的如何做安装部署，但其实是问你对于安装部署需要怎么测试？ 不直接问是因为很多小白都意识不到安装部署其实是软件功能测试范围中极为重要的一块，比如题主。&lt;/p&gt;
+&lt;p&gt;一个软件系统的安装，特别是直接交付给用户的系统，这部分可以说就是整个系统的门面，是使用这个软件的第一步，表现好坏直接影响用户对这个软件的评价。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/47-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116.png&#34;
+	width=&#34;847&#34;
+	height=&#34;312&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/47-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116_hu11675011067311093891.png 480w, https://chengxiaqiucao.github.io/post/47-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116_hu12808487661289549306.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;271&#34;
+		data-flex-basis=&#34;651px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;那么软件的安装部署测试要做哪些测试方面的考虑呢？可以从以下几个方面来看：&lt;/p&gt;
+&lt;h2 id=&#34;全新安装全量安装&#34;&gt;全新安装/全量安装
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;全新安装，指一个软件首次部署或者是在不保留原先已安装信息的情况下重新部署。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;这部分其实是测试的主要部分，题主所说的安装文档其实也主要会针对这一部分说明。&lt;/p&gt;
+&lt;p&gt;但测试时还是有很多需要注意的测试要点&lt;/p&gt;
+&lt;h3 id=&#34;1-安装的依赖&#34;&gt;1. 安装的依赖
+&lt;/h3&gt;&lt;p&gt;大部分的安装程序或脚本，它其实都是有一定的条件依赖的：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;需要的磁盘空间？&lt;/li&gt;
+&lt;li&gt;网络的连接状态？&lt;/li&gt;
+&lt;li&gt;CPU/内存有没有要求？&lt;/li&gt;
+&lt;li&gt;操作系统的版本？&lt;/li&gt;
+&lt;li&gt;系统用户的权限（是不是需要操作系统的管理员权限来安装？）&lt;/li&gt;
+&lt;li&gt;&amp;hellip;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;而且这些依赖也不单纯只是安装程序本身的依赖，也包括安装完成后，软件系统要正常运行需要的依赖条件，这些在我们程序安装的时候，都应该由安装程序提前进行验证。所有这些都是测试时需要考虑和进行设计的。&lt;/p&gt;
+&lt;h3 id=&#34;2-安装程序脚本的功能验证&#34;&gt;2. 安装程序/脚本的功能验证
+&lt;/h3&gt;&lt;p&gt;不管是有安装程序还是通过执行脚本，这部分是安装部署的主体，也是安装部署文档中重点描述的部分，大部分面向用户的安装程序其实都是有界面的。&lt;/p&gt;
+&lt;p&gt;那这里的验证其实和普通软件的功能测试没太大区别。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;界面中描述性信息、文字是否清晰&lt;/li&gt;
+&lt;li&gt;一些操作的提示信息是否明确&lt;/li&gt;
+&lt;li&gt;有用户交互部分，用户不同选择的分支验证&lt;/li&gt;
+&lt;li&gt;不同的屏幕分辨率下的兼容性&lt;/li&gt;
+&lt;li&gt;是否提供步骤回溯？误操作时能否返回上一步&amp;hellip;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在设计这部分验证时，最好结合流程图，梳理出各种不同路径逐一确认。&lt;/p&gt;
+&lt;h3 id=&#34;3-安装异常处理&#34;&gt;3. 安装异常处理
+&lt;/h3&gt;&lt;p&gt;这个是考验测试人员经验的重要环节。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;磁盘空间不足？&lt;/li&gt;
+&lt;li&gt;中途断网？&lt;/li&gt;
+&lt;li&gt;本地服务端口冲突？&lt;/li&gt;
+&lt;li&gt;中途断电？&amp;hellip;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/47-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-1.png&#34;
+	width=&#34;1158&#34;
+	height=&#34;622&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/47-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-1_hu16323414876787030216.png 480w, https://chengxiaqiucao.github.io/post/47-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-1_hu8516694880899618560.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;446px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;4-易用性&#34;&gt;4. 易用性
+&lt;/h3&gt;&lt;p&gt;关于安装程序的易用性，主要考虑安装过程中有没有对用户体验优化的一些考虑。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;比如安装选择一个已经存在的目录，是否有提示？&lt;/li&gt;
+&lt;li&gt;文件的覆盖会不会有二次确认？&lt;/li&gt;
+&lt;li&gt;安装过程中，有没有进度条显示安装进度?&lt;/li&gt;
+&lt;li&gt;在比较大的文件拷贝时，界面有没有一些信息变化提示，避免用户怀疑程序卡死？&lt;/li&gt;
+&lt;li&gt;检测到冲突，有没有给用户提供解决方案建议？&amp;hellip;..&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这些其实都是属于易用性的范畴&lt;/p&gt;
+&lt;h3 id=&#34;5-安装校验&#34;&gt;5. 安装校验
+&lt;/h3&gt;&lt;p&gt;在执行安装测试时，我们还应该了解并确认安装前后系统有哪些变化，这些变化是否是符合设计要求。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;安装后安装目录下会包含哪些程序文件？&lt;/li&gt;
+&lt;li&gt;操作系统的系统文件夹或非安装目录下有没有生成什么文件？&lt;/li&gt;
+&lt;li&gt;注册表有无增加和修改？&lt;/li&gt;
+&lt;li&gt;系统服务有没有增加和修改？&lt;/li&gt;
+&lt;li&gt;开始菜单中有没有添加程序组？&lt;/li&gt;
+&lt;li&gt;桌面上有没有创建快捷方式？&amp;hellip;..&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;掌握这些不仅是功能的检查，也是我们理解安装程序本身做了哪些事情，有没有测试场景的遗漏。&lt;/p&gt;
+&lt;h2 id=&#34;升级安装更新&#34;&gt;升级安装/更新
+&lt;/h2&gt;&lt;p&gt;除了全新安装外，另一个重要的场景是系统的升级，更新。也就是系统已经存在了一个版本，需要在原有基础上升级到当前安装包的版本。&lt;/p&gt;
+&lt;p&gt;而升级又可以分为全量升级和增量升级&lt;/p&gt;
+&lt;h3 id=&#34;全量升级&#34;&gt;全量升级
+&lt;/h3&gt;&lt;p&gt;全量的升级会完整替换原先的程序文件，但一般会保留原有的配置和数据，安装包通常会包含当前版本的所有文件，安装包通常比较大&lt;/p&gt;
+&lt;h3 id=&#34;增量升级&#34;&gt;增量升级
+&lt;/h3&gt;&lt;p&gt;增量升级则是根据用户的当前版本，安装包只包含增量的一些程序文件，包括一些升级操作的脚本文件。这种安装包一般比较小，安装过程也通常更加快速。但安装包要和用户的当前版本严格匹配。一般会在全量安装包非常庞大，分发给用户效率不高的时候采用&lt;/p&gt;
+&lt;h3 id=&#34;版本跨度&#34;&gt;版本跨度
+&lt;/h3&gt;&lt;p&gt;不管是全量还是增量，验证时和全新安装的要点基本类似。但有一个升级验证特定的场景需要重点考虑，就是版本的跨度问题&lt;/p&gt;
+&lt;p&gt;如果软件迭代，版本变更次数非常多，那么从历史古早版本升级到新版本往往会带来很多问题，包括配置、数据结构的变化造成的影响，以及升级策略的选择，是一次到位还是逐个中间版本升级？对测试策略可能都有影响。&lt;/p&gt;
+&lt;h3 id=&#34;数据转换&#34;&gt;数据转换
+&lt;/h3&gt;&lt;p&gt;对于牵涉到数据库，数据结构变化的版本升级，业务数据可能会需要进行很多数据转换的操作，这里也是Bug的高发地带，需要结合升级后的业务测试重点关注。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/47-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-2.png&#34;
+	width=&#34;553&#34;
+	height=&#34;335&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/47-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-2_hu14542477594004204598.png 480w, https://chengxiaqiucao.github.io/post/47-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-2_hu11957572846764343284.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;165&#34;
+		data-flex-basis=&#34;396px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;回退&#34;&gt;回退
+&lt;/h2&gt;&lt;p&gt;回退通常属于安装出现问题时，是否可以恢复原先状态，以不影响原来的业务。&lt;/p&gt;
+&lt;p&gt;这里主要从几个方面考虑：&lt;/p&gt;
+&lt;h3 id=&#34;正常取消安装部署&#34;&gt;正常取消安装/部署
+&lt;/h3&gt;&lt;p&gt;用户主动发起，属于正常回退，这时安装程序应该要能够清理掉已完成的安装文件，恢复原有的系统配置，将状态重置到安装前的状态&lt;/p&gt;
+&lt;h3 id=&#34;异常回退&#34;&gt;异常回退
+&lt;/h3&gt;&lt;p&gt;除了用户主动发起的正常回退外，如果安装过程中出现了一些未知的异常导致安装无法继续，这时需要提示用户安装失败，同时也应该触发回退流程，将系统恢复到安装前。&lt;/p&gt;
+&lt;p&gt;这种属于我们安装程序本身的异常捕捉和处理的一部分。&lt;/p&gt;
+&lt;p&gt;而即便不是安装程序本身捕捉的异常，比如安装过程中拔电源强制中断这样，我们的软件也应该提供一些清理脚本来将部署状态恢复到安装前。 这也是安装测试的重要场景之一。&lt;/p&gt;
+&lt;h3 id=&#34;回退有效性&#34;&gt;回退有效性
+&lt;/h3&gt;&lt;p&gt;除了回退的触发，就是我们还要对回退的效果进行确认。是否确实正确完成了清理和状态恢复。&lt;/p&gt;
+&lt;p&gt;另外，在回退执行过程中，如果出现异常（和因为异常触发回退不同），是否有对应的解决方案？比如提供清理工具&lt;/p&gt;
+&lt;h2 id=&#34;卸载&#34;&gt;卸载
+&lt;/h2&gt;&lt;p&gt;当然，有安装就有卸载。除了安装程序的验证，我们还要验证卸载程序或脚本。类似安装程序的功能验证&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/47-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-3.png&#34;
+	width=&#34;1228&#34;
+	height=&#34;812&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/47-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-3_hu9511788026918631111.png 480w, https://chengxiaqiucao.github.io/post/47-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-3_hu10285995699022025985.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;151&#34;
+		data-flex-basis=&#34;362px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;卸载入口&#34;&gt;卸载入口
+&lt;/h3&gt;&lt;p&gt;除了直接执行卸载程序，还有通过操作系统的卸载入口进行卸载，都是应该考虑的场景&lt;/p&gt;
+&lt;h3 id=&#34;卸载遗留&#34;&gt;卸载遗留
+&lt;/h3&gt;&lt;p&gt;软件卸载以后，有哪些文件、配置会遗留在操作系统中，是否符合设计要求？&lt;/p&gt;
+&lt;h3 id=&#34;破坏性卸载&#34;&gt;破坏性卸载
+&lt;/h3&gt;&lt;p&gt;制造一些特殊场景，比如一些关键文件物理删除，关键的配置被变更，确认卸载还是否能正常进行？&lt;/p&gt;
+&lt;h3 id=&#34;卸载中的异常&#34;&gt;卸载中的异常
+&lt;/h3&gt;&lt;p&gt;同样也要考虑卸载中的各种异常场景&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;文件正在使用？&lt;/li&gt;
+&lt;li&gt;断网？&lt;/li&gt;
+&lt;li&gt;断电？&amp;hellip;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;异常出现时，有没有对应的手段可以善后&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;很多时候，看上去简单的问题，深究的话门道可并不小。 测试是一门关于探索和发现未知的艺术，自有奥妙​。&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>关于测试和开发的选择</title>
         <link>https://chengxiaqiucao.github.io/post/46-%E6%B5%8B%E8%AF%95%E5%92%8C%E5%BC%80%E5%8F%91%E7%9A%84%E9%80%89%E6%8B%A9/</link>
         <pubDate>Sun, 03 Nov 2024 23:54:39 +0800</pubDate>
