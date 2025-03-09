@@ -2,18 +2,18 @@
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<meta name="msvalidate.01" content="03BBDF6AC26BCA2F36ADC5DC579B84AA" /><meta name='description' content="Pytest 发布历史 (latest 10) pytest 8.3.4 (2024-12-01) Bug fixes #12592: Fixed KeyError{.interpreted-text role=&ldquo;class&rdquo;} crash when using --import-mode=importlib in a directory layout where a directory contains a child directory with the same name. #12818: Assertion rewriting now preserves the source ranges of the original instructions, making it play well with tools that deal with the AST, like executing. #12849: ANSI escape codes for colored output now handled correctly">
+<meta name="msvalidate.01" content="03BBDF6AC26BCA2F36ADC5DC579B84AA" /><meta name='description' content="Pytest 发布历史 (latest 10) pytest 8.3.5 (2025-03-02) Bug fixes #11777: Fixed issue where sequences were still being shortened even with -vv verbosity. #12888: Fixed broken input when using Python 3.13+ and a libedit build of Python, such as on macOS or with uv-managed Python binaries from the python-build-standalone project. This could manifest e.g. by a broken prompt when using Pdb, or seeing empty inputs with manual usage">
 <title>Pytest 发布历史 (latest 10)</title>
 
 <link rel='canonical' href='https://chengxiaqiucao.github.io/page/pytest-10/'>
 
 <link rel="stylesheet" href="/scss/style.min.afc04e201e26111368df0fa482ffbcd8ad0a7779bfdcc0c73b0c9eac35357cdd.css"><meta property='og:title' content="Pytest 发布历史 (latest 10)">
-<meta property='og:description' content="Pytest 发布历史 (latest 10) pytest 8.3.4 (2024-12-01) Bug fixes #12592: Fixed KeyError{.interpreted-text role=&ldquo;class&rdquo;} crash when using --import-mode=importlib in a directory layout where a directory contains a child directory with the same name. #12818: Assertion rewriting now preserves the source ranges of the original instructions, making it play well with tools that deal with the AST, like executing. #12849: ANSI escape codes for colored output now handled correctly">
+<meta property='og:description' content="Pytest 发布历史 (latest 10) pytest 8.3.5 (2025-03-02) Bug fixes #11777: Fixed issue where sequences were still being shortened even with -vv verbosity. #12888: Fixed broken input when using Python 3.13+ and a libedit build of Python, such as on macOS or with uv-managed Python binaries from the python-build-standalone project. This could manifest e.g. by a broken prompt when using Pdb, or seeing empty inputs with manual usage">
 <meta property='og:url' content='https://chengxiaqiucao.github.io/page/pytest-10/'>
 <meta property='og:site_name' content='秋 草 观 “测” 台'>
-<meta property='og:type' content='article'><meta property='article:section' content='Page' /><meta property='article:tag' content='开源项目' /><meta property='article:published_time' content='2025-02-26T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-02-26T00:00:00&#43;00:00'/>
+<meta property='og:type' content='article'><meta property='article:section' content='Page' /><meta property='article:tag' content='开源项目' /><meta property='article:published_time' content='2025-03-09T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-03-09T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="Pytest 发布历史 (latest 10)">
-<meta name="twitter:description" content="Pytest 发布历史 (latest 10) pytest 8.3.4 (2024-12-01) Bug fixes #12592: Fixed KeyError{.interpreted-text role=&ldquo;class&rdquo;} crash when using --import-mode=importlib in a directory layout where a directory contains a child directory with the same name. #12818: Assertion rewriting now preserves the source ranges of the original instructions, making it play well with tools that deal with the AST, like executing. #12849: ANSI escape codes for colored output now handled correctly">
+<meta name="twitter:description" content="Pytest 发布历史 (latest 10) pytest 8.3.5 (2025-03-02) Bug fixes #11777: Fixed issue where sequences were still being shortened even with -vv verbosity. #12888: Fixed broken input when using Python 3.13+ and a libedit build of Python, such as on macOS or with uv-managed Python binaries from the python-build-standalone project. This could manifest e.g. by a broken prompt when using Pdb, or seeing empty inputs with manual usage">
   
 
 
@@ -340,23 +340,30 @@
         <div class="widget--toc">
             <nav id="TableOfContents">
   <ol>
-    <li><a href="#pytest-834-2024-12-01">pytest 8.3.4 (2024-12-01)</a>
+    <li><a href="#pytest-835-2025-03-02">pytest 8.3.5 (2025-03-02)</a>
       <ol>
         <li><a href="#bug-fixes">Bug fixes</a></li>
         <li><a href="#improved-documentation">Improved documentation</a></li>
         <li><a href="#contributor-facing-changes">Contributor-facing changes</a></li>
       </ol>
     </li>
-  </ol>
-
-  <ol>
-    <li><a href="#bug-fixes-1">Bug fixes</a></li>
-    <li><a href="#improved-documentation-1">Improved documentation</a></li>
-    <li><a href="#miscellaneous-internal-changes">Miscellaneous internal changes</a></li>
+    <li><a href="#pytest-834-2024-12-01">pytest 8.3.4 (2024-12-01)</a>
+      <ol>
+        <li><a href="#bug-fixes-1">Bug fixes</a></li>
+        <li><a href="#improved-documentation-1">Improved documentation</a></li>
+        <li><a href="#contributor-facing-changes-1">Contributor-facing changes</a></li>
+      </ol>
+    </li>
   </ol>
 
   <ol>
     <li><a href="#bug-fixes-2">Bug fixes</a></li>
+    <li><a href="#improved-documentation-2">Improved documentation</a></li>
+    <li><a href="#miscellaneous-internal-changes">Miscellaneous internal changes</a></li>
+  </ol>
+
+  <ol>
+    <li><a href="#bug-fixes-3">Bug fixes</a></li>
   </ol>
 
   <ol>
@@ -364,36 +371,28 @@
       <ol>
         <li><a href="#new-features">New features</a></li>
         <li><a href="#improvements-in-existing-functionality">Improvements in existing functionality</a></li>
-        <li><a href="#bug-fixes-3">Bug fixes</a></li>
-        <li><a href="#improved-documentation-2">Improved documentation</a></li>
-        <li><a href="#contributor-facing-changes-1">Contributor-facing changes</a></li>
+        <li><a href="#bug-fixes-4">Bug fixes</a></li>
+        <li><a href="#improved-documentation-3">Improved documentation</a></li>
+        <li><a href="#contributor-facing-changes-2">Contributor-facing changes</a></li>
       </ol>
     </li>
   </ol>
 
   <ol>
-    <li><a href="#bug-fixes-4">Bug Fixes</a></li>
-    <li><a href="#improved-documentation-3">Improved Documentation</a></li>
+    <li><a href="#bug-fixes-5">Bug Fixes</a></li>
+    <li><a href="#improved-documentation-4">Improved Documentation</a></li>
   </ol>
 
   <ol>
     <li><a href="#deprecations">Deprecations</a></li>
     <li><a href="#features">Features</a></li>
     <li><a href="#improvements">Improvements</a></li>
-    <li><a href="#bug-fixes-5">Bug Fixes</a></li>
+    <li><a href="#bug-fixes-6">Bug Fixes</a></li>
     <li><a href="#trivialinternal-changes">Trivial/Internal Changes</a></li>
   </ol>
 
   <ol>
-    <li><a href="#bug-fixes-6">Bug Fixes</a></li>
-  </ol>
-
-  <ol>
-    <li><a href="#features-1">Features</a></li>
-    <li><a href="#improvements-1">Improvements</a></li>
     <li><a href="#bug-fixes-7">Bug Fixes</a></li>
-    <li><a href="#improved-documentation-4">Improved Documentation</a></li>
-    <li><a href="#trivialinternal-changes-1">Trivial/Internal Changes</a></li>
   </ol>
 </nav>
         </div>
@@ -443,7 +442,7 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published">Feb 26, 2025</time>
+                <time class="article-time--published">Mar 09, 2025</time>
             </div>
         
 
@@ -458,7 +457,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 7 分钟
+                    阅读时长: 6 分钟
                 </time>
             </div>
         
@@ -475,8 +474,53 @@
     
     <h1 id="pytest-发布历史-latest-10">Pytest 发布历史 (latest 10)
 </h1><hr>
-<h2 id="pytest-834-2024-12-01">pytest 8.3.4 (2024-12-01)
+<h2 id="pytest-835-2025-03-02">pytest 8.3.5 (2025-03-02)
 </h2><h3 id="bug-fixes">Bug fixes
+</h3><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11777"  target="_blank" rel="noopener"
+    >#11777</a>: Fixed issue where sequences were still being shortened even with <code>-vv</code> verbosity.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12888"  target="_blank" rel="noopener"
+    >#12888</a>: Fixed broken input when using Python 3.13+ and a <code>libedit</code> build of Python, such as on macOS or with uv-managed Python binaries from the <code>python-build-standalone</code> project. This could manifest e.g. by a broken prompt when using <code>Pdb</code>, or seeing empty inputs with manual usage of <code>input()</code> and suspended capturing.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/13026"  target="_blank" rel="noopener"
+    >#13026</a>: Fixed <code>AttributeError</code>{.interpreted-text role=&ldquo;class&rdquo;} crash when using <code>--import-mode=importlib</code> when top-level directory same name as another module of the standard library.</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/13053"  target="_blank" rel="noopener"
+    >#13053</a>: Fixed a regression in pytest 8.3.4 where, when using <code>--import-mode=importlib</code>, a directory containing py file with the same name would cause an <code>ImportError</code></p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/13083"  target="_blank" rel="noopener"
+    >#13083</a>: Fixed issue where pytest could crash if one of the collected directories got removed during collection.</p>
+</li>
+</ul>
+<h3 id="improved-documentation">Improved documentation
+</h3><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12842"  target="_blank" rel="noopener"
+    >#12842</a>: Added dedicated page about using types with pytest.</p>
+<p>See <code>types</code>{.interpreted-text role=&ldquo;ref&rdquo;} for detailed usage.</p>
+</li>
+</ul>
+<h3 id="contributor-facing-changes">Contributor-facing changes
+</h3><ul>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/13112"  target="_blank" rel="noopener"
+    >#13112</a>: Fixed selftest failures in <code>test_terminal.py</code> with Pygments &gt;= 2.19.0</p>
+</li>
+<li>
+<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/13256"  target="_blank" rel="noopener"
+    >#13256</a>: Support for Towncrier versions released in 2024 has been re-enabled</p>
+<p>when building Sphinx docs -- by <code>webknjaz</code>{.interpreted-text role=&ldquo;user&rdquo;}.</p>
+</li>
+</ul>
+<p>========================================</p>
+<h2 id="pytest-834-2024-12-01">pytest 8.3.4 (2024-12-01)
+</h2><h3 id="bug-fixes-1">Bug fixes
 </h3><ul>
 <li>
 <p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12592"  target="_blank" rel="noopener"
@@ -496,7 +540,7 @@
     >#9353</a>: <code>pytest.approx</code>{.interpreted-text role=&ldquo;func&rdquo;} now uses strict equality when given booleans.</p>
 </li>
 </ul>
-<h3 id="improved-documentation">Improved documentation
+<h3 id="improved-documentation-1">Improved documentation
 </h3><ul>
 <li>
 <p><a class="link" href="https://github.com/pytest-dev/pytest/issues/10558"  target="_blank" rel="noopener"
@@ -515,14 +559,14 @@
     >#12966</a>: Clarify <code>filterwarnings</code>{.interpreted-text role=&ldquo;ref&rdquo;} docs on filter precedence/order when using multiple <code>@pytest.mark.filterwarnings &lt;pytest.mark.filterwarnings ref&gt;</code>{.interpreted-text role=&ldquo;ref&rdquo;} marks.</p>
 </li>
 </ul>
-<h3 id="contributor-facing-changes">Contributor-facing changes
+<h3 id="contributor-facing-changes-1">Contributor-facing changes
 </h3><ul>
 <li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12497"  target="_blank" rel="noopener"
     >#12497</a>: Fixed two failing pdb-related tests on Python 3.13.</li>
 </ul>
 <p>========================================</p>
 <h1 id="pytest-833-2024-09-09">pytest 8.3.3 (2024-09-09)
-</h1><h2 id="bug-fixes-1">Bug fixes
+</h1><h2 id="bug-fixes-2">Bug fixes
 </h2><ul>
 <li>
 <p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12446"  target="_blank" rel="noopener"
@@ -554,7 +598,7 @@
 <p>-- by <code>GTowers1</code>{.interpreted-text role=&ldquo;user&rdquo;}</p>
 </li>
 </ul>
-<h2 id="improved-documentation-1">Improved documentation
+<h2 id="improved-documentation-2">Improved documentation
 </h2><ul>
 <li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12663"  target="_blank" rel="noopener"
     >#12663</a>: Clarify that the [pytest_deselected]{.title-ref} hook should be called from [pytest_collection_modifyitems]{.title-ref} hook implementations when items are deselected.</li>
@@ -568,7 +612,7 @@
 </ul>
 <p>========================================</p>
 <h1 id="pytest-832-2024-07-24">pytest 8.3.2 (2024-07-24)
-</h1><h2 id="bug-fixes-2">Bug fixes
+</h1><h2 id="bug-fixes-3">Bug fixes
 </h2><ul>
 <li>
 <p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12652"  target="_blank" rel="noopener"
@@ -759,7 +803,7 @@
     >#7662</a>: Added timezone information to the testsuite timestamp in the JUnit XML report.</p>
 </li>
 </ul>
-<h3 id="bug-fixes-3">Bug fixes
+<h3 id="bug-fixes-4">Bug fixes
 </h3><ul>
 <li>
 <p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11706"  target="_blank" rel="noopener"
@@ -823,7 +867,7 @@
     >#7166</a>: Fixed progress percentages (the <code>[ 87%]</code> at the edge of the screen) sometimes not aligning correctly when running with pytest-xdist <code>-n</code>.</p>
 </li>
 </ul>
-<h3 id="improved-documentation-2">Improved documentation
+<h3 id="improved-documentation-3">Improved documentation
 </h3><ul>
 <li>
 <p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12153"  target="_blank" rel="noopener"
@@ -844,7 +888,7 @@
 <p>-- by <code>MarcBresson</code>{.interpreted-text role=&ldquo;user&rdquo;}.</p>
 </li>
 </ul>
-<h3 id="contributor-facing-changes-1">Contributor-facing changes
+<h3 id="contributor-facing-changes-2">Contributor-facing changes
 </h3><ul>
 <li>
 <p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12467"  target="_blank" rel="noopener"
@@ -940,7 +984,7 @@
 </ul>
 <p>========================================</p>
 <h1 id="pytest-822-2024-06-04">pytest 8.2.2 (2024-06-04)
-</h1><h2 id="bug-fixes-4">Bug Fixes
+</h1><h2 id="bug-fixes-5">Bug Fixes
 </h2><ul>
 <li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12355"  target="_blank" rel="noopener"
     >#12355</a>: Fix possible catastrophic performance slowdown on a certain parametrization pattern involving many higher-scoped parameters.</li>
@@ -949,7 +993,7 @@
 <li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12381"  target="_blank" rel="noopener"
     >#12381</a>: Fix possible &quot;Directory not empty&quot; crashes arising from concurent cache dir (<code>.pytest_cache</code>) creation. Regressed in pytest 8.2.0.</li>
 </ul>
-<h2 id="improved-documentation-3">Improved Documentation
+<h2 id="improved-documentation-4">Improved Documentation
 </h2><ul>
 <li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12290"  target="_blank" rel="noopener"
     >#12290</a>: Updated Sphinx theme to use Furo instead of Flask, enabling Dark mode theme.</li>
@@ -1047,7 +1091,7 @@ The old parameters will be removed in pytest 9.0.0.</p>
     >#9502</a>: Added <code>PYTEST_VERSION</code>{.interpreted-text role=&ldquo;envvar&rdquo;} environment variable which is defined at the start of the pytest session and undefined afterwards. It contains the value of <code>pytest.__version__</code>, and among other things can be used to easily check if code is running from within a pytest run.</p>
 </li>
 </ul>
-<h2 id="bug-fixes-5">Bug Fixes
+<h2 id="bug-fixes-6">Bug Fixes
 </h2><ul>
 <li>
 <p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12065"  target="_blank" rel="noopener"
@@ -1077,141 +1121,11 @@ Previously it was <code>None</code>, and all fixtures of such tests would share 
 </ul>
 <p>========================================</p>
 <h1 id="pytest-812-2024-04-26">pytest 8.1.2 (2024-04-26)
-</h1><h2 id="bug-fixes-6">Bug Fixes
+</h1><h2 id="bug-fixes-7">Bug Fixes
 </h2><ul>
 <li><a class="link" href="https://github.com/pytest-dev/pytest/issues/12114"  target="_blank" rel="noopener"
     >#12114</a>: Fixed error in <code>pytest.approx</code>{.interpreted-text role=&ldquo;func&rdquo;} when used with [numpy]{.title-ref} arrays and comparing with other types.</li>
 </ul>
-<p>========================================</p>
-<h1 id="pytest-811-2024-03-08">pytest 8.1.1 (2024-03-08)
-</h1><p>::: {.note}
-::: {.title}
-Note
-:::</p>
-<p>This release is not a usual bug fix release -- it contains features and improvements, being a follow up
-to <code>8.1.0</code>, which has been yanked from PyPI.
-:::</p>
-<h2 id="features-1">Features
-</h2><ul>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11475"  target="_blank" rel="noopener"
-    >#11475</a>: Added the new <code>consider_namespace_packages</code>{.interpreted-text role=&ldquo;confval&rdquo;} configuration option, defaulting to <code>False</code>.</p>
-<p>If set to <code>True</code>, pytest will attempt to identify modules that are part of <a class="link" href="https://packaging.python.org/en/latest/guides/packaging-namespace-packages"  target="_blank" rel="noopener"
-    >namespace packages</a> when importing modules.</p>
-</li>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11653"  target="_blank" rel="noopener"
-    >#11653</a>: Added the new <code>verbosity_test_cases</code>{.interpreted-text role=&ldquo;confval&rdquo;} configuration option for fine-grained control of test execution verbosity.
-See <code>Fine-grained verbosity &lt;pytest.fine_grained_verbosity&gt;</code>{.interpreted-text role=&ldquo;ref&rdquo;} for more details.</p>
-</li>
-</ul>
-<h2 id="improvements-1">Improvements
-</h2><ul>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/10865"  target="_blank" rel="noopener"
-    >#10865</a>: <code>pytest.warns</code>{.interpreted-text role=&ldquo;func&rdquo;} now validates that <code>warnings.warn</code>{.interpreted-text role=&ldquo;func&rdquo;} was called with a [str]{.title-ref} or a [Warning]{.title-ref}.
-Currently in Python it is possible to use other types, however this causes an exception when <code>warnings.filterwarnings</code>{.interpreted-text role=&ldquo;func&rdquo;} is used to filter those warnings (see <a class="link" href="https://github.com/python/cpython/issues/103577"  target="_blank" rel="noopener"
-    >CPython #103577</a> for a discussion).
-While this can be considered a bug in CPython, we decided to put guards in pytest as the error message produced without this check in place is confusing.</p>
-</li>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11311"  target="_blank" rel="noopener"
-    >#11311</a>: When using <code>--override-ini</code> for paths in invocations without a configuration file defined, the current working directory is used
-as the relative directory.</p>
-<p>Previoulsy this would raise an <code>AssertionError</code>{.interpreted-text role=&ldquo;class&rdquo;}.</p>
-</li>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11475"  target="_blank" rel="noopener"
-    >#11475</a>: <code>--import-mode=importlib &lt;import-mode-importlib&gt;</code>{.interpreted-text role=&ldquo;ref&rdquo;} now tries to import modules using the standard import mechanism (but still without changing :py<code>sys.path</code>{.interpreted-text role=&ldquo;data&rdquo;}), falling back to importing modules directly only if that fails.</p>
-<p>This means that installed packages will be imported under their canonical name if possible first, for example <code>app.core.models</code>, instead of having the module name always be derived from their path (for example <code>.env310.lib.site_packages.app.core.models</code>).</p>
-</li>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11801"  target="_blank" rel="noopener"
-    >#11801</a>: Added the <code>iter_parents() &lt;_pytest.nodes.Node.iter_parents&gt;</code>{.interpreted-text role=&ldquo;func&rdquo;} helper method on nodes.
-It is similar to <code>listchain &lt;_pytest.nodes.Node.listchain&gt;</code>{.interpreted-text role=&ldquo;func&rdquo;}, but goes from bottom to top, and returns an iterator, not a list.</p>
-</li>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11850"  target="_blank" rel="noopener"
-    >#11850</a>: Added support for <code>sys.last_exc</code>{.interpreted-text role=&ldquo;data&rdquo;} for post-mortem debugging on Python&gt;=3.12.</p>
-</li>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11962"  target="_blank" rel="noopener"
-    >#11962</a>: In case no other suitable candidates for configuration file are found, a <code>pyproject.toml</code> (even without a <code>[tool.pytest.ini_options]</code> table) will be considered as the configuration file and define the <code>rootdir</code>.</p>
-</li>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11978"  target="_blank" rel="noopener"
-    >#11978</a>: Add <code>--log-file-mode</code> option to the logging plugin, enabling appending to log-files. This option accepts either <code>&quot;w&quot;</code> or <code>&quot;a&quot;</code> and defaults to <code>&quot;w&quot;</code>.</p>
-<p>Previously, the mode was hard-coded to be <code>&quot;w&quot;</code> which truncates the file before logging.</p>
-</li>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12047"  target="_blank" rel="noopener"
-    >#12047</a>: When multiple finalizers of a fixture raise an exception, now all exceptions are reported as an exception group.
-Previously, only the first exception was reported.</p>
-</li>
-</ul>
-<h2 id="bug-fixes-7">Bug Fixes
-</h2><ul>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11475"  target="_blank" rel="noopener"
-    >#11475</a>: Fixed regression where <code>--importmode=importlib</code> would import non-test modules more than once.</p>
-</li>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11904"  target="_blank" rel="noopener"
-    >#11904</a>: Fixed a regression in pytest 8.0.0 that would cause test collection to fail due to permission errors when using <code>--pyargs</code>.</p>
-<p>This change improves the collection tree for tests specified using <code>--pyargs</code>, see <code>12043</code>{.interpreted-text role=&ldquo;pull&rdquo;} for a comparison with pytest 8.0 and &lt;8.</p>
-</li>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12011"  target="_blank" rel="noopener"
-    >#12011</a>: Fixed a regression in 8.0.1 whereby <code>setup_module</code> xunit-style fixtures are not executed when <code>--doctest-modules</code> is passed.</p>
-</li>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12014"  target="_blank" rel="noopener"
-    >#12014</a>: Fix the <code>stacklevel</code> used when warning about marks used on fixtures.</p>
-</li>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12039"  target="_blank" rel="noopener"
-    >#12039</a>: Fixed a regression in <code>8.0.2</code> where tests created using <code>tmp_path</code>{.interpreted-text role=&ldquo;fixture&rdquo;} have been collected multiple times in CI under Windows.</p>
-</li>
-</ul>
-<h2 id="improved-documentation-4">Improved Documentation
-</h2><ul>
-<li><a class="link" href="https://github.com/pytest-dev/pytest/issues/11790"  target="_blank" rel="noopener"
-    >#11790</a>: Documented the retention of temporary directories created using the <code>tmp_path</code> fixture in more detail.</li>
-</ul>
-<h2 id="trivialinternal-changes-1">Trivial/Internal Changes
-</h2><ul>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/11785"  target="_blank" rel="noopener"
-    >#11785</a>: Some changes were made to private functions which may affect plugins which access them:</p>
-<ul>
-<li><code>FixtureManager._getautousenames()</code> now takes a <code>Node</code> itself instead of the nodeid.</li>
-<li><code>FixtureManager.getfixturedefs()</code> now takes the <code>Node</code> itself instead of the nodeid.</li>
-<li>The <code>_pytest.nodes.iterparentnodeids()</code> function is removed without replacement.
-Prefer to traverse the node hierarchy itself instead.
-If you really need to, copy the function from the previous pytest release.</li>
-</ul>
-</li>
-<li>
-<p><a class="link" href="https://github.com/pytest-dev/pytest/issues/12069"  target="_blank" rel="noopener"
-    >#12069</a>: Delayed the deprecation of the following features to <code>9.0.0</code>:</p>
-<ul>
-<li><code>node-ctor-fspath-deprecation</code>{.interpreted-text role=&ldquo;ref&rdquo;}.</li>
-<li><code>legacy-path-hooks-deprecated</code>{.interpreted-text role=&ldquo;ref&rdquo;}.</li>
-</ul>
-<p>It was discovered after <code>8.1.0</code> was released that the warnings about the impeding removal were not being displayed, so the team decided to revert the removal.</p>
-<p>This is the reason for <code>8.1.0</code> being yanked.</p>
-</li>
-</ul>
-<h1 id="pytest-810-yanked">pytest 8.1.0 (YANKED)
-</h1><p>::: {.note}
-::: {.title}
-Note
-:::</p>
-<p>This release has been <strong>yanked</strong>: it broke some plugins without the proper warning period, due to
-some warnings not showing up as expected.</p>
-<p>See <a class="link" href="https://github.com/pytest-dev/pytest/issues/12069"  target="_blank" rel="noopener"
-    >#12069</a>.
-:::</p>
 <p>========================================</p>
 <blockquote>
 <p>完整清单，请访问官方列表: <a class="link" href="https://github.com/pytest-dev/pytest/releases"  target="_blank" rel="noopener"
