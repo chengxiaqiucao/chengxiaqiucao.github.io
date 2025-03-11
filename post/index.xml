@@ -8,6 +8,403 @@
         <language>zh-cn</language>
         <copyright>|by 城下秋草（公众号： 秋草说测试）</copyright>
         <lastBuildDate>Sun, 09 Mar 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>搞定正则表达式，告别新手村！</title>
+        <link>https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/</link>
+        <pubDate>Sun, 09 Mar 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250310.png" alt="Featured image of post 搞定正则表达式，告别新手村！" /&gt;&lt;h1 id=&#34;前言&#34;&gt;前言
+&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;正则表达式 （Regular Expression）&lt;/strong&gt; 是一种强大的文本模式描述语言，可以通过简洁的符号组合描述复杂的字符串匹配规则。被广泛应用于数据验证、文本提取、日志分析等领域，在我们日常工作中发挥着重要的作用。&lt;/p&gt;
+&lt;p&gt;软件行业从业，是否掌握正则表达式的使用，往往是区分菜鸟和老手的重要标识。 本文我们结合一些具体案例，详细梳理下正则表达式的应用，早日告别新手村！&lt;/p&gt;
+&lt;h1 id=&#34;正则表达式核心语法&#34;&gt;正则表达式核心语法
+&lt;/h1&gt;&lt;p&gt;学习正则表达式， 这里推荐一个非常直观的线上验证平台， &lt;a class=&#34;link&#34; href=&#34;https://regex101.com&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://regex101.com&lt;/a&gt; , 对于我们练习和掌握正则语法非常有帮助。&lt;/p&gt;
+&lt;h2 id=&#34;普通字符和特殊字符&#34;&gt;普通字符和特殊字符
+&lt;/h2&gt;&lt;p&gt;正则表达式作为一个匹配规则。当然首先可以匹配各种普通字符。主要指各种中英文单词、字母、数字。此外正则表达式还会预留很多特殊字符，如 &lt;code&gt;* ? + . () [] $ ^ \ |&lt;/code&gt; 等，代表一些特别的匹配规则，而如果这些特殊字符我们需要看作普通字符进行匹配时，则需要使用 &lt;code&gt;\&lt;/code&gt; 符号进行转义，因此 &lt;code&gt;\&lt;/code&gt; 也称转义符。比如  &lt;code&gt;\?&lt;/code&gt; 就会匹配目标文本中的 &lt;code&gt;?&lt;/code&gt; 字符， &lt;code&gt;\\&lt;/code&gt; 则会匹配目标文本中的 &lt;code&gt;\&lt;/code&gt; 字符&lt;/p&gt;
+&lt;h2 id=&#34;量词符quantifiers&#34;&gt;量词符（quantifiers）
+&lt;/h2&gt;&lt;p&gt;量词符是用于控制匹配次数的符号：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;*&lt;/code&gt; 零次或多次（如 &lt;code&gt;a*&lt;/code&gt; 可匹配 &amp;ldquo;&amp;rdquo;, &amp;ldquo;a&amp;rdquo;, &amp;ldquo;aa&amp;rdquo;）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;+&lt;/code&gt; 一次或多次（&lt;code&gt;a+&lt;/code&gt; 必须至少有一个a）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;?&lt;/code&gt; 零次或一次（&lt;code&gt;a?&lt;/code&gt; 可匹配 &amp;quot;&amp;quot; 或 a）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;{n}&lt;/code&gt; 精确匹配n次（&lt;code&gt;{4}&lt;/code&gt; 匹配4次）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;{m,n}&lt;/code&gt; 匹配m到n次（含边界）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;{m,}&lt;/code&gt; 匹配m到多次&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;{,n}&lt;/code&gt; 匹配零次到n次&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;另外，在正则表达式中，还有两种匹配模式&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;贪婪模式&lt;/strong&gt;：这是默认模式，也就会在目标文本中，尽可能最长地去匹配符合规则的字符&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;惰性模式&lt;/strong&gt;：而如果在量词后加&lt;code&gt;?&lt;/code&gt;则标记以惰性模式进行匹配，也就是尽可能少地去匹配符合规则的字符&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;举例来说：&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;浮云长长长长长长长消&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;这个上联中有 7 个 &lt;code&gt;长&lt;/code&gt; 字，正则表达式 &lt;code&gt;长{2,3}&lt;/code&gt; 默认按贪婪模式匹配，会匹配到 2 次 &lt;code&gt;长长长&lt;/code&gt;， 而加上 &lt;code&gt;长{2,3}?&lt;/code&gt; 则会按尽量少的字符匹配，匹配到 3 次 &lt;code&gt;长长&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-1.png&#34;
+	width=&#34;1250&#34;
+	height=&#34;531&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-1_hu4292376384757436978.png 480w, https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-1_hu12078470396668789776.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;235&#34;
+		data-flex-basis=&#34;564px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;元字符metacharacters&#34;&gt;元字符（Metacharacters）
+&lt;/h2&gt;&lt;p&gt;除量词符外，还有一类元字符，被预留构成正则表达式的基础特殊符号：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;\d&lt;/code&gt; 匹配数字（等价于 &lt;code&gt;[0-9]&lt;/code&gt;）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;\D&lt;/code&gt; 匹配非数字&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;\w&lt;/code&gt; 匹配单词，包括字母、数字和下划线（等价于 &lt;code&gt;[A-Za-z0-9_]&lt;/code&gt;）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;\W&lt;/code&gt; 匹配非单词&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;\s&lt;/code&gt; 匹配空白符（空格/制表符/换行符）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;\S&lt;/code&gt; 匹配非空白&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.&lt;/code&gt; 匹配任意单个字符（默认不匹配换行符）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;|&lt;/code&gt; 表示逻辑&amp;quot;或&amp;quot;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;位置限定符position-anchors&#34;&gt;位置限定符（Position Anchors）
+&lt;/h2&gt;&lt;p&gt;用于精准定位匹配位置：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;\b&lt;/code&gt; 匹配单词边界（如 &lt;code&gt;\bcat\b&lt;/code&gt; 匹配完整单词）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;\B&lt;/code&gt; 匹配非单词边界&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;^&lt;/code&gt; 匹配目标文本开头，多行模式下也匹配行首&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;$&lt;/code&gt; 匹配目标文本结尾，多行模式下也匹配行尾&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;举例来说:
+在&lt;code&gt;tester is good at testing&lt;/code&gt; 中，用 &lt;code&gt;^test&lt;/code&gt; 就只会匹配到行首的 &lt;code&gt;test&lt;/code&gt;， 但&lt;code&gt;testing&lt;/code&gt; 中的&lt;code&gt;test&lt;/code&gt; 就不会匹配到， 而如果 &lt;code&gt;test\b&lt;/code&gt;，同样匹配不到任何结果，因为这段文本中 &lt;code&gt;test&lt;/code&gt;都不是单独的单词，&lt;code&gt;test&lt;/code&gt; 后不存在单词边界&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-2.png&#34;
+	width=&#34;1273&#34;
+	height=&#34;451&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-2_hu12003295312580164051.png 480w, https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-2_hu1869652268967194448.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;282&#34;
+		data-flex-basis=&#34;677px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-3.png&#34;
+	width=&#34;1566&#34;
+	height=&#34;414&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-3_hu1713490921016965155.png 480w, https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-3_hu15281376087089290231.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;378&#34;
+		data-flex-basis=&#34;907px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;字符类character-classes&#34;&gt;字符类（Character Classes）
+&lt;/h2&gt;&lt;p&gt;字符类用于批量匹配特定字符集合：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;[abc]&lt;/code&gt; 匹配a/b/c中的任意字符&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;[^abc]&lt;/code&gt; 匹配不在集合中的字符&lt;/li&gt;
+&lt;li&gt;范围表示法：&lt;code&gt;[a-z]&lt;/code&gt;（小写字母）、&lt;code&gt;[A-Z]&lt;/code&gt;（大写字母）、&lt;code&gt;[0-9]&lt;/code&gt;（数字）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;下例中 &lt;code&gt;[b-f]&lt;/code&gt;， 就只匹配了目标字串中的 &lt;code&gt;d,e&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-4.png&#34;
+	width=&#34;1295&#34;
+	height=&#34;668&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-4_hu11950168645523784350.png 480w, https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-4_hu11406937495648812320.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;193&#34;
+		data-flex-basis=&#34;465px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;分组groups&#34;&gt;分组（Groups）
+&lt;/h2&gt;&lt;p&gt;分组是正则表达式中重要的技巧，用于对匹配规则进行分组，便于在后续的文本处理中提取匹配到的内容。 分组通过在表达式中将模式用 &lt;code&gt;()&lt;/code&gt; 框定来表示。&lt;/p&gt;
+&lt;p&gt;比如指定一个字串&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;this is a &amp;#34;testtest&amp;#34; string to demo regex group! 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;分组及其引用&#34;&gt;分组及其引用
+&lt;/h3&gt;&lt;p&gt;分组默认从 1 开始计数，也就是多个分组时，可以按顺序以 &lt;code&gt;\1&lt;/code&gt; &lt;code&gt;\2&lt;/code&gt; 来反向引用分组&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-5.png&#34;
+	width=&#34;1542&#34;
+	height=&#34;407&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-5_hu15193607086181765481.png 480w, https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-5_hu3712556361213910695.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;378&#34;
+		data-flex-basis=&#34;909px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这个例子，我们 通过 &lt;code&gt;(is)(\s)\1\2&lt;/code&gt; 指定了两个分组，组1 匹配 &amp;ldquo;is&amp;rdquo;， 组2匹配空白字符（这里是空格) ，然后用&lt;code&gt;\1\2&lt;/code&gt; 分别引用这两个组，最终其实就匹配了 &lt;code&gt;&amp;quot;is&amp;quot;+空格&lt;/code&gt; 连续出现了两次的情况&lt;/p&gt;
+&lt;h3 id=&#34;指定分组不进行引用&#34;&gt;指定分组不进行引用
+&lt;/h3&gt;&lt;p&gt;如果我们进行分组时，某个分组我们并不想在后续引用，那么可以使用 &lt;code&gt;(?:pattern)&lt;/code&gt; 来进行标记，指定当前分组在后续不会进行引用。 这时分组默认的提取序号中，就会忽略这一组不进行编号
+。&lt;/p&gt;
+&lt;p&gt;上例中，如果我们指定其中第二个分组不进行引用&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;(is)(?:\s)\1\2 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;这时其实上例中的正则表达式就出现语法错误，无法完成匹配，因为这时第二个分组被忽略，而 &lt;code&gt;\2&lt;/code&gt; 进行引用，这时就会因为不存在出现模式错误&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-6.png&#34;
+	width=&#34;1089&#34;
+	height=&#34;285&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-6_hu14821188561634322906.png 480w, https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-6_hu7209253652940592384.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;382&#34;
+		data-flex-basis=&#34;917px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;对分组进行注释&#34;&gt;对分组进行注释
+&lt;/h3&gt;&lt;p&gt;一些复杂的正则表达式，我们还可以在分组添加注释，起到对正则表达式进行说明的作用 &lt;code&gt;(?#comment)(other group)&lt;/code&gt;&lt;/p&gt;
+&lt;h3 id=&#34;分组命名&#34;&gt;分组命名
+&lt;/h3&gt;&lt;p&gt;除了默认用数字序号来引用分组，也可以通过给分组进行命名的方式： &lt;code&gt;(?P&amp;lt;name&amp;gt;pattern)&lt;/code&gt; 进行命名。
+然后用&lt;code&gt;(?P=&amp;lt;name&amp;gt;)&lt;/code&gt;进行引用&lt;/p&gt;
+&lt;p&gt;综合上面的说明，使用如下正则说明&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;(?#这是一个嵌套分组示例)(?P&amp;lt;demo&amp;gt;t(?:\w*)t)(?P=demo)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-7.png&#34;
+	width=&#34;1798&#34;
+	height=&#34;376&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-7_hu15101450436547688070.png 480w, https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-7_hu3107336103492922868.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;478&#34;
+		data-flex-basis=&#34;1147px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;断言assertions&#34;&gt;断言（Assertions）
+&lt;/h2&gt;&lt;p&gt;断言主要用于判断，用来匹配符合模式的字符所在位置。因为它主要用判断位置，不会消费字符，所以一般也叫 &lt;strong&gt;零宽断言&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;断言可分为4类，还是用上例中的文本举例&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;this is a &amp;#34;testtest&amp;#34; string to demo regex group! 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;正向肯定断言&#34;&gt;正向肯定断言
+&lt;/h3&gt;&lt;p&gt;判断匹配位置之后的字符符合模式， 通过&lt;code&gt;(?=pattern)&lt;/code&gt; 来进行断言&lt;/p&gt;
+&lt;p&gt;示例：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-8.png&#34;
+	width=&#34;1665&#34;
+	height=&#34;301&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-8_hu5374890049257188213.png 480w, https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-8_hu10713803433256911800.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;553&#34;
+		data-flex-basis=&#34;1327px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;正向否定断言&#34;&gt;正向否定断言
+&lt;/h3&gt;&lt;p&gt;判断匹配位置之后的字符不符合给定模式， 通过&lt;code&gt;(?!pattern)&lt;/code&gt; 来进行断言&lt;/p&gt;
+&lt;p&gt;示例：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-9.png&#34;
+	width=&#34;1594&#34;
+	height=&#34;722&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-9_hu5245498116365420834.png 480w, https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-9_hu4241650881163407472.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;220&#34;
+		data-flex-basis=&#34;529px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;反向肯定断言和反向否定断言&#34;&gt;反向肯定断言和反向否定断言
+&lt;/h3&gt;&lt;p&gt;和正向相对，反向断言匹配的是预期位置之前的字符是否符合模式，也有肯定和否定之分。在 &lt;code&gt;?&lt;/code&gt;后再添加一个&lt;code&gt;&amp;lt;&lt;/code&gt;表示反向， 即&lt;code&gt;(?&amp;lt;=pattern)&lt;/code&gt; 和 &lt;code&gt;(?&amp;lt;!pattern)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-10.png&#34;
+	width=&#34;1558&#34;
+	height=&#34;357&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-10_hu4471865789796017672.png 480w, https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309-10_hu1330268889236534299.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;436&#34;
+		data-flex-basis=&#34;1047px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;匹配模式&#34;&gt;匹配模式
+&lt;/h1&gt;&lt;p&gt;除了上述正则表达式的主要匹配规则外，正则表达式还有一些匹配模式。是用 &lt;code&gt;\&lt;/code&gt; 加上一些特殊的字母代表不同的模式&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;\g&lt;/code&gt;  表示全局匹配，也就是会在给定的文本中匹配所有符合条件的字串，如果不指定，则仅匹配出现的第一个符合模式的字串&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;\m&lt;/code&gt; 多行模式，主要是指定 &lt;code&gt;^ $&lt;/code&gt;是否匹配行首行尾&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;\i&lt;/code&gt; 匹配时忽略大小写&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;\x&lt;/code&gt; 匹配时是否忽略我们模式文本中的空白，在编写比较复杂规则时较为有用&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;\s&lt;/code&gt; 指定 &lt;code&gt;.&lt;/code&gt; 匹配字符时包含换行符&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;\u&lt;/code&gt; 匹配unicode字符，如中文&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;\a&lt;/code&gt; 仅匹配ascii字符&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;实用案例&#34;&gt;实用案例
+&lt;/h1&gt;&lt;p&gt;针对下面这段文本：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;用户注册信息如下：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;联系电话：+86 138-0013-8000（北京） / 400-800-8888（全国客服）
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;电子邮箱：support@example.com / service@sub.domain.org.cn / user.name+tag+sorting@example.co.uk
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;网站链接：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;https://www.example.com/page1.html?query=123&amp;amp;sort=desc#section2
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;http://sub.example.co.jp:8080/admin/dashboard
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ftp://ftp.example.org/upload.zip
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;产品序列号：SKU-20240309-001234（生产日期：2024-03-09）
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;INV-2023-Winter-Sale-0456（有效期至：2024-01-31）
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;活动时间：2024年第一季度（2024-01-01 至 2024-03-31）
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;特殊字符测试：!@#$%^&amp;amp;*()_+-=[]{}|;&amp;#39;:&amp;#34;,./&amp;lt;&amp;gt;?`~
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;测试用密码：Password123!@#（正确） / password123（错误） / Passw0rd!（错误）
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;日志条目：ERROR[2024-03-09T15:40:22+08:00] 用户登录失败
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;IP地址记录：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;192.168.1.1 / 203.0.113.255 / ::1 / IPv6-Test-Address::FFFFF:1234
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id=&#34;匹配完整url含协议域名端口路径&#34;&gt;匹配完整URL（含协议、域名、端口、路径）
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;^(https?:\/\/)([\w\-\.]+\.[a-z]{2,6})(:[0-9]{1,5})?(\/\S*)?$
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;匹配结果：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309.png&#34;
+	width=&#34;1569&#34;
+	height=&#34;994&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309_hu3030320190424860253.png 480w, https://chengxiaqiucao.github.io/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250309_hu14274878791255778257.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;157&#34;
+		data-flex-basis=&#34;378px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;提取电话号码&#34;&gt;提取电话号码
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;\b(\+?\d{2,3})[-\s]+?(?:\d{3,4}[- ]?)+
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;说明：首先&lt;code&gt;\b&lt;/code&gt;匹配单词边界，用分组提取国家码（2-3位，兼容有&lt;code&gt;+&lt;/code&gt;情况），跟&lt;code&gt;-&lt;/code&gt;或空格，惰性模式，再匹配3-4个数字和&lt;code&gt;-&lt;/code&gt;连续多次出现的情况&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;匹配结果&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;+86 138-0013-8000&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;400-800-8888&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;验证电子邮箱地址&#34;&gt;验证电子邮箱地址
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[-.\w]+@[-.\w]+\.[-.\w]+\b
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;匹配结果&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;support@example.com&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;service@sub.domain.org.cn&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sorting@example.co.uk&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;捕获产品序列号包含日期和唯一编码&#34;&gt;捕获产品序列号（包含日期和唯一编码）
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;SKU-\d{8}-\d{6}|INV-\d{4}[-A-Za-z]+-\d{4}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;匹配结果&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;SKU-20240309-001234&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;INV-2023-Winter-Sale-0456&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;匹配中文&#34;&gt;匹配中文
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[\u4e00-\u9fa5]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;解析日志条目中的时间戳&#34;&gt;解析日志条目中的时间戳
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ERROR\[(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2})\]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;分组提取结果&lt;/strong&gt;：
+&lt;code&gt;2024-03-09T15:40:22+08:00&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id=&#34;提取ip地址&#34;&gt;提取IP地址
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;(?:\d{1,3}\.){3}\d{1,3}|(?:(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4})
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;匹配结果&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;192.168.1.1&lt;/li&gt;
+&lt;li&gt;203.0.113.255&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;结语&#34;&gt;结语
+&lt;/h1&gt;&lt;p&gt;以上就是针对正则表达式的相关总结和部分案例演示。更多关于测试技能系统提升的学习可关注我的课程，回复 &lt;code&gt;大纲&lt;/code&gt; 获取详细目的。&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>敏捷是否是适用大多项目的灵丹妙药？对敏捷的一点反思</title>
         <link>https://chengxiaqiucao.github.io/post/64-%E5%AF%B9%E6%95%8F%E6%8D%B7%E7%9A%84%E5%8F%8D%E6%80%9D/</link>
         <pubDate>Fri, 07 Mar 2025 13:50:37 +0800</pubDate>
@@ -850,6 +1247,217 @@
 &lt;p&gt;掌握模拟技术能显著提高测试覆盖率与代码质量。建议结合 &lt;a class=&#34;link&#34; href=&#34;https://pytest-mock.readthedocs.io/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;官方文档&lt;/a&gt; 深入学习更复杂的使用场景。&lt;/p&gt;
 &lt;hr&gt;
+</description>
+        </item>
+        <item>
+        <title>测试工程师进阶必学 - Linux三剑客（grep）</title>
+        <link>https://chengxiaqiucao.github.io/post/60-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/</link>
+        <pubDate>Thu, 20 Feb 2025 14:02:28 +0800</pubDate>
+        
+        <guid>https://chengxiaqiucao.github.io/post/60-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/post/60-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/Pasted-20250310.png" alt="Featured image of post 测试工程师进阶必学 - Linux三剑客（grep）" /&gt;&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/60-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/Pasted-20250310.png&#34;
+	width=&#34;1379&#34;
+	height=&#34;583&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/60-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/Pasted-20250310_hu8238259576379359094.png 480w, https://chengxiaqiucao.github.io/post/60-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/Pasted-20250310_hu15956065924967937381.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;236&#34;
+		data-flex-basis=&#34;567px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;前言&#34;&gt;前言
+&lt;/h1&gt;&lt;p&gt;&lt;code&gt;grep&lt;/code&gt; 是 Linux 三剑客（&lt;code&gt;grep&lt;/code&gt;, &lt;code&gt;sed&lt;/code&gt;, &lt;code&gt;awk&lt;/code&gt;）之一，用于在文件中搜索特定的文本模式。它不仅功能强大，而且非常灵活，能够处理各种文本搜索需求。下文我们梳理 &lt;code&gt;grep&lt;/code&gt; 命令的详细用法及进阶示例。&lt;/p&gt;
+&lt;h1 id=&#34;基本用法&#34;&gt;基本用法
+&lt;/h1&gt;&lt;h2 id=&#34;基本搜索&#34;&gt;基本搜索
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep &lt;span class=&#34;s2&#34;&gt;&amp;#34;pattern&amp;#34;&lt;/span&gt; filename
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;用于在 &lt;code&gt;filename&lt;/code&gt; 文件中搜索包含 &lt;code&gt;pattern&lt;/code&gt; 的行，并打印出来。&lt;/p&gt;
+&lt;h2 id=&#34;忽略大小写&#34;&gt;忽略大小写
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -i &lt;span class=&#34;s2&#34;&gt;&amp;#34;pattern&amp;#34;&lt;/span&gt; filename
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;使用 &lt;code&gt;-i&lt;/code&gt; 选项忽略大小写。&lt;/p&gt;
+&lt;h2 id=&#34;递归搜索&#34;&gt;递归搜索
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -r &lt;span class=&#34;s2&#34;&gt;&amp;#34;pattern&amp;#34;&lt;/span&gt; directory
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;在 &lt;code&gt;directory&lt;/code&gt; 目录及其子目录中递归搜索包含 &lt;code&gt;pattern&lt;/code&gt; 的文件内容。&lt;/p&gt;
+&lt;h2 id=&#34;显示行号&#34;&gt;显示行号
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -n &lt;span class=&#34;s2&#34;&gt;&amp;#34;pattern&amp;#34;&lt;/span&gt; filename
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;使用 &lt;code&gt;-n&lt;/code&gt; 选项显示匹配行的行号。&lt;/p&gt;
+&lt;h2 id=&#34;反向搜索显示不匹配的行&#34;&gt;反向搜索（显示不匹配的行）
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -v &lt;span class=&#34;s2&#34;&gt;&amp;#34;pattern&amp;#34;&lt;/span&gt; filename
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;使用 &lt;code&gt;-v&lt;/code&gt; 选项显示不包含 &lt;code&gt;pattern&lt;/code&gt; 的行。&lt;/p&gt;
+&lt;h2 id=&#34;显示文件名&#34;&gt;显示文件名
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep &lt;span class=&#34;s2&#34;&gt;&amp;#34;pattern&amp;#34;&lt;/span&gt; file1 file2 file3
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;当搜索多个文件时，默认会显示匹配的文件名。使用 &lt;code&gt;-H&lt;/code&gt; 可以强制显示文件名，使用 &lt;code&gt;-h&lt;/code&gt; 可以隐藏文件名。&lt;/p&gt;
+&lt;h1 id=&#34;进阶用法&#34;&gt;进阶用法
+&lt;/h1&gt;&lt;h2 id=&#34;使用正则表达式&#34;&gt;使用正则表达式
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -E &lt;span class=&#34;s2&#34;&gt;&amp;#34;pattern1|pattern2&amp;#34;&lt;/span&gt; filename
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;使用 &lt;code&gt;-E&lt;/code&gt; 选项支持扩展正则表达式，例如 &lt;code&gt;|&lt;/code&gt; 表示或操作。&lt;/p&gt;
+&lt;h2 id=&#34;计数匹配的行数&#34;&gt;计数匹配的行数
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -c &lt;span class=&#34;s2&#34;&gt;&amp;#34;pattern&amp;#34;&lt;/span&gt; filename
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;使用 &lt;code&gt;-c&lt;/code&gt; 选项统计匹配的行数。&lt;/p&gt;
+&lt;h2 id=&#34;只显示匹配的部分&#34;&gt;只显示匹配的部分
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -o &lt;span class=&#34;s2&#34;&gt;&amp;#34;pattern&amp;#34;&lt;/span&gt; filename
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;使用 &lt;code&gt;-o&lt;/code&gt; 选项只显示匹配的部分，而不是整行内容。&lt;/p&gt;
+&lt;h2 id=&#34;前后行显示&#34;&gt;前后行显示
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -A &lt;span class=&#34;m&#34;&gt;3&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;pattern&amp;#34;&lt;/span&gt; filename  &lt;span class=&#34;c1&#34;&gt;# 显示匹配行及其后3行&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -B &lt;span class=&#34;m&#34;&gt;3&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;pattern&amp;#34;&lt;/span&gt; filename  &lt;span class=&#34;c1&#34;&gt;# 显示匹配行及其前3行&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -C &lt;span class=&#34;m&#34;&gt;3&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;pattern&amp;#34;&lt;/span&gt; filename  &lt;span class=&#34;c1&#34;&gt;# 显示匹配行及其前后各3行&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;-A&lt;/code&gt;, &lt;code&gt;-B&lt;/code&gt;, &lt;code&gt;-C&lt;/code&gt; 选项分别用于显示匹配行之后、之前或前后的指定行数。&lt;/p&gt;
+&lt;h2 id=&#34;从标准输入读取数据&#34;&gt;从标准输入读取数据
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;some text&amp;#34;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; grep &lt;span class=&#34;s2&#34;&gt;&amp;#34;pattern&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;grep&lt;/code&gt; 可以从标准输入读取数据，这在管道操作中非常有用。&lt;/p&gt;
+&lt;h2 id=&#34;使用固定字符串搜索提高性能&#34;&gt;使用固定字符串搜索（提高性能）
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -F &lt;span class=&#34;s2&#34;&gt;&amp;#34;fixed_string&amp;#34;&lt;/span&gt; filename
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;使用 &lt;code&gt;-F&lt;/code&gt; 选项将 &lt;code&gt;pattern&lt;/code&gt; 视为固定字符串而非正则表达式，可以提高搜索性能。&lt;/p&gt;
+&lt;h2 id=&#34;排除文件&#34;&gt;排除文件
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -r --exclude&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;*.log&amp;#34;&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;pattern&amp;#34;&lt;/span&gt; directory
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;使用 &lt;code&gt;--exclude&lt;/code&gt; 选项排除特定类型的文件。&lt;/p&gt;
+&lt;h2 id=&#34;使用-perl-兼容正则表达式&#34;&gt;使用 Perl 兼容正则表达式
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -P &lt;span class=&#34;s2&#34;&gt;&amp;#34;\d+&amp;#34;&lt;/span&gt; filename
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;使用 &lt;code&gt;-P&lt;/code&gt; 选项启用 Perl 兼容正则表达式，例如 &lt;code&gt;\d+&lt;/code&gt; 表示一个或多个数字。&lt;/p&gt;
+&lt;h2 id=&#34;零宽断言&#34;&gt;零宽断言
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -P &lt;span class=&#34;s1&#34;&gt;&amp;#39;(?&amp;lt;=foo)bar&amp;#39;&lt;/span&gt; filename
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;使用 Perl 兼容正则表达式支持零宽断言，例如 &lt;code&gt;(?&amp;lt;=foo)bar&lt;/code&gt; 匹配前面是 &lt;code&gt;foo&lt;/code&gt; 的 &lt;code&gt;bar&lt;/code&gt;。&lt;/p&gt;
+&lt;h1 id=&#34;组合使用示例&#34;&gt;组合使用示例
+&lt;/h1&gt;&lt;h2 id=&#34;查找特定目录中的特定类型文件并搜索内容&#34;&gt;查找特定目录中的特定类型文件并搜索内容
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -r --include&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;*.py&amp;#34;&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;import&amp;#34;&lt;/span&gt; /path/to/directory
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;在 &lt;code&gt;/path/to/directory&lt;/code&gt; 目录中递归搜索所有 &lt;code&gt;.py&lt;/code&gt; 文件，查找包含 &lt;code&gt;import&lt;/code&gt; 的行。&lt;/p&gt;
+&lt;h2 id=&#34;查找并显示匹配行及其前后两行&#34;&gt;查找并显示匹配行及其前后两行
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -C &lt;span class=&#34;m&#34;&gt;2&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;error&amp;#34;&lt;/span&gt; /var/log/syslog
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;在 &lt;code&gt;/var/log/syslog&lt;/code&gt; 文件中查找包含 &lt;code&gt;error&lt;/code&gt; 的行，并显示其前后两行。&lt;/p&gt;
+&lt;h2 id=&#34;统计包含特定单词的文件数量&#34;&gt;统计包含特定单词的文件数量
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;grep -rl &lt;span class=&#34;s2&#34;&gt;&amp;#34;word&amp;#34;&lt;/span&gt; /path/to/directory &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; wc -l
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;在 &lt;code&gt;/path/to/directory&lt;/code&gt; 目录中递归搜索包含 &lt;code&gt;word&lt;/code&gt; 的文件，并统计文件数量。&lt;/p&gt;
+&lt;h2 id=&#34;结语&#34;&gt;结语
+&lt;/h2&gt;&lt;p&gt;通过这些示例，可以体会到 &lt;code&gt;grep&lt;/code&gt; 的强大能力和灵活性，也让它成为Linux中最实用的文本处理工具之一。&lt;/p&gt;
 </description>
         </item>
         <item>
