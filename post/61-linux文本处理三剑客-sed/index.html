@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name="msvalidate.01" content="03BBDF6AC26BCA2F36ADC5DC579B84AA" /><meta name='description' content="本篇带来Linux三剑客中的sed命令，伪装成命令的编辑器">
+<title>Linux文本处理三剑客 Sed</title>
+
+<link rel='canonical' href='https://chengxiaqiucao.github.io/post/61-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/'>
+
+<link rel="stylesheet" href="/scss/style.min.afc04e201e26111368df0fa482ffbcd8ad0a7779bfdcc0c73b0c9eac35357cdd.css"><meta property='og:title' content="Linux文本处理三剑客 Sed">
+<meta property='og:description' content="本篇带来Linux三剑客中的sed命令，伪装成命令的编辑器">
+<meta property='og:url' content='https://chengxiaqiucao.github.io/post/61-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/'>
+<meta property='og:site_name' content='秋 草 观 “测” 台'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Linux' /><meta property='article:published_time' content='2025-03-13T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-03-13T00:00:00&#43;00:00'/><meta property='og:image' content='https://chengxiaqiucao.github.io/post/61-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/sed3.webp' />
+<meta name="twitter:title" content="Linux文本处理三剑客 Sed">
+<meta name="twitter:description" content="本篇带来Linux三剑客中的sed命令，伪装成命令的编辑器"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://chengxiaqiucao.github.io/post/61-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/sed3.webp' />
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0SZVJZGMHX"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8076532964743402"
+     crossorigin="anonymous"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0SZVJZGMHX');
+</script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/automnGrass_hu7204715396109996112.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">秋 草 观 “测” 台</a></h1>
+            <h2 class="site-description">Testing is not just checking...</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/chengxiaqiucao'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/472272606'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162803093" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10312" xmlns:xlink="http://www.w3.org/1999/xlink" width="211.71875" height="200"><path d="M896.43834 165.698h-62.34l54.57-54.57c23.43-23.37 23.43-70.17 0-93.54-23.37-23.37-70.17-23.37-93.54 0l-155.88 148.17H452.17034l-155.94-148.23c-23.43-23.37-70.17-23.37-93.54 0-23.37 23.43-23.43 70.17 0 93.54l54.57 54.57h-62.34A192.983 192.983 0 0 0 0.00934 360.607v420.899c0 116.97 85.71 202.68 194.91 202.68h693.75a192.983 192.983 0 0 0 194.85-194.85v-428.73c7.83-109.14-77.94-194.91-187.08-194.91z m54.63 615.809a69.869 69.869 0 0 1-70.17 70.17h-678.27a69.869 69.869 0 0 1-70.109-70.17v-413.13a69.869 69.869 0 0 1 70.17-70.17h678.21a69.869 69.869 0 0 1 70.17 70.17v413.19z m-608.039-342.96a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.23-70.17z m405.36 0a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.17-70.17z" p-id="10313" fill="#8a8a8a"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.zhihu.com/people/qiucao'
+                        target="_blank"
+                        title="zhihu"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162502588" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4642" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M540.95908203 555.43730469s0-62.74248047-30.56748047-65.96191407c-30.56748047-3.21943359-125.48583984 0-125.48583984 1e-8v-193.05527344h141.57246094s-1.60839844-64.35263672-28.95908203-64.35263672h-230.05810547l38.61035156-102.96210938s-57.91728516 3.21943359-78.83085938 40.21962891-86.87460938 222.01523438-86.87460937 222.01523438 22.52373047 9.65302734 59.52480469-17.69589844c37.00283203-27.34804688 49.87177734-75.61494141 49.87177734-75.61494141l67.56943359-3.21943359 1.60839844 196.27382812s-117.44033203-1.60839844-141.57246094 0c-24.13212891 1.60839844-37.00283203 65.96191406-37.00283203 65.96191407h178.57792969s-16.09013672 109.39746094-61.13408203 188.23007812c-46.65673828 78.83085938-133.53134766 141.57246094-133.53134766 141.57246094s62.74248047 25.74052734 123.87919922-9.65302735c61.13408203-37.00283203 106.18154297-196.27382812 106.18154297-196.27382812l143.184375 178.57792969s12.86982422-85.26533203-1.60839844-109.39746094c-16.09013672-24.13212891-99.74707031-120.65888672-99.74707031-120.65888672l-37.00283203 32.17412109 25.74052734-106.18154297h156.0515625zM577.96191406 227.24316406l-1.60839843 580.77509766h57.91728515l20.91357422 72.39550781 101.35634766-72.39550781h143.184375v-580.77509766h-321.75966797zM835.3671875 743.665625h-67.56943359l-85.26533203 65.96191406-19.30517579-65.96191406h-17.69589843v-450.46318359h189.83583984v450.46318359z" fill="#8a8a8a" p-id="4643"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='mailto:%20danmyw@qq.com'
+                        target="_blank"
+                        title="e-mail"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162879016" class="icon" viewBox="0 0 1451 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12462" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z" fill="#8a8a8a" p-id="12463"></path></svg>
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>检索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/releases/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+                
+                <span>热门开源</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="https://chengxiaqiucao.github.io/en/" >English</option>
+                                
+                                    <option value="https://chengxiaqiucao.github.io/" selected>中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#命令参数">命令参数</a>
+      <ol>
+        <li><a href="#默认输出">默认输出</a></li>
+        <li><a href="#修改原文件">修改原文件</a></li>
+        <li><a href="#多重指令">多重指令</a></li>
+      </ol>
+    </li>
+    <li><a href="#操作指令说明">操作指令说明</a>
+      <ol>
+        <li><a href="#寻址规则">寻址规则</a></li>
+        <li><a href="#操作指令">操作指令</a></li>
+      </ol>
+    </li>
+  </ol>
+
+  <ol>
+    <li><a href="#示例">示例</a></li>
+  </ol>
+
+  <ol>
+    <li><a href="#1-删除空白行">1. 删除空白行</a></li>
+    <li><a href="#2-给文件添加行号">2. 给文件添加行号</a></li>
+    <li><a href="#3-提取所有图片链接">3. 提取所有图片链接</a></li>
+    <li><a href="#4-提取log中异常行">4. 提取log中异常行</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/post/61-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/">
+                <img src="/post/61-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/sed3_hu15472739238599565284.webp"
+                        srcset="/post/61-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/sed3_hu15472739238599565284.webp 800w, /post/61-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/sed3_hu18388274806264849683.webp 1600w"
+                        width="800" 
+                        height="450" 
+                        loading="lazy"
+                        alt="Featured image of post Linux文本处理三剑客 Sed" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E6%B5%8B%E8%AF%95%E6%8A%80%E6%9C%AF/" style="background-color: #2a9d8f; color: #fff;">
+                测试技术
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/61-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/">Linux文本处理三剑客 Sed</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            本篇带来Linux三剑客中的sed命令，伪装成命令的编辑器
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 13, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 5 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="前言">前言
+</h1><p>在本系列上一篇  【】，我们介绍了 Linux 三剑客中的 <code>grep</code> 命令用法。而实际上，在三剑客中，<code>grep</code> 只能算是小弟，它的作用更多只是通过正则表达式的加持，实现针对文本的模式查询。
+而三剑客中，真正重量级的命令是 <code>sed</code> 和 <code>awk</code>,  <code>sed</code> 其实是 <code>stream editor（流编辑器）</code> 的缩写，因此，sed 命令它其实是能够起到文本编辑器的作用。本篇我们就来介绍这个 <strong>伪装成Linux命令的编辑器</strong> <code>sed</code></p>
+<h1 id="sed-命令概述">sed 命令概述
+</h1><p><code>sed</code>命令的语法如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">sed -命令参数 &#39;操作指令&#39; 文本文件或管道输入
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>sed</code> 是一个行编辑器，这里的操作指令会按行来对文本进行处理</p>
+<h2 id="命令参数">命令参数
+</h2><p>它的命令参数主要有如下一些：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>命令参数</strong></th>
+<th style="text-align:center"><strong>含义</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><strong>-n</strong></td>
+<td style="text-align:center">关闭默认输出</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>-r</strong></td>
+<td style="text-align:center">支持正则表达式扩展</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>-i</strong></td>
+<td style="text-align:center">直接对源文件进行操作</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>-e</strong></td>
+<td style="text-align:center">指定操作指令（默认开启，可指定多个）</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>-f</strong></td>
+<td style="text-align:center">从文件读取操作指令</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="默认输出">默认输出
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sed <span class="s1">&#39;/root/p&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># 其实会显示passwd文件中所有行，其中包含root用户的行重复显示</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sed -n <span class="s1">&#39;/root/p&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># 加上-n参数，才会关闭sed本身的默认输出，这样才是通过p指令显示匹配的行</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="修改原文件">修改原文件
+</h3><p>实际工作中，<code>-i</code> 参数是一个比较危险的参数，因为这个参数会直接修改原文件</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sed -i <span class="s1">&#39;/root/q&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># 这个操作会导致passwd文件中只包含有root用户这一行，因为指令q会在匹配到行后直接退出</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 而sed这时的输出内容会直接写入原文件</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>比较安全的做法，可以在使用<code>-i</code>参数时指定一个备份文件, 也就是在 <code>-i</code> 后指定一个备份文件的后缀名</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sed -i.bak <span class="s1">&#39;/root/q&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># 这个操作虽然还是会修改passwd文件，但在修改前会备份一个.bak文件，便于恢复</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="多重指令">多重指令
+</h3><p><code>sed</code> 命令的指令可以有多个，但又多个指令时，需要为每个指令指定一个<code>-e</code>参数，如果只使用 1 个指令，则这个 <code>-e</code> 可以忽略</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sed -e <span class="s1">&#39;=&#39;</span> -e <span class="s1">&#39;/root/q&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># = 指令会输出当前处理行的行号</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>如果我们想重复指定 <code>-e</code> ，也可以通过 <code>;</code> 组合指令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sed <span class="s1">&#39;=;/root/q&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># 和通过 -e 多重指定效果一样</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="操作指令说明">操作指令说明
+</h2><p>在上面的参数介绍中，我们其实已经使用了 如 <code>p</code>, <code>q</code> 等指令。</p>
+<p>而这个操作指令，其实是由两部分组成，也就是<strong>寻址部分</strong>和<strong>操作部分</strong>：</p>
+<ul>
+<li>寻址： <code>sed</code>命令是行处理命令，寻址其实就是指定要处理的行</li>
+<li>操作： 针对匹配寻址规则的行要执行的操作</li>
+</ul>
+<h3 id="寻址规则">寻址规则
+</h3><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>寻址格式</strong></th>
+<th style="text-align:center"><strong>含义</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><strong>数字</strong></td>
+<td style="text-align:center">指定行号匹配</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>m~n</strong></td>
+<td style="text-align:center">从m行开始，按步长n匹配</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>$</strong></td>
+<td style="text-align:center">匹配末行</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>/regex/</strong></td>
+<td style="text-align:center">按正则匹配</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>m,n</strong></td>
+<td style="text-align:center">从m行开始，匹配到n行</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>m,+n</strong></td>
+<td style="text-align:center">从m行开始，再匹配n行</td>
+</tr>
+</tbody>
+</table></div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sed -n <span class="s1">&#39;5p&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># 显示第 5 行内容</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sed -n <span class="s1">&#39;2~3p&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># 显示从第2行开始，步长3递进，即第 2,5,8,11,14.... 行内容</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sed -n <span class="s1">&#39;$p&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># 显示最后一行内容</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sed -n <span class="s1">&#39;/qiucao/p&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># 显示包含qiucao的行内容</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sed -n <span class="s1">&#39;5,8p&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># 显示第 5 行到第 8 行内容</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sed -n <span class="s1">&#39;5,+5p&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># 显示第 5,6,7,8,9,10行内容</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="操作指令">操作指令
+</h3><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>操作指令</strong></th>
+<th style="text-align:center"><strong>含义</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><strong>p</strong></td>
+<td style="text-align:center"><strong>打印</strong>匹配行</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>=</strong></td>
+<td style="text-align:center">输出匹配行行号</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>l</strong></td>
+<td style="text-align:center">打印匹配行并显示<strong>不可见字符</strong></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>s</strong></td>
+<td style="text-align:center"><strong>正则表达式</strong>匹配和替换</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>c</strong></td>
+<td style="text-align:center">匹配行<strong>整行</strong>替换</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>a</strong></td>
+<td style="text-align:center">在匹配行<strong>后</strong>追加内容</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>i</strong></td>
+<td style="text-align:center">在匹配行<strong>前</strong>追加内容</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>d</strong></td>
+<td style="text-align:center"><strong>删除</strong>匹配行</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>r</strong></td>
+<td style="text-align:center">在匹配换行后追加内容（从文件中）</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>w</strong></td>
+<td style="text-align:center">将匹配行内容写入文件</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>q</strong></td>
+<td style="text-align:center">匹配后退出，不再继续匹配</td>
+</tr>
+</tbody>
+</table></div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sed -n <span class="s1">&#39;=;5p&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># 显示所有行号并打印第 5 行内容</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sed -n <span class="s1">&#39;=;5l&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># 和上条命令类似，但行末的结束符($)也会打印出来</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sed -r <span class="s1">&#39;=;s/^m\w*/test/g&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># 替换所有以m开头的用户名为test, 加/g的作用是在行内替换所有匹配字符，否则只替换第一个</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sed  <span class="s1">&#39;=;5c\测试一下&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># 将第5行替换为 “测试一下”</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sed  <span class="s1">&#39;=;5a\测试一下&#39;</span> /etc/passwd    
+</span></span><span class="line"><span class="cl"><span class="c1"># 在第5行内容后追加一行</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sed  <span class="s1">&#39;=;5i\测试一下&#39;</span> /etc/passwd    
+</span></span><span class="line"><span class="cl"><span class="c1"># 在第5行内容前插入一行</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sed  <span class="s1">&#39;=;5d&#39;</span> /etc/passwd    
+</span></span><span class="line"><span class="cl"><span class="c1"># 删除第5行</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sed  <span class="s1">&#39;=;5r test.txt&#39;</span> /etc/passwd    
+</span></span><span class="line"><span class="cl"><span class="c1"># 从test.txt中读取一行并添加到第5行后</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sed  <span class="s1">&#39;=;5w test.txt&#39;</span> /etc/passwd    
+</span></span><span class="line"><span class="cl"><span class="c1"># 将第5行内容写入到test.txt</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="模式空间和保留空间">模式空间和保留空间
+</h1><p>上面介绍的操作指令，主要是针对行内操作的一些指令。 我们既然说 <code>sed</code> 其实是一个编辑器，那么对于多行的文本编辑操作，比如整行的复制、粘贴、剪切等，当然也是支持的。</p>
+<p>这就要说到 <code>sed</code> 命令处理时，预留的两个内存空间了：</p>
+<ul>
+<li><strong>模式空间</strong>： 存储当前处理行的内容，每完成一行的处理，处理完的内容放到这个空间中</li>
+<li><strong>保留空间</strong>： 用于临时存储数据，可以认为是像剪切板一样的一个缓存空间，用于不同行内容的交换。初始默认只有一个 <code>\n</code> 回车符</li>
+</ul>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>操作指令</strong></th>
+<th style="text-align:center"><strong>用法</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><strong>h</strong></td>
+<td style="text-align:center">将模式空间内容复制到保留空间，替换原内容(\n)</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>H</strong></td>
+<td style="text-align:center">追加模式空间内容到保留空间</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>g</strong></td>
+<td style="text-align:center">保留空间内容复制到模式空间，覆盖原内容</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>G</strong></td>
+<td style="text-align:center">保留空间内容追加到模式空间原内容后</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>x</strong></td>
+<td style="text-align:center">交换模式空间和保留空间内容</td>
+</tr>
+<tr>
+<td style="text-align:center">n</td>
+<td style="text-align:center">立即读取下一行，并复制到模式空间</td>
+</tr>
+<tr>
+<td style="text-align:center">N</td>
+<td style="text-align:center">立即读取下一行，并追加到当前模式空间（常用于行合并）</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="示例">示例
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sed <span class="s1">&#39;=;2h;3H;5x;8G&#39;</span> /etc/passwd   
+</span></span><span class="line"><span class="cl"><span class="c1"># 2h复制第2行到保留空间</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 3H复制第3行并追加到现有保留空间后</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 5x将当前模式空间和保留空间进行交换，复制的内容替换了原第 5 行的内容</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 8G将保留空间内容（原第5行模式空间内容）追加到当前模式空间即第8行内容后</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/post/61-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/Pasted-20250313.png"
+	width="912"
+	height="750"
+	srcset="/post/61-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/Pasted-20250313_hu9332941036495183507.png 480w, /post/61-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/Pasted-20250313_hu9565420929990143322.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="121"
+		data-flex-basis="291px"
+	
+></p>
+<h1 id="常用-sed-实操案例">常用 sed 实操案例
+</h1><h2 id="1-删除空白行">1. 删除空白行
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sed -i <span class="s1">&#39;/^\s*$/d&#39;</span> test.txt
+</span></span><span class="line"><span class="cl"><span class="c1"># 正则匹配仅包含空白字符的行并删除</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="2-给文件添加行号">2. 给文件添加行号
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sed <span class="s1">&#39;=&#39;</span> test.txt <span class="p">|</span> sed <span class="s1">&#39;N;s/\n/\t/&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 先用sed命令获取行号，或加到每行默认输出前一行</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 通过管道传递到后一个sed命令，通过 N 指令合并两行，并将 回车符替换为制表符</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="3-提取所有图片链接">3. 提取所有图片链接
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sed -nr <span class="s1">&#39;s/.*src=&#34;(.*\.png).*/\1/p&#39;</span> source.html
+</span></span><span class="line"><span class="cl"><span class="c1"># 正则表达式匹配图片链接，利用正则表达式分组保存路径并替换原有整行内容</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="4-提取log中异常行">4. 提取log中异常行
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sed -n <span class="s1">&#39;/ERROR/{=;p}&#39;</span> app.log
+</span></span><span class="line"><span class="cl"><span class="c1"># 匹配日志中包含ERROR字样的行并打印输出行号</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="结语">结语
+</h1><p>以上就是关于 linux 三剑客之 <code>sed</code> 命令的系统梳理，后续还会继续带来 <code>awk</code> 命令的总结！ 更多测试扩展技能，欢迎关注秋草的体系化提升课程，回复 <code>大纲</code> 获取详细目录。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/linux/">Linux</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/post/60-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/">
+        
+        
+            <div class="article-image">
+                <img src="/post/60-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/Pasted-20250310.a35c3d74a23da3521ae6652c97a9c7cc_hu15117418510203584372.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 测试工程师进阶必学 - Linux三剑客（grep）"
+                        
+                        data-hash="md5-o1w9dKI9o1Ia5mUsl6nHzA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">测试工程师进阶必学 - Linux三剑客（grep）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/">
+        
+        
+            <div class="article-image">
+                <img src="/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250310.0272fca3774f740dd5eb1e90ed59594a_hu10415203736845609563.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 搞定正则表达式，告别新手村！"
+                        
+                        data-hash="md5-AnL8o3dPdA3V6x6Q7VlZSg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">搞定正则表达式，告别新手村！</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/63-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/">
+        
+        
+            <div class="article-image">
+                <img src="/post/63-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/%E6%89%B9%E5%A4%84%E7%90%86For%E5%91%BD%E4%BB%A4_%E5%85%AC%E4%BC%97%E5%8F%B7.f10fa8faab6ade7818779e073811a930_hu6062582256822071057.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 批处理脚本之For命令"
+                        
+                        data-hash="md5-8Q&#43;o&#43;qtq3ngYd54HOBGpMA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">批处理脚本之For命令</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/55-debug%E5%B7%A5%E5%85%B7pysnooper/">
+        
+        
+            <div class="article-image">
+                <img src="/post/55-debug%E5%B7%A5%E5%85%B7pysnooper/Pasted-20250215.4d807a176d6bc4986e03634db5938f25_hu4736507994628485876.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 还在用print大法调试代码？换个玩法"
+                        
+                        data-hash="md5-TYB6F21rxJhuA2NNtZOPJQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">还在用print大法调试代码？换个玩法</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/25-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/">
+        
+        
+            <div class="article-image">
+                <img src="/post/25-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/docker%E4%BB%93%E5%BA%93.2ee49f4a4bd2aa42699cd3f6031b4a29_hu3448697681675513409.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 搭建基于https的Docker私有仓库"
+                        
+                        data-hash="md5-LuSfSkvSqkJpnNP2AxtKKQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">搭建基于https的Docker私有仓库</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2023 - 
+        
+        2025 |by 城下秋草（公众号： 秋草说测试）
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
