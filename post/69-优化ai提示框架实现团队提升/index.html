@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name="msvalidate.01" content="03BBDF6AC26BCA2F36ADC5DC579B84AA" /><meta name='description' content="打造提示词框架">
+<title>Deepseek提示词框架助力团队改进现状，效能提升</title>
+
+<link rel='canonical' href='https://chengxiaqiucao.github.io/post/69-%E4%BC%98%E5%8C%96ai%E6%8F%90%E7%A4%BA%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%9B%A2%E9%98%9F%E6%8F%90%E5%8D%87/'>
+
+<link rel="stylesheet" href="/scss/style.min.afc04e201e26111368df0fa482ffbcd8ad0a7779bfdcc0c73b0c9eac35357cdd.css"><meta property='og:title' content="Deepseek提示词框架助力团队改进现状，效能提升">
+<meta property='og:description' content="打造提示词框架">
+<meta property='og:url' content='https://chengxiaqiucao.github.io/post/69-%E4%BC%98%E5%8C%96ai%E6%8F%90%E7%A4%BA%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%9B%A2%E9%98%9F%E6%8F%90%E5%8D%87/'>
+<meta property='og:site_name' content='秋 草 观 “测” 台'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='AI' /><meta property='article:tag' content='质量管理' /><meta property='article:tag' content='测试技术' /><meta property='article:published_time' content='2025-03-19T22:44:42&#43;08:00'/><meta property='article:modified_time' content='2025-03-19T22:44:42&#43;08:00'/><meta property='og:image' content='https://chengxiaqiucao.github.io/post/69-%E4%BC%98%E5%8C%96ai%E6%8F%90%E7%A4%BA%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%9B%A2%E9%98%9F%E6%8F%90%E5%8D%87/%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%A1%86%E6%9E%B6.png' />
+<meta name="twitter:title" content="Deepseek提示词框架助力团队改进现状，效能提升">
+<meta name="twitter:description" content="打造提示词框架"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://chengxiaqiucao.github.io/post/69-%E4%BC%98%E5%8C%96ai%E6%8F%90%E7%A4%BA%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%9B%A2%E9%98%9F%E6%8F%90%E5%8D%87/%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%A1%86%E6%9E%B6.png' />
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0SZVJZGMHX"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8076532964743402"
+     crossorigin="anonymous"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0SZVJZGMHX');
+</script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/automnGrass_hu7204715396109996112.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">秋 草 观 “测” 台</a></h1>
+            <h2 class="site-description">Testing is not just checking...</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/chengxiaqiucao'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/472272606'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162803093" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10312" xmlns:xlink="http://www.w3.org/1999/xlink" width="211.71875" height="200"><path d="M896.43834 165.698h-62.34l54.57-54.57c23.43-23.37 23.43-70.17 0-93.54-23.37-23.37-70.17-23.37-93.54 0l-155.88 148.17H452.17034l-155.94-148.23c-23.43-23.37-70.17-23.37-93.54 0-23.37 23.43-23.43 70.17 0 93.54l54.57 54.57h-62.34A192.983 192.983 0 0 0 0.00934 360.607v420.899c0 116.97 85.71 202.68 194.91 202.68h693.75a192.983 192.983 0 0 0 194.85-194.85v-428.73c7.83-109.14-77.94-194.91-187.08-194.91z m54.63 615.809a69.869 69.869 0 0 1-70.17 70.17h-678.27a69.869 69.869 0 0 1-70.109-70.17v-413.13a69.869 69.869 0 0 1 70.17-70.17h678.21a69.869 69.869 0 0 1 70.17 70.17v413.19z m-608.039-342.96a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.23-70.17z m405.36 0a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.17-70.17z" p-id="10313" fill="#8a8a8a"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.zhihu.com/people/qiucao'
+                        target="_blank"
+                        title="zhihu"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162502588" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4642" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M540.95908203 555.43730469s0-62.74248047-30.56748047-65.96191407c-30.56748047-3.21943359-125.48583984 0-125.48583984 1e-8v-193.05527344h141.57246094s-1.60839844-64.35263672-28.95908203-64.35263672h-230.05810547l38.61035156-102.96210938s-57.91728516 3.21943359-78.83085938 40.21962891-86.87460938 222.01523438-86.87460937 222.01523438 22.52373047 9.65302734 59.52480469-17.69589844c37.00283203-27.34804688 49.87177734-75.61494141 49.87177734-75.61494141l67.56943359-3.21943359 1.60839844 196.27382812s-117.44033203-1.60839844-141.57246094 0c-24.13212891 1.60839844-37.00283203 65.96191406-37.00283203 65.96191407h178.57792969s-16.09013672 109.39746094-61.13408203 188.23007812c-46.65673828 78.83085938-133.53134766 141.57246094-133.53134766 141.57246094s62.74248047 25.74052734 123.87919922-9.65302735c61.13408203-37.00283203 106.18154297-196.27382812 106.18154297-196.27382812l143.184375 178.57792969s12.86982422-85.26533203-1.60839844-109.39746094c-16.09013672-24.13212891-99.74707031-120.65888672-99.74707031-120.65888672l-37.00283203 32.17412109 25.74052734-106.18154297h156.0515625zM577.96191406 227.24316406l-1.60839843 580.77509766h57.91728515l20.91357422 72.39550781 101.35634766-72.39550781h143.184375v-580.77509766h-321.75966797zM835.3671875 743.665625h-67.56943359l-85.26533203 65.96191406-19.30517579-65.96191406h-17.69589843v-450.46318359h189.83583984v450.46318359z" fill="#8a8a8a" p-id="4643"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='mailto:%20danmyw@qq.com'
+                        target="_blank"
+                        title="e-mail"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162879016" class="icon" viewBox="0 0 1451 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12462" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z" fill="#8a8a8a" p-id="12463"></path></svg>
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>检索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/releases/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+                
+                <span>热门开源</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="https://chengxiaqiucao.github.io/en/" >English</option>
+                                
+                                    <option value="https://chengxiaqiucao.github.io/" selected>中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#面对的困境案例">面对的困境案例</a>
+      <ol>
+        <li><a href="#设计提示词框架">设计提示词框架</a></li>
+        <li><a href="#质量改进方案面向迭代回顾会">质量改进方案（面向迭代回顾会）</a>
+          <ol>
+            <li><a href="#1-总体质量目标"><strong>1. 总体质量目标</strong></a></li>
+            <li><a href="#2-具体改进举措"><strong>2. 具体改进举措</strong></a></li>
+            <li><a href="#3-风险及应对"><strong>3. 风险及应对</strong></a></li>
+            <li><a href="#4-外部支持需求"><strong>4. 外部支持需求</strong></a></li>
+            <li><a href="#5-效果评估节点"><strong>5. 效果评估节点</strong></a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/post/69-%E4%BC%98%E5%8C%96ai%E6%8F%90%E7%A4%BA%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%9B%A2%E9%98%9F%E6%8F%90%E5%8D%87/">
+                <img src="/post/69-%E4%BC%98%E5%8C%96ai%E6%8F%90%E7%A4%BA%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%9B%A2%E9%98%9F%E6%8F%90%E5%8D%87/%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%A1%86%E6%9E%B6_hu16127260707715550843.png"
+                        srcset="/post/69-%E4%BC%98%E5%8C%96ai%E6%8F%90%E7%A4%BA%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%9B%A2%E9%98%9F%E6%8F%90%E5%8D%87/%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%A1%86%E6%9E%B6_hu16127260707715550843.png 800w, /post/69-%E4%BC%98%E5%8C%96ai%E6%8F%90%E7%A4%BA%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%9B%A2%E9%98%9F%E6%8F%90%E5%8D%87/%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%A1%86%E6%9E%B6_hu14874906090455254102.png 1600w"
+                        width="800" 
+                        height="340" 
+                        loading="lazy"
+                        alt="Featured image of post Deepseek提示词框架助力团队改进现状，效能提升" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E6%B5%8B%E8%AF%95%E6%8A%80%E6%9C%AF/" style="background-color: #2a9d8f; color: #fff;">
+                测试技术
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/69-%E4%BC%98%E5%8C%96ai%E6%8F%90%E7%A4%BA%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%9B%A2%E9%98%9F%E6%8F%90%E5%8D%87/">Deepseek提示词框架助力团队改进现状，效能提升</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            打造提示词框架
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 19, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 5 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>随着 AI 技术的快速发展，从 ChatGPT 到 Deepseek 的爆发，AI已经可以切实起到辅助我们日常工作的作用。</p>
+<p>除了在具体的像辅助编程、文案编写等方面，我们也可以充分利用 AI 的强大逻辑能力和海量基础数据，帮助我们针对工作中的一些困境，提出切实可行的改进方案。</p>
+<p>但要想 AI 帮助我们给出有可操作性的解决方案，提示词的框架设计和提供给AI的上下文信息是极为关键的。一个良好的提示词框架，可以帮助我们快速得到极为有价值的参考。</p>
+<h2 id="面对的困境案例">面对的困境案例
+</h2><p>这里以一个比较普遍的敏捷团队质量困境的案例来说明：</p>
+<blockquote>
+<p>作为一个测试工程师，在一个运行Scrum框架的敏捷团队中负责质量保障，团队成员还包括SM、PO、2个Android开发（其中小李负责了App的整体系统设计），1个后端开发，1个非全职的视觉设计。团队产品是一个物联网智能手环产品的配套Android App。但因为存在和硬件团队的配合、需求经常变化、视觉设计不及时、提测不及时、Bug积压等问题，导致产品质量不乐观。目前App已经运行了多个迭代，按计划上线时间越来越近，如何针对当前的质量困境提出改进方案？</p>
+</blockquote>
+<h3 id="设计提示词框架">设计提示词框架
+</h3><p>要 AI 帮助我们给出有可行性的改进方案，首先我们要合理地设计提示词框架，以便最终给出的方案更贴合团队现状以及具备可操作性。</p>
+<p>那么设计的提示词框架要点：</p>
+<ul>
+<li>给定的角色，让 AI 确定从什么角度去提出改进方案</li>
+<li>当前的现状，也就是充分的背景信息上下文</li>
+<li>AI 应该具体分析的内容或它的任务应该是什么</li>
+<li>希望 AI 提供的具体输出，包括格式要求，应包含的要素等</li>
+<li>相关的一些制约因素，这对方案是否可行会有重要影响</li>
+</ul>
+<p>现在针对上述困境，希望AI 能帮助我提供一份针对团队的整体质量提升方案，可以在回顾会上进行讨论。基于以上思路，通过向 Deepseek输入提示词框架，得到如下输出：</p>
+<h3 id="质量改进方案面向迭代回顾会">质量改进方案（面向迭代回顾会）
+</h3><hr>
+<h4 id="1-总体质量目标"><strong>1. 总体质量目标</strong>
+</h4><p><strong>&ldquo;在2个迭代内将自动化测试覆盖率提升至40%，缺陷修复响应时间缩短50%，回归测试时间压缩30%，建立需求变更与测试联动的质量防线&rdquo;</strong></p>
+<hr>
+<h4 id="2-具体改进举措"><strong>2. 具体改进举措</strong>
+</h4><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>举措</th>
+<th>执行人</th>
+<th>执行计划</th>
+<th>效果评估方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>需求冻结机制</strong><br>- 每个迭代前3天锁定核心功能需求<br>- 硬件对接需求由PO与硬件团队联合评审后形成接口文档</td>
+<td>PO、硬件团队负责人</td>
+<td>迭代计划会签署需求基线文档<br>硬件接口文档通过Confluence共享</td>
+<td>需求变更次数减少50%<br>接口文档版本变更记录可追溯</td>
+</tr>
+<tr>
+<td><strong>自动化用例分级策略</strong><br>- L0级（核心业务流）：强制全自动化<br>- L1级（高频使用场景）：优先自动化<br>- L2级（边缘场景）：手动验证</td>
+<td>测试工程师<br>（主导）<br>Android开发工程师<br>（辅助）</td>
+<td>使用Allure标记用例等级<br>每日构建优先执行L0用例</td>
+<td>L0用例100%通过率作为提测准出条件<br>自动化执行时间减少40%</td>
+</tr>
+<tr>
+<td><strong>开发自测责任制</strong><br>- 开发提交代码需附带单元测试（覆盖率≥60%）<br>- 接口测试由后端工程师在Swagger维护</td>
+<td>Android开发工程师<br>后端工程师</td>
+<td>单元测试纳入代码评审检查项<br>Postman接口用例与代码库联动</td>
+<td>提测版本冒烟测试通过率提升至80%<br>接口缺陷率下降30%</td>
+</tr>
+<tr>
+<td><strong>硬件兼容性Mock服务</strong><br>- 基于硬件协议开发模拟器<br>- 自动化测试与真实设备解耦</td>
+<td>测试工程师<br>（主导）<br>硬件团队提供协议文档</td>
+<td>使用Python开发蓝牙协议模拟器<br>Jenkins构建时自动启动Mock服务</td>
+<td>硬件依赖导致测试阻塞次数清零<br>自动化稳定性提升至95%</td>
+</tr>
+<tr>
+<td><strong>缺陷分级管理</strong><br>- P0级缺陷：2小时内响应<br>- P1级缺陷：当前迭代必须修复<br>- 遗留缺陷需PO签字确认风险</td>
+<td>测试工程师<br>（分类）<br>开发工程师<br>（修复）</td>
+<td>Jira配置自动化缺陷流转规则<br>每日站会同步TOP3缺陷进展</td>
+<td>缺陷平均修复周期缩短至8小时<br>积压缺陷数量下降60%</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h4 id="3-风险及应对"><strong>3. 风险及应对</strong>
+</h4><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>风险</th>
+<th>应对方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>开发人员抵触单元测试</td>
+<td>- 由小李（系统设计师）示范编写单元测试<br>- 将测试覆盖率纳入DoD完成标准</td>
+</tr>
+<tr>
+<td>硬件协议频繁变更</td>
+<td>- 要求硬件团队提前3天通知协议变更<br>- Mock服务设计版本兼容机制</td>
+</tr>
+<tr>
+<td>UE设计延迟影响UI测试</td>
+<td>- 与UE设计师约定：视觉稿交付同时提供UI元素ID规范<br>- 使用截图对比工具容差10%像素差异</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h4 id="4-外部支持需求"><strong>4. 外部支持需求</strong>
+</h4><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>具体需求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>工具</td>
+<td>- 申请BrowserStack移动云测试平台license<br>- 采购Xray测试用例管理插件License</td>
+</tr>
+<tr>
+<td>人员</td>
+<td>- 硬件团队指定协议对接接口人<br>- DevOps工程师优化CI/CD流水线</td>
+</tr>
+<tr>
+<td>培训</td>
+<td>- 邀请单元测试专家开展TDD工作坊<br>- Appium高级用法内部培训</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h4 id="5-效果评估节点"><strong>5. 效果评估节点</strong>
+</h4><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>节点</th>
+<th>检验标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>迭代5中期</td>
+<td>- L0级自动化用例覆盖所有核心业务流程<br>- 单元测试覆盖率≥40%</td>
+</tr>
+<tr>
+<td>迭代5结束</td>
+<td>- 自动化覆盖率≥25%<br>- 回归测试时间≤8小时/次</td>
+</tr>
+<tr>
+<td>迭代6结束</td>
+<td>- 自动化覆盖率≥40%<br>- 生产环境致命缺陷数为0</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<p><strong>执行要点说明：</strong></p>
+<ol>
+<li><strong>每日质量看板</strong>：在团队作战室悬挂自动化执行率/缺陷趋势图</li>
+<li><strong>质量门禁机制</strong>：代码合并请求必须通过L0用例+SonarQube检测</li>
+<li><strong>测试左移实践</strong>：测试工程师参与需求评审时即输出测试要点矩阵</li>
+</ol>
+<p>该方案需团队全员签署质量承诺书，建议在迭代回顾会上通过&quot;5Why分析法&quot;就当前质量问题达成改进共识。</p>
+<p>可以看到，得到了一份极有针对性且有相当可行性的改进方案。我们根据目前的团队现状，进行微调其实就可以纳入实施。</p>
+<p>所以善用 AI 提示词框架，不仅可以帮助我们在具体事务上获取帮助，对于这种整体改进方面的举措，AI 也能提供巨大助力。</p>
+<p>回复 “提示词框架” 可获取上文的提示词完整示例。关于 AI 在工作中的更多应用实践，也欢迎大家留言或入群探讨！</p>
+<p><img src="/qrcode_for_gh_e12c318badb4_258%20%281%29.jpg"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/ai/">AI</a>
+        
+            <a href="/tags/%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86/">质量管理</a>
+        
+            <a href="/tags/%E6%B5%8B%E8%AF%95%E6%8A%80%E6%9C%AF/">测试技术</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/67-%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E4%B8%AD%E5%8F%AF%E5%81%9A%E4%BD%86%E4%B8%8D%E5%BA%94%E5%81%9A%E7%9A%84%E4%B8%80%E4%BA%9B%E9%99%B7%E9%98%B1/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">软件测试中&#34;可做但不应做&#34;的一些陷阱</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/">
+        
+        
+            <div class="article-image">
+                <img src="/post/58-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%A8%E6%B3%95%E8%AF%A6%E8%A7%A3/Pasted-20250310.0272fca3774f740dd5eb1e90ed59594a_hu10415203736845609563.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 搞定正则表达式，告别新手村！"
+                        
+                        data-hash="md5-AnL8o3dPdA3V6x6Q7VlZSg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">搞定正则表达式，告别新手村！</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/63-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/">
+        
+        
+            <div class="article-image">
+                <img src="/post/63-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/%E6%89%B9%E5%A4%84%E7%90%86For%E5%91%BD%E4%BB%A4_%E5%85%AC%E4%BC%97%E5%8F%B7.f10fa8faab6ade7818779e073811a930_hu6062582256822071057.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 批处理脚本之For命令"
+                        
+                        data-hash="md5-8Q&#43;o&#43;qtq3ngYd54HOBGpMA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">批处理脚本之For命令</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/60-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/">
+        
+        
+            <div class="article-image">
+                <img src="/post/60-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/Pasted-20250310.a35c3d74a23da3521ae6652c97a9c7cc_hu15117418510203584372.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 测试工程师进阶必学 - Linux三剑客（grep）"
+                        
+                        data-hash="md5-o1w9dKI9o1Ia5mUsl6nHzA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">测试工程师进阶必学 - Linux三剑客（grep）</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/61-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/">
+        
+        
+            <div class="article-image">
+                <img src="/post/61-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/sed3.6477d53a4ba91cfb096fec7b34871855_hu11887395125516574666.webp" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post Linux文本处理三剑客 Sed"
+                        
+                        data-hash="md5-ZHfVOkupHPsJb&#43;x7NIcYVQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Linux文本处理三剑客 Sed</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2023 - 
+        
+        2025 |by 城下秋草（公众号： 秋草说测试）
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
