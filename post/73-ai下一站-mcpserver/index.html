@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name="msvalidate.01" content="03BBDF6AC26BCA2F36ADC5DC579B84AA" /><meta name='description' content="在AI技术高速演进的2025年，大模型的局限性日益凸显：它们虽拥有强大的推理能力，却难以直接访问私有数据或调用外部工具。这一痛点催生了一项革命性技术——**MCP（Model Context Protocol，模型上下文协议）**，而作为其核心组件的**MCP Server**，正成为AI行业的下一个风口。本文将深入解析MCP Server的技术本质、行业价值，并结合实际案例探讨其应用前景。">
+<title>AI下一站 MCPServer</title>
+
+<link rel='canonical' href='https://chengxiaqiucao.github.io/post/73-ai%E4%B8%8B%E4%B8%80%E7%AB%99-mcpserver/'>
+
+<link rel="stylesheet" href="/scss/style.min.afc04e201e26111368df0fa482ffbcd8ad0a7779bfdcc0c73b0c9eac35357cdd.css"><meta property='og:title' content="AI下一站 MCPServer">
+<meta property='og:description' content="在AI技术高速演进的2025年，大模型的局限性日益凸显：它们虽拥有强大的推理能力，却难以直接访问私有数据或调用外部工具。这一痛点催生了一项革命性技术——**MCP（Model Context Protocol，模型上下文协议）**，而作为其核心组件的**MCP Server**，正成为AI行业的下一个风口。本文将深入解析MCP Server的技术本质、行业价值，并结合实际案例探讨其应用前景。">
+<meta property='og:url' content='https://chengxiaqiucao.github.io/post/73-ai%E4%B8%8B%E4%B8%80%E7%AB%99-mcpserver/'>
+<meta property='og:site_name' content='秋 草 观 “测” 台'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='AI' /><meta property='article:tag' content='AI测试' /><meta property='article:published_time' content='2025-04-01T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-04-01T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="AI下一站 MCPServer">
+<meta name="twitter:description" content="在AI技术高速演进的2025年，大模型的局限性日益凸显：它们虽拥有强大的推理能力，却难以直接访问私有数据或调用外部工具。这一痛点催生了一项革命性技术——**MCP（Model Context Protocol，模型上下文协议）**，而作为其核心组件的**MCP Server**，正成为AI行业的下一个风口。本文将深入解析MCP Server的技术本质、行业价值，并结合实际案例探讨其应用前景。">
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0SZVJZGMHX"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8076532964743402"
+     crossorigin="anonymous"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0SZVJZGMHX');
+</script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/automnGrass_hu7204715396109996112.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">秋 草 观 “测” 台</a></h1>
+            <h2 class="site-description">Testing is not just checking...</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/chengxiaqiucao'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/472272606'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162803093" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10312" xmlns:xlink="http://www.w3.org/1999/xlink" width="211.71875" height="200"><path d="M896.43834 165.698h-62.34l54.57-54.57c23.43-23.37 23.43-70.17 0-93.54-23.37-23.37-70.17-23.37-93.54 0l-155.88 148.17H452.17034l-155.94-148.23c-23.43-23.37-70.17-23.37-93.54 0-23.37 23.43-23.43 70.17 0 93.54l54.57 54.57h-62.34A192.983 192.983 0 0 0 0.00934 360.607v420.899c0 116.97 85.71 202.68 194.91 202.68h693.75a192.983 192.983 0 0 0 194.85-194.85v-428.73c7.83-109.14-77.94-194.91-187.08-194.91z m54.63 615.809a69.869 69.869 0 0 1-70.17 70.17h-678.27a69.869 69.869 0 0 1-70.109-70.17v-413.13a69.869 69.869 0 0 1 70.17-70.17h678.21a69.869 69.869 0 0 1 70.17 70.17v413.19z m-608.039-342.96a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.23-70.17z m405.36 0a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.17-70.17z" p-id="10313" fill="#8a8a8a"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.zhihu.com/people/qiucao'
+                        target="_blank"
+                        title="zhihu"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162502588" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4642" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M540.95908203 555.43730469s0-62.74248047-30.56748047-65.96191407c-30.56748047-3.21943359-125.48583984 0-125.48583984 1e-8v-193.05527344h141.57246094s-1.60839844-64.35263672-28.95908203-64.35263672h-230.05810547l38.61035156-102.96210938s-57.91728516 3.21943359-78.83085938 40.21962891-86.87460938 222.01523438-86.87460937 222.01523438 22.52373047 9.65302734 59.52480469-17.69589844c37.00283203-27.34804688 49.87177734-75.61494141 49.87177734-75.61494141l67.56943359-3.21943359 1.60839844 196.27382812s-117.44033203-1.60839844-141.57246094 0c-24.13212891 1.60839844-37.00283203 65.96191406-37.00283203 65.96191407h178.57792969s-16.09013672 109.39746094-61.13408203 188.23007812c-46.65673828 78.83085938-133.53134766 141.57246094-133.53134766 141.57246094s62.74248047 25.74052734 123.87919922-9.65302735c61.13408203-37.00283203 106.18154297-196.27382812 106.18154297-196.27382812l143.184375 178.57792969s12.86982422-85.26533203-1.60839844-109.39746094c-16.09013672-24.13212891-99.74707031-120.65888672-99.74707031-120.65888672l-37.00283203 32.17412109 25.74052734-106.18154297h156.0515625zM577.96191406 227.24316406l-1.60839843 580.77509766h57.91728515l20.91357422 72.39550781 101.35634766-72.39550781h143.184375v-580.77509766h-321.75966797zM835.3671875 743.665625h-67.56943359l-85.26533203 65.96191406-19.30517579-65.96191406h-17.69589843v-450.46318359h189.83583984v450.46318359z" fill="#8a8a8a" p-id="4643"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='mailto:%20danmyw@qq.com'
+                        target="_blank"
+                        title="e-mail"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162879016" class="icon" viewBox="0 0 1451 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12462" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z" fill="#8a8a8a" p-id="12463"></path></svg>
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>检索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/releases/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+                
+                <span>热门开源</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="https://chengxiaqiucao.github.io/en/" >English</option>
+                                
+                                    <option value="https://chengxiaqiucao.github.io/" selected>中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#引言">引言</a></li>
+    <li><a href="#一何为mcpmcp的前世今生">一、何为MCP？MCP的前世今生</a>
+      <ol>
+        <li><a href="#1-mcp的定义与设计目标">1. MCP的定义与设计目标</a></li>
+        <li><a href="#2-从langchain到mcp的技术演进">2. 从Langchain到MCP的技术演进</a></li>
+        <li><a href="#3-mcp的生态现状">3. MCP的生态现状</a></li>
+      </ol>
+    </li>
+    <li><a href="#二mcp-server有何作用为什么它可能是ai行业的下一个风口">二、MCP Server有何作用？为什么它可能是AI行业的下一个风口？</a>
+      <ol>
+        <li><a href="#1-mcp-server的核心功能">1. MCP Server的核心功能</a></li>
+        <li><a href="#2-成为风口的三大驱动力">2. 成为风口的三大驱动力</a>
+          <ol>
+            <li><a href="#1技术趋势从胖模型到瘦模型生态">（1）技术趋势：从“胖模型”到“瘦模型+生态”</a></li>
+            <li><a href="#2经济模型创作者经济的ai化">（2）经济模型：创作者经济的AI化</a></li>
+            <li><a href="#3行业需求企业私有化ai落地的刚需">（3）行业需求：企业私有化AI落地的刚需</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#三作为软件测试从业者我们如何应用mcp-server">三、作为软件测试从业者，我们如何应用MCP Server？</a>
+      <ol>
+        <li><a href="#1-测试场景的mcp化改造">1. 测试场景的MCP化改造</a>
+          <ol>
+            <li><a href="#1模拟外部依赖">（1）模拟外部依赖</a></li>
+            <li><a href="#2数据驱动测试">（2）数据驱动测试</a></li>
+            <li><a href="#3ai辅助测试">（3）AI辅助测试</a></li>
+          </ol>
+        </li>
+        <li><a href="#2-测试从业者的技能升级建议">2. 测试从业者的技能升级建议</a></li>
+      </ol>
+    </li>
+    <li><a href="#四mcp-server的简单实现案例桌面文件查询服务">四、MCP Server的简单实现案例：桌面文件查询服务</a>
+      <ol>
+        <li><a href="#1-环境准备">1. 环境准备</a></li>
+        <li><a href="#2-代码实现">2. 代码实现</a></li>
+        <li><a href="#3-客户端配置与测试">3. 客户端配置与测试</a></li>
+      </ol>
+    </li>
+    <li><a href="#结语">结语</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E6%B5%8B%E8%AF%95%E6%8A%80%E6%9C%AF/" style="background-color: #2a9d8f; color: #fff;">
+                测试技术
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/73-ai%E4%B8%8B%E4%B8%80%E7%AB%99-mcpserver/">AI下一站 MCPServer</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            在AI技术高速演进的2025年，大模型的局限性日益凸显：它们虽拥有强大的推理能力，却难以直接访问私有数据或调用外部工具。这一痛点催生了一项革命性技术——**MCP（Model Context Protocol，模型上下文协议）**，而作为其核心组件的**MCP Server**，正成为AI行业的下一个风口。本文将深入解析MCP Server的技术本质、行业价值，并结合实际案例探讨其应用前景。
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Apr 01, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 5 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p><img src="/post/73-ai%E4%B8%8B%E4%B8%80%E7%AB%99-mcpserver/Pasted-20250402.png"
+	width="565"
+	height="316"
+	srcset="/post/73-ai%E4%B8%8B%E4%B8%80%E7%AB%99-mcpserver/Pasted-20250402_hu18273069205234057292.png 480w, /post/73-ai%E4%B8%8B%E4%B8%80%E7%AB%99-mcpserver/Pasted-20250402_hu9049435738599389796.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="178"
+		data-flex-basis="429px"
+	
+></p>
+<h2 id="引言">引言
+</h2><p>在AI技术高速演进的2025年，大模型的局限性日益凸显：它们虽拥有强大的推理能力，却难以直接访问私有数据或调用外部工具。这一痛点催生了一项革命性技术——<strong>MCP（Model Context Protocol，模型上下文协议）</strong>，而作为其核心组件的<strong>MCP Server</strong>，正成为AI行业的下一个风口。本文将深入解析MCP Server的技术本质、行业价值，并结合实际案例探讨其应用前景。</p>
+<hr>
+<h2 id="一何为mcpmcp的前世今生">一、何为MCP？MCP的前世今生
+</h2><h3 id="1-mcp的定义与设计目标">1. MCP的定义与设计目标
+</h3><p>MCP是由AI公司Anthropic（claude母公司）于2024年11月推出的开放协议，旨在标准化大语言模型（LLM）与外部数据源、工具之间的交互接口。其核心设计目标：</p>
+<ul>
+<li><strong>解耦与标准化</strong>：将LLM与外部系统的集成从定制化开发转变为基于统一协议的通用连接，类似硬件领域的USB-C接口。</li>
+<li><strong>去中心化</strong>：通过允许开发者自主构建MCP Server，分散AI能力，避免单一厂商垄断知识和服务。</li>
+<li><strong>安全可控</strong>：通过权限验证和本地化部署，确保数据隐私与操作安全。</li>
+</ul>
+<h3 id="2-从langchain到mcp的技术演进">2. 从Langchain到MCP的技术演进
+</h3><p>在MCP之前，开发者依赖如Langchain等中间层框架连接LLM与工具，但这些方案存在两大瓶颈：</p>
+<ol>
+<li><strong>碎片化</strong>：不同厂商的API标准不统一，集成成本高；</li>
+<li><strong>封闭性</strong>：OpenAI等厂商的插件生态受限于自身平台，难以跨模型复用。</li>
+<li></li>
+</ol>
+<p>MCP通过协议层的抽象，将工具调用、数据访问等能力封装为标准化接口，使任何支持MCP协议的LLM均可无缝接入第三方服务。</p>
+<h3 id="3-mcp的生态现状">3. MCP的生态现状
+</h3><p>现阶段，MCP生态已初具规模：</p>
+<ul>
+<li><strong>头部公司支持</strong>：除了发起公司的claude，包括AI行业领军的OpenAI，在国内百度、腾讯等也均宣称支持MCP</li>
+<li><strong>开发者众多</strong>：因开发门槛低，当前公开的各类MCP Server已呈爆炸式增长态势，短短数周已有数千个公开Server，涵盖数据库、设计工具、支付系统等领域。</li>
+<li><strong>商业价值显现</strong>：a16z等机构已绘制MCP市场地图，预测其可能催生“Agentic AI领域的Stripe”级公司。</li>
+</ul>
+<hr>
+<h2 id="二mcp-server有何作用为什么它可能是ai行业的下一个风口">二、MCP Server有何作用？为什么它可能是AI行业的下一个风口？
+</h2><h3 id="1-mcp-server的核心功能">1. MCP Server的核心功能
+</h3><p>MCP Server是MCP协议的具体实现，承担以下关键角色：</p>
+<ul>
+<li><strong>工具代理</strong>：将外部API（如GitHub、PostgreSQL）转化为LLM可理解的标准化工具描述，例如将“创建GitHub Issue”抽象为函数调用。</li>
+<li><strong>数据网关</strong>：安全访问本地或云端数据，例如通过文件系统MCP Server让LLM读取桌面文件。</li>
+<li><strong>流程编排</strong>：支持多工具串联调用，例如先查询数据库再生成报告。</li>
+</ul>
+<h3 id="2-成为风口的三大驱动力">2. 成为风口的三大驱动力
+</h3><h4 id="1技术趋势从胖模型到瘦模型生态">（1）技术趋势：从“胖模型”到“瘦模型+生态”
+</h4><p>传统“胖模型”试图将所有知识内化于参数中，导致训练成本高且时效性差。MCP架构下，LLM专注于语言理解，知识扩展与工具调用由MCP Server网络实现，形成“瘦模型+分布式能力”的新范式。</p>
+<h4 id="2经济模型创作者经济的ai化">（2）经济模型：创作者经济的AI化
+</h4><p>MCP允许个人开发者通过构建MCP Server（如鸟类知识库）获得收益分成，形成去中心化的知识经济网络。例如，基于以太坊的OpenMCP.Network可通过智能合约实现调用量自动结算。</p>
+<h4 id="3行业需求企业私有化ai落地的刚需">（3）行业需求：企业私有化AI落地的刚需
+</h4><p>企业可通过MCP Server将内部系统（如CRM、ERP）安全暴露给LLM，无需将敏感数据上传至云端。NineData等公司已推出数据库MCP Server解决方案，支持本地化数据管理。</p>
+<hr>
+<h2 id="三作为软件测试从业者我们如何应用mcp-server">三、作为软件测试从业者，我们如何应用MCP Server？
+</h2><h3 id="1-测试场景的mcp化改造">1. 测试场景的MCP化改造
+</h3><h4 id="1模拟外部依赖">（1）模拟外部依赖
+</h4><p>通过构建Mock MCP Server，替代真实支付、第三方API等依赖项，实现测试环境隔离。例如，模拟支付宝接口返回异常响应，验证系统容错能力。</p>
+<h4 id="2数据驱动测试">（2）数据驱动测试
+</h4><p>将测试用例存储在数据库或文件中，通过MCP Server动态读取并执行。例如：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nd">@mcp.tool</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">load_test_cases</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;从指定目录加载JSON格式测试用例&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">&#34;test_cases.json&#34;</span><span class="p">))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>测试框架可自动获取用例并生成测试报告。</p>
+<h4 id="3ai辅助测试">（3）AI辅助测试
+</h4><p>利用LLM通过MCP Server调用测试工具，例如：</p>
+<ul>
+<li><strong>自动生成测试脚本</strong>：根据需求描述生成Selenium代码；</li>
+<li><strong>智能分析日志</strong>：结合ELK Stack的MCP Server定位缺陷根源。</li>
+</ul>
+<h3 id="2-测试从业者的技能升级建议">2. 测试从业者的技能升级建议
+</h3><ul>
+<li><strong>掌握MCP Server开发</strong>：学习Python/TypeScript的MCP SDK，构建定制化测试工具。</li>
+<li><strong>熟悉主流MCP生态</strong>：关注GitHub上的Awesome MCP Servers列表，了解测试相关服务（如PostgreSQL、JIRA集成）。</li>
+</ul>
+<hr>
+<h2 id="四mcp-server的简单实现案例桌面文件查询服务">四、MCP Server的简单实现案例：桌面文件查询服务
+</h2><h3 id="1-环境准备">1. 环境准备
+</h3><ul>
+<li>安装Python MCP SDK：<code>pip install mcp</code></li>
+<li>创建项目目录：<code>mkdir mcp-demo &amp;&amp; cd mcp-demo</code></li>
+</ul>
+<h3 id="2-代码实现">2. 代码实现
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">mcp.server.fastmcp</span> <span class="kn">import</span> <span class="n">FastMCP</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">mcp</span> <span class="o">=</span> <span class="n">FastMCP</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@mcp.tool</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">list_desktop_files</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;获取当前用户桌面文件列表&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&#34;~/Desktop&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">mcp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">transport</span><span class="o">=</span><span class="s1">&#39;stdio&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此代码定义了一个MCP Server，提供<code>list_desktop_files</code>工具，允许LLM查询用户桌面文件。</p>
+<h3 id="3-客户端配置与测试">3. 客户端配置与测试
+</h3><p>在Cursor编辑器的<code>mcp.json</code>中添加配置：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;mcpServers&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;desktop&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;command&#34;</span><span class="p">:</span> <span class="s2">&#34;python server.py&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>启动服务后，我们可直接提问：“我的桌面有哪些文件？”，Cursor将通过MCP协议调用服务并返回我当前桌面上的文件清单，并按类型进行分类。</p>
+<hr>
+<h2 id="结语">结语
+</h2><p>MCP Server正在重塑AI与物理世界的交互方式。对开发者而言，它是降低集成成本的利器；对企业而言，它是激活数据价值的钥匙；对测试从业者而言，它是自动化演进的新引擎。尽管生态仍处早期，但其标准化、去中心化的设计理念，已为AI行业的下一站指明了方向。正如Anthropic所言：“MCP不是终点，而是Agentic AI时代的起点。”</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/ai/">AI</a>
+        
+            <a href="/tags/ai%E6%B5%8B%E8%AF%95/">AI测试</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/post/72-%E5%BE%AE%E8%BD%AF%E5%B7%B2%E5%8F%91%E5%B8%83playwright-mcp/">
+        
+        
+            <div class="article-image">
+                <img src="/post/72-%E5%BE%AE%E8%BD%AF%E5%B7%B2%E5%8F%91%E5%B8%83playwright-mcp/Pasted-20250402.edb9525a16cda48c1d70d1a55f9e35ca_hu17208628146621733927.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 微软已发布Playwright Mcp"
+                        
+                        data-hash="md5-7blSWhbNpIwdcNGlX541yg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">微软已发布Playwright Mcp</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/70-ai%E6%97%B6%E4%BB%A3%E7%9A%84%E6%B5%8B%E8%AF%95/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">AI时代的软件测试，助手还是对手？</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/69-%E4%BC%98%E5%8C%96ai%E6%8F%90%E7%A4%BA%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%9B%A2%E9%98%9F%E6%8F%90%E5%8D%87/">
+        
+        
+            <div class="article-image">
+                <img src="/post/69-%E4%BC%98%E5%8C%96ai%E6%8F%90%E7%A4%BA%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%9B%A2%E9%98%9F%E6%8F%90%E5%8D%87/%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%A1%86%E6%9E%B6.f1ae45c50751fe194a3d3273880ea3c4_hu7602186480733047688.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post Deepseek提示词框架助力团队改进现状，效能提升"
+                        
+                        data-hash="md5-8a5FxQdR/hlKPTJziA6jxA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Deepseek提示词框架助力团队改进现状，效能提升</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/52-%E7%94%A8deepseek&#43;vscode%E8%87%AA%E5%8A%A8%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95%E8%84%9A%E6%9C%AC/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">用deepseek&#43;vscode自动完成测试脚本</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/71-%E6%B5%8B%E8%AF%95%E4%BA%BA%E5%91%98%E4%BC%A4%E5%AE%B3%E8%B4%A8%E9%87%8F%E7%9A%84%E5%8D%81%E5%A4%A7%E8%AF%AF%E5%8C%BA/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">测试人员伤害质量的十大误区</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2023 - 
+        
+        2025 |by 城下秋草（公众号： 秋草说测试）
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
