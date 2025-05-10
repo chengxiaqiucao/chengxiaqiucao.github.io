@@ -7,7 +7,644 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>|by 城下秋草（公众号： 秋草说测试）</copyright>
-        <lastBuildDate>Wed, 02 Apr 2025 16:38:33 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Tue, 22 Apr 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title># Postman最佳平替, API测试工具Bruno实用教程(一)：基础篇</title>
+        <link>https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/</link>
+        <pubDate>Tue, 22 Apr 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/snap_20250420-2" alt="Featured image of post # Postman最佳平替, API测试工具Bruno实用教程(一)：基础篇" /&gt;&lt;h2 id=&#34;序言&#34;&gt;序言
+&lt;/h2&gt;&lt;p&gt;在前文【】中，我们介绍了目前目前Github上广受关注的新锐接口测试工具Bruno，给厌倦了Postman必须在线使用限制的同学提供了一个很好的替代选择。&lt;/p&gt;
+&lt;p&gt;Bruno的核心优势，官网重点给出了如下几点：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/86-bruno%e4%bb%8b%e7%bb%8d/snap_20250420-3.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;承诺开源和可扩展，并且专心做客户端，永不向“平台化”扩充产品。&lt;/li&gt;
+&lt;li&gt;基于Git实现协作和版本管理&lt;/li&gt;
+&lt;li&gt;离线使用，永不同步本地数据 😂😂😂&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;下面我们就通过一个系列，详细介绍通过Bruno来进行API接口测试的详细实战教程。本文是第一篇，重点介绍如下内容：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Bruno的安装和界面说明&lt;/li&gt;
+&lt;li&gt;结合Github API实现典型API操作的方法&lt;/li&gt;
+&lt;li&gt;环境管理&lt;/li&gt;
+&lt;li&gt;鉴权机制和加密&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;bruno安装和界面概览&#34;&gt;Bruno安装和界面概览
+&lt;/h2&gt;&lt;h3 id=&#34;安装&#34;&gt;安装
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Mac (Homebrew)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;brew install bruno
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Windows (Winget)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;winget install usebruno.bruno
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Linux (Snap)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo snap install bruno
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;使用界面&#34;&gt;使用界面
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;1014&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427_hu1280820275372942198.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427_hu8308940580351092276.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;189&#34;
+		data-flex-basis=&#34;454px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;左侧面板&lt;/strong&gt;：Collection管理、导航（类似IDE的项目结构）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;中央区域&lt;/strong&gt;：请求编辑器（URL/Headers/Body配置）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;右侧面板&lt;/strong&gt;：响应结果显示（内容、状态、断言等）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;工具栏&lt;/strong&gt;：顶部主要是一些高级功能配置（付费版本）、变量管理（全局、环境）；底部工具栏是工具的系统级配置（界面、代理、鉴权等），cookies、license管理&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;快捷键体系&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Ctrl +E&lt;/code&gt;：环境变量设置&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Ctrl + B&lt;/code&gt;：新建请求&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Ctrl + Enter&lt;/code&gt;：立即发送请求&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;典型http接口测试实现github-api&#34;&gt;典型HTTP接口测试实现(Github API)
+&lt;/h2&gt;&lt;p&gt;下面我们结合 &lt;code&gt;Github&lt;/code&gt; 的官方API接口，介绍在 &lt;code&gt;Bruno&lt;/code&gt; 中如何完成典型HTTP接口请求测试。&lt;/p&gt;
+&lt;h3 id=&#34;github-api简介&#34;&gt;Github API简介
+&lt;/h3&gt;&lt;p&gt;GitHub 是一个面向开源软件项目的托管平台，因为使用 Git 作为唯一的版本库格式进行托管，故名 GitHub。也是目前全球最大的代码托管平台，可以说是程序员的圣地，号称&lt;strong&gt;全球最大的同性交友平台&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;GitHub API目前有两个版本，一个是基于GraphQL的V4版本， 而更常用的主要还是之前的Restful API，它的Restful API定义长期以来被视作此类接口的典范。&lt;/p&gt;
+&lt;p&gt;具体的接口说明文档：参见 &lt;a class=&#34;link&#34; href=&#34;https://docs.github.com/zh/rest?apiVersion=2022-11-28&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://docs.github.com/zh/rest?apiVersion=2022-11-28&lt;/a&gt;&lt;/p&gt;
+&lt;h5 id=&#34;github-中的时间格式&#34;&gt;github 中的时间格式
+&lt;/h5&gt;&lt;p&gt;&lt;code&gt;YYYY-MM-DDTHH:MM:SSZ&lt;/code&gt;&lt;/p&gt;
+&lt;h5 id=&#34;github-限流规则&#34;&gt;github 限流规则
+&lt;/h5&gt;&lt;p&gt;github 为包含服务端负载压力，会对请求流量进行限制。在每个 github 的响应消息头中都会携带 github 的限流设置。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;头参数&lt;/th&gt;
+&lt;th&gt;含义&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;X-RateLimit-Limit&lt;/td&gt;
+&lt;td&gt;当前每小时最大请求限制，一般未鉴权请求60次，鉴权请求5000次&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;X-RateLimit-Remaining&lt;/td&gt;
+&lt;td&gt;当前剩余请求次数&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;X-RateLimit-Reset&lt;/td&gt;
+&lt;td&gt;剩余限制重置时间，毫秒&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h5 id=&#34;请求参数与分页&#34;&gt;请求参数与分页
+&lt;/h5&gt;&lt;p&gt;请求中可以携带参数，一般包含两种参数: &lt;strong&gt;路径参数&lt;/strong&gt;和&lt;strong&gt;查询参数&lt;/strong&gt;
+&lt;img src=&#34;https://chengxiaqiucao.github.io/frontEndDemo/images/20190119_121133.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;github API中默认支持两个分页参数：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;page  当前显示页数&lt;/li&gt;
+&lt;li&gt;per_page 每页显示结果数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id=&#34;github-请求token&#34;&gt;github 请求Token
+&lt;/h5&gt;&lt;p&gt;从Github账号设置页中，增加访问API的Token配置&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-2.png&#34;
+	width=&#34;557&#34;
+	height=&#34;515&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-2_hu4943685012304958102.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-2_hu4155900466536041072.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;108&#34;
+		data-flex-basis=&#34;259px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;配置token鉴权&#34;&gt;配置Token鉴权
+&lt;/h3&gt;&lt;p&gt;进入Bruno，新建一个Collection， 命名 &lt;code&gt;github&lt;/code&gt;，在其中的 &lt;code&gt;Auth&lt;/code&gt; 部分, 将之前设置的API token添加进来，这里的鉴权方式选择 &lt;code&gt;bearer Token&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-3.png&#34;
+	width=&#34;1327&#34;
+	height=&#34;640&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-3_hu8970350698984062653.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-3_hu4378544909599311794.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;207&#34;
+		data-flex-basis=&#34;497px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;除了 &lt;code&gt;bearer Token&lt;/code&gt; 外， Bruno还支持其他多种鉴权方式，能基本覆盖到各种API接口的鉴权模式。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;AWS Sig&lt;/strong&gt;：针对亚马逊的AWS公有云用户签名的认证方式&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Basic auth&lt;/strong&gt;：基本鉴权，通过输入账号、密码&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;WSSE auth&lt;/strong&gt;：Web Service安全用户认证&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Bearer Token&lt;/strong&gt;：基于加密文本的安全认证令牌&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Digest auth&lt;/strong&gt;：摘要式认证&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;NTLM auth&lt;/strong&gt;：微软的局域网管理认证协议&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Oauth 2.0&lt;/strong&gt;：开放式授权协议，是第三方认证的常用协议&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;API Key&lt;/strong&gt;：服务端自己定义的接入令牌&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;no Auth&lt;/strong&gt;：不鉴权&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;inherit&lt;/strong&gt;：继承上一级鉴权（Bruno中，下一级请求可以使用上一级的鉴权设置）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;接口测试中的增删改查&#34;&gt;接口测试中的增删改查
+&lt;/h3&gt;&lt;h5 id=&#34;1-get请求获取制定项目最新release&#34;&gt;1. GET请求：获取制定项目最新Release
+&lt;/h5&gt;&lt;p&gt;&lt;strong&gt;目标接口&lt;/strong&gt;：&lt;code&gt;GET /repos/{owner}/{repo}/releases/latest&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Bruno中通过 &lt;code&gt;{{var}}&lt;/code&gt;，可以在请求中指定变量，变量配置如下。点击发送按钮后，成功获得响应。&lt;/p&gt;
+&lt;p&gt;请求这里的鉴权方式使用&lt;code&gt;inherit&lt;/code&gt;， 继承collection中配置的 &lt;code&gt;bearer token&lt;/code&gt; 鉴权方式&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-4.png&#34;
+	width=&#34;1617&#34;
+	height=&#34;814&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-4_hu1983051634976872514.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-4_hu18144446089573391506.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;198&#34;
+		data-flex-basis=&#34;476px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h5 id=&#34;2--post请求创建issue&#34;&gt;2.  POST请求：创建Issue
+&lt;/h5&gt;&lt;p&gt;&lt;strong&gt;目标接口&lt;/strong&gt;：&lt;code&gt;POST   /repos/{owner}/{repo}/issues&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;创建issue，对应 &lt;code&gt;POST&lt;/code&gt; 方法，Bruno中配置如下，&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;959&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428_hu12536877240761757733.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428_hu11994804475195574515.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;200&#34;
+		data-flex-basis=&#34;480px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Body配置&lt;/strong&gt;：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;title&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;{issue_title&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}}&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s2&#34;&gt;&amp;#34;body&amp;#34;&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;发现一个测试问题&amp;#34;&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s2&#34;&gt;&amp;#34;labels&amp;#34;&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;s2&#34;&gt;&amp;#34;bug&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;err&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;动态变量注入&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;这里的issue标题，我们使用Bruno的内置动态变量 &lt;code&gt;{{$timestamp}}&lt;/code&gt;, Bruno提供了丰富的内置动态变量，对于我们动态模拟请求数据提供了极大方便。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c&#34;&gt;# 标题预置变量&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;vars&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;issue_title&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;测试问题_{{$timestamp}}&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;到Github上查看，Issue已创建
+&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-1.png&#34;
+	width=&#34;1169&#34;
+	height=&#34;519&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-1_hu5854467980820522588.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-1_hu11683340414787186250.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;225&#34;
+		data-flex-basis=&#34;540px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h5 id=&#34;3-patch请求修改issue&#34;&gt;3. PATCH请求：修改Issue
+&lt;/h5&gt;&lt;p&gt;&lt;strong&gt;目标接口&lt;/strong&gt;：&lt;code&gt;PATCH   /repos/{owner}/{repo}/issues/3&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;关闭 issue_number 为 3 的问题&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nt&#34;&gt;&amp;#34;state&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;closed&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-2.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;959&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-2_hu17734667382742071261.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-2_hu18228507227820878304.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;200&#34;
+		data-flex-basis=&#34;480px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h5 id=&#34;4-delete请求删除issue-评论&#34;&gt;4. DELETE请求：删除Issue 评论
+&lt;/h5&gt;&lt;p&gt;&lt;strong&gt;目标接口&lt;/strong&gt;：&lt;code&gt;DELETE /repos/{owner}/{repo}/issues/comments/{comment_id}&lt;/code&gt;
+&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-3.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;959&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-3_hu1902692786199017933.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-3_hu6748800900389929673.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;200&#34;
+		data-flex-basis=&#34;480px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;基础测试断言&#34;&gt;基础测试断言
+&lt;/h3&gt;&lt;h5 id=&#34;test脚本验证--状态码&#34;&gt;Test脚本验证  状态码
+&lt;/h5&gt;&lt;p&gt;Bruno 中可以类似Postman那样编写Test脚本来进行结果验证&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;test&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;Status is 200&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nx&#34;&gt;expect&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;res&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;status&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;).&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;to&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;equal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;200&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h5 id=&#34;界面assert&#34;&gt;界面Assert
+&lt;/h5&gt;&lt;p&gt;对于一些常用的断言，Bruno中也可以直接在界面上通过添加 &lt;code&gt;Assert&lt;/code&gt; 来进行断言。&lt;/p&gt;
+&lt;p&gt;以上Test和Assert 执行结果如下&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-4.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;959&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-4_hu14194031349793751052.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-4_hu8239106714095035079.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;200&#34;
+		data-flex-basis=&#34;480px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;以上就是关于Bruno进行接口测试时，主要的基础功能用法介绍。后续会继续更新其他进阶用法更新。 也欢迎大家进入测试交流群和小伙伴们继续深入交流。回复 &lt;code&gt;进群&lt;/code&gt; 获取入群邀请。&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>github星标超3万！Postman最强平替Bruno你用了吗？</title>
+        <link>https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/</link>
+        <pubDate>Wed, 16 Apr 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/snap_20250420-2.png%29" alt="Featured image of post github星标超3万！Postman最强平替Bruno你用了吗？" /&gt;&lt;h2 id=&#34;序言&#34;&gt;序言
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;Postman&lt;/code&gt;长期以来都是API测试领域居领先地位的测试工具。以其友好的工具界面，便捷的API接口请求编辑，强大的脚本支持和云端服务，以及丰富的生态，在接口开发和测试中，有极为广泛你的应用。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420-1.png&#34;
+	width=&#34;945&#34;
+	height=&#34;386&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420-1_hu3982279776171109616.png 480w, https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420-1_hu235737393210018866.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;244&#34;
+		data-flex-basis=&#34;587px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;但作为一个商用工具，它的很多高级功能都依赖云端服务，且收费不菲。虽然免费的基础版本同样功能强大，能满足大部分使用需求，但随着工具本身和云端服务的整合以及更多向协作平台方向发展，基础版本也需要注册并登录云端服务后才可完全使用。&lt;/p&gt;
+&lt;p&gt;但这却限制了很多脱离互联网环境的应用需求，而且频繁的同步机制和连接稳定性要求也颇受诟病。&lt;/p&gt;
+&lt;p&gt;很多受Postman这些限制困扰的同学也一直在寻找和Postman类似的替代工具，本文我们向大家介绍一个API接口测试明日之星，开源接口测试工具 &lt;code&gt;Bruno&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/85-bruno%e5%9f%ba%e7%a1%80/snap_20250420-2.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;从github的star趋势可以看到，Bruno诞生不久，但从2024年开始，已经开始得到广泛关注，star数量一路飙升，潜力无限！&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420.png&#34;
+	width=&#34;1071&#34;
+	height=&#34;712&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420_hu1307315593139152473.png 480w, https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420_hu6266850528378610743.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;150&#34;
+		data-flex-basis=&#34;361px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;bruno简介&#34;&gt;Bruno简介
+&lt;/h2&gt;&lt;p&gt;可以说 &lt;code&gt;Bruno&lt;/code&gt; 从诞生之初针对的就是前述 &lt;strong&gt;Postman&lt;/strong&gt; 的痛点。官方首页上强调的 Bruno 主要特性也重点说明了这几点：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420-3.png&#34;
+	width=&#34;1834&#34;
+	height=&#34;608&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420-3_hu8389723719791598316.png 480w, https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420-3_hu15829097769678655259.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;301&#34;
+		data-flex-basis=&#34;723px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;承诺开源和可扩展，并且专心做客户端，永不向“平台化”扩充产品。&lt;/li&gt;
+&lt;li&gt;基于Git实现协作和版本管理&lt;/li&gt;
+&lt;li&gt;离线使用，永不同步本地数据 😂😂😂&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;可以说，Bruno的出现，就是针对Postman作为一个客户端工具，过于强调平台化和云端功能的现状，提供的平替方案。&lt;/p&gt;
+&lt;h2 id=&#34;bruno的优势&#34;&gt;Bruno的优势
+&lt;/h2&gt;&lt;p&gt;Bruno在官方网站上，也是专门针对 Postman ，将Bruno和Postman进行了详细比对（当然一家之言，免不得自吹，大家辩证看待）网址如下：
+&lt;a class=&#34;link&#34; href=&#34;https://www.usebruno.com/compare/bruno-vs-postman&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.usebruno.com/compare/bruno-vs-postman&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;我整理了一下，主要包含如下几个维度：&lt;/p&gt;
+&lt;h4 id=&#34;整体定位&#34;&gt;整体定位
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;开源、本地优先、注重隐私&lt;/td&gt;
+&lt;td&gt;最初是 API 客户端，现已发展为包含云协作功能的 API 平台&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;数据存储&#34;&gt;数据存储
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;集合直接存储在本地文件系统，使用名为 Bru 的纯文本标记语言&lt;/td&gt;
+&lt;td&gt;主要存储在 Postman 云端，需要账户登录（虽然可以导出，但核心工作流依赖云）&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;开放源码&#34;&gt;开放源码
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;完全开源 (MIT 许可证)&lt;/td&gt;
+&lt;td&gt;部分开源，核心平台和云服务是专有的&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;离线支持&#34;&gt;离线支持
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;完全支持离线工作，因为所有数据都在本地&lt;/td&gt;
+&lt;td&gt;核心功能（尤其协作）严重依赖在线连接和账户登录&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;协作方式&#34;&gt;协作方式
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;通过 Git 或任何版本控制系统进行协作，利用其文件存储特性&lt;/td&gt;
+&lt;td&gt;通过 Postman 内置的云同步和团队协作功能（通常需要付费计划）&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;cli命令行&#34;&gt;CLI命令行
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;提供名为 &lt;code&gt;bru&lt;/code&gt; 的 CLI 工具，用于运行集合和测试&lt;/td&gt;
+&lt;td&gt;提供名为 &lt;code&gt;Newman&lt;/code&gt; 的 CLI 工具，用于运行集合和集成到 CI/CD&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;脚本支持&#34;&gt;脚本支持
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;支持声明式脚本（Bru Lang）和 JavaScript 进行自动化测试和脚本编写&lt;/td&gt;
+&lt;td&gt;支持 JavaScript 进行请求前脚本、测试脚本编写&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;交互界面&#34;&gt;交互界面
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;界面和功能相对更简洁，专注于 API 请求和测试的核心任务&lt;/td&gt;
+&lt;td&gt;功能更全面，但也可能更复杂，涵盖了 API 设计、文档、监控等更多方面&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;版本控制&#34;&gt;版本控制
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;可直接利用 Git 进行精细的版本控制&lt;/td&gt;
+&lt;td&gt;内置版本控制功能，但与 Git 的集成和灵活性不同&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总体来说，Bruno针对Postman的主要痛点，都给出了对应的应对处理，如果使用Postman受限或更希望在非互联网线环境下进行接口测试，可以说Bruno就是最佳选择&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;bruno的局限性&#34;&gt;Bruno的局限性
+&lt;/h2&gt;&lt;p&gt;虽然Bruno已经受到了极大的关注，而且功能也足够丰富，但相比Postman这样老牌头部工具，功能上还是有一些局限性。这里总结起来，大致有如下几点：&lt;/p&gt;
+&lt;h4 id=&#34;云端协作和同步&#34;&gt;云端协作和同步
+&lt;/h4&gt;&lt;p&gt;完全本地化和简洁、轻量，是Bruno重点突出的优势，但换一个角度来说，也是它主要的局限。&lt;/p&gt;
+&lt;p&gt;Bruno的团队协作以来Git来实现，对于熟悉Git使用的研发团队来说，当然足够强大，但如果团队对API的协作牵涉到混合团队时，比如包含客户、设计人员、产品经理等时，Git的使用门槛就相对更高了。Postman那样的基于云服务的团队功能则更易于接受，团队共享工作区、并可进行评论、共享。&lt;/p&gt;
+&lt;h4 id=&#34;在api全生命周期管理上的欠缺&#34;&gt;在API全生命周期管理上的欠缺
+&lt;/h4&gt;&lt;p&gt;还是因为纯本地客户端的原因，Bruno很难像Postman那样实现针对API的全生命周期管理和支持，包括接口设计（OpenAPI、swagger等接口设计的导入）、交互式文档（API Documentation）、接口模拟（Mock Server）、健康监测（monitor）等，Postman都有对应的功能可以覆盖，而Bruno则无法涵盖如此丰富的场景。&lt;/p&gt;
+&lt;h4 id=&#34;接口类型支持不如postman丰富&#34;&gt;接口类型支持不如Postman丰富
+&lt;/h4&gt;&lt;p&gt;虽然Bruno目前已经支持restful和GraphQL接口，已经能够满足我们绝大多数的接口测试协议要求。但相比Postman还有MQTT这样的物联网协议支持，在协议扩展上，还有待继续补充。&lt;/p&gt;
+&lt;h4 id=&#34;生态系统不如postman成熟&#34;&gt;生态系统不如Postman成熟
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Postman 经过多年发展，已经围绕其平台构建了一个庞大的生态系统，包括大量的第三方工具集成（如很多第三方的 APM 工具、API 网关、CI/CD 工具等）都对Postman支持良好）。&lt;/li&gt;
+&lt;li&gt;经过多年积累，Postman社区繁荣，用户数量庞大，积累了海量的资源和教程。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Bruno 作为一个较新的工具，其原生集成和社区支持的插件相对较少&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421.png&#34;
+	width=&#34;1432&#34;
+	height=&#34;821&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421_hu1736885629923217087.png 480w, https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421_hu5908073081409471841.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;174&#34;
+		data-flex-basis=&#34;418px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;ai测试能力的支持&#34;&gt;AI测试能力的支持
+&lt;/h4&gt;&lt;p&gt;Postman通过内置的 &lt;code&gt;postbot&lt;/code&gt; 助手，借助AI能力，可以实现接口测试用例的自动生成，优化建议等典型的AI增强。而随着AI应用的越来越广泛，对AI的支持也是Bruno还需要重点补充的部分。&lt;/p&gt;
+&lt;h2 id=&#34;bruno安装和应用基本示例&#34;&gt;Bruno安装和应用基本示例
+&lt;/h2&gt;&lt;p&gt;Bruno作为一个纯客户端，安装其实极为方便。访问官网，下载对应安装包即可(&lt;a class=&#34;link&#34; href=&#34;https://www.usebruno.com/downloads&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.usebruno.com/downloads&lt;/a&gt;)。&lt;/p&gt;
+&lt;p&gt;win11下也可以利用内建的winget命令直接下载安装&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;winget&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;install&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;bruno&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;py&#34;&gt;bruno&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;安装后，桌面上会出一个bruno的小狗logo，类似Postman，双击就可打开Bruno客户端，界面其实和Postman颇为类似。下面我们以获取Github上一个开源项目的最近一次发布为例，看下Bruno中如何操作。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;首先建立一个collection，命名为 &amp;ldquo;github&amp;rdquo;, 并在其下创建一个目录，“repos”。 并可以在collection设置界面，添加github的访问Token。这里可以看到，Bruno支持的鉴权方式已经非常全面。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-3.png&#34;
+	width=&#34;1275&#34;
+	height=&#34;632&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-3_hu8434813226214801353.png 480w, https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-3_hu5900016794827556457.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;201&#34;
+		data-flex-basis=&#34;484px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;在 “repos” 目录下，新建一个Get请求，“getRelease”,  根据Github定义，对应请求接口 &amp;ldquo;&lt;a class=&#34;link&#34; href=&#34;https://api.github.com/repos/%7b%7bowner%7d%7d/%7b%7brepo%7d%7d/releases/latest%22&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://api.github.com/repos/{{owner}}/{{repo}}/releases/latest&#34;&lt;/a&gt;， 这里我们使用了两个变量，和Postman类似，这里设置的变量可以通过&lt;code&gt;{{var}}&lt;/code&gt; 来引用。 测试一下，成功获取了appium项目的最近一次发布信息&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-1.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;959&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-1_hu6704278981453768427.png 480w, https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-1_hu14743541688875029221.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;200&#34;
+		data-flex-basis=&#34;480px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;作为一个本地客户端，这里Bruno所有的请求和配置信息，其实都保存在本地，&lt;code&gt;.bru&lt;/code&gt;文件中进行存储。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-2.png&#34;
+	width=&#34;1543&#34;
+	height=&#34;891&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-2_hu17607946812133256273.png 480w, https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-2_hu1434291110228875471.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;173&#34;
+		data-flex-basis=&#34;415px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;以上就是关于Bruno的几个概要介绍，对于不希望受Postman在线限制的同学，Bruno就是最佳替代。&lt;/p&gt;
+&lt;p&gt;欢迎继续关注秋草的后续博客文章，会陆续带来更多关于Bruno的深度使用总结和分享！&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>微软已发布Playwright Mcp</title>
         <link>https://chengxiaqiucao.github.io/post/72-%E5%BE%AE%E8%BD%AF%E5%B7%B2%E5%8F%91%E5%B8%83playwright-mcp/</link>
         <pubDate>Wed, 02 Apr 2025 16:38:33 +0800</pubDate>

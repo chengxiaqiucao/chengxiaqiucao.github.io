@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name="msvalidate.01" content="03BBDF6AC26BCA2F36ADC5DC579B84AA" /><meta name='description' content="过去数周间，模型上下文协议（Model Context Protocol，MCP）快速崛起为第三方数据与工具接入LLM对话系统的实际标准。互联网短时间已充斥着各类炫酷应用案例，想象空间极为广阔。但这个协议背后却也暗藏一些微妙的安全隐患与功能的局限性。">
+<title>Mcp大流行背后的隐忧</title>
+
+<link rel='canonical' href='https://chengxiaqiucao.github.io/post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/'>
+
+<link rel="stylesheet" href="/scss/style.min.afc04e201e26111368df0fa482ffbcd8ad0a7779bfdcc0c73b0c9eac35357cdd.css"><meta property='og:title' content="Mcp大流行背后的隐忧">
+<meta property='og:description' content="过去数周间，模型上下文协议（Model Context Protocol，MCP）快速崛起为第三方数据与工具接入LLM对话系统的实际标准。互联网短时间已充斥着各类炫酷应用案例，想象空间极为广阔。但这个协议背后却也暗藏一些微妙的安全隐患与功能的局限性。">
+<meta property='og:url' content='https://chengxiaqiucao.github.io/post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/'>
+<meta property='og:site_name' content='秋 草 观 “测” 台'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='AI' /><meta property='article:tag' content='AI测试' /><meta property='article:tag' content='行业趋势' /><meta property='article:published_time' content='2025-04-14T15:28:24&#43;08:00'/><meta property='article:modified_time' content='2025-04-14T15:28:24&#43;08:00'/><meta property='og:image' content='https://chengxiaqiucao.github.io/post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/mcp_risk.jpg' />
+<meta name="twitter:title" content="Mcp大流行背后的隐忧">
+<meta name="twitter:description" content="过去数周间，模型上下文协议（Model Context Protocol，MCP）快速崛起为第三方数据与工具接入LLM对话系统的实际标准。互联网短时间已充斥着各类炫酷应用案例，想象空间极为广阔。但这个协议背后却也暗藏一些微妙的安全隐患与功能的局限性。"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://chengxiaqiucao.github.io/post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/mcp_risk.jpg' />
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0SZVJZGMHX"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8076532964743402"
+     crossorigin="anonymous"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0SZVJZGMHX');
+</script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/automnGrass_hu7204715396109996112.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">秋 草 观 “测” 台</a></h1>
+            <h2 class="site-description">Testing is not just checking...</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/chengxiaqiucao'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/472272606'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162803093" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10312" xmlns:xlink="http://www.w3.org/1999/xlink" width="211.71875" height="200"><path d="M896.43834 165.698h-62.34l54.57-54.57c23.43-23.37 23.43-70.17 0-93.54-23.37-23.37-70.17-23.37-93.54 0l-155.88 148.17H452.17034l-155.94-148.23c-23.43-23.37-70.17-23.37-93.54 0-23.37 23.43-23.43 70.17 0 93.54l54.57 54.57h-62.34A192.983 192.983 0 0 0 0.00934 360.607v420.899c0 116.97 85.71 202.68 194.91 202.68h693.75a192.983 192.983 0 0 0 194.85-194.85v-428.73c7.83-109.14-77.94-194.91-187.08-194.91z m54.63 615.809a69.869 69.869 0 0 1-70.17 70.17h-678.27a69.869 69.869 0 0 1-70.109-70.17v-413.13a69.869 69.869 0 0 1 70.17-70.17h678.21a69.869 69.869 0 0 1 70.17 70.17v413.19z m-608.039-342.96a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.23-70.17z m405.36 0a69.869 69.869 0 0 0-70.23 70.17v70.17a69.869 69.869 0 0 0 70.17 70.17 69.869 69.869 0 0 0 70.23-70.17v-70.17a69.869 69.869 0 0 0-70.17-70.17z" p-id="10313" fill="#8a8a8a"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.zhihu.com/people/qiucao'
+                        target="_blank"
+                        title="zhihu"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162502588" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4642" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M540.95908203 555.43730469s0-62.74248047-30.56748047-65.96191407c-30.56748047-3.21943359-125.48583984 0-125.48583984 1e-8v-193.05527344h141.57246094s-1.60839844-64.35263672-28.95908203-64.35263672h-230.05810547l38.61035156-102.96210938s-57.91728516 3.21943359-78.83085938 40.21962891-86.87460938 222.01523438-86.87460937 222.01523438 22.52373047 9.65302734 59.52480469-17.69589844c37.00283203-27.34804688 49.87177734-75.61494141 49.87177734-75.61494141l67.56943359-3.21943359 1.60839844 196.27382812s-117.44033203-1.60839844-141.57246094 0c-24.13212891 1.60839844-37.00283203 65.96191406-37.00283203 65.96191407h178.57792969s-16.09013672 109.39746094-61.13408203 188.23007812c-46.65673828 78.83085938-133.53134766 141.57246094-133.53134766 141.57246094s62.74248047 25.74052734 123.87919922-9.65302735c61.13408203-37.00283203 106.18154297-196.27382812 106.18154297-196.27382812l143.184375 178.57792969s12.86982422-85.26533203-1.60839844-109.39746094c-16.09013672-24.13212891-99.74707031-120.65888672-99.74707031-120.65888672l-37.00283203 32.17412109 25.74052734-106.18154297h156.0515625zM577.96191406 227.24316406l-1.60839843 580.77509766h57.91728515l20.91357422 72.39550781 101.35634766-72.39550781h143.184375v-580.77509766h-321.75966797zM835.3671875 743.665625h-67.56943359l-85.26533203 65.96191406-19.30517579-65.96191406h-17.69589843v-450.46318359h189.83583984v450.46318359z" fill="#8a8a8a" p-id="4643"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='mailto:%20danmyw@qq.com'
+                        target="_blank"
+                        title="e-mail"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1724162879016" class="icon" viewBox="0 0 1451 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12462" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z" fill="#8a8a8a" p-id="12463"></path></svg>
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>检索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/releases/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+                
+                <span>热门开源</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="https://chengxiaqiucao.github.io/en/" >English</option>
+                                
+                                    <option value="https://chengxiaqiucao.github.io/" selected>中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#隐患一协议本身的安全性"><strong>隐患一：协议本身的安全性</strong></a>
+      <ol>
+        <li><a href="#认证机制"><strong>认证机制</strong></a></li>
+        <li><a href="#恶意代码本地执行风险"><strong>恶意代码本地执行风险</strong></a></li>
+        <li><a href="#mcp对用户输入的信任"><strong>MCP对用户输入的信任</strong></a></li>
+      </ol>
+    </li>
+    <li><a href="#隐患二交互设计上的限制"><strong>隐患二：交互设计上的限制</strong></a>
+      <ol>
+        <li><a href="#缺少针对不同等级的操作风险分级"><strong>缺少针对不同等级的操作风险分级</strong></a></li>
+        <li><a href="#成本控制能力"><strong>成本控制能力</strong></a></li>
+        <li><a href="#牺牲结构化数据的优势"><strong>牺牲结构化数据的优势</strong></a></li>
+      </ol>
+    </li>
+    <li><a href="#隐患三llm的安全性"><strong>隐患三：LLM的安全性</strong></a>
+      <ol>
+        <li><a href="#mcp让提示词注入能力更强悍"><strong>MCP让提示词注入能力更强悍</strong></a></li>
+        <li><a href="#敏感数据泄露"><strong>敏感数据泄露</strong></a></li>
+      </ol>
+    </li>
+    <li><a href="#隐患四打破企业中的传统数据权限控制">隐患四：<strong>打破企业中的传统数据权限控制</strong></a></li>
+    <li><a href="#隐患五llm自身的能力局限"><strong>隐患五：LLM自身的能力局限</strong></a>
+      <ol>
+        <li><a href="#mcp的能力发挥依赖于被助手集成的llm"><strong>MCP的能力发挥依赖于被助手集成的LLM</strong></a></li>
+        <li><a href="#工具实现和用户预期的落差"><strong>工具实现和用户预期的落差</strong></a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/">
+                <img src="/post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/mcp_risk_hu2594865000962741255.jpg"
+                        srcset="/post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/mcp_risk_hu2594865000962741255.jpg 800w, /post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/mcp_risk_hu8748096679687330672.jpg 1600w"
+                        width="800" 
+                        height="340" 
+                        loading="lazy"
+                        alt="Featured image of post Mcp大流行背后的隐忧" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E6%B5%8B%E8%AF%95%E6%8A%80%E6%9C%AF/" style="background-color: #2a9d8f; color: #fff;">
+                测试技术
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/">Mcp大流行背后的隐忧</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            过去数周间，模型上下文协议（Model Context Protocol，MCP）快速崛起为第三方数据与工具接入LLM对话系统的实际标准。互联网短时间已充斥着各类炫酷应用案例，想象空间极为广阔。但这个协议背后却也暗藏一些微妙的安全隐患与功能的局限性。
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Apr 14, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 5 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p><img src="/post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/mcp_risk.jpg"
+	width="900"
+	height="383"
+	srcset="/post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/mcp_risk_hu12474602767367484928.jpg 480w, /post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/mcp_risk_hu11655005085072708488.jpg 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="234"
+		data-flex-basis="563px"
+	
+></p>
+<p>过去数周间，模型上下文协议（Model Context Protocol，MCP）快速崛起为第三方数据与工具接入LLM对话系统的实际标准。互联网短时间已充斥着各类炫酷应用案例，想象空间极为广阔。但这个协议背后却也暗藏一些微妙的安全隐患与功能的局限性。</p>
+<h1 id="背景">背景
+</h1><p>MCP的本质是构建&quot;智能助手插件生态&quot;的桥梁，让用户能为各种支持了MCP协议的大模型和AI客户端提供本地扩展能力，让这些基于LLM的智能界面可以通过MCP的&quot;工具调用&quot;执行非文本操作，MCP协议实际上是标准化了LLM和本地数据、工具的对接方式。</p>
+<p>比如在前文【】中，我们只是在<code> Cursor</code> 中告诉大模型: <em>&ldquo;访问www.saucedemo.com网站，使用problem_user登录，验证该网站完整流程并记录发现的问题&rdquo;</em> , Cursor 就会通过<code>playwright-mcp</code> 这个 mcp server来调用<code>playwright</code>框架完成浏览器的调用、访问、浏览、测试、记录问题等一系列活动，完成跟手工测试工程师类似的测试活动</p>
+<p>所以通过MCP，它的核心价值就是突破了原来AI大模型文字型咨询助手的角色，转变为实际的执行者角色，更能够直接操作本地的工具和数据，为大模型提供了万能插口。</p>
+<h1 id="潜在的隐忧">潜在的隐忧
+</h1><p>但我们在看到MCP巨大潜力的同时，也要看到，MCP作为刚起步不久的一个基础协议，尚不能称为尽善尽美，要看到还有如下一些隐忧：</p>
+<h2 id="隐患一协议本身的安全性"><strong>隐患一：协议本身的安全性</strong>
+</h2><h3 id="认证机制"><strong>认证机制</strong>
+</h3><p>MCP的初始版本未定义认证规范，导致各MCP服务器可自行其是，从繁琐的验证到敏感数据裸奔，可谓乱象丛生。虽后续推出认证方案，但实现复杂度引发新的争议。</p>
+<h3 id="恶意代码本地执行风险"><strong>恶意代码本地执行风险</strong>
+</h3><p>协议支持通过标准输入输出运行MCP服务器，这样虽然降低使用门槛，却也为恶意代码传播提供了温床。如果技术小白执行第三方恶意MCP代码引发本地设备安全故障，已成新型攻击手段。</p>
+<h3 id="mcp对用户输入的信任"><strong>MCP对用户输入的信任</strong>
+</h3><p>很多Mcp Server会直接执行用户的输入指令。当用户意图经LLM转译并对系统产生作用时，传统安全模型面临严峻挑战：用户输入指令与攻击系统的边界不再清晰。</p>
+<h2 id="隐患二交互设计上的限制"><strong>隐患二：交互设计上的限制</strong>
+</h2><p>MCP协议更多是面向LLM交互，但针对用户来说，交互方式谈不上易用、友好。</p>
+<h3 id="缺少针对不同等级的操作风险分级"><strong>缺少针对不同等级的操作风险分级</strong>
+</h3><p>很多助手工具会提供全局的操作确认机制，但针对很多无害工具养成的“自动确认”习惯，往往会导致一些严重误操作的发生，比如本地重要文件的删除、邮件误发等情况。</p>
+<h3 id="成本控制能力"><strong>成本控制能力</strong>
+</h3><p>与传统协议不同，LLM场景下依据不同token的返回量会产生数额不等的费用，而用户服务成本高度依赖MCP工具的词元效率，而目前协议中并没有对返回长度的限制以强化成本控制。</p>
+<h3 id="牺牲结构化数据的优势"><strong>牺牲结构化数据的优势</strong>
+</h3><p>为适配LLM偏好，MCP偏向采用类似人类可读的方式，如纯文本/图片/音频片段传输，而牺牲结构化数据优势。比如类似像地图、滴滴叫车等服务，需确保位置准确性、行程细节反馈、实时状态更新等需求的话，现有协议难堪重任。目前解决这类问题还需要在工具层做一些变通的额外设计</p>
+<hr>
+<h2 id="隐患三llm的安全性"><strong>隐患三：LLM的安全性</strong>
+</h2><p>大模型本身安全性的探讨，目前还悬而未决，而引入MCP连接更多的数据、工具让这个问题更为凸显。</p>
+<h3 id="mcp让提示词注入能力更强悍"><strong>MCP让提示词注入能力更强悍</strong>
+</h3><p>LLM 通常有两层指令：<strong>系统级提示词</strong>（控制助手的行为和策略）和<strong>用户级提示词</strong>（由用户提供）。通常，以前提到<strong>提示词注入</strong>通常指恶意的用户输入。而MCP 模型一个相当大的漏洞是允许第三方提供的工具被信任为助手系统级提示的一部分，从而赋予它们更大权限来覆盖代理行为。</p>
+<h3 id="敏感数据泄露"><strong>敏感数据泄露</strong>
+</h3><p>除了恶意地通过恶意工具劫持外，MCP也可能让用户在无意中泄露敏感数据。即便用户严格确认每个操作，数据仍可能通过&quot;合理&quot;的方式外泄出去。比如你的指令：“帮我解释一下个人病历记录”，助手可能会启动一个医疗检索类的多租户MCP工具，并把个人隐私信息泄露到服务提供商。</p>
+<p>包括MCP Server也很容易通过伪装提示词和实际的工具实现，劫持、更改用户的意图。</p>
+<h2 id="隐患四打破企业中的传统数据权限控制">隐患四：<strong>打破企业中的传统数据权限控制</strong>
+</h2><p>与直接泄露敏感数据不同，企业在将大量内部数据通过MCP连接到LLM以后，可能会让普通员工访问或推断出无权访问到的数据。</p>
+<p>举例来说，如果一个企业的所有内部文档都接入LLM，员工通过助手：</p>
+<p><em>“根据所有我有权限访问的文档和公司的任免通知，推断尚未宣布的重大事件如裁员行动”</em></p>
+<p>或者一个经理级别的人：</p>
+<p><em>“我看到内部wiki上有一条匿名的针对XXX的负面评价，内容是XXXX，请分析XX团队中成员的发言记录并推断最可能是谁写的这条评价”</em></p>
+<h2 id="隐患五llm自身的能力局限"><strong>隐患五：LLM自身的能力局限</strong>
+</h2><p>对于大规模的MCP集成，LLM本身的负载能力很可能无法承受。Google推出的<strong>A2A协议(Agent to Agent)</strong> 可能是解决手段，另当别论。</p>
+<h3 id="mcp的能力发挥依赖于被助手集成的llm"><strong>MCP的能力发挥依赖于被助手集成的LLM</strong>
+</h3><p>一个事实是<strong>并非工具越多，数据越多，结果越准确</strong>，恰恰相反，同类的数据和工具越多，会导致最终输出的精确性越差。随着MCP Server的数量越来越多，集成的工具越来越多，AI助手的性能也将显著下降，并且请求和分析的成本也会增加。</p>
+<h3 id="工具实现和用户预期的落差"><strong>工具实现和用户预期的落差</strong>
+</h3><p>很多MCP Server在实现上其实是编写调用本地已有工具的函数方法，MCP Server的能力其实主要受这些函数方法的制约。如果用户对具体的函数实现没什么了解，只是按通常的人为沟通思路和LLM交互，很可能难以获得满意的结果。</p>
+<p><em>“请为我查找最近所有博客中包含AI测试相关的文章”</em>，这个指令其实需要本地MCP Server具备全文检索本地文本内容的能力，但如果集成的MCP Server仅仅包含了文件查找的功能，自然得不到相应的结果。</p>
+<h1 id="结论和展望">结论和展望
+</h1><p>MCP的诞生顺应了AI时代的数据整合需求，其日常应用价值毋庸置疑。但我们也需要清醒认知：MCP协议还在成长期，我们在拥抱应用的同时，也需要认识到其中的风险， 将LLM与数据的结合，会放大既有风险，也催生了新型的威胁。</p>
+<hr>
+<p>本文大部分观点参考了Shrivu的博客内容</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/ai/">AI</a>
+        
+            <a href="/tags/ai%E6%B5%8B%E8%AF%95/">AI测试</a>
+        
+            <a href="/tags/%E8%A1%8C%E4%B8%9A%E8%B6%8B%E5%8A%BF/">行业趋势</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/post/72-%E5%BE%AE%E8%BD%AF%E5%B7%B2%E5%8F%91%E5%B8%83playwright-mcp/">
+        
+        
+            <div class="article-image">
+                <img src="/post/72-%E5%BE%AE%E8%BD%AF%E5%B7%B2%E5%8F%91%E5%B8%83playwright-mcp/Pasted-20250402.edb9525a16cda48c1d70d1a55f9e35ca_hu17208628146621733927.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 微软已发布Playwright Mcp"
+                        
+                        data-hash="md5-7blSWhbNpIwdcNGlX541yg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">微软已发布Playwright Mcp</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/73-ai%E4%B8%8B%E4%B8%80%E7%AB%99-mcpserver/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">AI下一站 MCPServer</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/70-ai%E6%97%B6%E4%BB%A3%E7%9A%84%E6%B5%8B%E8%AF%95/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">AI时代的软件测试，助手还是对手？</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/83-aria%E4%BB%8B%E7%BB%8D/">
+        
+        
+            <div class="article-image">
+                <img src="/post/83-aria%E4%BB%8B%E7%BB%8D/-20250417.3717a89b9e3a59cfc38496c6374f9fa3_hu15807213231008405591.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post Fiddler用法"
+                        
+                        data-hash="md5-Nxeom546Wc/DhJbGN0&#43;fow==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Fiddler用法</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/84-bruno%E9%AB%98%E7%BA%A7/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/-20250417.png" loading="lazy" data-key="" data-hash="/-20250417.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Fiddler用法</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2023 - 
+        
+        2025 |by 城下秋草（公众号： 秋草说测试）
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

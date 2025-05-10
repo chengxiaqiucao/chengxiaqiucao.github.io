@@ -7,7 +7,1682 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>|by 城下秋草（公众号： 秋草说测试）</copyright>
-        <lastBuildDate>Mon, 14 Apr 2025 15:28:24 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Sat, 03 May 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>可以抛弃postman啦, API测试工具Bruno实用教程(二)：进阶篇</title>
+        <link>https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/</link>
+        <pubDate>Sat, 03 May 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/</guid>
+        <description>&lt;p&gt;在前两篇介绍中，我们分别对&lt;code&gt;Bruno&lt;/code&gt; 这个近来备受关注的接口测试工具的优缺点和基本使用方法进行了介绍，本文我们会继续在上一篇的基础上，介绍 &lt;strong&gt;Bruno&lt;/strong&gt; 和自动化测试相关的进阶用法&lt;/p&gt;
+&lt;h2 id=&#34;bruno的六层变量作用域&#34;&gt;Bruno的六层变量作用域
+&lt;/h2&gt;&lt;p&gt;和 &lt;strong&gt;postman&lt;/strong&gt; 类似，&lt;strong&gt;Bruno&lt;/strong&gt; 中也同样对接口测试中的变量使用提供了多层设计，可以通过不同层级的作用域区分，为接口测试和自动化提供了更多灵活性和应用场景。&lt;/p&gt;
+&lt;p&gt;Bruno中提供了6类不同的变量，其作用范围次序如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250429.png&#34;
+	width=&#34;954&#34;
+	height=&#34;384&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250429_hu5574824286334559960.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250429_hu15951582500854677211.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;248&#34;
+		data-flex-basis=&#34;596px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;全局变量&#34;&gt;全局变量
+&lt;/h3&gt;&lt;p&gt;全局变量是作用范围最大的变量类型。设置全局变量是通过 Bruno 的 &lt;code&gt;global Environments&lt;/code&gt; 设置，位置如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505.png&#34;
+	width=&#34;793&#34;
+	height=&#34;365&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505_hu11726551013022793595.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505_hu12498813088926047680.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;217&#34;
+		data-flex-basis=&#34;521px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后比如增加一个全局变量，配置并启用：
+&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-1.png&#34;
+	width=&#34;1271&#34;
+	height=&#34;732&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-1_hu10884665872117860878.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-1_hu12814869178885690070.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;173&#34;
+		data-flex-basis=&#34;416px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这时我们获取Github API中的用户信息，可以获取&lt;code&gt;userid = 1&lt;/code&gt; 的用户&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-2.png&#34;
+	width=&#34;1910&#34;
+	height=&#34;787&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-2_hu6832474962126611240.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-2_hu4340752879441120062.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;242&#34;
+		data-flex-basis=&#34;582px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;collection变量&#34;&gt;Collection变量
+&lt;/h3&gt;&lt;p&gt;在设置了全局变量后，再设置 collection 集合变量
+&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-3.png&#34;
+	width=&#34;1389&#34;
+	height=&#34;613&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-3_hu12954664509497056855.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-3_hu5025253536889298664.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;226&#34;
+		data-flex-basis=&#34;543px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;然后发送请求，此时生效的就是集合变量&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-4.png&#34;
+	width=&#34;1896&#34;
+	height=&#34;555&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-4_hu7950626086008129917.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-4_hu7265523278725511843.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;341&#34;
+		data-flex-basis=&#34;819px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;环境变量&#34;&gt;环境变量
+&lt;/h3&gt;&lt;p&gt;下一层是可以设置不同的环境，在如下位置配置：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-5.png&#34;
+	width=&#34;1603&#34;
+	height=&#34;706&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-5_hu6093951400480655010.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-5_hu18373836024822789955.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;227&#34;
+		data-flex-basis=&#34;544px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;此时生效的是 &lt;code&gt;userid = 3&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-6.png&#34;
+	width=&#34;1917&#34;
+	height=&#34;647&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-6_hu9786873193340570152.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-6_hu13946237297338163957.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;296&#34;
+		data-flex-basis=&#34;711px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;folder变量&#34;&gt;Folder变量
+&lt;/h3&gt;&lt;p&gt;在collection下一层，可以创建目录，这里设置变量， 生效的就是目录变量&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-7.png&#34;
+	width=&#34;967&#34;
+	height=&#34;619&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-7_hu6234128718823887535.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-7_hu13248787107681889482.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;156&#34;
+		data-flex-basis=&#34;374px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-8.png&#34;
+	width=&#34;1897&#34;
+	height=&#34;728&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-8_hu11803705477507090582.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-8_hu17221714684615438070.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;260&#34;
+		data-flex-basis=&#34;625px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;请求变量&#34;&gt;请求变量
+&lt;/h3&gt;&lt;p&gt;再下一层，则是具体的请求当中设置的变量&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-9.png&#34;
+	width=&#34;1913&#34;
+	height=&#34;633&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-9_hu10893913981100038448.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-9_hu10658136140833741824.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;302&#34;
+		data-flex-basis=&#34;725px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;运行时变量&#34;&gt;运行时变量
+&lt;/h3&gt;&lt;p&gt;除了预设变量的情况，Bruno也支持通过脚本，在执行时设置&lt;strong&gt;运行时变量&lt;/strong&gt;，使用如下代码设置&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;bru&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;setVar&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;userid&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;6&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;在执行请求后，查看当前runtime变量，还可以通过工具栏中的对应按钮进入显示界面查看。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-10.png&#34;
+	width=&#34;1917&#34;
+	height=&#34;553&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-10_hu15322499653876921224.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-10_hu2768024769453004849.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;346&#34;
+		data-flex-basis=&#34;831px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;通过以上实例，可以看到，Bruno的多层变量体系及其作用范围，同样的变量名，生效优先次序依次为：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;运行时变量 -&amp;gt; 请求变量 -&amp;gt; 目录变量 -&amp;gt; 环境变量 -&amp;gt; 集合变量 -&amp;gt; 全局变量&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&#34;流程环境变量&#34;&gt;流程环境变量
+&lt;/h3&gt;&lt;p&gt;除了上面这些多层变量设计外，在我们处理接口时，像token、API Key或一些账号密码等比较敏感的数据变量，可能并不希望在接口及相关配置文件( *.bru )中体现。针对这类变量，Bruno 也提供了一个针对性的处理方式，就是通过 &lt;code&gt;.env&lt;/code&gt; 文件来存储。&lt;code&gt;.env&lt;/code&gt; 文件需放置在collection的根目录下，变量定义采用key-value 形式，如：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;userid = 7
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;这时，我们在配置变量时就可以通过&lt;code&gt;{{process.env.userid}}&lt;/code&gt; 来实现引用，避免相关敏感数据，直接出现在接口定义文件中&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-11.png&#34;
+	width=&#34;1624&#34;
+	height=&#34;674&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-11_hu3352360863328047141.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-11_hu5094169309436486114.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;240&#34;
+		data-flex-basis=&#34;578px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;bruno脚本及执行顺序&#34;&gt;Bruno脚本及执行顺序
+&lt;/h2&gt;&lt;p&gt;Bruno的脚本功能，使用的是标准JavaScript语法。可以在Collection、Folder、Request三个不同层级上定义请求前（Pre）和请求后（Post）要执行的脚本。并且Bruno提供了两种脚本执行顺序模型（主要区别是post脚本的执行顺序）&lt;/p&gt;
+&lt;h3 id=&#34;1-sandwich-flow-默认&#34;&gt;1. Sandwich Flow （默认）
+&lt;/h3&gt;&lt;p&gt;这种模式下，不同层级脚本的执行顺序如下&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Collection Pre Script&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Folder Pre Script&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Request Pre Script&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Request Post Script&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Folder Post Script&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Collection Post Script&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;和各类单元测试框架的分层执行顺序类似。&lt;/p&gt;
+&lt;h3 id=&#34;2-sequential-natural-flow&#34;&gt;2. Sequential (Natural) Flow
+&lt;/h3&gt;&lt;p&gt;这种执行顺序，和Postman的脚本执行顺序类似，完全按层级顺序来执行。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Collection Pre Script&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Folder Pre Script&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Request Pre Script&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Collection Post Script&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Folder Post Script&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Request Post Script&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;要采用这种顺序，需要在Bruno的配置文件 &lt;code&gt;bruno.json&lt;/code&gt; 中配置 &lt;code&gt;flow&lt;/code&gt; 参数，形如：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nt&#34;&gt;&amp;#34;scripts&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;filesystemAccess&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;nt&#34;&gt;&amp;#34;allow&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;flow&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;sequential&amp;#34;&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// Or &amp;#34;sandwich&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;执行示例&#34;&gt;执行示例
+&lt;/h3&gt;&lt;p&gt;在各个层级的脚本中分别添加对应的脚本日志，打开Bruno集成的Dev Tool控制台，可看到对应执行顺序的不同。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-12.png&#34;
+	width=&#34;1907&#34;
+	height=&#34;959&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-12_hu4460745755089306640.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-12_hu14567909080423456040.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;198&#34;
+		data-flex-basis=&#34;477px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;修改 &lt;code&gt;bruno.json&lt;/code&gt;， 配置flow模式为 &lt;code&gt;sequential&lt;/code&gt;，可以看到post部分的输出顺序发生了变化。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-13.png&#34;
+	width=&#34;1900&#34;
+	height=&#34;959&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-13_hu1748684743451648553.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250505-13_hu10451743361001728074.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;198&#34;
+		data-flex-basis=&#34;475px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;流程依赖处理&#34;&gt;流程依赖处理
+&lt;/h2&gt;&lt;p&gt;在我们实际的接口测试时，一个经常遇到的场景，就是后续的请求，会需要依赖之前请求的返回数据，比如最常见的动态token获取等场景。&lt;/p&gt;
+&lt;p&gt;而利用Bruno的变量和脚本，我们可以通过脚本实现这种接口的关联操作。&lt;/p&gt;
+&lt;p&gt;在Bruno的官方文档中，他内置的bru对象，提供了 &lt;code&gt;setNextRequest&lt;/code&gt;， &lt;code&gt;runRequest&lt;/code&gt; 这样的方法，使我们可以根据自己的需要，确定在执行某个接口请求时，指定下一条需要执行的请求（不再按默认顺序执行），或者也可以直接在当前请求的脚本中，运行其他接口请求。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-2.png&#34;
+	width=&#34;1799&#34;
+	height=&#34;859&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-2_hu4674359161499579248.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-2_hu16078603113573497839.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;209&#34;
+		data-flex-basis=&#34;502px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;通过这种方式，我们就可以通过设置变量，并将变量进行接口间的传递，以此完成流程依赖场景的实现。&lt;/p&gt;
+&lt;p&gt;比如这里我们获取github用户下的repo清单，这个接口。 这里的 &lt;code&gt;{{username}}&lt;/code&gt; 变量，我们希望通过指定 &lt;code&gt;userid&lt;/code&gt; 来获取。也就是先执行前面的 &lt;code&gt;getUserInfo&lt;/code&gt; 这个接口，根据 &lt;code&gt;userid&lt;/code&gt; 来获取 &lt;code&gt;username&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-3.png&#34;
+	width=&#34;1133&#34;
+	height=&#34;468&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-3_hu17588995898243290783.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-3_hu11010307107810958266.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;242&#34;
+		data-flex-basis=&#34;581px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这里我们定义getUserRepos，使用变量&lt;code&gt;{{username}}&lt;/code&gt;， 但此时该变量未定义，所以显示为红色&lt;/p&gt;
+&lt;p&gt;然后在 &lt;code&gt;getUserInfo&lt;/code&gt; 这个接口中，我们定义脚本，提取当前响应的username，并进行变量赋值。然后直接调用 &lt;code&gt;getUserRepos&lt;/code&gt; 接口（注意这里调用的接口路径，应该以collection根路径进行定义）&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;bru&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;setVar&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;username&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;res&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;body&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;login&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;response&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;bru&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;runRequest&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;variables/getUserRepos&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;console&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;response&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;status&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;执行&lt;code&gt;getUserInfo&lt;/code&gt;， 可以看到，执行成功，脚本中执行的 &lt;code&gt;getUserRepos&lt;/code&gt; 接口也成功得到了 &lt;code&gt;200OK&lt;/code&gt; 的响应状态&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-4.png&#34;
+	width=&#34;1915&#34;
+	height=&#34;959&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-4_hu17323329982467174979.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-4_hu17850328756952033551.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;199&#34;
+		data-flex-basis=&#34;479px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;runner执行器&#34;&gt;Runner执行器
+&lt;/h2&gt;&lt;p&gt;除了在脚本中执行指定接口， Bruno其实也提供了一个Runner的执行器，从工具栏打开执行器，也可以批量地依次运行Collection中的所有接口&lt;/p&gt;
+&lt;p&gt;比如上例，我们如果只是在 &lt;code&gt;getUserInfo&lt;/code&gt; 中获取并定义变量 username, 而不执行。 只要&lt;code&gt;getUserRepos&lt;/code&gt;在 &lt;code&gt;getUserInfo&lt;/code&gt; 之后执行，也同样可以执行成功。&lt;/p&gt;
+&lt;p&gt;Runner运行效果如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507.png&#34;
+	width=&#34;786&#34;
+	height=&#34;739&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507_hu2820282844944436103.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507_hu2368836861491831722.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;106&#34;
+		data-flex-basis=&#34;255px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;但这里Bruno默认的功能，是运行collection中的所有请求，且调整顺序的功能，虽然有提供，但只包含在付费的高级版中，包括基于csv或json的数据驱动功能，免费版本中也不包含。稍显鸡肋。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-1.png&#34;
+	width=&#34;1908&#34;
+	height=&#34;602&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-1_hu1237334842188474217.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-1_hu9299810788815770874.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;316&#34;
+		data-flex-basis=&#34;760px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;bruno命令行-bruno-cli&#34;&gt;Bruno命令行 Bruno CLI
+&lt;/h3&gt;&lt;p&gt;上面 &lt;code&gt;Runner执行器&lt;/code&gt; 的功能因为受限，在我们要进行接口自动化时，比较鸡肋，基本无法使用。但Bruno这里的高级版本功能，其实只是针对界面上触发进行了限制。&lt;/p&gt;
+&lt;p&gt;我们要执行自动化，也可以利用它提供的命令行功能来实现。&lt;/p&gt;
+&lt;p&gt;这里的CLI程序，需要单独安装&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;npm install -g @usebruno/cli
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;安装后，能正确显示版本号表示安装成功， 如：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;C:\qiucao&amp;gt;bru --version
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2.1.0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;通过命令行执行，我们就可以根据自己的需要，比如执行指定目录下的接口。&lt;/p&gt;
+&lt;p&gt;这里携带的两个参数 &lt;code&gt;--env&lt;/code&gt; 指定需要使用的环境， &lt;code&gt;--reporter-html&lt;/code&gt; 会在完成执行后生成一个html格式的测试报告。（详细的参数，可参考文档 &lt;a class=&#34;link&#34; href=&#34;https://docs.usebruno.com/bru-cli/commandOptions&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://docs.usebruno.com/bru-cli/commandOptions&lt;/a&gt;）&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-5.png&#34;
+	width=&#34;1073&#34;
+	height=&#34;778&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-5_hu8041923377017665591.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-5_hu15691487026236207072.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;137&#34;
+		data-flex-basis=&#34;331px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;生成的测试报告：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-6.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;904&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-6_hu16617822486132831047.png 480w, https://chengxiaqiucao.github.io/post/87-bruno%E8%BF%9B%E9%98%B6/snap_20250507-6_hu3000942089506551776.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;212&#34;
+		data-flex-basis=&#34;509px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;以上就是关于Bruno中使用脚本和自动化执行相关功能的进阶说明。欢迎继续关注后续文章。&lt;/p&gt;
+&lt;p&gt;回复&lt;code&gt;大纲&lt;/code&gt; 可查看秋草测试技能全栈提升课详细目录。回复 &lt;code&gt;进群&lt;/code&gt;可进入测试交流群和小伙伴们分享测试技术、交换资讯。&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title># Postman最佳平替, API测试工具Bruno实用教程(一)：基础篇</title>
+        <link>https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/</link>
+        <pubDate>Tue, 22 Apr 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/snap_20250420-2" alt="Featured image of post # Postman最佳平替, API测试工具Bruno实用教程(一)：基础篇" /&gt;&lt;h2 id=&#34;序言&#34;&gt;序言
+&lt;/h2&gt;&lt;p&gt;在前文【】中，我们介绍了目前目前Github上广受关注的新锐接口测试工具Bruno，给厌倦了Postman必须在线使用限制的同学提供了一个很好的替代选择。&lt;/p&gt;
+&lt;p&gt;Bruno的核心优势，官网重点给出了如下几点：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/86-bruno%e4%bb%8b%e7%bb%8d/snap_20250420-3.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;承诺开源和可扩展，并且专心做客户端，永不向“平台化”扩充产品。&lt;/li&gt;
+&lt;li&gt;基于Git实现协作和版本管理&lt;/li&gt;
+&lt;li&gt;离线使用，永不同步本地数据 😂😂😂&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;下面我们就通过一个系列，详细介绍通过Bruno来进行API接口测试的详细实战教程。本文是第一篇，重点介绍如下内容：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Bruno的安装和界面说明&lt;/li&gt;
+&lt;li&gt;结合Github API实现典型API操作的方法&lt;/li&gt;
+&lt;li&gt;环境管理&lt;/li&gt;
+&lt;li&gt;鉴权机制和加密&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;bruno安装和界面概览&#34;&gt;Bruno安装和界面概览
+&lt;/h2&gt;&lt;h3 id=&#34;安装&#34;&gt;安装
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Mac (Homebrew)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;brew install bruno
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Windows (Winget)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;winget install usebruno.bruno
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Linux (Snap)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo snap install bruno
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;使用界面&#34;&gt;使用界面
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;1014&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427_hu1280820275372942198.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427_hu8308940580351092276.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;189&#34;
+		data-flex-basis=&#34;454px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;左侧面板&lt;/strong&gt;：Collection管理、导航（类似IDE的项目结构）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;中央区域&lt;/strong&gt;：请求编辑器（URL/Headers/Body配置）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;右侧面板&lt;/strong&gt;：响应结果显示（内容、状态、断言等）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;工具栏&lt;/strong&gt;：顶部主要是一些高级功能配置（付费版本）、变量管理（全局、环境）；底部工具栏是工具的系统级配置（界面、代理、鉴权等），cookies、license管理&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;快捷键体系&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Ctrl +E&lt;/code&gt;：环境变量设置&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Ctrl + B&lt;/code&gt;：新建请求&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Ctrl + Enter&lt;/code&gt;：立即发送请求&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;典型http接口测试实现github-api&#34;&gt;典型HTTP接口测试实现(Github API)
+&lt;/h2&gt;&lt;p&gt;下面我们结合 &lt;code&gt;Github&lt;/code&gt; 的官方API接口，介绍在 &lt;code&gt;Bruno&lt;/code&gt; 中如何完成典型HTTP接口请求测试。&lt;/p&gt;
+&lt;h3 id=&#34;github-api简介&#34;&gt;Github API简介
+&lt;/h3&gt;&lt;p&gt;GitHub 是一个面向开源软件项目的托管平台，因为使用 Git 作为唯一的版本库格式进行托管，故名 GitHub。也是目前全球最大的代码托管平台，可以说是程序员的圣地，号称&lt;strong&gt;全球最大的同性交友平台&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;GitHub API目前有两个版本，一个是基于GraphQL的V4版本， 而更常用的主要还是之前的Restful API，它的Restful API定义长期以来被视作此类接口的典范。&lt;/p&gt;
+&lt;p&gt;具体的接口说明文档：参见 &lt;a class=&#34;link&#34; href=&#34;https://docs.github.com/zh/rest?apiVersion=2022-11-28&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://docs.github.com/zh/rest?apiVersion=2022-11-28&lt;/a&gt;&lt;/p&gt;
+&lt;h5 id=&#34;github-中的时间格式&#34;&gt;github 中的时间格式
+&lt;/h5&gt;&lt;p&gt;&lt;code&gt;YYYY-MM-DDTHH:MM:SSZ&lt;/code&gt;&lt;/p&gt;
+&lt;h5 id=&#34;github-限流规则&#34;&gt;github 限流规则
+&lt;/h5&gt;&lt;p&gt;github 为包含服务端负载压力，会对请求流量进行限制。在每个 github 的响应消息头中都会携带 github 的限流设置。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;头参数&lt;/th&gt;
+&lt;th&gt;含义&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;X-RateLimit-Limit&lt;/td&gt;
+&lt;td&gt;当前每小时最大请求限制，一般未鉴权请求60次，鉴权请求5000次&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;X-RateLimit-Remaining&lt;/td&gt;
+&lt;td&gt;当前剩余请求次数&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;X-RateLimit-Reset&lt;/td&gt;
+&lt;td&gt;剩余限制重置时间，毫秒&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h5 id=&#34;请求参数与分页&#34;&gt;请求参数与分页
+&lt;/h5&gt;&lt;p&gt;请求中可以携带参数，一般包含两种参数: &lt;strong&gt;路径参数&lt;/strong&gt;和&lt;strong&gt;查询参数&lt;/strong&gt;
+&lt;img src=&#34;https://chengxiaqiucao.github.io/frontEndDemo/images/20190119_121133.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;github API中默认支持两个分页参数：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;page  当前显示页数&lt;/li&gt;
+&lt;li&gt;per_page 每页显示结果数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id=&#34;github-请求token&#34;&gt;github 请求Token
+&lt;/h5&gt;&lt;p&gt;从Github账号设置页中，增加访问API的Token配置&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-2.png&#34;
+	width=&#34;557&#34;
+	height=&#34;515&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-2_hu4943685012304958102.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-2_hu4155900466536041072.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;108&#34;
+		data-flex-basis=&#34;259px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;配置token鉴权&#34;&gt;配置Token鉴权
+&lt;/h3&gt;&lt;p&gt;进入Bruno，新建一个Collection， 命名 &lt;code&gt;github&lt;/code&gt;，在其中的 &lt;code&gt;Auth&lt;/code&gt; 部分, 将之前设置的API token添加进来，这里的鉴权方式选择 &lt;code&gt;bearer Token&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-3.png&#34;
+	width=&#34;1327&#34;
+	height=&#34;640&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-3_hu8970350698984062653.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-3_hu4378544909599311794.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;207&#34;
+		data-flex-basis=&#34;497px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;除了 &lt;code&gt;bearer Token&lt;/code&gt; 外， Bruno还支持其他多种鉴权方式，能基本覆盖到各种API接口的鉴权模式。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;AWS Sig&lt;/strong&gt;：针对亚马逊的AWS公有云用户签名的认证方式&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Basic auth&lt;/strong&gt;：基本鉴权，通过输入账号、密码&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;WSSE auth&lt;/strong&gt;：Web Service安全用户认证&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Bearer Token&lt;/strong&gt;：基于加密文本的安全认证令牌&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Digest auth&lt;/strong&gt;：摘要式认证&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;NTLM auth&lt;/strong&gt;：微软的局域网管理认证协议&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Oauth 2.0&lt;/strong&gt;：开放式授权协议，是第三方认证的常用协议&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;API Key&lt;/strong&gt;：服务端自己定义的接入令牌&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;no Auth&lt;/strong&gt;：不鉴权&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;inherit&lt;/strong&gt;：继承上一级鉴权（Bruno中，下一级请求可以使用上一级的鉴权设置）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;接口测试中的增删改查&#34;&gt;接口测试中的增删改查
+&lt;/h3&gt;&lt;h5 id=&#34;1-get请求获取制定项目最新release&#34;&gt;1. GET请求：获取制定项目最新Release
+&lt;/h5&gt;&lt;p&gt;&lt;strong&gt;目标接口&lt;/strong&gt;：&lt;code&gt;GET /repos/{owner}/{repo}/releases/latest&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Bruno中通过 &lt;code&gt;{{var}}&lt;/code&gt;，可以在请求中指定变量，变量配置如下。点击发送按钮后，成功获得响应。&lt;/p&gt;
+&lt;p&gt;请求这里的鉴权方式使用&lt;code&gt;inherit&lt;/code&gt;， 继承collection中配置的 &lt;code&gt;bearer token&lt;/code&gt; 鉴权方式&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-4.png&#34;
+	width=&#34;1617&#34;
+	height=&#34;814&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-4_hu1983051634976872514.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250427-4_hu18144446089573391506.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;198&#34;
+		data-flex-basis=&#34;476px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h5 id=&#34;2--post请求创建issue&#34;&gt;2.  POST请求：创建Issue
+&lt;/h5&gt;&lt;p&gt;&lt;strong&gt;目标接口&lt;/strong&gt;：&lt;code&gt;POST   /repos/{owner}/{repo}/issues&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;创建issue，对应 &lt;code&gt;POST&lt;/code&gt; 方法，Bruno中配置如下，&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;959&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428_hu12536877240761757733.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428_hu11994804475195574515.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;200&#34;
+		data-flex-basis=&#34;480px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Body配置&lt;/strong&gt;：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;title&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;{issue_title&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}}&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s2&#34;&gt;&amp;#34;body&amp;#34;&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;发现一个测试问题&amp;#34;&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s2&#34;&gt;&amp;#34;labels&amp;#34;&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;s2&#34;&gt;&amp;#34;bug&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;err&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;动态变量注入&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;这里的issue标题，我们使用Bruno的内置动态变量 &lt;code&gt;{{$timestamp}}&lt;/code&gt;, Bruno提供了丰富的内置动态变量，对于我们动态模拟请求数据提供了极大方便。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c&#34;&gt;# 标题预置变量&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;vars&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;issue_title&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;测试问题_{{$timestamp}}&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;到Github上查看，Issue已创建
+&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-1.png&#34;
+	width=&#34;1169&#34;
+	height=&#34;519&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-1_hu5854467980820522588.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-1_hu11683340414787186250.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;225&#34;
+		data-flex-basis=&#34;540px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h5 id=&#34;3-patch请求修改issue&#34;&gt;3. PATCH请求：修改Issue
+&lt;/h5&gt;&lt;p&gt;&lt;strong&gt;目标接口&lt;/strong&gt;：&lt;code&gt;PATCH   /repos/{owner}/{repo}/issues/3&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;关闭 issue_number 为 3 的问题&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nt&#34;&gt;&amp;#34;state&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;closed&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-2.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;959&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-2_hu17734667382742071261.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-2_hu18228507227820878304.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;200&#34;
+		data-flex-basis=&#34;480px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h5 id=&#34;4-delete请求删除issue-评论&#34;&gt;4. DELETE请求：删除Issue 评论
+&lt;/h5&gt;&lt;p&gt;&lt;strong&gt;目标接口&lt;/strong&gt;：&lt;code&gt;DELETE /repos/{owner}/{repo}/issues/comments/{comment_id}&lt;/code&gt;
+&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-3.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;959&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-3_hu1902692786199017933.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-3_hu6748800900389929673.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;200&#34;
+		data-flex-basis=&#34;480px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;基础测试断言&#34;&gt;基础测试断言
+&lt;/h3&gt;&lt;h5 id=&#34;test脚本验证--状态码&#34;&gt;Test脚本验证  状态码
+&lt;/h5&gt;&lt;p&gt;Bruno 中可以类似Postman那样编写Test脚本来进行结果验证&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;test&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;Status is 200&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nx&#34;&gt;expect&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;res&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;status&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;).&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;to&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;equal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;200&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h5 id=&#34;界面assert&#34;&gt;界面Assert
+&lt;/h5&gt;&lt;p&gt;对于一些常用的断言，Bruno中也可以直接在界面上通过添加 &lt;code&gt;Assert&lt;/code&gt; 来进行断言。&lt;/p&gt;
+&lt;p&gt;以上Test和Assert 执行结果如下&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-4.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;959&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-4_hu14194031349793751052.png 480w, https://chengxiaqiucao.github.io/post/85-bruno%E5%9F%BA%E7%A1%80/snap_20250428-4_hu8239106714095035079.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;200&#34;
+		data-flex-basis=&#34;480px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;以上就是关于Bruno进行接口测试时，主要的基础功能用法介绍。后续会继续更新其他进阶用法更新。 也欢迎大家进入测试交流群和小伙伴们继续深入交流。回复 &lt;code&gt;进群&lt;/code&gt; 获取入群邀请。&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Fiddler用法</title>
+        <link>https://chengxiaqiucao.github.io/post/83-aria%E4%BB%8B%E7%BB%8D/</link>
+        <pubDate>Sat, 19 Apr 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://chengxiaqiucao.github.io/post/83-aria%E4%BB%8B%E7%BB%8D/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/post/83-aria%E4%BB%8B%E7%BB%8D/-20250417.png" alt="Featured image of post Fiddler用法" /&gt;&lt;h2 id=&#34;前言&#34;&gt;前言
+&lt;/h2&gt;&lt;p&gt;自动化测试领域目前最火热的自动化框架非&lt;code&gt;Playwright&lt;/code&gt; 莫属，而在 Playwright 中，对于自动化测试中极为关键的页面元素定位，相比传统的&lt;code&gt;Selenium&lt;/code&gt;等工具, 它引入了一个新的元素定位方法 &lt;code&gt;getByRole&lt;/code&gt;，也就是它充分利用了W3C 定义的 ARIA Roles对象, 来进行元素的识别。在提升元素识别灵活性及识别效率的同时，其实也同步对页面的无障碍合规进行了验证。 比如：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// 定位名为&amp;#34;搜索&amp;#34;的按钮
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;page&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;getByRole&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;button&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;搜索&amp;#39;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;}).&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;click&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// 定位复选框并勾选
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;page&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;getByRole&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;checkbox&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;同意条款&amp;#39;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;}).&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;check&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// 定位文本输入框并填写内容
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;page&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;getByRole&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;textbox&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;用户名&amp;#39;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;}).&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;fill&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;testuser&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// 定位下拉选择框并选择选项
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;page&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;getByRole&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;combobox&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;国家&amp;#39;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;}).&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;selectOption&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;中国&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;而目前，AI 越来越多地参与到我们实际工作中，正如前文 【】中展示的，AI 通过 &lt;code&gt;mcp server&lt;/code&gt;驱动页面完成自动化测试已经具备相当的落地可能。在这个文章后，很多小伙伴对于 AI 如何对页面元素进行识别和定位，并通过工具来驱动执行，实际应用后效果能否达到预期抱有较大的怀疑。&lt;/p&gt;
+&lt;p&gt;其实这里，&lt;code&gt;W3C&lt;/code&gt;web规范中的&lt;code&gt;ARIA&lt;/code&gt;标准，对于将页面对象结构化展示给AI，便于AI对页面完成分析，有着重要意义。 本文，我们就来探讨一下&lt;code&gt;ARIA&lt;/code&gt;标准，及其在AI驱动自动化测试中的重要作用。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/83-aria%E4%BB%8B%E7%BB%8D/-20250417.png&#34;
+	width=&#34;899&#34;
+	height=&#34;328&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/83-aria%E4%BB%8B%E7%BB%8D/-20250417_hu3076471244930224411.png 480w, https://chengxiaqiucao.github.io/post/83-aria%E4%BB%8B%E7%BB%8D/-20250417_hu11411478496401650829.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;274&#34;
+		data-flex-basis=&#34;657px&#34;
+	
+&gt;、&lt;/p&gt;
+&lt;h2 id=&#34;什么是aria&#34;&gt;什么是ARIA？
+&lt;/h2&gt;&lt;h3 id=&#34;定义&#34;&gt;定义
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;WAI-ARIA&lt;/strong&gt; (Web Accessibility Initiative – Accessible Rich Internet Applications)，即 &lt;strong&gt;web无障碍倡议-无障碍富互联网应用标准&lt;/strong&gt;， 是一个让Web应用可以更好支持残障人士使用的规范。&lt;/p&gt;
+&lt;p&gt;而&lt;strong&gt;ARIA Roles&lt;/strong&gt;是W3C &lt;strong&gt;WAI-ARIA&lt;/strong&gt; 规范中定义的一组属性，用于描述Web元素的功能和目的，帮助辅助技术（如屏幕阅读器）更准确地理解和传达页面内容。**ARIA Roles **通过&lt;code&gt;role&lt;/code&gt;属性添加到HTML元素中，例如&lt;code&gt;&amp;lt;div role=&amp;quot;button&amp;quot;&amp;gt;&lt;/code&gt;表示该div元素应被视为按钮。&lt;/p&gt;
+&lt;h3 id=&#34;标准的演进及aria的优势&#34;&gt;标准的演进及ARIA的优势
+&lt;/h3&gt;&lt;p&gt;该标准经历了三个重要发展阶段：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;2008年&lt;/strong&gt;：W3C首次发布ARIA 1.0&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;2014年&lt;/strong&gt;：ARIA 1.1引入新角色如&lt;code&gt;searchbox&lt;/code&gt;、&lt;code&gt;switch&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;2021年&lt;/strong&gt;：ARIA 1.2增加了&lt;code&gt;comment&lt;/code&gt;、&lt;code&gt;mark&lt;/code&gt;等数字内容相关Role&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;和传统 UI 自动化测试的比较：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;维度&lt;/th&gt;
+&lt;th&gt;传统UI测试&lt;/th&gt;
+&lt;th&gt;基于ARIA的测试&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;元素识别依据&lt;/td&gt;
+&lt;td&gt;DOM结构/视觉特征&lt;/td&gt;
+&lt;td&gt;语义角色/功能属性&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;维护成本&lt;/td&gt;
+&lt;td&gt;高(随UI变化频繁更新)&lt;/td&gt;
+&lt;td&gt;低(角色定义更稳定)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;跨平台一致性&lt;/td&gt;
+&lt;td&gt;依赖渲染引擎&lt;/td&gt;
+&lt;td&gt;标准化行为&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;无障碍支持&lt;/td&gt;
+&lt;td&gt;需额外验证&lt;/td&gt;
+&lt;td&gt;内置支持&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;aria-roles类别&#34;&gt;ARIA Roles类别
+&lt;/h3&gt;&lt;p&gt;根据W3C规范，ARIA Roles可分为以下几大类：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Widget Roles&lt;/strong&gt;：描述交互式UI组件&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;button&lt;/code&gt;：可点击的按钮&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;checkbox&lt;/code&gt;：复选框&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;radio&lt;/code&gt;：单选按钮&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;textbox&lt;/code&gt;：文本输入框&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;combobox&lt;/code&gt;：下拉组合框&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;slider&lt;/code&gt;：滑块控件&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Document Structure Roles&lt;/strong&gt;：描述页面内容结构&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;heading&lt;/code&gt;：标题 (h1-h6的替代)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;list&lt;/code&gt;/&lt;code&gt;listitem&lt;/code&gt;：列表和列表项&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;table&lt;/code&gt;/&lt;code&gt;row&lt;/code&gt;/&lt;code&gt;cell&lt;/code&gt;：表格结构&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;img&lt;/code&gt;：图像&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Landmark Roles&lt;/strong&gt;：标识页面主要区域&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;banner&lt;/code&gt;：页眉&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;navigation&lt;/code&gt;：导航区域&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;main&lt;/code&gt;：主要内容&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;search&lt;/code&gt;：搜索区域&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;contentinfo&lt;/code&gt;：页脚信息&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Live Region Roles&lt;/strong&gt;：动态内容更新区域&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;alert&lt;/code&gt;：重要且需立即通知的信息&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;status&lt;/code&gt;：操作状态反馈&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;timer&lt;/code&gt;：计时器或计数器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;除基础Role外， 现代Web应用常用的高级角色还包括：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;复合组件角色&lt;/strong&gt;：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-html&#34; data-lang=&#34;html&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;div&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;role&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;tree&amp;#34;&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;aria-label&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;文件浏览器&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;div&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;role&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;treeitem&amp;#34;&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;aria-expanded&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;true&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;文档
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;div&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;role&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;group&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;div&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;role&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;treeitem&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;工作文档.docx&lt;span class=&#34;p&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;div&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;div&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;div&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;div&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;实时通信角色&lt;/strong&gt;：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-html&#34; data-lang=&#34;html&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;div&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;role&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;feed&amp;#34;&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;aria-busy&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;false&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;article&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;role&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;article&amp;#34;&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;aria-posinset&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;1&amp;#34;&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;aria-setsize&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;10&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;...&lt;span class=&#34;p&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;article&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;div&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;拖放操作角色&lt;/strong&gt;：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-html&#34; data-lang=&#34;html&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;div&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;role&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;draggable&amp;#34;&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;aria-grabbed&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;false&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;可拖动项&lt;span class=&#34;p&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;div&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;div&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;role&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;droppable&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;div&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;aria在-ai-驱动测试中的核心作用&#34;&gt;ARIA在 AI 驱动测试中的核心作用
+&lt;/h2&gt;&lt;h3 id=&#34;语义理解增强&#34;&gt;语义理解增强
+&lt;/h3&gt;&lt;p&gt;AI 测试系统通过ARIA角色建立的语义网络，能更准确地理解UI功能：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;graph TD
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    A[原始DOM] --&amp;gt; B(视觉特征分析)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    A --&amp;gt; C(ARIA角色解析)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    C --&amp;gt; D[语义理解层]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    B --&amp;gt; D
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    D --&amp;gt; E[组件功能分类]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    D --&amp;gt; F[操作意图推断]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;典型应用场景&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;自动识别未标注的表单必填字段（通过&lt;code&gt;aria-required&lt;/code&gt;）&lt;/li&gt;
+&lt;li&gt;发现动态内容更新的优先级（通过&lt;code&gt;aria-live&lt;/code&gt;的&lt;code&gt;polite&lt;/code&gt;/&lt;code&gt;assertive&lt;/code&gt;）&lt;/li&gt;
+&lt;li&gt;识别复合组件的交互边界（如&lt;code&gt;role=&amp;quot;dialog&amp;quot;&lt;/code&gt;的模态范围）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;测试用例智能生成&#34;&gt;测试用例智能生成
+&lt;/h3&gt;&lt;p&gt;基于ARIA的AI测试生成流程：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;角色图谱构建&lt;/strong&gt;：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;build_role_graph&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;page&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;graph&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;element&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;page&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;query_selector_all&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;[role]&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;role&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;element&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;get_attribute&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;role&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;related&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;get_related_aria_attributes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;element&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;graph&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;element&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;role&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;role&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;attributes&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;related&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;graph&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;测试策略匹配&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;按钮类角色(&lt;code&gt;button&lt;/code&gt;, &lt;code&gt;switch&lt;/code&gt;) → 点击操作序列&lt;/li&gt;
+&lt;li&gt;输入类角色(&lt;code&gt;textbox&lt;/code&gt;, &lt;code&gt;spinbutton&lt;/code&gt;) → 输入验证测试&lt;/li&gt;
+&lt;li&gt;状态类角色(&lt;code&gt;progressbar&lt;/code&gt;, &lt;code&gt;timer&lt;/code&gt;) → 动态监控测试&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;边缘用例推导&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;当检测到&lt;code&gt;role=&amp;quot;combobox&amp;quot;&lt;/code&gt;但缺少&lt;code&gt;aria-controls&lt;/code&gt;时&lt;/li&gt;
+&lt;li&gt;发现&lt;code&gt;role=&amp;quot;tablist&amp;quot;&lt;/code&gt;中子项未正确设置&lt;code&gt;aria-selected&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;23-自愈测试维护&#34;&gt;2.3 自愈测试维护
+&lt;/h3&gt;&lt;p&gt;AI 系统利用ARIA实现的测试自愈机制：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sequenceDiagram
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    Test Case-&amp;gt;&amp;gt;+AI Engine: 定位失败(旧选择器)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    AI Engine-&amp;gt;&amp;gt;+DOM: 查询同角色元素
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    DOM--&amp;gt;&amp;gt;-AI Engine: 返回候选元素
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    AI Engine-&amp;gt;&amp;gt;+ARIA Analyzer: 验证名称/状态
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    ARIA Analyzer--&amp;gt;&amp;gt;-AI Engine: 最佳匹配结果
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    AI Engine-&amp;gt;&amp;gt;Test Case: 更新定位器
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;效果预期&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;选择器维护工作量减少&lt;/li&gt;
+&lt;li&gt;相比传统方法，降低误报率&lt;/li&gt;
+&lt;li&gt;跨平台测试一致性提升&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;aria与计算机视觉测试的协同&#34;&gt;ARIA与计算机视觉测试的协同
+&lt;/h2&gt;&lt;h3 id=&#34;31-多模态测试融合&#34;&gt;3.1 多模态测试融合
+&lt;/h3&gt;&lt;p&gt;现代AI测试平台结合ARIA与CV的优势：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;检测维度&lt;/th&gt;
+&lt;th&gt;ARIA提供信息&lt;/th&gt;
+&lt;th&gt;CV补充信息&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;元素功能&lt;/td&gt;
+&lt;td&gt;明确角色定义&lt;/td&gt;
+&lt;td&gt;视觉样式验证&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;交互状态&lt;/td&gt;
+&lt;td&gt;aria-pressed等属性&lt;/td&gt;
+&lt;td&gt;实际渲染状态&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;层级关系&lt;/td&gt;
+&lt;td&gt;aria-owns等属性&lt;/td&gt;
+&lt;td&gt;空间位置关系&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;动态变化&lt;/td&gt;
+&lt;td&gt;aria-live区域&lt;/td&gt;
+&lt;td&gt;像素级变化检测&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;协同工作流示例&lt;/strong&gt;：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;validate_accessible_button&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;element&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;c1&#34;&gt;# ARIA验证&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;assert&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;element&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;get_attribute&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;role&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;button&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;assert&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;element&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;get_attribute&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;aria-label&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;is&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;not&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;None&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;c1&#34;&gt;# CV验证&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;screenshot&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;element&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;screenshot&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;cv_result&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;analyze_button_visuals&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;screenshot&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;assert&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cv_result&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;contrast_ratio&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;4.5&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;# WCAG AA标准&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;无障碍智能审计&#34;&gt;无障碍智能审计
+&lt;/h3&gt;&lt;p&gt;AI驱动的ARIA审计系统架构：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[页面爬取模块]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[ARIA属性提取器]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[规则引擎]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;├── WCAG 2.1规则集
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;├── 自定义业务规则
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;└── 机器学习异常检测
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[修复建议生成]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;├── 自动修复方案
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;├── 设计模式推荐
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;└── 代码补全提示
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;ai自动化测试应用场景&#34;&gt;AI自动化测试应用场景
+&lt;/h2&gt;&lt;h3 id=&#34;大语言模型llm集成&#34;&gt;大语言模型(LLM)集成
+&lt;/h3&gt;&lt;p&gt;ARIA可为LLM提供的结构化上下文：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;给定以下ARIA上下文：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;-&lt;/span&gt; 当前焦点元素: role=&amp;#34;combobox&amp;#34;, aria-expanded=&amp;#34;false&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;-&lt;/span&gt; 相关元素: 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;k&#34;&gt;*&lt;/span&gt; role=&amp;#34;listbox&amp;#34; (hidden)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;k&#34;&gt;*&lt;/span&gt; role=&amp;#34;option&amp;#34; x3 (hidden)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;LLM生成的测试操作序列：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;1.&lt;/span&gt; 触发combobox的展开操作
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;2.&lt;/span&gt; 验证listbox可见性变为true
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;3.&lt;/span&gt; 获取选项列表并选择第二项
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;4.&lt;/span&gt; 验证combobox的aria-activedescendant更新
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;无脚本测试自动化&#34;&gt;无脚本测试自动化
+&lt;/h3&gt;&lt;p&gt;基于ARIA和MCP结合，实现零代码测试：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;录制阶段&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;监听所有交互事件的ARIA角色变化&lt;/li&gt;
+&lt;li&gt;构建操作-状态转换图&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;回放阶段&lt;/strong&gt;：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;replay_by_aria&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;flow&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;step&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;flow&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;target&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;find_element_by_role_state&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;step&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;role&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;step&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;attributes&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;execute_action&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;target&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;step&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;action&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;])&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;validate_aria_states&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;step&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;expected_states&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;])&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;跨设备测试适配&#34;&gt;跨设备测试适配
+&lt;/h3&gt;&lt;p&gt;ARIA角色在不同设备上的映射策略：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;桌面端角色&lt;/th&gt;
+&lt;th&gt;移动端等效模式&lt;/th&gt;
+&lt;th&gt;AI处理策略&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;tablist&lt;/td&gt;
+&lt;td&gt;底部导航栏&lt;/td&gt;
+&lt;td&gt;基于aria-orientation自动适配&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tooltip&lt;/td&gt;
+&lt;td&gt;长按提示&lt;/td&gt;
+&lt;td&gt;交互超时自动调整&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;slider&lt;/td&gt;
+&lt;td&gt;触摸滑块&lt;/td&gt;
+&lt;td&gt;根据屏幕尺寸优化步长&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;发展方向&#34;&gt;发展方向
+&lt;/h2&gt;&lt;h3 id=&#34;aria与testing-ai的深度结合&#34;&gt;ARIA与Testing AI的深度结合：
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;角色驱动的自主探索式测试&lt;/li&gt;
+&lt;li&gt;基于角色相似性的迁移学习&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;和其他新测试技术整合&#34;&gt;和其他新测试技术整合：
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;graph LR
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    A[ARIA语义] --&amp;gt; B[VR/AR测试]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    A --&amp;gt; C[语音交互测试]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    A --&amp;gt; D[物联网界面测试]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;标准化演进&#34;&gt;标准化演进：
+&lt;/h3&gt;&lt;p&gt;正在制定的ARIA 2.0将增加：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;更细粒度的状态描述&lt;/li&gt;
+&lt;li&gt;增强的AI辅助属性&lt;/li&gt;
+&lt;li&gt;三维界面支持&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;结语&#34;&gt;结语
+&lt;/h2&gt;&lt;p&gt;ARIA标准正在成为智能测试自动化的关键基础设施，其提供的丰富语义层使得AI系统能像人类一样理解Web应用的交互逻辑。随着W3C对标准的持续完善和测试工具链的进化，基于ARIA的AI驱动测试必将成为Web自动化测试领域的核心支柱。&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Fiddler用法</title>
+        <link>https://chengxiaqiucao.github.io/post/84-bruno%E9%AB%98%E7%BA%A7/</link>
+        <pubDate>Sat, 19 Apr 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://chengxiaqiucao.github.io/post/84-bruno%E9%AB%98%E7%BA%A7/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/-20250417.png" alt="Featured image of post Fiddler用法" /&gt;&lt;h2 id=&#34;基于git的协作&#34;&gt;基于Git的协作
+&lt;/h2&gt;&lt;h2 id=&#34;第三方库的使用&#34;&gt;第三方库的使用
+&lt;/h2&gt;&lt;h2 id=&#34;cicd集成&#34;&gt;CI/CD集成
+&lt;/h2&gt;&lt;h2 id=&#34;复杂接口测试案例&#34;&gt;复杂接口测试案例
+&lt;/h2&gt;</description>
+        </item>
+        <item>
+        <title>github星标超3万！Postman最强平替Bruno你用了吗？</title>
+        <link>https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/</link>
+        <pubDate>Wed, 16 Apr 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/snap_20250420-2.png%29" alt="Featured image of post github星标超3万！Postman最强平替Bruno你用了吗？" /&gt;&lt;h2 id=&#34;序言&#34;&gt;序言
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;Postman&lt;/code&gt;长期以来都是API测试领域居领先地位的测试工具。以其友好的工具界面，便捷的API接口请求编辑，强大的脚本支持和云端服务，以及丰富的生态，在接口开发和测试中，有极为广泛你的应用。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420-1.png&#34;
+	width=&#34;945&#34;
+	height=&#34;386&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420-1_hu3982279776171109616.png 480w, https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420-1_hu235737393210018866.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;244&#34;
+		data-flex-basis=&#34;587px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;但作为一个商用工具，它的很多高级功能都依赖云端服务，且收费不菲。虽然免费的基础版本同样功能强大，能满足大部分使用需求，但随着工具本身和云端服务的整合以及更多向协作平台方向发展，基础版本也需要注册并登录云端服务后才可完全使用。&lt;/p&gt;
+&lt;p&gt;但这却限制了很多脱离互联网环境的应用需求，而且频繁的同步机制和连接稳定性要求也颇受诟病。&lt;/p&gt;
+&lt;p&gt;很多受Postman这些限制困扰的同学也一直在寻找和Postman类似的替代工具，本文我们向大家介绍一个API接口测试明日之星，开源接口测试工具 &lt;code&gt;Bruno&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/85-bruno%e5%9f%ba%e7%a1%80/snap_20250420-2.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;从github的star趋势可以看到，Bruno诞生不久，但从2024年开始，已经开始得到广泛关注，star数量一路飙升，潜力无限！&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420.png&#34;
+	width=&#34;1071&#34;
+	height=&#34;712&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420_hu1307315593139152473.png 480w, https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420_hu6266850528378610743.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;150&#34;
+		data-flex-basis=&#34;361px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;bruno简介&#34;&gt;Bruno简介
+&lt;/h2&gt;&lt;p&gt;可以说 &lt;code&gt;Bruno&lt;/code&gt; 从诞生之初针对的就是前述 &lt;strong&gt;Postman&lt;/strong&gt; 的痛点。官方首页上强调的 Bruno 主要特性也重点说明了这几点：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420-3.png&#34;
+	width=&#34;1834&#34;
+	height=&#34;608&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420-3_hu8389723719791598316.png 480w, https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250420-3_hu15829097769678655259.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;301&#34;
+		data-flex-basis=&#34;723px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;承诺开源和可扩展，并且专心做客户端，永不向“平台化”扩充产品。&lt;/li&gt;
+&lt;li&gt;基于Git实现协作和版本管理&lt;/li&gt;
+&lt;li&gt;离线使用，永不同步本地数据 😂😂😂&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;可以说，Bruno的出现，就是针对Postman作为一个客户端工具，过于强调平台化和云端功能的现状，提供的平替方案。&lt;/p&gt;
+&lt;h2 id=&#34;bruno的优势&#34;&gt;Bruno的优势
+&lt;/h2&gt;&lt;p&gt;Bruno在官方网站上，也是专门针对 Postman ，将Bruno和Postman进行了详细比对（当然一家之言，免不得自吹，大家辩证看待）网址如下：
+&lt;a class=&#34;link&#34; href=&#34;https://www.usebruno.com/compare/bruno-vs-postman&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.usebruno.com/compare/bruno-vs-postman&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;我整理了一下，主要包含如下几个维度：&lt;/p&gt;
+&lt;h4 id=&#34;整体定位&#34;&gt;整体定位
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;开源、本地优先、注重隐私&lt;/td&gt;
+&lt;td&gt;最初是 API 客户端，现已发展为包含云协作功能的 API 平台&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;数据存储&#34;&gt;数据存储
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;集合直接存储在本地文件系统，使用名为 Bru 的纯文本标记语言&lt;/td&gt;
+&lt;td&gt;主要存储在 Postman 云端，需要账户登录（虽然可以导出，但核心工作流依赖云）&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;开放源码&#34;&gt;开放源码
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;完全开源 (MIT 许可证)&lt;/td&gt;
+&lt;td&gt;部分开源，核心平台和云服务是专有的&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;离线支持&#34;&gt;离线支持
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;完全支持离线工作，因为所有数据都在本地&lt;/td&gt;
+&lt;td&gt;核心功能（尤其协作）严重依赖在线连接和账户登录&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;协作方式&#34;&gt;协作方式
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;通过 Git 或任何版本控制系统进行协作，利用其文件存储特性&lt;/td&gt;
+&lt;td&gt;通过 Postman 内置的云同步和团队协作功能（通常需要付费计划）&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;cli命令行&#34;&gt;CLI命令行
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;提供名为 &lt;code&gt;bru&lt;/code&gt; 的 CLI 工具，用于运行集合和测试&lt;/td&gt;
+&lt;td&gt;提供名为 &lt;code&gt;Newman&lt;/code&gt; 的 CLI 工具，用于运行集合和集成到 CI/CD&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;脚本支持&#34;&gt;脚本支持
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;支持声明式脚本（Bru Lang）和 JavaScript 进行自动化测试和脚本编写&lt;/td&gt;
+&lt;td&gt;支持 JavaScript 进行请求前脚本、测试脚本编写&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;交互界面&#34;&gt;交互界面
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;界面和功能相对更简洁，专注于 API 请求和测试的核心任务&lt;/td&gt;
+&lt;td&gt;功能更全面，但也可能更复杂，涵盖了 API 设计、文档、监控等更多方面&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;版本控制&#34;&gt;版本控制
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;Bruno&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Postman&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;可直接利用 Git 进行精细的版本控制&lt;/td&gt;
+&lt;td&gt;内置版本控制功能，但与 Git 的集成和灵活性不同&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总体来说，Bruno针对Postman的主要痛点，都给出了对应的应对处理，如果使用Postman受限或更希望在非互联网线环境下进行接口测试，可以说Bruno就是最佳选择&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;bruno的局限性&#34;&gt;Bruno的局限性
+&lt;/h2&gt;&lt;p&gt;虽然Bruno已经受到了极大的关注，而且功能也足够丰富，但相比Postman这样老牌头部工具，功能上还是有一些局限性。这里总结起来，大致有如下几点：&lt;/p&gt;
+&lt;h4 id=&#34;云端协作和同步&#34;&gt;云端协作和同步
+&lt;/h4&gt;&lt;p&gt;完全本地化和简洁、轻量，是Bruno重点突出的优势，但换一个角度来说，也是它主要的局限。&lt;/p&gt;
+&lt;p&gt;Bruno的团队协作以来Git来实现，对于熟悉Git使用的研发团队来说，当然足够强大，但如果团队对API的协作牵涉到混合团队时，比如包含客户、设计人员、产品经理等时，Git的使用门槛就相对更高了。Postman那样的基于云服务的团队功能则更易于接受，团队共享工作区、并可进行评论、共享。&lt;/p&gt;
+&lt;h4 id=&#34;在api全生命周期管理上的欠缺&#34;&gt;在API全生命周期管理上的欠缺
+&lt;/h4&gt;&lt;p&gt;还是因为纯本地客户端的原因，Bruno很难像Postman那样实现针对API的全生命周期管理和支持，包括接口设计（OpenAPI、swagger等接口设计的导入）、交互式文档（API Documentation）、接口模拟（Mock Server）、健康监测（monitor）等，Postman都有对应的功能可以覆盖，而Bruno则无法涵盖如此丰富的场景。&lt;/p&gt;
+&lt;h4 id=&#34;接口类型支持不如postman丰富&#34;&gt;接口类型支持不如Postman丰富
+&lt;/h4&gt;&lt;p&gt;虽然Bruno目前已经支持restful和GraphQL接口，已经能够满足我们绝大多数的接口测试协议要求。但相比Postman还有MQTT这样的物联网协议支持，在协议扩展上，还有待继续补充。&lt;/p&gt;
+&lt;h4 id=&#34;生态系统不如postman成熟&#34;&gt;生态系统不如Postman成熟
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Postman 经过多年发展，已经围绕其平台构建了一个庞大的生态系统，包括大量的第三方工具集成（如很多第三方的 APM 工具、API 网关、CI/CD 工具等）都对Postman支持良好）。&lt;/li&gt;
+&lt;li&gt;经过多年积累，Postman社区繁荣，用户数量庞大，积累了海量的资源和教程。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Bruno 作为一个较新的工具，其原生集成和社区支持的插件相对较少&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421.png&#34;
+	width=&#34;1432&#34;
+	height=&#34;821&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421_hu1736885629923217087.png 480w, https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421_hu5908073081409471841.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;174&#34;
+		data-flex-basis=&#34;418px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;ai测试能力的支持&#34;&gt;AI测试能力的支持
+&lt;/h4&gt;&lt;p&gt;Postman通过内置的 &lt;code&gt;postbot&lt;/code&gt; 助手，借助AI能力，可以实现接口测试用例的自动生成，优化建议等典型的AI增强。而随着AI应用的越来越广泛，对AI的支持也是Bruno还需要重点补充的部分。&lt;/p&gt;
+&lt;h2 id=&#34;bruno安装和应用基本示例&#34;&gt;Bruno安装和应用基本示例
+&lt;/h2&gt;&lt;p&gt;Bruno作为一个纯客户端，安装其实极为方便。访问官网，下载对应安装包即可(&lt;a class=&#34;link&#34; href=&#34;https://www.usebruno.com/downloads&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.usebruno.com/downloads&lt;/a&gt;)。&lt;/p&gt;
+&lt;p&gt;win11下也可以利用内建的winget命令直接下载安装&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;winget&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;install&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;bruno&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;py&#34;&gt;bruno&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;安装后，桌面上会出一个bruno的小狗logo，类似Postman，双击就可打开Bruno客户端，界面其实和Postman颇为类似。下面我们以获取Github上一个开源项目的最近一次发布为例，看下Bruno中如何操作。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;首先建立一个collection，命名为 &amp;ldquo;github&amp;rdquo;, 并在其下创建一个目录，“repos”。 并可以在collection设置界面，添加github的访问Token。这里可以看到，Bruno支持的鉴权方式已经非常全面。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-3.png&#34;
+	width=&#34;1275&#34;
+	height=&#34;632&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-3_hu8434813226214801353.png 480w, https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-3_hu5900016794827556457.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;201&#34;
+		data-flex-basis=&#34;484px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;在 “repos” 目录下，新建一个Get请求，“getRelease”,  根据Github定义，对应请求接口 &amp;ldquo;&lt;a class=&#34;link&#34; href=&#34;https://api.github.com/repos/%7b%7bowner%7d%7d/%7b%7brepo%7d%7d/releases/latest%22&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://api.github.com/repos/{{owner}}/{{repo}}/releases/latest&#34;&lt;/a&gt;， 这里我们使用了两个变量，和Postman类似，这里设置的变量可以通过&lt;code&gt;{{var}}&lt;/code&gt; 来引用。 测试一下，成功获取了appium项目的最近一次发布信息&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-1.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;959&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-1_hu6704278981453768427.png 480w, https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-1_hu14743541688875029221.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;200&#34;
+		data-flex-basis=&#34;480px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;作为一个本地客户端，这里Bruno所有的请求和配置信息，其实都保存在本地，&lt;code&gt;.bru&lt;/code&gt;文件中进行存储。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-2.png&#34;
+	width=&#34;1543&#34;
+	height=&#34;891&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-2_hu17607946812133256273.png 480w, https://chengxiaqiucao.github.io/post/86-bruno%E4%BB%8B%E7%BB%8D/snap_20250421-2_hu1434291110228875471.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;173&#34;
+		data-flex-basis=&#34;415px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;以上就是关于Bruno的几个概要介绍，对于不希望受Postman在线限制的同学，Bruno就是最佳替代。&lt;/p&gt;
+&lt;p&gt;欢迎继续关注秋草的后续博客文章，会陆续带来更多关于Bruno的深度使用总结和分享！&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Mcp大流行背后的隐忧</title>
+        <link>https://chengxiaqiucao.github.io/post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/</link>
+        <pubDate>Mon, 14 Apr 2025 15:28:24 +0800</pubDate>
+        
+        <guid>https://chengxiaqiucao.github.io/post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/</guid>
+        <description>&lt;img src="https://chengxiaqiucao.github.io/post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/mcp_risk.jpg" alt="Featured image of post Mcp大流行背后的隐忧" /&gt;&lt;p&gt;&lt;img src=&#34;https://chengxiaqiucao.github.io/post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/mcp_risk.jpg&#34;
+	width=&#34;900&#34;
+	height=&#34;383&#34;
+	srcset=&#34;https://chengxiaqiucao.github.io/post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/mcp_risk_hu12474602767367484928.jpg 480w, https://chengxiaqiucao.github.io/post/76-mcp%E5%A4%A7%E6%B5%81%E8%A1%8C%E8%83%8C%E5%90%8E%E7%9A%84%E9%9A%90%E5%BF%A7/mcp_risk_hu11655005085072708488.jpg 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;234&#34;
+		data-flex-basis=&#34;563px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;过去数周间，模型上下文协议（Model Context Protocol，MCP）快速崛起为第三方数据与工具接入LLM对话系统的实际标准。互联网短时间已充斥着各类炫酷应用案例，想象空间极为广阔。但这个协议背后却也暗藏一些微妙的安全隐患与功能的局限性。&lt;/p&gt;
+&lt;h1 id=&#34;背景&#34;&gt;背景
+&lt;/h1&gt;&lt;p&gt;MCP的本质是构建&amp;quot;智能助手插件生态&amp;quot;的桥梁，让用户能为各种支持了MCP协议的大模型和AI客户端提供本地扩展能力，让这些基于LLM的智能界面可以通过MCP的&amp;quot;工具调用&amp;quot;执行非文本操作，MCP协议实际上是标准化了LLM和本地数据、工具的对接方式。&lt;/p&gt;
+&lt;p&gt;比如在前文【】中，我们只是在&lt;code&gt; Cursor&lt;/code&gt; 中告诉大模型: &lt;em&gt;&amp;ldquo;访问www.saucedemo.com网站，使用problem_user登录，验证该网站完整流程并记录发现的问题&amp;rdquo;&lt;/em&gt; , Cursor 就会通过&lt;code&gt;playwright-mcp&lt;/code&gt; 这个 mcp server来调用&lt;code&gt;playwright&lt;/code&gt;框架完成浏览器的调用、访问、浏览、测试、记录问题等一系列活动，完成跟手工测试工程师类似的测试活动&lt;/p&gt;
+&lt;p&gt;所以通过MCP，它的核心价值就是突破了原来AI大模型文字型咨询助手的角色，转变为实际的执行者角色，更能够直接操作本地的工具和数据，为大模型提供了万能插口。&lt;/p&gt;
+&lt;h1 id=&#34;潜在的隐忧&#34;&gt;潜在的隐忧
+&lt;/h1&gt;&lt;p&gt;但我们在看到MCP巨大潜力的同时，也要看到，MCP作为刚起步不久的一个基础协议，尚不能称为尽善尽美，要看到还有如下一些隐忧：&lt;/p&gt;
+&lt;h2 id=&#34;隐患一协议本身的安全性&#34;&gt;&lt;strong&gt;隐患一：协议本身的安全性&lt;/strong&gt;
+&lt;/h2&gt;&lt;h3 id=&#34;认证机制&#34;&gt;&lt;strong&gt;认证机制&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;MCP的初始版本未定义认证规范，导致各MCP服务器可自行其是，从繁琐的验证到敏感数据裸奔，可谓乱象丛生。虽后续推出认证方案，但实现复杂度引发新的争议。&lt;/p&gt;
+&lt;h3 id=&#34;恶意代码本地执行风险&#34;&gt;&lt;strong&gt;恶意代码本地执行风险&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;协议支持通过标准输入输出运行MCP服务器，这样虽然降低使用门槛，却也为恶意代码传播提供了温床。如果技术小白执行第三方恶意MCP代码引发本地设备安全故障，已成新型攻击手段。&lt;/p&gt;
+&lt;h3 id=&#34;mcp对用户输入的信任&#34;&gt;&lt;strong&gt;MCP对用户输入的信任&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;很多Mcp Server会直接执行用户的输入指令。当用户意图经LLM转译并对系统产生作用时，传统安全模型面临严峻挑战：用户输入指令与攻击系统的边界不再清晰。&lt;/p&gt;
+&lt;h2 id=&#34;隐患二交互设计上的限制&#34;&gt;&lt;strong&gt;隐患二：交互设计上的限制&lt;/strong&gt;
+&lt;/h2&gt;&lt;p&gt;MCP协议更多是面向LLM交互，但针对用户来说，交互方式谈不上易用、友好。&lt;/p&gt;
+&lt;h3 id=&#34;缺少针对不同等级的操作风险分级&#34;&gt;&lt;strong&gt;缺少针对不同等级的操作风险分级&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;很多助手工具会提供全局的操作确认机制，但针对很多无害工具养成的“自动确认”习惯，往往会导致一些严重误操作的发生，比如本地重要文件的删除、邮件误发等情况。&lt;/p&gt;
+&lt;h3 id=&#34;成本控制能力&#34;&gt;&lt;strong&gt;成本控制能力&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;与传统协议不同，LLM场景下依据不同token的返回量会产生数额不等的费用，而用户服务成本高度依赖MCP工具的词元效率，而目前协议中并没有对返回长度的限制以强化成本控制。&lt;/p&gt;
+&lt;h3 id=&#34;牺牲结构化数据的优势&#34;&gt;&lt;strong&gt;牺牲结构化数据的优势&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;为适配LLM偏好，MCP偏向采用类似人类可读的方式，如纯文本/图片/音频片段传输，而牺牲结构化数据优势。比如类似像地图、滴滴叫车等服务，需确保位置准确性、行程细节反馈、实时状态更新等需求的话，现有协议难堪重任。目前解决这类问题还需要在工具层做一些变通的额外设计&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;隐患三llm的安全性&#34;&gt;&lt;strong&gt;隐患三：LLM的安全性&lt;/strong&gt;
+&lt;/h2&gt;&lt;p&gt;大模型本身安全性的探讨，目前还悬而未决，而引入MCP连接更多的数据、工具让这个问题更为凸显。&lt;/p&gt;
+&lt;h3 id=&#34;mcp让提示词注入能力更强悍&#34;&gt;&lt;strong&gt;MCP让提示词注入能力更强悍&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;LLM 通常有两层指令：&lt;strong&gt;系统级提示词&lt;/strong&gt;（控制助手的行为和策略）和&lt;strong&gt;用户级提示词&lt;/strong&gt;（由用户提供）。通常，以前提到&lt;strong&gt;提示词注入&lt;/strong&gt;通常指恶意的用户输入。而MCP 模型一个相当大的漏洞是允许第三方提供的工具被信任为助手系统级提示的一部分，从而赋予它们更大权限来覆盖代理行为。&lt;/p&gt;
+&lt;h3 id=&#34;敏感数据泄露&#34;&gt;&lt;strong&gt;敏感数据泄露&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;除了恶意地通过恶意工具劫持外，MCP也可能让用户在无意中泄露敏感数据。即便用户严格确认每个操作，数据仍可能通过&amp;quot;合理&amp;quot;的方式外泄出去。比如你的指令：“帮我解释一下个人病历记录”，助手可能会启动一个医疗检索类的多租户MCP工具，并把个人隐私信息泄露到服务提供商。&lt;/p&gt;
+&lt;p&gt;包括MCP Server也很容易通过伪装提示词和实际的工具实现，劫持、更改用户的意图。&lt;/p&gt;
+&lt;h2 id=&#34;隐患四打破企业中的传统数据权限控制&#34;&gt;隐患四：&lt;strong&gt;打破企业中的传统数据权限控制&lt;/strong&gt;
+&lt;/h2&gt;&lt;p&gt;与直接泄露敏感数据不同，企业在将大量内部数据通过MCP连接到LLM以后，可能会让普通员工访问或推断出无权访问到的数据。&lt;/p&gt;
+&lt;p&gt;举例来说，如果一个企业的所有内部文档都接入LLM，员工通过助手：&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;“根据所有我有权限访问的文档和公司的任免通知，推断尚未宣布的重大事件如裁员行动”&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;或者一个经理级别的人：&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;“我看到内部wiki上有一条匿名的针对XXX的负面评价，内容是XXXX，请分析XX团队中成员的发言记录并推断最可能是谁写的这条评价”&lt;/em&gt;&lt;/p&gt;
+&lt;h2 id=&#34;隐患五llm自身的能力局限&#34;&gt;&lt;strong&gt;隐患五：LLM自身的能力局限&lt;/strong&gt;
+&lt;/h2&gt;&lt;p&gt;对于大规模的MCP集成，LLM本身的负载能力很可能无法承受。Google推出的&lt;strong&gt;A2A协议(Agent to Agent)&lt;/strong&gt; 可能是解决手段，另当别论。&lt;/p&gt;
+&lt;h3 id=&#34;mcp的能力发挥依赖于被助手集成的llm&#34;&gt;&lt;strong&gt;MCP的能力发挥依赖于被助手集成的LLM&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;一个事实是&lt;strong&gt;并非工具越多，数据越多，结果越准确&lt;/strong&gt;，恰恰相反，同类的数据和工具越多，会导致最终输出的精确性越差。随着MCP Server的数量越来越多，集成的工具越来越多，AI助手的性能也将显著下降，并且请求和分析的成本也会增加。&lt;/p&gt;
+&lt;h3 id=&#34;工具实现和用户预期的落差&#34;&gt;&lt;strong&gt;工具实现和用户预期的落差&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;很多MCP Server在实现上其实是编写调用本地已有工具的函数方法，MCP Server的能力其实主要受这些函数方法的制约。如果用户对具体的函数实现没什么了解，只是按通常的人为沟通思路和LLM交互，很可能难以获得满意的结果。&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;“请为我查找最近所有博客中包含AI测试相关的文章”&lt;/em&gt;，这个指令其实需要本地MCP Server具备全文检索本地文本内容的能力，但如果集成的MCP Server仅仅包含了文件查找的功能，自然得不到相应的结果。&lt;/p&gt;
+&lt;h1 id=&#34;结论和展望&#34;&gt;结论和展望
+&lt;/h1&gt;&lt;p&gt;MCP的诞生顺应了AI时代的数据整合需求，其日常应用价值毋庸置疑。但我们也需要清醒认知：MCP协议还在成长期，我们在拥抱应用的同时，也需要认识到其中的风险， 将LLM与数据的结合，会放大既有风险，也催生了新型的威胁。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;本文大部分观点参考了Shrivu的博客内容&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>Google推出A2A协议</title>
         <link>https://chengxiaqiucao.github.io/post/75-google%E6%8E%A8%E5%87%BAa2a%E5%8D%8F%E8%AE%AE/</link>
         <pubDate>Fri, 11 Apr 2025 11:36:52 +0800</pubDate>
