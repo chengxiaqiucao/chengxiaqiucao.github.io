@@ -1,0 +1,389 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Postman的进阶用法"><title>Postman进阶篇</title><link rel=canonical href=https://chengxiaqiucao.github.io/post/002-postman%E8%BF%9B%E9%98%B6%E7%AF%87/><link rel=stylesheet href=/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css><meta property='og:title' content="Postman进阶篇"><meta property='og:description' content="Postman的进阶用法"><meta property='og:url' content='https://chengxiaqiucao.github.io/post/002-postman%E8%BF%9B%E9%98%B6%E7%AF%87/'><meta property='og:site_name' content='秋 草 观 “测” 台'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Postman'><meta property='article:tag' content='接口测试'><meta property='article:published_time' content='2022-06-22T00:00:00+00:00'><meta property='article:modified_time' content='2022-06-22T00:00:00+00:00'><meta property='og:image' content='https://chengxiaqiucao.github.io/frontEndDemo/images/20181225_210709.png'><meta name=twitter:title content="Postman进阶篇"><meta name=twitter:description content="Postman的进阶用法"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://chengxiaqiucao.github.io/frontEndDemo/images/20181225_210709.png'></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/automnGrass_hu_5e44a092fd905642.png width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>秋 草 观 “测” 台</a></h1><h2 class=site-description>Testing is not just checking...</h2></div></header><ol class=menu-social><li><a href=https://github.com/chengxiaqiucao target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://space.bilibili.com/472272606 target=_blank title=Bilibili rel=me><!doctype html><svg t="1750732982440" class="icon" viewBox="0 0 1024 1024" p-id="4593" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632 444.330667 256h135.296l138.368-138.325333A42.666667 42.666667.0 01778.368 178.048L700.330667 256H789.333333A149.333333 149.333333.0 01938.666667 405.333333v341.333334A149.333333 149.333333.0 01789.333333 896H234.666667A149.333333 149.333333.0 0185.333333 746.666667V405.333333A149.333333 149.333333.0 01234.666667 256h88.96L245.632 177.962667a42.666667 42.666667.0 0160.373333-60.373334zm483.328 223.701333H234.666667a64 64 0 00-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0057.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0063.701334-57.856L853.333333 746.666667V405.333333a64 64 0 00-64-64zm-448 128A42.666667 42.666667.0 01384 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666666-42.666667zm341.333334.0A42.666667 42.666667.0 01725.333333 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666667-42.666667z" p-id="4594" fill="#8a8a8a"/></svg></a></li><li><a href=https://www.zhihu.com/people/qiucao target=_blank title=zhihu rel=me><!doctype html><svg t="1750733049138" class="icon" viewBox="0 0 1024 1024" p-id="5820" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M570.581333 806.272h61.952L652.928 876.117333 764.074667 806.272h130.986666V230.186667h-324.48V806.272zM636.501333 292.693333h192.64V743.68h-73.898666l-73.813334 46.378667L668.032 743.808l-31.530667-.128V292.736zM515.754667 493.738667H377.429333a2999.466667 2999.466667.0 005.802667-194.56h135.338667S523.776 239.445334 495.872 240.128H261.76c9.216-34.730667 20.821333-70.613333 34.688-107.690667.0.0-63.701333.0-85.333333 57.130667C202.112 213.12 176.128 303.786667 129.877333 396.416c15.573333-1.706667 67.114667-3.114667 97.450667-58.794667 5.589333-15.616 6.656-17.621333 13.568-38.485333h76.373333c0 27.776-3.157333 177.109333-4.437333 194.474667h-138.24c-31.104.0-41.173333 62.549333-41.173333 62.549333h173.482666C295.253333 688.256 232.789333 799.573333 119.466667 887.466667c54.186667 15.488 108.202667-2.432 134.912-26.197334.0.0 60.8-55.338667 94.122666-183.381333L491.264 849.834667s20.906667-71.168-3.285333-105.856c-20.053333-23.637333-74.24-87.552-97.322667-110.72l-38.698667 30.72c11.52-36.992 18.474667-72.96 20.821334-107.690667h163.072s-.213333-62.549333-20.053334-62.549333z" p-id="5821" fill="#8a8a8a"/></svg></a></li><li><a href=mailto:%20danmyw@qq.com target=_blank title=e-mail rel=me><!doctype html><svg t="1750733089669" class="icon" viewBox="0 0 1451 1024" p-id="6983" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759.0 97.881301C0 3.997201 71.046997.0 71.046997.0H474.477909 961.649408h399.992405s71.046998 3.997201 71.046998 97.881301L771.345323 681.472759S764.482731 685.154773 753.594283 688.65053V688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858V688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759zm53.281707 130.131124C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633.0 212.052267.0 212.052267V942.809523S0 1024 83.726336 1024H682.532949 753.579947h595.368192C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523V212.052267S893.138176 701.759633 817.019477 767.734955c-39.771477 34.470494-74.671786 43.295855-98.955861 43.868928z" fill="#8a8a8a" p-id="6984"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>主页</span></a></li><li><a href=/page/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>归档</span></a></li><li><a href=/page/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>检索</span></a></li><li><a href=/page/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>链接</span></a></li><li><a href=/page/about/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>关于</span></a></li><li><a href=/page/releases/><svg class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M9.828 9.172a4 4 0 100 5.656A10 10 0 0012 12a10 10 0 012.172-2.828 4 4 0 110 5.656A10 10 0 0112 12 10 10 0 009.828 9.172"/></svg>
+<span>热门开源</span></a></li><li class=menu-bottom-section><ol class=menu><li id=i18n-switch><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg>
+<select name=language title=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://chengxiaqiucao.github.io/en/>English</option><option value=https://chengxiaqiucao.github.io/ selected>中文</option></select></li><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><ol><li><a href=#前言>前言</a></li><li><a href=#postman的变量>Postman的变量</a><ol><li><a href=#global-变量>global 变量</a></li><li><a href=#collection-与-collection-变量>Collection 与 Collection 变量</a></li><li><a href=#环境和-environment-变量>环境和 environment 变量</a></li><li><a href=#data-变量>data 变量</a></li><li><a href=#local-变量>local 变量</a></li></ol></li><li><a href=#postman-脚本及其执行顺序>Postman 脚本及其执行顺序</a></li><li><a href=#postman脚本-prerequest>Postman脚本-PreRequest</a></li><li><a href=#postman脚本-test脚本>Postman脚本-Test脚本</a><ol><li><a href=#判断接口响应状态码>判断接口响应状态码</a></li><li><a href=#校验响应时间>校验响应时间</a></li><li><a href=#校验消息内容>校验消息内容</a></li></ol></li><li><a href=#postman脚本-接口的关联>Postman脚本-接口的关联</a></li><li><a href=#postman脚本-代码复用>Postman脚本-代码复用</a></li><li><a href=#postman脚本-一个结合第三方库的复杂场景案例>Postman脚本-一个结合第三方库的复杂场景案例</a></li><li><a href=#结语及预告>结语及预告</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/post/002-postman%E8%BF%9B%E9%98%B6%E7%AF%87/><img src=https://chengxiaqiucao.github.io/frontEndDemo/images/20181225_210709.png loading=lazy alt="Featured image of post Postman进阶篇"></a></div><div class=article-details><header class=article-category><a href=/categories/%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7/ style=background-color:#c6fad2;color:#000>测试工具</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/post/002-postman%E8%BF%9B%E9%98%B6%E7%AF%87/>Postman进阶篇</a></h2><h3 class=article-subtitle>Postman的进阶用法</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Jun 22, 2022</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 13 分钟</time></div></footer></div></header><section class=article-content><h3 id=前言>前言</h3><p>在上一篇 《玩转Postman：基础篇》中，我们介绍了 Postman 工具的主要功能和一些基本用法。 其实 Postman 作为目前使用最为广泛的接口测试工具，除了能提供交互良好的 UI 界面以及完成基本的http协议的鉴权、header、body 等的设置以及请求提交和响应解析这些基本功能外，它还提供了非常丰富的测试辅助能力。本篇我们就来为大家详细介绍 postman 的脚本进阶功能。</p><h3 id=postman的变量>Postman的变量</h3><p>在接口测试工具中，变量对于接口消息的重用和灵活匹配意义重大，作为一个专业的接口测试工具，对变量的支持是必须具备的。</p><p>而 Postman 就提供了丰富的变量支持，在 Postman 中定义了5种不同作用范围的变量类型，在变量的使用和管理上更加地灵活和有针对性。下图是官方给出的不同类型变量的作用范围</p><p><img src=/frontEndDemo/images/20190113_142618.png loading=lazy alt=image></p><p>从外向内作用域逐渐变小，同时生效优先级越高，也就是当存在同一变量名时，内层变量类型的变量会优先生效。下面我们结合实例来具体说明一下这些变量类型的作用范围：</p><h4 id=global-变量>global 变量</h4><p>global 变量即全局变量，是作用范围最大的一种变量类型。设置好 global 变量后，可以在 Postman 工具中所有可以使用变量的地方生效。</p><p>下面在 Postman 工具中看一下 global 变量的设置：
+在工具右上角打开环境管理界面：
+<img src=/frontEndDemo/images/20190119_223500.png loading=lazy alt=image></p><p>选择 global 变量管理：
+<img src=/frontEndDemo/images/20190119_223538.png loading=lazy alt=image></p><p>添加 Global 变量：
+<img src=/frontEndDemo/images/20190120_102808.png loading=lazy alt=image></p><p>此例中，我们设置一个 global 变量 name，取值为 1。
+在 Postman 中，使用双花括号表示变量，形如 <strong>{{ variable }}</strong>。以 Github API 为例，比如我们获取用户名为变量 name 取值的用户信息。</p><blockquote><p><a class=link href=https://api.github.com/users/%7b%7bname%7d%7d target=_blank rel=noopener>https://api.github.com/users/{{name}}</a></p></blockquote><p>url中输入双花括号后会自动联想出我们需要的变量类型。</p><p><img src=/frontEndDemo/images/20190120_102954.png loading=lazy alt=image></p><p>发送请求后，检查 Postman 响应区，可以看到我们获取了 username 为 1 的用户信息。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;login&#34;</span><span class=p>:</span> <span class=s2>&#34;1&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=mi>1825798</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;node_id&#34;</span><span class=p>:</span> <span class=s2>&#34;MDQ6VXNlcjE4MjU3OTg=&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;avatar_url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://avatars2.githubusercontent.com/u/1825798?v=4&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;gravatar_id&#34;</span><span class=p>:</span> <span class=s2>&#34;&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://api.github.com/users/1&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;html_url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://github.com/1&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;followers_url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://api.github.com/users/1/followers&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;following_url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://api.github.com/users/1/following{/other_user}&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;gists_url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://api.github.com/users/1/gists{/gist_id}&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;starred_url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://api.github.com/users/1/starred{/owner}{/repo}&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;subscriptions_url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://api.github.com/users/1/subscriptions&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;organizations_url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://api.github.com/users/1/orgs&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;repos_url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://api.github.com/users/1/repos&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;events_url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://api.github.com/users/1/events{/privacy}&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;received_events_url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://api.github.com/users/1/received_events&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;type&#34;</span><span class=p>:</span> <span class=s2>&#34;User&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;site_admin&#34;</span><span class=p>:</span> <span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Michael&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;company&#34;</span><span class=p>:</span> <span class=kc>null</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;blog&#34;</span><span class=p>:</span> <span class=s2>&#34;&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;location&#34;</span><span class=p>:</span> <span class=s2>&#34;San Francisco, CA&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;email&#34;</span><span class=p>:</span> <span class=s2>&#34;mbalaban1989@gmail.com&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;hireable&#34;</span><span class=p>:</span> <span class=kc>null</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;bio&#34;</span><span class=p>:</span> <span class=kc>null</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;public_repos&#34;</span><span class=p>:</span> <span class=mi>3</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;public_gists&#34;</span><span class=p>:</span> <span class=mi>0</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;followers&#34;</span><span class=p>:</span> <span class=mi>15</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;following&#34;</span><span class=p>:</span> <span class=mi>0</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;created_at&#34;</span><span class=p>:</span> <span class=s2>&#34;2012-06-07T06:10:07Z&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;updated_at&#34;</span><span class=p>:</span> <span class=s2>&#34;2019-01-17T08:29:21Z&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=collection-与-collection-变量>Collection 与 Collection 变量</h4><p>再来看另一个变量类型 Collection 变量。首先了解下 Collection 的概念。Collection 是 Postman 中组织接口的一个集合单位，Postman 中也主要以 Collection 为配置存储的一个基本单位。我们可以把 Collection 看作软件测试中测试用例集的概念。</p><p>Collection 变量就是作用域在 Collection 上的变量类型，这种变量只会在设置变量的 Collection 上生效。
+设置方法：选择 Edit Collection
+<img src=/frontEndDemo/images/20190119_223837.png loading=lazy alt=image></p><p>在 variable 页中添加 Collection 变量，本例中我们在 Github 这个 Collection 添加一个同样命名为name 的变量
+<img src=/frontEndDemo/images/20190120_104130.png loading=lazy alt=image></p><p>将上例中获取用户的接口保存到 Github 这个 Collection 中（我们可以在 Collection 下再创建一层子目录，注意目录是不支持设置目录级别的变量的，Collection 变量在子目录下的接口依然会生效），我们再提交一下这个接口
+<img src=/frontEndDemo/images/20190120_104718.png loading=lazy alt=image></p><p>此时可以看到，我们设置的 Collection 变量已经生效，获取到的是 name 为 2 的用户信息。注意此时我们还设置了一个 name 为 1 的 global 变量，可以看到 Collection 变量的优先级高于 global变量。</p><h4 id=环境和-environment-变量>环境和 environment 变量</h4><p>环境是 Postman 中的一个非常有用的概念。做过软件测试的同学都了解，我们在实际工作中会接触到不同的软件环境。对应于我们被测试系统的不同运行场景。比如一般互联网企业在研发中会存在以下的一些不同环境：</p><ul><li>开发环境</li><li>集成环境（联调环境）</li><li>系统测试环境</li><li>试生产环境</li><li>生产环境</li><li>性能测试环境</li><li>安全测试环境</li></ul><p>不同的环境在接入途径、网络拓扑、访问权限以及硬件配置上往往都有较大区别。Postman 中引入 Environment 这个概念，通过 Environment 变量来管理一组环境配置，便于我们来方便地在不同环境间进行切换。</p><p>在环境管理界面中，可以添加环境，以及该环境对应的相关变量。本例我们添加一个 GitChat 环境，并且设置一个 name = 3 的环境变量。
+<img src=/frontEndDemo/images/20190120_110446.png loading=lazy alt=image>
+设置完环境后，我们再刚才的获取用户接口界面上，选择对应的 GitChat 环境，再重新提交请求。可以看到环境变量已经生效，获取了name为 3 的用户信息，同样可以看到，此时环境变量的优先级比 Collection 又要更高。
+<img src=/frontEndDemo/images/20190120_110733.png loading=lazy alt=image></p><h4 id=data-变量>data 变量</h4><p>另一种 Postman 中的变量类型是 data 变量，data 变量只能在 Postman Runner 中使用，也就是会在 Runner 运行时才生效，data 变量可以提供多组测试数据供接口测试时调用，为 Postman 提供接口批量数据验证能力。要使用 data 变量，打开 Postman Runner， 如下图，选择 data 变量定义文件加载 data 变量文件。</p><p><img src=/frontEndDemo/images/20190126_232538.png loading=lazy alt=image></p><p>data 变量支持json或者txt/csv数据格式，json 定义格式如下，</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>[</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;id&#34;</span><span class=p>:</span><span class=s2>&#34;11&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;name&#34;</span><span class=p>:</span><span class=s2>&#34;user1&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=p>},</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;id&#34;</span><span class=p>:</span><span class=s2>&#34;12&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;name&#34;</span><span class=p>:</span><span class=s2>&#34;user2&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=p>},</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;id&#34;</span><span class=p>:</span><span class=s2>&#34;13&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;name&#34;</span><span class=p>:</span><span class=s2>&#34;user3&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>]</span>
+</span></span></code></pre></td></tr></table></div></div><p>txt/csv 格式如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>id,name
+</span></span><span class=line><span class=cl>11,user1
+</span></span><span class=line><span class=cl>12,user2
+</span></span><span class=line><span class=cl>13,user3
+</span></span></code></pre></td></tr></table></div></div><p>在 runner 界面上可以通过 preview 查看运行时不同迭代所加载的变量取值，如下：</p><p><img src=/frontEndDemo/images/20190126_232629.png loading=lazy alt=image></p><p>如本例，点击 Run variables 会执行 3 次不同的迭代，通过 Postman Console查看运行日志，可以看到每次均使用了 data 变量中定义的对应变量值。 同样，虽然我们选择 environment，但可以看到 data 变量在 runner 运行时优先级更高。</p><p><img src=/frontEndDemo/images/20190126_233803.png loading=lazy alt=image></p><h4 id=local-变量>local 变量</h4><p>Local 变量在 Postman 官方文档中并没有给出明确的定义。一般可以理解成 Postman 脚本中支持的 JS 变量，它的作用域只会在脚本中生效， 此时 Postman 界面引用的 <strong>{{variable}}</strong> 并不会取到 local 变量值。
+脚本中直接引用的变量名会取local变量，其他数据类型则通过 Postman 对应的取值语句来获取。</p><p>比如我们在 Pre-Request 中定义以下脚本并执行：
+<img src=/frontEndDemo/images/20190126_234936.png loading=lazy alt=image></p><p>在 Console 中查看结果如下，可以比较清楚地看到每次执行在预执行脚本中不同变量的当前取值
+<img src=/frontEndDemo/images/20190126_235036.png loading=lazy alt=image></p><p>通过以上实例，我们可以看到，Postman 针对不同的接口作用范围支持了丰富的变量类型，使我们在应用变量功能的时候可以更加的灵活</p><h3 id=postman-脚本及其执行顺序>Postman 脚本及其执行顺序</h3><p>除了支持丰富的变量功能，Postman 还支持强大的脚本功能，测试人员在进行接口测试时，可以通过脚本来动态地对接口测试逻辑进行定制，再结合变量，就可以实现一些复杂的场景。</p><p>Postman 的脚本功能是基于 Node.js 语言，Node.js 成熟的语法和丰富的扩展库给 Postman 提供了巨大的灵活性和强力的扩展能力。</p><p>在 Postman 中，测试脚本 可以在接口发送之前和收到响应之后执行，分别对应 Pre-request Script 和 Test Script，如下图：
+<img src=/frontEndDemo/images/20190126_235928.png loading=lazy alt=image></p><p>比如我们前文介绍变量时的实例，其实就是一个 pre-request 脚本
+<img src=/frontEndDemo/images/20190127_000131.png loading=lazy alt=image></p><p>除了接口本身可以设置 pre-request 和 Test Script，我们在编辑 Collection 和 Collection 下的folder时，可以看到 Collection 和 Folder 也都支持设置 pre-request 和 test 脚本。 那这几种脚本的执行优先级或者说顺序是如何的呢？ 下图就是这几个不同位置脚本的调用执行顺序：
+<img src=/frontEndDemo/images/20190126_235847.png loading=lazy alt=image></p><p>对TestNG 或者 Junit 等测试框架有所了解的同学，应该知道这些测试框架也有类似的运行时概念，也就是 Setup 和 teardown 方法，而且也有 case、class、suite 这样的层次。不过这些不同层次的方法都是成对出现的，即 case 的 setup 和 teardown 在 case 执行前和结束后会执行。 而 Postman 的 Script 执行顺序和这个稍有差别，是按层级顺序排列，而不是成对出现的。大家参照图片注意理解下差异。</p><p>大家也可以自己验证下这个执行顺序，分别在Collection、folder 以及 folder 下的请求中定义相关脚本，如：
+<img src=/frontEndDemo/images/20190129_205434.png loading=lazy alt=image></p><p>执行，查看 console 输出：
+<img src=/frontEndDemo/images/20190129_205811.png loading=lazy alt=image>
+可见 Postman 对不同脚本的执行顺序和前文所述一致。</p><h3 id=postman脚本-prerequest>Postman脚本-PreRequest</h3><p>Pre-request 脚本，顾名思义，其实就是在接口消息发送前，可以进行一些预处理动作，类似于 Junit 或 TestNG 等测试框架中的 Setup 方法。 利用 Pre-Script 脚本，我们就可以在发送接口请求前来完成一些需要动态处理的动作，比如调整变量取值，或者对一些动态参数进行一些特殊处理。</p><p>下面我们就以 GitHub API 中的一个实例来看下 Pre-Script 脚本的主要作用。（关于GitHub API 的一些具体说明，大家可以先看下我在上一篇 Chat <a class=link href=https://gitbook.cn/gitchat/activity/5c373c316cf27775f39ee310 target=_blank rel=noopener>《玩转Postman：基础篇》</a>中的介绍）</p><p>GitHub API 中一个经常使用到的接口是查询接口</p><p>根据 GitHub API 官网的定义说明，查询 repositories 的接口定义如下：</p><blockquote><p>GET /search/repositories</p></blockquote><p><img src=/frontEndDemo/images/20190207_115633.png loading=lazy alt=image></p><p>其中参数 q 是主要的查询参数，具体定义参见
+<a class=link href=https://help.github.com/articles/searching-for-repositories/ target=_blank rel=noopener>https://help.github.com/articles/searching-for-repositories/</a></p><p>比如我们要查询包含在指定日期 2018-11-11 后创建且包含关键字 automation 的 repository 信息。
+<img src=/frontEndDemo/images/20190207_120638.png loading=lazy alt=image>
+可知 GitHub 上存在这样的 repo 数量有七千多个。</p><p>在这个例子中，因为查询条件包含一个日期参数，而实际测试工作场景中，很多时候我们希望日期是动态生成的，比如根据当前日期取一年以前作为查询参数值，这时我们就需要对参数进行一些预处理，这就是 Pre-Script 的用武之地了。</p><p>这时我们可以首先设置一个环境变量 created，再在 pre-script 脚本中动态预处理这个日期，来完成日期动态设置的目的。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=nx>pm</span><span class=p>.</span><span class=nx>environment</span><span class=p>.</span><span class=nx>set</span><span class=p>(</span><span class=s2>&#34;created&#34;</span><span class=p>,</span><span class=nx>getCreated</span><span class=p>(</span><span class=k>new</span> <span class=nb>Date</span><span class=p>(),</span> <span class=o>-</span><span class=mi>1</span><span class=p>)</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cm>/*
+</span></span></span><span class=line><span class=cl><span class=cm>获取&#34;YYYY-MM-DD&#34;格式的日期
+</span></span></span><span class=line><span class=cl><span class=cm>第一个入参为日期对象
+</span></span></span><span class=line><span class=cl><span class=cm>第二个入参为年份偏移量，负数为向前偏移
+</span></span></span><span class=line><span class=cl><span class=cm>*/</span>
+</span></span><span class=line><span class=cl><span class=kd>function</span> <span class=nx>getCreated</span><span class=p>(</span><span class=nx>date</span><span class=p>,</span> <span class=nx>yearOffset</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=kd>var</span> <span class=nx>seperator1</span> <span class=o>=</span> <span class=s2>&#34;-&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=kd>var</span> <span class=nx>year</span> <span class=o>=</span> <span class=nx>date</span><span class=p>.</span><span class=nx>getFullYear</span><span class=p>()</span> <span class=o>+</span> <span class=nx>yearOffset</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=kd>var</span> <span class=nx>month</span> <span class=o>=</span> <span class=nx>date</span><span class=p>.</span><span class=nx>getMonth</span><span class=p>()</span> <span class=o>+</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=kd>var</span> <span class=nx>day</span> <span class=o>=</span> <span class=nx>date</span><span class=p>.</span><span class=nx>getDate</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=nx>month</span> <span class=o>&gt;=</span> <span class=mi>1</span> <span class=o>&amp;&amp;</span> <span class=nx>month</span> <span class=o>&lt;=</span> <span class=mi>9</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nx>month</span> <span class=o>=</span> <span class=s2>&#34;0&#34;</span> <span class=o>+</span> <span class=nx>month</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=nx>day</span> <span class=o>&gt;=</span> <span class=mi>0</span> <span class=o>&amp;&amp;</span> <span class=nx>day</span> <span class=o>&lt;=</span> <span class=mi>9</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nx>day</span> <span class=o>=</span> <span class=s2>&#34;0&#34;</span> <span class=o>+</span> <span class=nx>day</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=kd>var</span> <span class=nx>currentDate</span> <span class=o>=</span> <span class=nx>year</span> <span class=o>+</span> <span class=nx>seperator1</span> <span class=o>+</span> <span class=nx>month</span> <span class=o>+</span> <span class=nx>seperator1</span> <span class=o>+</span> <span class=nx>day</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>currentDate</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=nx>currentDate</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>在 Postman中执行如图，获取当前日期一年以来创建的 repositories 信息。
+<img src=/frontEndDemo/images/20190207_145753.png loading=lazy alt=image></p><p>在 Pre-Script中，主要是围绕 Postman 的变量来进行预处理，所以主要使用的就是 Postman 的变量域的一些封装方法。</p><ul><li><strong>pm.globals.has(variableName:String)</strong></li></ul><p>是否存在某全局变量</p><ul><li><strong>pm.globals.get(variableName:String)</strong></li></ul><p>获取全局变量</p><ul><li><strong>pm.globals.set(variableName:String, variableValue:String)</strong></li></ul><p>设置全局变量</p><ul><li><strong>pm.globals.unset(variableName:String)</strong></li></ul><p>取消当前全局变量设置</p><ul><li><strong>pm.globals.clear()</strong></li></ul><p>清空全局变量</p><ul><li><strong>pm.environment.has(variableName:String)</strong></li></ul><p>是否存在某环境变量</p><ul><li><strong>pm.environment.get(variableName:String)</strong></li></ul><p>获取环境变量</p><ul><li><strong>pm.environment.set(variableName:String, variableValue:String)</strong></li></ul><p>设置环境变量</p><ul><li><strong>pm.environment.unset(variableName:String)</strong></li></ul><p>取消当前环境变量设置</p><ul><li><strong>pm.environment.clear()</strong></li></ul><p>清空环境变量</p><ul><li><strong>pm.variables.get(variableName:String)</strong></li></ul><p>根据变量名获取变量</p><ul><li><strong>pm.sendRequest()</strong></li></ul><p>发送请求</p><h3 id=postman脚本-test脚本>Postman脚本-Test脚本</h3><p>Postman 的 Test 脚本是 Postman 另一个值得称道的特色功能，在 Test 脚本中，Postman 封装了很多丰富的校验逻辑，并结合 JS 脚本本身语言的灵活性，给测试人员对接口的判断、校验和响应处理带来极大的便利性。</p><p>下面我们重点介绍下 Test 脚本中封装一些主要的校验方法。</p><h4 id=判断接口响应状态码>判断接口响应状态码</h4><p>对接口响应状态码的校验，是接口测试校验的常用手段。关于状态码的详细说明也可参见我的上一篇 Chat <a class=link href=https://gitbook.cn/gitchat/activity/5c373c316cf27775f39ee310 target=_blank rel=noopener>《玩转Postman：基础篇》</a> ， 下面看一个 Postman 中进行接口校验码校验的代码:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=nx>pm</span><span class=p>.</span><span class=nx>test</span><span class=p>(</span><span class=s2>&#34;判断返回成功状态码&#34;</span><span class=p>,</span><span class=kd>function</span><span class=p>(){</span>
+</span></span><span class=line><span class=cl>    <span class=nx>pm</span><span class=p>.</span><span class=nx>response</span><span class=p>.</span><span class=nx>to</span><span class=p>.</span><span class=nx>have</span><span class=p>.</span><span class=nx>status</span><span class=p>(</span><span class=mi>200</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><p>或者也可以使用第三方校验库 chaijs 的expect 方法来进行校验。 Chaijs 对常用的校验方式按照行为驱动开发（BDD）的描述方式进行了封装，使校验判断的代码编写方便了很多。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=nx>pm</span><span class=p>.</span><span class=nx>test</span><span class=p>(</span><span class=s2>&#34;expect方法判断返回成功&#34;</span><span class=p>,</span><span class=kd>function</span><span class=p>(){</span>
+</span></span><span class=line><span class=cl>    <span class=nx>pm</span><span class=p>.</span><span class=nx>expect</span><span class=p>(</span><span class=nx>pm</span><span class=p>.</span><span class=nx>response</span><span class=p>.</span><span class=nx>code</span><span class=p>).</span><span class=nx>to</span><span class=p>.</span><span class=nx>equal</span><span class=p>(</span><span class=mi>200</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><p>再或者我们还可以直接使用 Postman 对返回状态码的封装方法来进行判断</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=nx>pm</span><span class=p>.</span><span class=nx>test</span><span class=p>(</span><span class=s2>&#34;Postman封装方法判断返回成功&#34;</span><span class=p>,</span><span class=kd>function</span><span class=p>(){</span>
+</span></span><span class=line><span class=cl>    <span class=nx>pm</span><span class=p>.</span><span class=nx>response</span><span class=p>.</span><span class=nx>to</span><span class=p>.</span><span class=nx>be</span><span class=p>.</span><span class=nx>ok</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><p>Postman 中直接封装了常见的返回状态校验方法：</p><ul><li><strong>pm.response.to.be.info</strong></li></ul><p>校验 1XX 信息状态码</p><ul><li><strong>pm.response.to.be.success</strong></li></ul><p>校验 2XX 成功状态码</p><ul><li><strong>pm.response.to.be.redirection</strong></li></ul><p>校验 3XX 重定向状态码</p><ul><li><strong>pm.response.to.be.clientError</strong></li></ul><p>校验 4XX 客户端错误状态码</p><ul><li><strong>pm.response.to.be.serverError</strong></li></ul><p>校验 5XX 服务端错误状态码</p><ul><li><strong>pm.response.to.be.error</strong></li></ul><p>校验 4XX 或 5XX 错误状态码</p><ul><li><strong>pm.response.to.be.ok</strong></li></ul><p>检验 200 的 OK 返回</p><ul><li><strong>pm.response.to.be.accepted</strong></li></ul><p>校验状态码 202 的接受返回</p><ul><li><strong>pm.response.to.be.badRequest</strong></li></ul><p>校验状态码 400 的请求消息错误</p><ul><li><strong>pm.response.to.be.unauthorized</strong></li></ul><p>校验状态码 401 的认证错误</p><ul><li><strong>pm.response.to.be.forbidden</strong></li></ul><p>校验状态码 403 的访问受限</p><ul><li><strong>pm.response.to.be.notFound</strong></li></ul><p>校验状态码 404 的资源未见错误</p><ul><li><strong>pm.response.to.be.rateLimited</strong></li></ul><p>校验状态码 429 的访问频次限制错误</p><h4 id=校验响应时间>校验响应时间</h4><p>除了对于返回码的校验，我们还会经常校验的一个响应指标是响应时间。Postman 对于响应时间的校验也非常简单</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=nx>pm</span><span class=p>.</span><span class=nx>test</span><span class=p>(</span><span class=s2>&#34;响应时间小于1s&#34;</span><span class=p>,</span> <span class=kd>function</span> <span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>pm</span><span class=p>.</span><span class=nx>expect</span><span class=p>(</span><span class=nx>pm</span><span class=p>.</span><span class=nx>response</span><span class=p>.</span><span class=nx>responseTime</span><span class=p>).</span><span class=nx>to</span><span class=p>.</span><span class=nx>be</span><span class=p>.</span><span class=nx>below</span><span class=p>(</span><span class=mi>1000</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=校验消息内容>校验消息内容</h4><p>对接口返回内容的校验是我们判断业务逻辑正确性与否的必要手段。响应的消息头或者消息体内容我们可以通过 <code>pm.response.header</code> 或者 <code>pm.response.text</code> 、 <code>pm.response.json</code> 来获取。在相应的校验代码中我们就可以根据获取到的内容来进一步判断响应的正确性</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=nx>pm</span><span class=p>.</span><span class=nx>test</span><span class=p>(</span><span class=s2>&#34;校验消息头Content-Type&#34;</span><span class=p>,</span> <span class=kd>function</span> <span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>pm</span><span class=p>.</span><span class=nx>expect</span><span class=p>(</span><span class=nx>postman</span><span class=p>.</span><span class=nx>getResponseHeader</span><span class=p>(</span><span class=s2>&#34;Content-Type&#34;</span><span class=p>)).</span><span class=nx>to</span><span class=p>.</span><span class=nx>include</span><span class=p>(</span><span class=s2>&#34;application/json&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>pm</span><span class=p>.</span><span class=nx>test</span><span class=p>(</span><span class=s2>&#34;校验消息体返回数量大于1000&#34;</span><span class=p>,</span> <span class=kd>function</span> <span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nx>jsonData</span> <span class=o>=</span> <span class=nx>pm</span><span class=p>.</span><span class=nx>response</span><span class=p>.</span><span class=nx>json</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=nx>pm</span><span class=p>.</span><span class=nx>expect</span><span class=p>(</span><span class=nx>jsonData</span><span class=p>.</span><span class=nx>total_count</span><span class=p>).</span><span class=nx>to</span><span class=p>.</span><span class=nx>gt</span><span class=p>(</span><span class=mi>1000</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><p>在 Postman 中执行以上校验，可以在 Response 的 Test Results 中看到校验结果
+<img src=/frontEndDemo/images/20190208_170618.png loading=lazy alt=image></p><h3 id=postman脚本-接口的关联>Postman脚本-接口的关联</h3><p>在接口测试中，经常出现的一种情况是：我们需要从另一个接口的响应中获取某些值作为当前测试接口的输入来使用。结合 Postman 的 Pre-Script 脚本和 Test 脚本以及变量功能，我们可以方便地完成内容获取和参数传递的场景。</p><p>以下面的场景为例：</p><blockquote><p>从 Junit5 这个 repo 的接口信息中，获取该 repo 的创建时间，再查询在这个时间之后创建的所有包含 Junit5 字样的 repo 信息，判断 repo 数量是否超过 1000</p></blockquote><p><strong>方法一：</strong></p><ol><li>设置一个环境变量 created</li><li>在获取 repo 接口 GetRepo 的 Test 脚本中获取 Junit5 这个 repo 的创建时间</li><li>在 Test 脚本中将获取到的创建时间赋值给环境变量 created</li><li>在查询 repo 接口中使用环境变量 created</li><li>在查询 repo 接口中添加判断返回数量的校验代码</li><li>通过 Runner 执行器按顺序执行这两个接口，完成关联执行</li></ol><p>如图：
+<img src=/frontEndDemo/images/20190208_195305.png loading=lazy alt=image></p><p><img src=/frontEndDemo/images/20190208_195403.png loading=lazy alt=image></p><p>在 Runner 执行器中执行结果
+<img src=/frontEndDemo/images/20190208_195606.png loading=lazy alt=image></p><p><strong>方法二：</strong></p><p>在方法一中我们利用环境变量来传递参数，这种方法需要依赖 runner 执行器对接口的执行顺序来保证 GetRepo 接口在 SearchRepo 接口之前执行。</p><p>我们也可以利用 Postman 提供的请求发送方法 <code>pm.sendRequest </code>在 SearchRepo 的 pre-Script 脚本中直接完成前置请求的发送和参数获取。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=nx>pm</span><span class=p>.</span><span class=nx>sendRequest</span><span class=p>(</span><span class=s1>&#39;https://api.github.com/repos/junit-team/junit5&#39;</span><span class=p>,</span> <span class=kd>function</span> <span class=p>(</span><span class=nx>err</span><span class=p>,</span> <span class=nx>res</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>pm</span><span class=p>.</span><span class=nx>environment</span><span class=p>.</span><span class=nx>set</span><span class=p>(</span><span class=s2>&#34;created&#34;</span><span class=p>,</span> <span class=nx>res</span><span class=p>.</span><span class=nx>json</span><span class=p>().</span><span class=nx>created_at</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><p>此时不需要利用 runner 执行器，直接执行 SearchRepo 接口，也可得到同样的结果
+<img src=/frontEndDemo/images/20190208_200927.png loading=lazy alt=image></p><h3 id=postman脚本-代码复用>Postman脚本-代码复用</h3><p>Postman 作为一个接口测试工具而不是专业的代码编辑 IDE， 并没有提供脚本的复用以及代码片、模块定义之类的功能。但借助 Postman 强大的变量和 js 语法的良好支持，我们可以变通地实现代码复用。</p><p>我们可以将一些常用的代码片段保存到 global 变量中， 在需要使用的时候，直接调用这个 global 变量即可。</p><p>比如上面判断返回 repo 数量是否超过 1000 这段校验代码：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=nx>pm</span><span class=p>.</span><span class=nx>test</span><span class=p>(</span><span class=s2>&#34;判断返回成功状态码&#34;</span><span class=p>,</span><span class=kd>function</span><span class=p>(){</span>
+</span></span><span class=line><span class=cl>    <span class=nx>pm</span><span class=p>.</span><span class=nx>response</span><span class=p>.</span><span class=nx>to</span><span class=p>.</span><span class=nx>have</span><span class=p>.</span><span class=nx>status</span><span class=p>(</span><span class=mi>200</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>pm</span><span class=p>.</span><span class=nx>test</span><span class=p>(</span><span class=s2>&#34;校验消息体返回数量大于1000&#34;</span><span class=p>,</span> <span class=kd>function</span> <span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nx>jsonData</span> <span class=o>=</span> <span class=nx>pm</span><span class=p>.</span><span class=nx>response</span><span class=p>.</span><span class=nx>json</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=nx>pm</span><span class=p>.</span><span class=nx>expect</span><span class=p>(</span><span class=nx>jsonData</span><span class=p>.</span><span class=nx>total_count</span><span class=p>).</span><span class=nx>to</span><span class=p>.</span><span class=nx>gt</span><span class=p>(</span><span class=mi>1000</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><p>我们将它设置在 global 变量 checkRepoCount 中，在需要调用的地方，以如下代码代替即可：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=nb>eval</span><span class=p>(</span><span class=nx>globals</span><span class=p>.</span><span class=nx>checkRepoCount</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>Postman 中如图：
+<img src=/frontEndDemo/images/20190208_203114.png loading=lazy alt=image></p><h3 id=postman脚本-一个结合第三方库的复杂场景案例>Postman脚本-一个结合第三方库的复杂场景案例</h3><p>Postman 为便于接口脚本的编写，内建支持了丰富的第三方库，官方文档中列出了详细清单
+<img src=/frontEndDemo/images/20190208_203727.png loading=lazy alt=image></p><p>除了前面提到的 BDD 校验库 chai, 下面我们再结合第三方时间处理库 moment 来完成一个相对复杂的场景案例实现：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>1. 获取最近 6 个月包含有 Junit5 字样且 Star 数 &gt;1 的 repo 信息
+</span></span><span class=line><span class=cl>2. 判断返回 repo 数量是否 &gt;0, 结果显示到 Test Result
+</span></span><span class=line><span class=cl>3. 如果数量 &gt;0 , 获取 star 数最多的 repo 信息
+</span></span><span class=line><span class=cl>4. 判断自己是否已经 star 过这个repo
+</span></span><span class=line><span class=cl>5. 如果没有 star 过，执行 star操作
+</span></span></code></pre></td></tr></table></div></div><p>相关的接口如下：</p><ul><li>查询接口，查询关键字 junit5，star 数 >1 , 创建时间 6 月内， 按 star 数降序查询</li></ul><blockquote><p>/search/repositories?q=junit5+stars:>1+created:>{{created}}&amp;sort=stars</p></blockquote><ul><li>查询是否 star 了某 repo</li></ul><blockquote><p>GET /user/starred/:owner/:repo</p></blockquote><p>已 star 返回 204，未 star 返回 404</p><ul><li>执行 star repo 操作</li></ul><blockquote><p>PUT /user/starred/:owner/:repo</p></blockquote><p>成功则返回 204</p><p>在查询repo接口的 Pre-Script 脚本中引入事件处理库 moment，可以看到 moment 库相比 js 本身的 date 方法，对日期的处理更加方法灵活，利用 subtract 方法可简单获取半年前的日期，无需考虑日期补零、跨年等判断，代码如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=kd>var</span> <span class=nx>m</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s2>&#34;moment&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1>//利用 moment 库获取六个月前日期
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>let</span> <span class=nx>createDate</span> <span class=o>=</span> <span class=nx>m</span><span class=p>(</span><span class=nx>m</span><span class=p>.</span><span class=nx>now</span><span class=p>()).</span><span class=nx>subtract</span><span class=p>(</span><span class=mi>6</span><span class=p>,</span><span class=s2>&#34;months&#34;</span><span class=p>).</span><span class=nx>format</span><span class=p>(</span><span class=s2>&#34;YYYY-MM-DD&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>pm</span><span class=p>.</span><span class=nx>environment</span><span class=p>.</span><span class=nx>set</span><span class=p>(</span><span class=s2>&#34;created&#34;</span><span class=p>,</span> <span class=nx>createDate</span><span class=p>);</span>
+</span></span></code></pre></td></tr></table></div></div><p>在查询repo接口的 Test 脚本中编写校验和后续逻辑代码：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=c1>//获取符合条件repo总数量
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>let</span> <span class=nx>count</span> <span class=o>=</span> <span class=nx>pm</span><span class=p>.</span><span class=nx>response</span><span class=p>.</span><span class=nx>json</span><span class=p>().</span><span class=nx>total_count</span>
+</span></span><span class=line><span class=cl><span class=nx>pm</span><span class=p>.</span><span class=nx>test</span><span class=p>(</span><span class=s2>&#34;覆盖条件repo数量为 &#34;</span><span class=o>+</span><span class=nx>count</span><span class=p>,</span> <span class=kd>function</span><span class=p>(){</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span><span class=p>(</span> <span class=nx>count</span> <span class=o>&gt;</span> <span class=mi>0</span> <span class=p>){</span>
+</span></span><span class=line><span class=cl>        <span class=c1>//保存repo的owner和repo名称，查询条件为按star排序，所以index为0的repo即star数最多
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kd>var</span> <span class=nx>repoName</span> <span class=o>=</span> <span class=nx>pm</span><span class=p>.</span><span class=nx>response</span><span class=p>.</span><span class=nx>json</span><span class=p>().</span><span class=nx>items</span><span class=p>[</span><span class=mi>0</span><span class=p>].</span><span class=nx>name</span>
+</span></span><span class=line><span class=cl>        <span class=kd>var</span> <span class=nx>owner</span> <span class=o>=</span> <span class=nx>pm</span><span class=p>.</span><span class=nx>response</span><span class=p>.</span><span class=nx>json</span><span class=p>().</span><span class=nx>items</span><span class=p>[</span><span class=mi>0</span><span class=p>].</span><span class=nx>owner</span><span class=p>.</span><span class=nx>login</span>
+</span></span><span class=line><span class=cl>        <span class=nx>pm</span><span class=p>.</span><span class=nx>test</span><span class=p>(</span><span class=s2>&#34;当前star数最多的repo是【&#34;</span><span class=o>+</span> <span class=nx>pm</span><span class=p>.</span><span class=nx>response</span><span class=p>.</span><span class=nx>json</span><span class=p>().</span><span class=nx>items</span><span class=p>[</span><span class=mi>0</span><span class=p>].</span><span class=nx>full_name</span> <span class=o>+</span> <span class=s2>&#34;】&#34;</span><span class=p>,</span> <span class=kd>function</span><span class=p>(){</span>
+</span></span><span class=line><span class=cl>            <span class=c1>//需要定义请求信息，指定header和执行方法。不指定的话直接在SendRequest中使用默认为GET方法，不携带Header
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=kr>const</span> <span class=nx>getStarReq</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>              <span class=nx>url</span><span class=o>:</span> <span class=s2>&#34;https://api.github.com/user/starred/&#34;</span><span class=o>+</span><span class=nx>owner</span><span class=o>+</span><span class=s2>&#34;/&#34;</span><span class=o>+</span><span class=nx>repoName</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>              <span class=nx>method</span><span class=o>:</span> <span class=s1>&#39;GET&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>              <span class=c1>//接口需要经过鉴权，代码中不能使用Postman界面设置，将鉴权信息携带在header中
+</span></span></span><span class=line><span class=cl><span class=c1></span>              <span class=nx>header</span><span class=o>:</span><span class=s1>&#39;Authorization:Bearer 84fb9e0706bab75f1d4b6f4e3586683d8c4605af&#39;</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=nx>pm</span><span class=p>.</span><span class=nx>sendRequest</span><span class=p>(</span><span class=nx>getStarReq</span><span class=p>,</span> <span class=kd>function</span> <span class=p>(</span><span class=nx>err</span><span class=p>,</span> <span class=nx>res</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=kd>let</span> <span class=nx>stared</span> <span class=o>=</span> <span class=nx>pm</span><span class=p>.</span><span class=nx>test</span><span class=p>(</span><span class=s2>&#34;当前repo已star&#34;</span><span class=p>,</span><span class=kd>function</span><span class=p>(){</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>                        <span class=k>if</span> <span class=p>(</span><span class=nx>res</span><span class=p>.</span><span class=nx>code</span> <span class=o>===</span> <span class=mi>404</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>                            <span class=kr>const</span> <span class=nx>starRequest</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                              <span class=nx>url</span><span class=o>:</span> <span class=s2>&#34;https://api.github.com/user/starred/&#34;</span><span class=o>+</span><span class=nx>owner</span><span class=o>+</span><span class=s2>&#34;/&#34;</span><span class=o>+</span><span class=nx>repoName</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                              <span class=nx>method</span><span class=o>:</span> <span class=s1>&#39;PUT&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                              <span class=c1>//接口需要经过鉴权，代码中不能使用Postman界面设置，将鉴权信息携带在header中
+</span></span></span><span class=line><span class=cl><span class=c1></span>                              <span class=nx>header</span><span class=o>:</span> <span class=s1>&#39;Authorization:Bearer 84fb9e0706bab75f1d4b6f4e3586683d8c4605af&#39;</span>
+</span></span><span class=line><span class=cl>                            <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>                            <span class=nx>pm</span><span class=p>.</span><span class=nx>sendRequest</span><span class=p>(</span><span class=nx>starRequest</span><span class=p>,</span> <span class=kd>function</span> <span class=p>(</span><span class=nx>starErr</span><span class=p>,</span> <span class=nx>starRes</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>                                <span class=k>if</span> <span class=p>(</span><span class=nx>starErr</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                                    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>starErr</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>                                <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                                    <span class=nx>pm</span><span class=p>.</span><span class=nx>test</span><span class=p>(</span><span class=s2>&#34;已star成功&#34;</span><span class=p>,</span><span class=kd>function</span><span class=p>(){</span>
+</span></span><span class=line><span class=cl>                                        <span class=nx>pm</span><span class=p>.</span><span class=nx>expect</span><span class=p>(</span><span class=nx>starRes</span><span class=p>.</span><span class=nx>code</span><span class=p>).</span><span class=nx>to</span><span class=p>.</span><span class=nx>equal</span><span class=p>(</span><span class=mi>204</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                                    <span class=p>})</span>
+</span></span><span class=line><span class=cl>                                <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>                            <span class=p>})</span>
+</span></span><span class=line><span class=cl>                        <span class=p>}</span>
+</span></span><span class=line><span class=cl>                        <span class=nx>pm</span><span class=p>.</span><span class=nx>expect</span><span class=p>(</span><span class=nx>res</span><span class=p>.</span><span class=nx>code</span><span class=p>).</span><span class=nx>to</span><span class=p>.</span><span class=nx>equal</span><span class=p>(</span><span class=mi>204</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                    <span class=p>})</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>})</span>
+</span></span><span class=line><span class=cl>        <span class=p>})</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>})</span>
+</span></span></code></pre></td></tr></table></div></div><p>Postman 中执行效果如图：
+<img src=/frontEndDemo/images/20190208_232013.png loading=lazy alt=image></p><h3 id=结语及预告>结语及预告</h3><p>以上就是关于 Postman 的脚本进阶使用的介绍。简单总结一下：</p><ul><li><p>Postman 提供了 5 种不同的变量类型，且分别对应不同的作用域。灵活使用这些变量，可以帮助我们实现动态匹配、参数传递、代码复用等场景。</p></li><li><p>postman 在 Collection、Folder、接口本身三层上都分别提供了两种脚本沙箱：Pre-Script、Test。Pre-Script是在接口请求之前执行，Test 是在接口响应之后执行。注意三层对象上不同的执行顺序。</p></li><li><p>Postman 脚本基于 Node.js，内建支持了丰富的第三方库，并且 Postman 自身也封装了很多上层方法，可以参考 <a class=link href=https://learning.getpostman.com/docs/postman/scripts/postman_sandbox_api_reference target=_blank rel=noopener>Postman 官方沙箱方法参考</a></p></li></ul><p>所以Postman 通过丰富的变量以及强大的 js 脚本支持，可以非常灵活地帮助我们更好地完成接口测试中一些复杂的场景。</p><p>虽然目前两篇 Chat 主要介绍了 Postman 在接口手工测试中的主要功能和使用技巧，但 Postman 其实也能非常方便地应用在自动化测试中，欢迎大家继续关注下一篇 <strong>《玩转Postman：自动化篇》</strong>，我们将一起来学习：</p><ul><li>Postman 的批量执行工具 Runner 详解</li><li>Postman 实现接口的流程控制</li><li>Postman 的命令行自动化工具 NewMan 详解</li><li>结合持续集成工具 Jenkins 实现 Postman 接口脚本的自动调度和执行</li></ul></section><footer class=article-footer><section class=article-tags><a href=/tags/postman/>Postman</a>
+<a href=/tags/%E6%8E%A5%E5%8F%A3%E6%B5%8B%E8%AF%95/>接口测试</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/post/088-bruno%E5%9F%BA%E7%A1%80/><div class=article-details><h2 class=article-title>Postman最佳平替, API测试工具Bruno实用教程(一)：基础篇</h2></div></a></article><article class=has-image><a href=/post/015-postmanv11%E6%9B%B4%E6%96%B0%E4%BE%BF%E8%A7%88/><div class=article-image><img src=/post/015-postmanv11%E6%9B%B4%E6%96%B0%E4%BE%BF%E8%A7%88/v11-Launch-Blog.a608c30644c420f9807534f7846be2b8_hu_90c53885421b2aff.jpg width=250 height=150 loading=lazy alt="Featured image of post PostmanV11更新便览" data-hash="md5-pgjDBkTEIPmAdTT3hGviuA=="></div><div class=article-details><h2 class=article-title>PostmanV11更新便览</h2></div></a></article><article class=has-image><a href=/post/004-postman%E9%AB%98%E7%BA%A7%E7%AF%87/><div class=article-image><img src=https://chengxiaqiucao.github.io/frontEndDemo/images/20181225_210709.png loading=lazy data-key data-hash=https://chengxiaqiucao.github.io/frontEndDemo/images/20181225_210709.png></div><div class=article-details><h2 class=article-title>Postman高级篇</h2></div></a></article><article class=has-image><a href=/post/003-postman%E8%87%AA%E5%8A%A8%E5%8C%96%E7%AF%87/><div class=article-image><img src=https://chengxiaqiucao.github.io/frontEndDemo/images/20181225_210709.png loading=lazy data-key data-hash=https://chengxiaqiucao.github.io/frontEndDemo/images/20181225_210709.png></div><div class=article-details><h2 class=article-title>Postman自动化篇</h2></div></a></article><article class=has-image><a href=/post/001-postman%E5%9F%BA%E7%A1%80%E7%AF%87/><div class=article-image><img src=https://chengxiaqiucao.github.io/frontEndDemo/images/20181225_210709.png loading=lazy data-key data-hash=https://chengxiaqiucao.github.io/frontEndDemo/images/20181225_210709.png></div><div class=article-details><h2 class=article-title>Postman基础篇</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2023 -
+2025 |by 城下秋草（公众号： 秋草说测试）</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

@@ -1,0 +1,684 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Windows on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/windows/</link><description>Recent content in Windows on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Tue, 29 Apr 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/windows/index.xml" rel="self" type="application/rss+xml"/><item><title>AutoHotKey：让效率倍增的桌面自动化利器</title><link>https://chengxiaqiucao.github.io/post/085-autohotkey/</link><pubDate>Tue, 29 Apr 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/085-autohotkey/</guid><description>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>之前在介绍Markdown文档中图片处理方法的文章 【&lt;a class="link" href="https://mp.weixin.qq.com/s/Mom021usUHUFwE8aGXVtVg" target="_blank" rel="noopener"
+>本地Markdown编写的文档，发布到网上如何处理图片？&lt;/a>】 中，介绍了可以使用 &lt;strong>AutoHotKey&lt;/strong> 来辅助完成截图和链接的自动生成。有小伙伴私信问这个工具的具体用法。&lt;/p>
+&lt;p>下文我们就比较系统地介绍下这个工具，了解通过ahk的脚本魔法，如何让重复操作一键完成！&lt;/p>
+&lt;h2 id="ahk简介">AHK简介
+&lt;/h2>&lt;p>在追求效率的软件开发与技术工作中，&lt;strong>重复性操作&lt;/strong>往往吞噬宝贵时间。AutoHotkey（AHK）作为一款轻量级、开源的&lt;strong>Windows桌面自动化工具&lt;/strong>。可以通过编写简洁的脚本，将用户从繁琐、重复的键盘鼠标操作中解放出来，显著提升工作效率。&lt;/p>
+&lt;p>理解AHK的关键在于其&lt;strong>脚本语言&lt;/strong>。核心功能包括模拟键盘输入（&lt;code>Send&lt;/code>）、鼠标操作（&lt;code>Click&lt;/code>）、程序运行（&lt;code>Run&lt;/code>）、条件判断（&lt;code>If&lt;/code>）和循环控制（&lt;code>Loop&lt;/code>）等。用户无需编译环境，脚本文件（&lt;code>.ahk&lt;/code>）可直接运行，资源占用极低。&lt;/p>
+&lt;p>AHK的应用场景极为广泛。简单如自动填写表单、快捷输入预设短语；进阶如批量重命名文件、自动化软件测试、定制专属工作流；甚至可开发带有图形界面（GUI）的小工具。其强大之处在于&lt;strong>深度集成Windows系统&lt;/strong>，能够操作窗口、读写注册表、访问文件系统，实现高度的定制化自动化。&lt;/p>
+&lt;p>简单来说，AutoHotKey 赋予了用户&lt;strong>用脚本指挥电脑&lt;/strong>的能力。无论是开发者、办公人员还是追求效率的普通用户，都能通过它定制专属的“快捷键魔法”，将重复劳动转化为瞬间完成的自动化操作。&lt;/p>
+&lt;h2 id="ahk-核心语法与常用函数">AHK 核心语法与常用函数
+&lt;/h2>&lt;h3 id="基础热键">**基础热键
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>热键定义&lt;/strong>：由一个热键后跟双冒号组成.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-autohotkey" data-lang="autohotkey">&lt;span class="line">&lt;span class="cl">&lt;span class="o">^&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="c1"> ; Ctrl+J 热键&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Send&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Hello&lt;/span> &lt;span class="n">World&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="c1"> ; 发送文本&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">return&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>如果只有一行执行的操作， &lt;code>return&lt;/code> 也可省略&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>符号&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>#&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Win 键 (Windows 徽标键)&lt;br>- 等待 Win 释放后发送文本（Vista+）&lt;br>- 可能导致额外模拟击键（详见 &lt;code>#MenuMaskKey&lt;/code>)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>!&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Alt 键&lt;br>- 可能导致额外模拟击键（详见 &lt;code>#MenuMaskKey&lt;/code>)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>^&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Ctrl 键&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>+&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Shift 键&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>&amp;amp;&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>组合任意两个按键/鼠标按钮创建自定义热键&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>&amp;lt;&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>使用成对按键中的左侧键（如 &lt;code>&amp;lt;!a&lt;/code> 仅左 Alt 触发）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>&amp;gt;&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>使用成对按键中的右侧键&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>&amp;lt;^&amp;gt;!&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>AltGr 键（替代图形键）&lt;br>- 表示 AltGr 组合键（如 &lt;code>&amp;lt;^&amp;gt;!m&lt;/code>）&lt;br>- 单独使用：&lt;code>LControl &amp;amp; RAlt&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>*&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>通配符：即使附加修饰键按住也能触发&lt;br>- 示例：&lt;code>*#c&lt;/code>（Win+C/Shift+Win+C 等均触发）&lt;br>- 强制使用键盘钩子&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>~&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>保留按键原生功能（不屏蔽操作系统事件）&lt;br>- 示例：&lt;code>~RButton&lt;/code>（右键点击仍发送到窗口）&lt;br>- 影响所有组合行为&lt;br>- 强制使用键盘钩子&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>$&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>强制使用键盘钩子，避免 Send 命令触发自身&lt;br>- 对鼠标热键无效&lt;br>- 替代方案：&lt;code>#InputLevel&lt;/code>/&lt;code>SendLevel&lt;/code> (v1.1.06+)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>UP&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>在按键释放时触发（非按下时）&lt;br>- 示例：&lt;code>^!r Up::&lt;/code>（释放 Ctrl+Alt+R 触发）&lt;br>- 限制：&lt;br> 1) 不适用于控制器按钮&lt;br> 2) 需配合普通热键避免卡键&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>&lt;strong>示例&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-autohotkey" data-lang="autohotkey">&lt;span class="line">&lt;span class="cl">&lt;span class="nl">#a::&lt;/span>&lt;span class="n">Run&lt;/span> &lt;span class="n">Calculator&lt;/span>&lt;span class="c1"> ; Win+A 启动计算器&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="o">^!+&lt;/span>&lt;span class="n">s&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Send&lt;/span> &lt;span class="n">Hello&lt;/span> &lt;span class="n">World&lt;/span>&lt;span class="c1"> ; Ctrl+Alt+Shift+S 发送文本&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="o">~&lt;/span>&lt;span class="n">RButton&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">MsgBox&lt;/span> &lt;span class="n">Right&lt;/span> &lt;span class="n">Click&lt;/span>&lt;span class="c1"> ; 保留右键原生功能的弹窗&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="n">LWin&lt;/span> &lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">R&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Reload&lt;/span>&lt;span class="c1"> ; 左Win+R 重载脚本&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">#c&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Run&lt;/span> &lt;span class="n">cmd&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exe&lt;/span>&lt;span class="c1"> ; 任何修饰键+Win+C 启动命令提示符&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="o">^!&lt;/span>&lt;span class="n">r&lt;/span> &lt;span class="n">Up&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">MsgBox&lt;/span> &lt;span class="n">Released&lt;/span>&lt;span class="c1"> ; 释放组合键时触发&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="热字串">热字串
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>热字串&lt;/strong>：由一个冒号, 零个或多个选项, 另一个冒号, 缩写字符和双冒号组成.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-autohotkey" data-lang="autohotkey">&lt;span class="line">&lt;span class="cl">&lt;span class="o">:*:&lt;/span>&lt;span class="n">btw&lt;/span>&lt;span class="o">::&lt;/span> &lt;span class="n">by&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">way&lt;/span>&lt;span class="c1"> ; 输入btw后按空格/回车替换&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>或者也可以通过热字串执行复杂些的操作&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-autohotkey" data-lang="autohotkey">&lt;span class="line">&lt;span class="cl">&lt;span class="o">:*:&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="c1"> ; 此热字串通过后面的命令把 &amp;#34;]d&amp;#34; 替换成当前日期和时间.&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">FormatTime&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">CurrentDateTime&lt;/span>&lt;span class="p">,,&lt;/span> &lt;span class="n">M&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">yyyy&lt;/span> &lt;span class="n">h&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="n">mm&lt;/span> &lt;span class="n">tt&lt;/span>&lt;span class="c1"> ; &lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">SendInput&lt;/span> &lt;span class="nv">%CurrentDateTime%&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">return&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="核心命令函数">&lt;strong>核心命令函数&lt;/strong>
+&lt;/h3>&lt;p>常用的一些核心函数包括：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>函数名&lt;/th>
+&lt;th>类别&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>FileExist&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>文件操作&lt;/td>
+&lt;td>检查文件/文件夹是否存在并返回属性（如 &amp;ldquo;D&amp;rdquo; 表示目录）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>GetKeyState&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>输入检测&lt;/td>
+&lt;td>检测键盘/鼠标按键状态，返回 1（按下）或 0（松开）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>InStr&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>字符串处理&lt;/td>
+&lt;td>查找子串在字符串中的位置，支持从左/右搜索&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>StrLen&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>字符串处理&lt;/td>
+&lt;td>获取字符串长度（字节数或字符数）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>SubStr&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>字符串处理&lt;/td>
+&lt;td>截取字符串指定位置开始的子串&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>WinActive&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>窗口控制&lt;/td>
+&lt;td>检测指定窗口是否活动，返回窗口句柄（HWND）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>WinExist&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>窗口控制&lt;/td>
+&lt;td>检测指定窗口是否存在，返回首个匹配窗口句柄&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>Format&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>数据处理&lt;/td>
+&lt;td>格式化字符串（类似 sprintf 功能）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>DllCall&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>系统交互&lt;/td>
+&lt;td>调用 Windows API 等外部 DLL 函数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>Run&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>进程控制&lt;/td>
+&lt;td>启动程序/执行命令（已在初稿列出，此处补充完整描述）&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>&lt;strong>示例:&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-autohotkey" data-lang="autohotkey">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">; 组合使用示例&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">if &lt;/span>&lt;span class="nf">WinActive&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ahk_exe chrome.exe&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nf">GetKeyState&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Ctrl&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;P&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">FileAppend&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">%&lt;/span>&lt;span class="n">Format&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%time%] Ctrl pressed in Chrome`n&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">%&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nf">log&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">txt&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">Send&lt;/span> &lt;span class="o">^&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">t&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="c1"> ; 在Chrome中新建标签页&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="变量与表达式">&lt;strong>变量与表达式&lt;/strong>
+&lt;/h3>&lt;ul>
+&lt;li>变量无需声明，直接赋值（如 &lt;code>count := 10&lt;/code>）&lt;/li>
+&lt;li>支持字符串拼接（&lt;code>.&lt;/code> 运算符）与数学运算&lt;/li>
+&lt;/ul>
+&lt;h2 id="实用案例说明">实用案例说明
+&lt;/h2>&lt;h3 id="案例-1截图自动生成-markdown-图片链接">案例 1：截图自动生成 Markdown 图片链接
+&lt;/h3>&lt;p>&lt;strong>痛点&lt;/strong>：手动截图→保存→复制路径→插入 Markdown 繁琐
+&lt;strong>解决方案&lt;/strong>：一键完成截图并生成标准链接&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-autohotkey" data-lang="autohotkey">&lt;span class="line">&lt;span class="cl">&lt;span class="nl">#s::&lt;/span>&lt;span class="c1"> ; Win+S 快捷键&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Run&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nv">%A_WinDir%&lt;/span>\&lt;span class="n">System32&lt;/span>\&lt;span class="n">SnippingTool&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exe&lt;/span>&lt;span class="c1"> ; 启动截图工具&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">WinWaitActive&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Snip&lt;/span> &lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">Sketch&lt;/span>&lt;span class="c1"> ; 等待窗口激活&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Send&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">^+&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="c1"> ; 模拟新建截图快捷键（Ctrl+Shift+N）&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">WinWaitActive&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ahk_class&lt;/span> &lt;span class="n">Microsoft&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ScreenSketch&lt;/span>&lt;span class="c1"> ; 等待截图完成&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Send&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">^&lt;/span>&lt;span class="n">s&lt;/span>&lt;span class="c1"> ; 保存截图&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">WinWaitActive&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Save&lt;/span> &lt;span class="n">As&lt;/span>&lt;span class="c1"> ; 等待保存对话框&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">FormatTime&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">CurrentTime&lt;/span>&lt;span class="p">,,&lt;/span> &lt;span class="n">yyyyMMdd_HHmmss&lt;/span>&lt;span class="c1"> ; 生成时间戳文件名&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">SendInput&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nv">%CurrentTime%&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">png&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">Enter&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="c1"> ; 输入文件名&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Sleep&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1000&lt;/span>&lt;span class="c1"> ; 等待保存完成&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nv">clipboard&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="s">&amp;#34;![](&amp;#34;&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="nv">A_Desktop&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="s">&amp;#34;\&amp;#34;&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="n">CurrentTime&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="s">&amp;#34;.png)&amp;#34;&lt;/span>&lt;span class="c1"> ; 生成MD链接&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">MsgBox&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Markdown截图链接已复制到剪贴板&lt;/span>&lt;span class="err">！
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">return&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>效果&lt;/strong>：按 Win+S → 截图 → 自动保存为带时间戳的 PNG → 剪贴板生成 &lt;code>![](路径)&lt;/code> 格式链接。&lt;/p>
+&lt;h3 id="案例-2一键执行复杂命令序列">案例 2：一键执行复杂命令序列
+&lt;/h3>&lt;p>&lt;strong>痛点&lt;/strong>：部署环境需重复输入多条命令
+&lt;strong>解决方案&lt;/strong>：单键触发命令组合&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-autohotkey" data-lang="autohotkey">&lt;span class="line">&lt;span class="cl">&lt;span class="o">^!&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="c1"> ; Ctrl+Alt+D&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Run&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">cmd&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exe&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="o">:&lt;/span>\&lt;span class="n">MyProject&lt;/span>&lt;span class="c1"> ; 打开CMD并进入项目目录&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">WinWaitActive&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ahk_class&lt;/span> &lt;span class="n">ConsoleWindowClass&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Send&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">git&lt;/span> &lt;span class="n">pull&lt;/span> &lt;span class="n">origin&lt;/span> &lt;span class="n">main&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">Enter&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Sleep&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2000&lt;/span>&lt;span class="c1"> ; 等待git pull完成&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Send&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">mvn&lt;/span> &lt;span class="n">clean&lt;/span> &lt;span class="n">install&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">Enter&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Sleep&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5000&lt;/span>&lt;span class="c1"> ; 等待Maven构建&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Send&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">docker&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">compose&lt;/span> &lt;span class="n">up&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">Enter&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">MsgBox&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="err">环境部署命令已执行！
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">return&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>效果&lt;/strong>：一键完成代码拉取、项目构建、容器启动。&lt;/p>
+&lt;h3 id="案例-3自动化测试数据生成">案例 3：自动化测试数据生成
+&lt;/h3>&lt;p>&lt;strong>痛点&lt;/strong>：手动创建大量测试数据效率低下
+&lt;strong>解决方案&lt;/strong>：脚本批量生成结构化数据&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-autohotkey" data-lang="autohotkey">&lt;span class="line">&lt;span class="cl">&lt;span class="nl">F9::&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">testData&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="s">&amp;#34;&amp;#34;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Loop&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">100&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="c1"> ; 生成100条数据&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">name&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="s">&amp;#34;User&amp;#34;&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="nv">A_Index&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">email&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="s">&amp;#34;user&amp;#34;&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="nv">A_Index&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="s">&amp;#34;@test.com&amp;#34;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">age&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="n">Random&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">18&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">60&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="c1"> ; 自定义Random函数生成随机数&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">testData&lt;/span> &lt;span class="o">.=&lt;/span> &lt;span class="n">name&lt;/span> &lt;span class="s">&amp;#34;,&amp;#34;&lt;/span> &lt;span class="n">email&lt;/span> &lt;span class="s">&amp;#34;,&amp;#34;&lt;/span> &lt;span class="n">age&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">`n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="c1"> ; 拼接CSV格式&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">FileAppend&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nv">%testData%&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="o">:&lt;/span>\&lt;span class="n">TestData&lt;/span>\&lt;span class="n">users&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">csv&lt;/span>&lt;span class="c1"> ; 写入文件&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Run&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">notepad&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exe&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="o">:&lt;/span>\&lt;span class="n">TestData&lt;/span>\&lt;span class="n">users&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">csv&lt;/span>&lt;span class="c1"> ; 打开查看&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">return&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">Random&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">min&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">max&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Random&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">rand&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">min&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">max&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">return&lt;/span> &lt;span class="n">rand&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>效果&lt;/strong>：按 F9 自动生成含用户名、邮箱、年龄的 100 条 CSV 测试数据。&lt;/p>
+&lt;hr>
+&lt;h2 id="总结为什么使用autohotkey">总结：为什么使用AutoHotKey？
+&lt;/h2>&lt;ol>
+&lt;li>&lt;strong>极简入门&lt;/strong>：语法接近自然语言，无需编译环境&lt;/li>
+&lt;li>&lt;strong>资源友好&lt;/strong>：轻量级（安装包 &amp;lt; 3MB），后台占用可忽略&lt;/li>
+&lt;li>&lt;strong>深度集成&lt;/strong>：无缝操作窗口、注册表、文件系统&lt;/li>
+&lt;li>&lt;strong>生态丰富&lt;/strong>：官方论坛提供海量脚本库与插件支持&lt;/li>
+&lt;li>&lt;strong>跨场景适用&lt;/strong>：从文本处理到 GUI 自动化全覆盖&lt;/li>
+&lt;/ol>
+&lt;blockquote>
+&lt;p>进一步学习：&lt;/p>
+&lt;ul>
+&lt;li>官方文档：&lt;a class="link" href="https://www.autohotkey.com/docs/" target="_blank" rel="noopener"
+>https://www.autohotkey.com/docs/&lt;/a>&lt;/li>
+&lt;li>脚本仓库：&lt;a class="link" href="https://github.com/AutoHotkey" target="_blank" rel="noopener"
+>https://github.com/AutoHotkey&lt;/a>&lt;/li>
+&lt;/ul>&lt;/blockquote>
+&lt;p>&lt;strong>你的下一个自动化脚本，准备解决哪个痛点？&lt;/strong>&lt;/p></description></item><item><title>批处理脚本之For命令</title><link>https://chengxiaqiucao.github.io/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/</link><pubDate>Sat, 01 Mar 2025 15:13:59 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/%E6%89%B9%E5%A4%84%E7%90%86For%E5%91%BD%E4%BB%A4_%E5%85%AC%E4%BC%97%E5%8F%B7.jpg" alt="Featured image of post 批处理脚本之For命令" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>在我们工作中，如果使用Windows系统，善用批处理命令，特别是在批量的文件处理，文本处理时能帮助我们极大地提升工作效率，起到事半功倍的效果！&lt;/p>
+&lt;p>但很多同学，对批处理的使用更多还停留在可以将多个command命令组合到一起执行，省去重复敲命令和等待的时间。这个其实只是批处理脚本最基本的使用方法&lt;/p>
+&lt;p>但要充分发挥批处理的作用，批处理脚本中的 &lt;code>for&lt;/code> 命令其实才是核心，它作为一个兼顾循环处理，和文本列处理的命令工具，在提升批处理脚本效率方面，无出其右！&lt;/p>
+&lt;p>但 for 命令的使用，相对比较复杂，很多同学可能并未很好掌握，所以本文，我们带来关于批处理中这个核心命令的系统介绍&lt;/p>
+&lt;blockquote>
+&lt;p>文中还有一个秋草发现的彩蛋，微软竟然有一个官方陈年Bug一直没有修 😂😂😂&lt;/p>&lt;/blockquote>
+&lt;h2 id="for-命令介绍">For 命令介绍
+&lt;/h2>&lt;p>下面我们就来详细介绍这个 windows 批处理中的重磅命令&lt;/p>
+&lt;h3 id="基础语法">&lt;strong>基础语法&lt;/strong>
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="k">FOR&lt;/span> %variable &lt;span class="k">IN&lt;/span> &lt;span class="p">(&lt;/span>set&lt;span class="p">)&lt;/span> &lt;span class="k">DO&lt;/span> command [command-parameters]
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>%variable&lt;/strong>: for循环变量，批处理脚本中需用 &lt;code>%%&lt;/code>，命令行直接执行用 &lt;code>%&lt;/code>&lt;/li>
+&lt;li>(&lt;strong>set)&lt;/strong>： 可以是文件、目录、字符串或命令输出。。&lt;/li>
+&lt;li>&lt;strong>command&lt;/strong>： 指定对每组循环执行的命令。&lt;/li>
+&lt;li>&lt;strong>command-parameters&lt;/strong>： 控制循环行为（如 &lt;code>/R&lt;/code>, &lt;code>/D&lt;/code>, &lt;code>/L&lt;/code>, &lt;code>/F&lt;/code> 等）&lt;/li>
+&lt;/ul>
+&lt;p>如遍历集合:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="p">@&lt;/span>&lt;span class="k">echo&lt;/span> off
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="se">%%&lt;/span>a &lt;span class="k">in&lt;/span> &lt;span class="p">(&lt;/span>苹果 香蕉 &lt;span class="s2">&amp;#34;西瓜 芒果&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">do&lt;/span> &lt;span class="k">echo&lt;/span> 水果：&lt;span class="se">%%&lt;/span>a
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>输出&lt;/strong>：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">水果：苹果
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">水果：香蕉
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">水果：&amp;#34;西瓜 芒果&amp;#34;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>说明&lt;/strong>：默认按空格分隔元素，带引号的字符串视为整体。&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h3 id="-r参数递归遍历文件">** &lt;code>/R&lt;/code>参数：递归遍历文件**
+&lt;/h3>&lt;p>这个参数，用于递归遍历目录及其子目录中的文件。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="p">@&lt;/span>&lt;span class="k">echo&lt;/span> off
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> /R &lt;span class="s2">&amp;#34;C:\Chengxiaqiucao&amp;#34;&lt;/span> &lt;span class="se">%%&lt;/span>a &lt;span class="k">in&lt;/span> &lt;span class="p">(&lt;/span>*.txt&lt;span class="p">)&lt;/span> &lt;span class="k">do&lt;/span> &lt;span class="k">echo&lt;/span> 找到文件：&lt;span class="se">%%&lt;/span>a
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>功能&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>遍历 &lt;code>C:\Chengxiaqiucao&lt;/code> 及其子目录下的所有 &lt;code>.txt&lt;/code> 文件。&lt;/li>
+&lt;li>&lt;code>%%a&lt;/code> 会包含完整文件路径（如 &lt;code>C:\Chengxiaqiucao\test\file.txt&lt;/code>）。&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h3 id="d">&lt;strong>&lt;code>/D&lt;/code>：处理目录&lt;/strong>
+&lt;/h3>&lt;p>这个参数会仅遍历目录（不处理文件）。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="p">@&lt;/span>&lt;span class="k">echo&lt;/span> off
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> /D &lt;span class="se">%%&lt;/span>a &lt;span class="k">in&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;C:\*&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">do&lt;/span> &lt;span class="k">echo&lt;/span> 目录：&lt;span class="se">%%&lt;/span>a
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>功能&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>列出 &lt;code>C:\&lt;/code> 下的所有一级目录（如 &lt;code>Program Files&lt;/code>, &lt;code>Users&lt;/code> 等）。&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h4 id="4">&lt;strong>4. &lt;code>/L&lt;/code>：生成数字序列&lt;/strong>
+&lt;/h4>&lt;p>这个参数和我们编程时控制循环次数比较类似。&lt;/p>
+&lt;p>&lt;strong>语法&lt;/strong>：&lt;code>for /L %%a in (起始, 步长, 结束)&lt;/code>&lt;/p>
+&lt;p>如下例生成等差数列：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="p">@&lt;/span>&lt;span class="k">echo&lt;/span> off
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="k">/L&lt;/span> &lt;span class="se">%%&lt;/span>a &lt;span class="k">in&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>, &lt;span class="mi">2&lt;/span>, &lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">do&lt;/span> &lt;span class="k">echo&lt;/span> 当前数字：&lt;span class="se">%%&lt;/span>a
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>输出&lt;/strong>：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">当前数字：1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">当前数字：3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">当前数字：5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">当前数字：7
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">当前数字：9
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;h3 id="f">&lt;strong>&lt;code>/F&lt;/code>：高级文本解析（核心参数）&lt;/strong>
+&lt;/h3>&lt;p>这个参数可以说是 For 命令最核心的参数，For命令大展身手，大部分情况下都是这个参数的功劳。&lt;/p>
+&lt;p>这个参数主要用于逐行解析文本、字符串或命令输出，并支持复杂规则。&lt;/p>
+&lt;h5 id="语法">&lt;strong>语法&lt;/strong>：
+&lt;/h5>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="k">/F&lt;/span> [&lt;span class="s2">&amp;#34;选项&amp;#34;&lt;/span>] &lt;span class="se">%%&lt;/span>a &lt;span class="k">in&lt;/span> &lt;span class="p">(&lt;/span>数据源&lt;span class="p">)&lt;/span> &lt;span class="k">do&lt;/span> 命令
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>数据源&lt;/strong>：文件、字符串或命令输出（用反引号 &lt;code>`&lt;/code> 包裹）。&lt;/li>
+&lt;li>&lt;strong>选项&lt;/strong>：&lt;code>delims&lt;/code>, &lt;code>tokens&lt;/code>, &lt;code>skip&lt;/code>, &lt;code>eol&lt;/code>, &lt;code>usebackq&lt;/code> 等。&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h4 id="f-1">&lt;strong>&lt;code>/F&lt;/code> 的常用选项&lt;/strong>
+&lt;/h4>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>选项&lt;/th>
+&lt;th>作用&lt;/th>
+&lt;th>示例&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>delims=xyz&lt;/code>&lt;/td>
+&lt;td>定义分隔符（默认空格/制表符）&lt;/td>
+&lt;td>&lt;code>delims=,&lt;/code> 按逗号分割&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>tokens=n&lt;/code>&lt;/td>
+&lt;td>提取第n列（多列用逗号分隔，如 &lt;code>1,3&lt;/code>）&lt;/td>
+&lt;td>&lt;code>tokens=2&lt;/code> 提取第二列&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>skip=n&lt;/code>&lt;/td>
+&lt;td>跳过前n行&lt;/td>
+&lt;td>&lt;code>skip=2&lt;/code> 跳过前两行&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>eol=;&lt;/code>&lt;/td>
+&lt;td>定义行注释符（默认 &lt;code>;&lt;/code>）&lt;/td>
+&lt;td>&lt;code>eol=#&lt;/code> 忽略以 &lt;code>#&lt;/code> 开头的行&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>usebackq&lt;/code>&lt;/td>
+&lt;td>改变数据源引用方式（见下文）&lt;/td>
+&lt;td>处理带空格路径或命令输出&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;hr>
+&lt;h4 id="usebackq">&lt;strong>&lt;code>usebackq&lt;/code> 的作用&lt;/strong>
+&lt;/h4>&lt;h5 id="此处有彩蛋官方文档中的bug">此处有彩蛋：官方文档中的Bug
+&lt;/h5>&lt;p>在windows的中文官方帮助中，对 &lt;code>-F&lt;/code> 参数的说明，其实是错误的&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/Pasted-20250303.png"
+width="1134"
+height="927"
+srcset="https://chengxiaqiucao.github.io/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/Pasted-20250303_hu_69c28a787679498a.png 480w, https://chengxiaqiucao.github.io/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/Pasted-20250303_hu_6b054e8443412a20.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="122"
+data-flex-basis="293px"
+>&lt;/p>
+&lt;p>可以看到，这里对使用 &lt;code>usebackq&lt;/code> 的介绍和不使用该参数完全一样，而且，这里中文翻译的非常拗口，很难理解什么意思&lt;/p>
+&lt;p>不过，我们通过 &lt;code>chcp 65001&lt;/code> 命令将命令行代码页切换至utf8，这时查看帮助会显示英文帮助&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/Pasted-20250303-1.png"
+width="882"
+height="1016"
+srcset="https://chengxiaqiucao.github.io/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/Pasted-20250303-1_hu_58dff411620f63af.png 480w, https://chengxiaqiucao.github.io/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/Pasted-20250303-1_hu_70197c22987e192e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="86"
+data-flex-basis="208px"
+>&lt;/p>
+&lt;p>可以看到，理解起来就清晰多了， &lt;code>usebackq&lt;/code>解决以下场景的问题：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>处理带空格的文件路径&lt;/strong>：用双引号引用文件名。&lt;/li>
+&lt;li>&lt;strong>执行命令并解析输出&lt;/strong>：用反引号 &lt;code>`&lt;/code> 引用系统命令。&lt;/li>
+&lt;li>&lt;strong>直接解析字符串&lt;/strong>：用单引号 &lt;code>'&lt;/code> 引用字符串。&lt;/li>
+&lt;/ol>
+&lt;h5 id="案例一">&lt;strong>案例一&lt;/strong>：
+&lt;/h5>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="p">@&lt;/span>&lt;span class="k">echo&lt;/span> off
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="k">/F&lt;/span> &lt;span class="s2">&amp;#34;usebackq delims=&amp;#34;&lt;/span> &lt;span class="se">%%&lt;/span>a &lt;span class="k">in&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;C:\My Files\data.txt&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">do&lt;/span> &lt;span class="k">echo&lt;/span> &lt;span class="se">%%&lt;/span>a
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>若不使用 &lt;code>usebackq&lt;/code>，路径中的空格会导致解析错误。&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h5 id="-案例二">** 案例二**
+&lt;/h5>&lt;p>解析 &lt;code>data.csv&lt;/code>（格式：&lt;code>姓名,年龄,城市&lt;/code>），跳过标题行，提取姓名和城市。&lt;/p>
+&lt;p>&lt;strong>输入文件 &lt;code>data.csv&lt;/code>&lt;/strong>：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">姓名,年龄,城市
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">张三,25,北京
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">李四,30,上海
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>批处理：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="p">@&lt;/span>&lt;span class="k">echo&lt;/span> off
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="k">/F&lt;/span> &lt;span class="s2">&amp;#34;usebackq skip=1 delims=, tokens=1,3&amp;#34;&lt;/span> &lt;span class="se">%%&lt;/span>a &lt;span class="k">in&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;data.csv&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">do&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">echo&lt;/span> 姓名：&lt;span class="se">%%&lt;/span>a，城市：&lt;span class="se">%%&lt;/span>b
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>输出&lt;/strong>：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">姓名：张三，城市：北京
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">姓名：李四，城市：上海
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;h2 id="应用场景总结">&lt;strong>应用场景总结&lt;/strong>
+&lt;/h2>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>适用场景&lt;/th>
+&lt;th>典型命令示例&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>无参数&lt;/td>
+&lt;td>遍历简单文件或字符串列表&lt;/td>
+&lt;td>&lt;code>for %%a in (*.txt) do echo %%a&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>/R&lt;/code>&lt;/td>
+&lt;td>递归处理目录下的文件&lt;/td>
+&lt;td>&lt;code>for /R %%a in (*.log) do del %%a&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>/D&lt;/code>&lt;/td>
+&lt;td>仅处理目录&lt;/td>
+&lt;td>&lt;code>for /D %%a in (C:\*) do echo %%a&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>/L&lt;/code>&lt;/td>
+&lt;td>生成数字序列（如循环固定次数）&lt;/td>
+&lt;td>&lt;code>for /L %%a in (1,1,5) do echo %%a&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>/F&lt;/code>&lt;/td>
+&lt;td>解析文本文件、命令输出或复杂字符串&lt;/td>
+&lt;td>&lt;code>for /F &amp;quot;tokens=2&amp;quot; %%a in (data.txt)&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>所以通过掌握For命令的这些参数和技巧，完全可以让它成为批处理脚本中处理文件、文本和系统任务的“瑞士军刀”。&lt;/p>
+&lt;hr></description></item><item><title>Win11操作小技巧二则</title><link>https://chengxiaqiucao.github.io/post/010-windows%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E5%B0%8F%E6%8A%80%E5%B7%A7/</link><pubDate>Thu, 22 Aug 2024 15:40:10 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/010-windows%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E5%B0%8F%E6%8A%80%E5%B7%A7/</guid><description>&lt;h2 id="windows11-右键恢复传统菜单">Windows11 右键恢复传统菜单
+&lt;/h2>&lt;p>win11相比以前的版本进行了很多界面上的优化，不过有一个优化带来了不小的困扰，就是它的右键菜单，会默认折叠掉一些非系统的菜单项，必须多点击一步 &lt;code>显示更多选项&lt;/code> 才能看到原来默认一些其他菜单项。&lt;/p>
+&lt;img src="Pasted-20240822.png" alt="右键菜单" width=300 />
+&lt;p>这里其实有两个方法恢复传统方式：&lt;/p>
+&lt;ol>
+&lt;li>在点击菜单时，同时按下shift键，这时就会直接打开被折叠的菜单 （&lt;strong>推荐&lt;/strong>）&lt;/li>
+&lt;li>另一种方式，彻底恢复的话，可以添加一个注册表项&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Console" data-lang="Console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> reg.exe add &lt;span class="s2">&amp;#34;HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32&amp;#34;&lt;/span> /f /ve
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>执行后需要重启下资源管理器&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Console" data-lang="Console">&lt;span class="line">&lt;span class="cl">&lt;span class="go">taskkill /f /im explorer.exe &amp;amp; start explorer.exe
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这样就会彻底将右键菜单恢复成传统样式了。如果想恢复，删除改注册表项即可。&lt;/p>
+&lt;h2 id="剪贴板历史小工具">剪贴板历史小工具
+&lt;/h2>&lt;p>Win11下有一个很好用的小工具，可以记录多次剪贴板的历史记录。通过 &lt;code>win+v&lt;/code>键可以呼出这个工具。&lt;/p>
+&lt;img src="Pasted-20240822-2.png" alt="剪贴板工具" width=350 />
+&lt;p>除了可以方便地记录多次拷贝的历史记录，这个小工具还提供了插入emoji表情、颜文字、常用特殊字符以及gif图搜索等功能。&lt;/p>
+&lt;p>❤️👍😎🏠🕍❄️ (●ˇ∀ˇ●)(❤️´艸｀❤️)◀▶◯◻&lt;/p>
+&lt;p>要关闭剪贴板历史记录。可以去到 &lt;strong>系统设置&amp;gt;系统&amp;gt;剪贴板&lt;/strong> 中关闭&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/010-windows%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E5%B0%8F%E6%8A%80%E5%B7%A7/Pasted-20240822-1.png"
+width="1289"
+height="185"
+srcset="https://chengxiaqiucao.github.io/post/010-windows%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E5%B0%8F%E6%8A%80%E5%B7%A7/Pasted-20240822-1_hu_560c7e4763a9b58.png 480w, https://chengxiaqiucao.github.io/post/010-windows%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E5%B0%8F%E6%8A%80%E5%B7%A7/Pasted-20240822-1_hu_fa42a580c2c171b8.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="696"
+data-flex-basis="1672px"
+>&lt;/p>
+&lt;hr></description></item></channel></rss>

@@ -1,0 +1,1567 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AI on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/categories/ai/</link><description>Recent content in AI on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Sun, 01 Jun 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/categories/ai/index.xml" rel="self" type="application/rss+xml"/><item><title>AI自动化工具Mid scene.js评测</title><link>https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/</link><pubDate>Sun, 01 Jun 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521.png" alt="Featured image of post AI自动化工具Mid scene.js评测" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>AI已经越来越深入地走入我们的实际工作，在软件测试领域，和AI相关的新测试工具、方法也层出不穷。在之前我们介绍过结合 mcp server 实现 AI 驱动测试的案例，本文我们将介绍一个近期崭露头角的国产AI测试工具 &lt;code>Midscene.js&lt;/code>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521.png"
+width="508"
+height="482"
+srcset="https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521_hu_8c2283c0ca764a99.png 480w, https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521_hu_c98e8bf2be242eda.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="105"
+data-flex-basis="252px"
+>&lt;/p>
+&lt;h2 id="midscenejs简介">Midscene.js简介
+&lt;/h2>&lt;p>&lt;code>MidScene.js&lt;/code> 是由字节跳动 web-infra 团队推出的一个开源 ai 自动化测试工具，基于多模态大模型，通过针对页面的智能视觉解析来理解我们的自然语言指令，并进一步完成自动化操作。可以显著降低编写自动化测试脚本的复杂性，并更好适应页面结构和元素的变化，使自动化测试脚本的稳定性也有较大提升。&lt;/p>
+&lt;p>官网地址： &lt;a class="link" href="https://midscenejs.com/" target="_blank" rel="noopener"
+>https://midscenejs.com/&lt;/a>&lt;/p>
+&lt;h2 id="midscene工作原理">Midscene工作原理
+&lt;/h2>&lt;p>和之前我们介绍 mcp server 时，利用通用大模型来理解页面并调用本地工具能力进行扩展不同，Midscene使用多模态大模型如 &lt;code>ChatGPT-4o&lt;/code>，&lt;code>qwen-vl&lt;/code>, 字节的 &lt;code>UI-TARS&lt;/code>等，也就是能支持视觉输入的大模型来理解页面，更接近我们进行实际功能测试的场景。&lt;/p>
+&lt;p>MidScene会首先获取页面当前截图和具体的页面结构信息，再和用户指令一起提交给大模型，由大模型判断出需要操作的页面控件位置，并进行下一步动作。&lt;/p>
+&lt;p>以在待办页面任务框中输入 “今天学习Playwright”为例：&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521-3.png"
+width="1920"
+height="673"
+srcset="https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521-3_hu_19ae45ca69a8c700.png 480w, https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521-3_hu_e22ffafc27de64a6.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="285"
+data-flex-basis="684px"
+>&lt;/p>
+&lt;p>MidScene的内部操作大致如下：&lt;/p>
+&lt;ol>
+&lt;li>获取用户指令 “在任务框输入 学习Playwright，按回车键”&lt;/li>
+&lt;li>MidScene截图，获取页面整体元素结构&lt;/li>
+&lt;li>提交大模型完成页面特征提取&lt;/li>
+&lt;li>获取大模型分析结果，确定下一步操作类型(Tap)和控件的具体位置(坐标)&lt;/li>
+&lt;li>规划下一步操作&lt;/li>
+&lt;li>完成执行&lt;/li>
+&lt;/ol>
+&lt;h2 id="大模型的选择">大模型的选择
+&lt;/h2>&lt;p>从以上Midscene的原理分析，MidScene 主要依赖多模态大模型的如下能力&lt;/p>
+&lt;ol>
+&lt;li>理解截图和 &lt;em>规划&lt;/em> 操作步骤的能力。&lt;/li>
+&lt;li>给出指定元素的坐标信息（Visual Grounding）的能力。&lt;/li>
+&lt;/ol>
+&lt;p>支持以上能力的大模型，目前官网提供的支持包括如下几种：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>OPENAI GPT-4o&lt;/strong>&lt;/li>
+&lt;li>&lt;strong>阿里 Qwen-2.5-VL&lt;/strong>&lt;/li>
+&lt;li>&lt;strong>字节 UI-TARS&lt;/strong>&lt;/li>
+&lt;li>&lt;strong>字节火山引擎 Doubao-1.5-thinking-vision-pro&lt;/strong>&lt;/li>
+&lt;li>&lt;strong>Google Gemini-2.5-Pro&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;p>从工作原理上，需要提供给大模型包括截图和页面结构等信息，对大模型的Token消耗还是比较可观。从官方的评估，每个操作通常都要至少数千Token的消耗。而其中性价比较好的大模型，官方推荐的QWen-VL。&lt;/p>
+&lt;h2 id="chrome插件方式使用">Chrome插件方式使用
+&lt;/h2>&lt;p>零代码的Chrome插件方式，可以帮助我们快速理解MidScene的应用。&lt;/p>
+&lt;p>通过Chrome的插件商店可以直接安装 &lt;a class="link" href="https://chromewebstore.google.com/detail/midscenejs/gbldofcpkknbggpkmbdaefngejllnief" target="_blank" rel="noopener"
+>Midscene插件&lt;/a>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521-2.png"
+width="1755"
+height="547"
+srcset="https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521-2_hu_42f4fce6b95b35ab.png 480w, https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521-2_hu_b3474ce1983fd3ed.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="320"
+data-flex-basis="770px"
+>&lt;/p>
+&lt;h3 id="配置大模型">配置大模型
+&lt;/h3>&lt;p>启用插件后，需要配置使用的大模型。这里我们使用对token消耗比较少的阿里千问多模态模型&lt;code>qwen-vl-max-latest&lt;/code>, 通过阿里云百炼平台申请对应的API Key即可，现在申请还赠送100W Token额度。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520-2.png"
+width="1199"
+height="217"
+srcset="https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520-2_hu_89f4c27c45807341.png 480w, https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520-2_hu_d9e504c150c9fb67.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="552"
+data-flex-basis="1326px"
+>&lt;/p>
+&lt;p>完成申请后，在插件的模型配置界面中配置对应的大模型参数，qwen模型需要配置以下四个参数&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">OPENAI_BASE_URL=&amp;#34;https://dashscope.aliyuncs.com/compatible-mode/v1&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">OPENAI_API_KEY=&amp;#34;sk- your API KEY&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">MIDSCENE_MODEL_NAME=&amp;#34;qwen-vl-max-latest&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">MIDSCENE_USE_QWEN_VL=1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="操作浏览器">操作浏览器
+&lt;/h3>&lt;p>接下来就可以在插件界面中体验Midscene对浏览器的操控了，这里主要支持四种行为：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Action&lt;/strong>：对应AI自动规划操作，Midscene会自动规划操作步骤并执行。更智能，但速度较慢，效果依赖大模型的质量。&lt;/li>
+&lt;li>&lt;strong>Query&lt;/strong>：直接从 UI 提取数据，并借助多模态 AI 的推理能力，实现智能提取&lt;/li>
+&lt;li>&lt;strong>Assert&lt;/strong>：通过自然语言描述一个断言条件，让 AI 判断该条件是否为真&lt;/li>
+&lt;li>&lt;strong>Tap&lt;/strong>：对应页面点击的即时操作，Midscene会直接执行，大模型只负责底层如元素定位等任务。效率更高，适合已确定要执行的操作时使用&lt;/li>
+&lt;/ul>
+&lt;p>我们可以用接近自然语言的AI提示词输入提示词指令，针对不同的行为模式，插件会驱动浏览器完成不同的操作，并反馈操作结果。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520.png"
+width="1910"
+height="899"
+srcset="https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520_hu_82f5a3b5c2a2fe48.png 480w, https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520_hu_b94695f1053d5140.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="212"
+data-flex-basis="509px"
+>&lt;/p>
+&lt;p>具体执行过程也可参见下方视频演示。&lt;/p>
+&lt;h2 id="脚本集成">脚本集成
+&lt;/h2>&lt;p>除了通过浏览器插件调用Midscene，更推荐的方法是通过测试框架的脚本集成Midscene能力。&lt;/p>
+&lt;p>通过脚本集成，同样需要配置相关模型调用参数，和插件中配置的相关变量值一样，只是需要将相关变量配置为&lt;strong>系统环境变量&lt;/strong>&lt;/p>
+&lt;p>因为 Midscene 是基于JS的工具，这里的和测试框架集成，也是需要支持JS。这里以 Playwright 为例&lt;/p>
+&lt;h3 id="安装">安装
+&lt;/h3>&lt;p>首先自然需要具备 Playwright 框架，进入项目目录，初始化并安装Playwright，然后安装Midscene&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">npm&lt;/span> &lt;span class="n">init&lt;/span> &lt;span class="n">playwright&lt;/span>&lt;span class="nv">@latest&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">npm&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="nv">@midscene&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">web&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-save-dev&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="playwright框架配置">playwright框架配置
+&lt;/h3>&lt;p>在 &lt;code>playwright.config.ts&lt;/code> 文件中配置框架本身的测试发现目录和测试脚本，加载环境变量以及浏览器类型，执行策略等基础配置&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;span class="lnt">59
+&lt;/span>&lt;span class="lnt">60
+&lt;/span>&lt;span class="lnt">61
+&lt;/span>&lt;span class="lnt">62
+&lt;/span>&lt;span class="lnt">63
+&lt;/span>&lt;span class="lnt">64
+&lt;/span>&lt;span class="lnt">65
+&lt;/span>&lt;span class="lnt">66
+&lt;/span>&lt;span class="lnt">67
+&lt;/span>&lt;span class="lnt">68
+&lt;/span>&lt;span class="lnt">69
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">defineConfig&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">devices&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s2">&amp;#34;@playwright/test&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">dotenv&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s2">&amp;#34;dotenv&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 通过dotenv从.env文件中加载环境变量 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">dotenv&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">config&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="nx">defineConfig&lt;/span>&lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="nx">testDir&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;./e2e&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="nx">testMatch&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;**/*.spec.ts&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="nx">timeout&lt;/span>: &lt;span class="kt">10&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">60&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">1000&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="cm">/* Run tests in files in parallel */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="nx">fullyParallel&lt;/span>: &lt;span class="kt">false&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="cm">/* Fail the build on CI if you accidentally left test.only in the source code. */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="nx">forbidOnly&lt;/span>: &lt;span class="kt">Boolean&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">process&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">env&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">CI&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="cm">/* Retry on CI only */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="nx">retries&lt;/span>: &lt;span class="kt">process.env.CI&lt;/span> &lt;span class="o">?&lt;/span> &lt;span class="nx">2&lt;/span> : &lt;span class="kt">0&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="cm">/* Opt out of parallel tests on CI. */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="nx">workers&lt;/span>: &lt;span class="kt">process.env.CI&lt;/span> &lt;span class="o">?&lt;/span> &lt;span class="nx">1&lt;/span> : &lt;span class="kt">undefined&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="cm">/* Reporter to use. See https://playwright.dev/docs/test-reporters */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="nx">reporter&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[[&lt;/span>&lt;span class="s2">&amp;#34;line&amp;#34;&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;@midscene/web/playwright-report&amp;#34;&lt;/span>&lt;span class="p">]],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="cm">/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="nx">use&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="cm">/* Base URL to use in actions like `await page.goto(&amp;#39;/&amp;#39;)`. */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="c1">// baseURL: &amp;#39;http://127.0.0.1:3000&amp;#39;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="cm">/* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="nx">trace&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;on-first-retry&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="cm">/* Configure projects for major browsers */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="nx">projects&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">      &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;chromium&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">      &lt;span class="nx">use&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="p">...&lt;/span>&lt;span class="nx">devices&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;Desktop Chrome&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="测试脚本">测试脚本
+&lt;/h3>&lt;p>通过单独的fixture脚本引入Midscene库&lt;/p>
+&lt;p>fixture.ts&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">test&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">base&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@playwright/test&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="kr">type&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">PlayWrightAiFixtureType&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@midscene/web/playwright&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">PlaywrightAiFixture&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@midscene/web/playwright&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">test&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">base&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">extend&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">PlayWrightAiFixtureType&lt;/span>&lt;span class="p">&amp;gt;(&lt;/span>&lt;span class="nx">PlaywrightAiFixture&lt;/span>&lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="nx">waitForNetworkIdleTimeout&lt;/span>: &lt;span class="kt">10000&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// 可选, 交互过程中等待网络空闲的超时时间, 默认值为 2000ms, 设置为 0 则禁用超时
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}));&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>编写脚本测试 &lt;code>https://todomvc.com/&lt;/code> 待办清单示例项目，通过 &lt;code>.ai&lt;/code>、&lt;code>.aiTap&lt;/code>、 &lt;code>.aiQuery&lt;/code>、&lt;code>.aiAssert&lt;/code>等API方法，对应前面说到的四种典型操作。&lt;/p>
+&lt;p>todo_spec.ts&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">expect&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s2">&amp;#34;@playwright/test&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">test&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s2">&amp;#34;./fixture&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">test&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">beforeEach&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kr">async&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">page&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="k">await&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">goto&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;https://todomvc.com/examples/react/dist/&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;ai todo - Chinese Prompt&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">ai&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">aiQuery&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">aiAssert&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">aiTap&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="c1">// .ai - 通用 AI 操作方法
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="k">await&lt;/span> &lt;span class="nx">ai&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;在任务框 input 输入 今天学习 Playwright，按回车键&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="k">await&lt;/span> &lt;span class="nx">ai&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;在任务框 input 输入 明天学习 js脚本，按回车键&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="k">await&lt;/span> &lt;span class="nx">ai&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;在任务框 input 输入 后天学习 AI测试，按回车键&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="k">await&lt;/span> &lt;span class="nx">ai&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;将鼠标移动到任务列表中的第二项&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="k">await&lt;/span> &lt;span class="nx">aiTap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;第二项任务右边的删除按钮&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="c1">// .aiTap - 指定操作类型
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="k">await&lt;/span> &lt;span class="nx">aiTap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;第二条任务左边的勾选按钮&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="k">await&lt;/span> &lt;span class="nx">aiTap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;任务列表下面的 completed 状态按钮&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// .aiQuery - 页面信息提取操作
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>  &lt;span class="kr">const&lt;/span> &lt;span class="nx">list&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">aiQuery&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;string[], 完整的任务列表&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">list&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">toEqual&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// .aiAssert - 断言操作
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="k">await&lt;/span> &lt;span class="nx">aiAssert&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;列表下方有一个区域显示有 &amp;#34;1 item left&amp;#34;&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>执行脚本：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">npx&lt;/span> &lt;span class="n">playwright&lt;/span> &lt;span class="n">test&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-headed&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>执行过程可以参见我录制的视频&lt;/p>
+&lt;p>【】&lt;/p>
+&lt;h3 id="可视化结果报告">可视化结果报告
+&lt;/h3>&lt;p>报告是Midscene的一大亮点，通过这个报告可以回看整个执行过程，并详细显示AI的空间判断过程和具体操作细节，便于调试和优化脚本。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520-1.png"
+width="1920"
+height="899"
+srcset="https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520-1_hu_8c25d4e74876b37c.png 480w, https://chengxiaqiucao.github.io/post/099-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520-1_hu_f9ca92c1327f521.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="213"
+data-flex-basis="512px"
+>&lt;/p>
+&lt;h2 id="yaml文件驱动">YAML文件驱动
+&lt;/h2>&lt;p>除了通过测试框架脚本的集成方法，Midscene也支持直接通过YAML文件编写测试脚本，实现无代码的脚本驱动，类似于传统自动化的关键字驱动方式。&lt;/p>
+&lt;p>这种方式，本质上其实还是将对应关键转化为 Midscene 支持的相关API来进行驱动。&lt;/p>
+&lt;p>类似如下的格式， 操作天气网站：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-YAML" data-lang="YAML">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">web&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">url&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">https://www.bing.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">tasks&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">搜索天气&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">flow&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">ai&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">搜索 &amp;#34;今日天气&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">sleep&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">3000&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">检查结果&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">flow&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">aiAssert&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">结果中展示了天气信息&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>运行yaml格式脚本，需要安装Midscene的命令行支持&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">npm&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="nv">@midscene&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="nb">cli &lt;/span>&lt;span class="p">-&lt;/span>&lt;span class="n">-save-dev&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c"># 执行&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">npx&lt;/span> &lt;span class="n">midscene&lt;/span> &lt;span class="p">./&lt;/span>&lt;span class="n">weather&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="py">yaml&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="mcp方式">MCP方式
+&lt;/h2>&lt;p>除了上述方式之外，Midscene也提供了作为本地MCP server方式。这种方式，其实是将MidScene的Chrome插件作为本地能力封装到MCP中，再通过大模型结合mcp server的方式完成浏览器驱动。&lt;/p>
+&lt;p>关于 mcp server的介绍和使用，可以参考我之前的相关文章 【】&lt;/p>
+&lt;p>mcp server 配置：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;mcpServers&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;mcp-midscene&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;command&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;npx&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;args&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;-y&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;@midscene/mcp&amp;#34;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;env&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;MIDSCENE_MODEL_NAME&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;REPLACE_WITH_YOUR_MODEL_NAME&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;OPENAI_API_KEY&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;REPLACE_WITH_YOUR_OPENAI_API_KEY&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;MCP_SERVER_REQUEST_TIMEOUT&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;800000&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="当前版本的局限">当前版本的局限
+&lt;/h2>&lt;p>虽然Midsence工具已经展现出不俗的潜力，目前也还在持续更新和迭代中，但在实用上还是具有不少缺陷，主要表现在：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>交互类型有限&lt;/strong>：目前仅支持点击、拖拽(只在 UI-TARS 模型中支持)、输入、键盘和滚动操作。&lt;/li>
+&lt;li>&lt;strong>稳定性风险&lt;/strong>：AI 模型的返回值不能保证 100% 准确。对提示词的编写要求较高&lt;/li>
+&lt;li>&lt;strong>元素识别能力&lt;/strong>：部分大模型在元素识别上的能力不太好，比如iframe、canvas等元素的交互。而且对于Chrome的原生控件如弹出提示、右键菜单等还不能支持。&lt;/li>
+&lt;li>&lt;strong>成本较高&lt;/strong>：基于视觉识别方式，对Token的消耗比较可观，如果使用付费大模型，成本比较高昂。&lt;/li>
+&lt;/ul>
+&lt;p>但瑕不掩瑜，Midscene在UI自动化测试借助AI能力的提升上，已经迈出了坚实的一步！后续我们还会持续关注其进一步发展！&lt;/p>
+&lt;hr>
+&lt;h3 id="参考阅读">参考阅读：
+&lt;/h3>&lt;p>【】
+【】&lt;/p>
+&lt;p>进群，大纲&lt;/p></description></item><item><title>微软重磅发布Magentic UI，交互式AI Agent助手实测！</title><link>https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/</link><pubDate>Fri, 30 May 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/magentic_logo.png" alt="Featured image of post 微软重磅发布Magentic UI，交互式AI Agent助手实测！" />&lt;h2 id="何为magentic-ui">何为Magentic UI？
+&lt;/h2>&lt;p>&lt;code>Magentic UI&lt;/code> 是微软于5.19重磅发布的开源Agent助手，并于24日刚更新了第二个版本0.04版&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526.png"
+width="437"
+height="121"
+srcset="https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526_hu_998ab8bc0c64b884.png 480w, https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526_hu_7362028b6e24293.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="361"
+data-flex-basis="866px"
+>&lt;/p>
+&lt;p>从官方的介绍来看，目标是打造一款 &lt;strong>以人为中心&lt;/strong> 的智能助手，其底层由多个不同的智能体系统驱动，能够实现网页浏览与操作、代码生成与执行、文件生成与分析等功能。&lt;/p>
+&lt;p>它区别于其他一些AI浏览器工具的主要区别在于其 &lt;strong>透明可控的交互界面&lt;/strong>，支持高效的人机协同参与。该系统基于微软的Agent构建框架 AutoGen 构建，目前还处在原型研究阶段。&lt;/p>
+&lt;p>核心功能包括：&lt;/p>
+&lt;p>🧑‍🤝‍🧑 &lt;strong>协同规划&lt;/strong>：用户和AI通过聊天和计划编辑器协作创建并修订分步执行计划。&lt;br>
+🤝 &lt;strong>协同任务&lt;/strong>：用户可直接通过网页浏览器或聊天界面实时介入并指导任务执行。Magentic-UI 能在需要时主动确认或要求协助。&lt;br>
+🛡️ &lt;strong>操作防护&lt;/strong>：敏感操作需经用户明确批准后方可执行。&lt;br>
+🧠 &lt;strong>计划学习与检索&lt;/strong>：从过往任务中学习经验以优化未来自动化流程，并将优秀方案保存至计划库。在后续任务中可自动或手动调用已存储的计划。&lt;br>
+🔀 &lt;strong>并行任务执行&lt;/strong>：支持多任务并行运行，会话状态指示器会实时提示 Magentic-UI 何时需要您的输入或任务已完成。&lt;/p>
+&lt;h2 id="设计架构">设计架构
+&lt;/h2>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526-1.png"
+width="1723"
+height="1307"
+srcset="https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526-1_hu_427424952f587218.png 480w, https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526-1_hu_5cfb5d6930358133.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="131"
+data-flex-basis="316px"
+>&lt;/p>
+&lt;p>&lt;strong>Magentic-UI&lt;/strong> 的底层系统是由一组从 AutoGen 的 &lt;strong>Magentic-One&lt;/strong> 系统（如上图所示）改造而来的专业化 Agent 组构成，各Agent通过模块化协作实现不同功能：&lt;/p>
+&lt;h3 id="agent功能说明">Agent功能说明
+&lt;/h3>&lt;h4 id="总控代理orchestrator">&lt;strong>总控代理（Orchestrator）&lt;/strong>
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>功能定位&lt;/strong>：基于大语言模型（LLM）的主控智能体，负责与用户协同制定计划、决策何时请求用户反馈，并向其他智能体分配子任务。&lt;/li>
+&lt;li>&lt;strong>协作流程&lt;/strong>：
+&lt;ol>
+&lt;li>与用户共同制定分步执行计划；&lt;/li>
+&lt;li>动态判断需用户介入的节点；&lt;/li>
+&lt;li>将子任务分派至其他智能体执行。&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="网页浏览代理websurfer">&lt;strong>网页浏览代理（WebSurfer）&lt;/strong>
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>功能定位&lt;/strong>：配备网页浏览器的 LLM 智能体，支持多轮次网页交互操作。&lt;/li>
+&lt;li>&lt;strong>核心能力&lt;/strong>：
+&lt;ul>
+&lt;li>根据总控代理的指令，执行点击、输入、滚动、页面跳转等操作；&lt;/li>
+&lt;li>&lt;strong>超越 AutoGen 多模态网页浏览器&lt;/strong>：新增标签管理、选项选择、文件上传及多模态查询支持。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="代码执行代理coder">&lt;strong>代码执行代理（Coder）&lt;/strong>
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>功能定位&lt;/strong>：配备 Docker 代码执行容器的 LLM 智能体。&lt;/li>
+&lt;li>&lt;strong>核心能力&lt;/strong>：
+&lt;ul>
+&lt;li>编写并执行 Python 和 Shell 命令；&lt;/li>
+&lt;li>将执行结果反馈至总控代理。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="文件处理代理filesurfer">**文件处理代理（FileSurfer）
+&lt;/h4>&lt;p>**&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>功能定位&lt;/strong>：集成 Docker 容器与 MarkItDown 包文件转换工具的 LLM 智能体。&lt;/li>
+&lt;li>&lt;strong>核心能力&lt;/strong>：
+&lt;ul>
+&lt;li>定位 Magentic-UI 控制目录下的文件；&lt;/li>
+&lt;li>将文件转换为 Markdown 格式并支持内容问答。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="用户代理userproxy">&lt;strong>用户代理（UserProxy）&lt;/strong>
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>功能定位&lt;/strong>：代表用户与系统交互的代理角色。&lt;/li>
+&lt;li>&lt;strong>协作模式&lt;/strong>：总控代理可将任务直接委派给用户（而非其他智能体）完成。&lt;/li>
+&lt;/ul>
+&lt;h3 id="用户交互流程">用户交互流程
+&lt;/h3>&lt;p>用户利用 Magentic UI 的交互流程可以用下图表示：
+&lt;a class="link" href="https://mermaid.live/edit#pako:eNplVFtPGlEQ_ivkPKOyiCKYtGm9VFut9zbpwgPKqiSVNSsk2g2JNl5AUaCo0YgXLF7SVNCmliqif4Zzdvdf9OyZZcW6Tztzvm_mmzkzR0Zjol9AbjQh-aYnLcPtnqCFfq94ZfOcRIs4kVKvi2qhSK6-ei11dS8sr3n1Po2XTsj2Csn8bNB2F_HqEd67V2Ir3lYgv2bANrnXNyEEQ4GxupFui7J5SKJJHF0mFydqPouj3yIGuo2ijWMdsXrI2O2GAPVhjyYDhnK3rd6nlK24tn_sfc7GuSv19wnk5niSSCq5WwiirayT7UvQbRI5KIea4GiHSDoeEkFShuqQwUXS65Vypqq8Q2eQYok2oAFHj7TdXEPlIU82b2iN2o8c1FGLVbJ5NZ_D-ThVy047eTJfIhtnldJ3JbmML3bw13NI6zV1dTLkGx4nC3jVOCWxMzUbx3dbJL1RLegNw3XJJB7Tsrf4NgEg0BIxw3UxWLeMy2kcW4dT5aqED9ZeVuuaCY_CNOClYqWcBgxEA4D--QOSMBYKiEFLz-Cjt1sv86MwOhSWxgWJpXrLA1Upp7TsNXSwqtmktNEhBPg73rjNmz_A03tztPCM0Rn4LNRk6eFxbpH2kI5lpfTnGXpkRpD6JXF2joF7n0wHia3Rxj4VJgT91Ya9ZZT3stGGnQJOnsKgwkWabXsHQMPqeWL1mhbY79no7BSYu08msXmSiUEGvL-Ci7_-i83wNDHD9_Nq_hKXt7TNXbVQwBuHeO_ocV76GWZABqVaZl49XTAW4GyRzo4Zc6BWwyAPS25sXf4vThRqWdXGDIKQOFlMwKbV-snaN6W0z_xDvFKKkotjcr2gnK95a1NWyxgyJffVKhk2BoBk5mkIpZQmB-a19NXyu0z-MLNH6IqkjGcrFVU2Lp9yRxjoA6979w-9rchK37yAH7lDUliwoilBmvLpJpJ1vAeFJoUpwYPc9HdclISZkAd5ghHKmvYFP4niVJUoieGJSeQe932eoVZ42u8LCe0BH92gRwgdJ0FqE8PBEHJzLhYCuWU0i9yNLU31dpvLaWtq4Zycw95kRXPI7eDqHZzdaXM4XdTlbOQiVvSF5bTVu2wue6O92c412m0tDluzFQn-QEiUeuEdZ8955B-N54jD" target="_blank" rel="noopener"
+>&lt;img src="https://mermaid.ink/img/pako:eNplVFtPGlEQ_ivkPKOyiCKYtGm9VFut9zbpwgPKqiSVNSsk2g2JNl5AUaCo0YgXLF7SVNCmliqif4Zzdvdf9OyZZcW6Tztzvm_mmzkzR0Zjol9AbjQh-aYnLcPtnqCFfq94ZfOcRIs4kVKvi2qhSK6-ei11dS8sr3n1Po2XTsj2Csn8bNB2F_HqEd67V2Ir3lYgv2bANrnXNyEEQ4GxupFui7J5SKJJHF0mFydqPouj3yIGuo2ijWMdsXrI2O2GAPVhjyYDhnK3rd6nlK24tn_sfc7GuSv19wnk5niSSCq5WwiirayT7UvQbRI5KIea4GiHSDoeEkFShuqQwUXS65Vypqq8Q2eQYok2oAFHj7TdXEPlIU82b2iN2o8c1FGLVbJ5NZ_D-ThVy047eTJfIhtnldJ3JbmML3bw13NI6zV1dTLkGx4nC3jVOCWxMzUbx3dbJL1RLegNw3XJJB7Tsrf4NgEg0BIxw3UxWLeMy2kcW4dT5aqED9ZeVuuaCY_CNOClYqWcBgxEA4D--QOSMBYKiEFLz-Cjt1sv86MwOhSWxgWJpXrLA1Upp7TsNXSwqtmktNEhBPg73rjNmz_A03tztPCM0Rn4LNRk6eFxbpH2kI5lpfTnGXpkRpD6JXF2joF7n0wHia3Rxj4VJgT91Ya9ZZT3stGGnQJOnsKgwkWabXsHQMPqeWL1mhbY79no7BSYu08msXmSiUEGvL-Ci7_-i83wNDHD9_Nq_hKXt7TNXbVQwBuHeO_ocV76GWZABqVaZl49XTAW4GyRzo4Zc6BWwyAPS25sXf4vThRqWdXGDIKQOFlMwKbV-snaN6W0z_xDvFKKkotjcr2gnK95a1NWyxgyJffVKhk2BoBk5mkIpZQmB-a19NXyu0z-MLNH6IqkjGcrFVU2Lp9yRxjoA6979w-9rchK37yAH7lDUliwoilBmvLpJpJ1vAeFJoUpwYPc9HdclISZkAd5ghHKmvYFP4niVJUoieGJSeQe932eoVZ42u8LCe0BH92gRwgdJ0FqE8PBEHJzLhYCuWU0i9yNLU31dpvLaWtq4Zycw95kRXPI7eDqHZzdaXM4XdTlbOQiVvSF5bTVu2wue6O92c412m0tDluzFQn-QEiUeuEdZ8955B-N54jD?type=png"
+loading="lazy"
+>&lt;/a>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;span class="lnt">59
+&lt;/span>&lt;span class="lnt">60
+&lt;/span>&lt;span class="lnt">61
+&lt;/span>&lt;span class="lnt">62
+&lt;/span>&lt;span class="lnt">63
+&lt;/span>&lt;span class="lnt">64
+&lt;/span>&lt;span class="lnt">65
+&lt;/span>&lt;span class="lnt">66
+&lt;/span>&lt;span class="lnt">67
+&lt;/span>&lt;span class="lnt">68
+&lt;/span>&lt;span class="lnt">69
+&lt;/span>&lt;span class="lnt">70
+&lt;/span>&lt;span class="lnt">71
+&lt;/span>&lt;span class="lnt">72
+&lt;/span>&lt;span class="lnt">73
+&lt;/span>&lt;span class="lnt">74
+&lt;/span>&lt;span class="lnt">75
+&lt;/span>&lt;span class="lnt">76
+&lt;/span>&lt;span class="lnt">77
+&lt;/span>&lt;span class="lnt">78
+&lt;/span>&lt;span class="lnt">79
+&lt;/span>&lt;span class="lnt">80
+&lt;/span>&lt;span class="lnt">81
+&lt;/span>&lt;span class="lnt">82
+&lt;/span>&lt;span class="lnt">83
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">graph TD
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    A[用户发起请求] --&amp;gt; B[输入文本/附加图片];
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    B --&amp;gt; C{Magentic-UI 生成分步计划};
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    C -- 生成成功 --&amp;gt; D[用户进入计划编辑界面];
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    C -- 生成失败 --&amp;gt; C1[提示用户重新输入];
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    C1 --&amp;gt; B;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    D -- 用户编辑计划 --&amp;gt; E{编辑操作};
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    E -- 添加/删除/修改步骤 --&amp;gt; D;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    E -- 确认完成 --&amp;gt; F[总控代理存储计划];
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    F --&amp;gt; G[启动计划执行引擎];
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    G --&amp;gt; H{按顺序执行步骤};
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    H --&amp;gt; I{当前步骤类型?};
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    subgraph 具体步骤执行
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">        direction LR
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">        I -- WebSurfer --&amp;gt; J[执行网页操作];
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">        I -- Coder --&amp;gt; K[生成并执行代码];
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">        I -- FileSurfer --&amp;gt; L[处理文件];
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">        I -- UserProxy --&amp;gt; M[提示用户手动操作];
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    end
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    J --&amp;gt; N{步骤是否成功完成?};
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    K --&amp;gt; N;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    L --&amp;gt; N;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    M --&amp;gt; N;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    N -- 是 --&amp;gt; O{所有步骤均已完成?};
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    N -- 否 --&amp;gt; P[记录错误原因];
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    P --&amp;gt; Q{是否需要重新规划?};
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    Q -- 是 --&amp;gt; R[请求用户许可重新规划];
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    R -- 同意 --&amp;gt; C;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    R -- 拒绝 --&amp;gt; S[终止流程];
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    Q -- 否 --&amp;gt; S;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    O -- 是 --&amp;gt; T[生成最终结果];
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    O -- 否 --&amp;gt; H;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    T --&amp;gt; U[向用户呈现结果];
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    U --&amp;gt; V[结束];
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;ol>
+&lt;li>
+&lt;p>&lt;strong>输入与计划生成&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>用户通过文本/图片触发流程，系统生成初始计划。若失败则提示用户重新输入。&lt;/li>
+&lt;li>用户通过编辑界面迭代优化计划，确认后进入执行阶段。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>计划执行逻辑&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>总控代理按步骤分配任务至对应智能体（WebSurfer/Coder/FileSurfer）或用户。&lt;/li>
+&lt;li>每个步骤完成后验证状态，若失败则判断是否需要重新规划（需用户授权）。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>动态控制与终止&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>用户可随时干预：暂停执行、修改计划或终止流程。&lt;/li>
+&lt;li>所有步骤完成后交付最终结果，异常情况下提供透明错误反馈。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="工具部署">工具部署
+&lt;/h2>&lt;p>&lt;strong>Magentic AI&lt;/strong> 主要基于Python 开发，Web部分基于FastAPI。而它的AI控制主要通过 Playwright 控制 &lt;strong>Docker&lt;/strong> 容器中的一个虚拟浏览器，且可以实时显示给用户。而背后的大模型则主要基于各个开放大模型的API接入方式使用。&lt;/p>
+&lt;p>所以要部署Magentic UI，需要先确认相关前置条件：&lt;/p>
+&lt;ul>
+&lt;li>Docker已安装，如果是Window系统，安装Docker Desktop，且和WSL集成&lt;/li>
+&lt;li>提供大模型的接入&lt;strong>API KEY&lt;/strong>，默认使用的是 &lt;strong>OPENAI&lt;/strong> 的API KEY&lt;/li>
+&lt;li>Python运行环境且 &lt;strong>&amp;gt;3.10&lt;/strong> 版本&lt;/li>
+&lt;/ul>
+&lt;p>是在WSL中部署的这个工具， 首先创建python虚拟环境，然后安装Magentic AI及相关依赖&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">python3 -m venv .venv
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">source&lt;/span> .venv/bin/activate
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">pip3 install magentic-ui
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>确保Docker已启动, 运行Magentic UI前应该没有相关容器在运行&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker ps
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>大模型这里可以使用微软Azure AI上的OPENAI, ， 完成配置后，将对应api key设置为环境变量 &lt;code>OPENAI_API_KEY&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">OPENAI_API_KEY&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;YOUR_API_KEY&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>另外Magentic UI本身需要对大模型进行配置，Azure AI的配置模板如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-YAML" data-lang="YAML">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">model_config&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="cp">&amp;amp;client&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">  &lt;/span>&lt;span class="nt">provider&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AzureOpenAIChatCompletionClient&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">  &lt;/span>&lt;span class="nt">config&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">    &lt;/span>&lt;span class="nt">model&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">gpt-4o&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">    &lt;/span>&lt;span class="nt">azure_endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;YOUR ENDPOINT&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">    &lt;/span>&lt;span class="nt">azure_deployment&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;YOUR DEPLOYMENT&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">    &lt;/span>&lt;span class="nt">api_version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;2024-10-21&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">    &lt;/span>&lt;span class="nt">azure_ad_token_provider&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">      &lt;/span>&lt;span class="nt">provider&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">autogen_ext.auth.azure.AzureTokenProvider&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">      &lt;/span>&lt;span class="nt">config&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">        &lt;/span>&lt;span class="nt">provider_kind&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">DefaultAzureCredential&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">        &lt;/span>&lt;span class="nt">scopes&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">          &lt;/span>- &lt;span class="l">https://cognitiveservices.azure.com/.default&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">    &lt;/span>&lt;span class="nt">max_retries&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">10&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">orchestrator_client&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="cp">*client&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">coder_client&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="cp">*client&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">web_surfer_client&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="cp">*client&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">file_surfer_client&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="cp">*client&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">action_guard_client&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="cp">*client&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="运行">运行
+&lt;/h2>&lt;p>然后运行Magentic ui, 默认使用8081端口，首次运行会下载多个不同docker镜像及相关依赖，时间较长，等待安装完成&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">magentic ui --port &lt;span class="m">8081&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>等运行log中出现如下信息，则启动成功&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">| INFO | magentic_ui.backend.web.app:lifespan:59 - Application startup complete. Navigate to http://127.0.0.1:8081
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>浏览器访问 &lt;code>http://localhost:8081&lt;/code>&lt;/p>
+&lt;p>会看到如下界面
+&lt;img src="https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526-3.png"
+width="1799"
+height="762"
+srcset="https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526-3_hu_fe26cb204b45df8c.png 480w, https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526-3_hu_d4b7548936aad01a.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="236"
+data-flex-basis="566px"
+>&lt;/p>
+&lt;p>启动一个会话后，比如让AI协助我们完成一个测试&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">请测试saucedemo.com网站的不同用户登录功能是否正常，并汇总问题为markdown格式
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>如安装正确，大模型调用正常，那么Magentic UI 就会规划相关任务计划，并让用户确认&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526-5.png"
+width="1830"
+height="825"
+srcset="https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526-5_hu_e4f7b711cc461b62.png 480w, https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526-5_hu_5dc9845a629c1a17.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="221"
+data-flex-basis="532px"
+>&lt;/p>
+&lt;p>用户也可以根据相关反馈，对计划进行调整，在计划执行过程中，也可以和AI交互，变更它的执行路径。具体的执行演示，可参看下方视频。&lt;/p>
+&lt;p>这时查看WSL中的docker 运行信息，可以看到运行了3个容器，其中两个是mangenti UI的&lt;code>coder&lt;/code> 和 &lt;code>file surfer&lt;/code> 智能体，另一个是可远程查看的 &lt;code>vnc_browser&lt;/code> 容器&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526-2.png"
+width="795"
+height="189"
+srcset="https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526-2_hu_4b1b4977de39e810.png 480w, https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526-2_hu_bf1e193fd2bb5b12.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="420"
+data-flex-basis="1009px"
+>&lt;/p>
+&lt;p>一系列步骤执行完成，Magentic UI根据最开始的指令，得到了如下markdown格式结果汇总。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-markdown" data-lang="markdown">&lt;span class="line">&lt;span class="cl">以下是对saucedemo.com网站不同用户登录功能测试的结果汇总：
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">1.&lt;/span> &lt;span class="gs">**标准用户**&lt;/span> (&lt;span class="sb">`standard_user`&lt;/span>):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">-&lt;/span> 登录成功。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">-&lt;/span> 无问题，用户可以正常访问库存页面并浏览产品。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">2.&lt;/span> &lt;span class="gs">**被锁定用户**&lt;/span> (&lt;span class="sb">`locked_out_user`&lt;/span>):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">-&lt;/span> 登录失败。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">-&lt;/span> 显示错误消息 &amp;#34;Epic sadface: Sorry, this user has been locked out.&amp;#34; 账户已被锁定，无法访问。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">3.&lt;/span> &lt;span class="gs">**问题用户**&lt;/span> (&lt;span class="sb">`problem_user`&lt;/span>):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">-&lt;/span> 登录成功。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">-&lt;/span> 产品图像存在不匹配的问题，图像错误是已知问题。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">4.&lt;/span> &lt;span class="gs">**性能故障用户**&lt;/span> (&lt;span class="sb">`performance_glitch_user`&lt;/span>):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">-&lt;/span> 登录成功。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">-&lt;/span> 无明显系统减慢或异常，用户可以正常导航。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">这些结果表明网站能够正确处理不同账户类型的登录场景。如果您想亲自测试，可以访问 [&lt;span class="nt">saucedemo.com&lt;/span>](&lt;span class="na">https://www.saucedemo.com/&lt;/span>)。
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="使用体会">使用体会
+&lt;/h2>&lt;p>总体应用下来，把AI重新定位为辅助者角色，显然更贴合当前AI应用的实际，而且通过容器实时显示AI的操作过程，使AI执行任务不再像个黑盒，确实友好了很多。&lt;/p>
+&lt;p>不过应用中感觉还是实用性不是太好，虽然官方已声明现阶段还是研究性质，但尚有较大改进空间。&lt;/p>
+&lt;ol>
+&lt;li>安装和配置比较复杂，各种依赖包众多，耗时较久&lt;/li>
+&lt;li>大模型本身能力对执行过程，包括是否能正常完成交互都有较大影响。调用失败和异常较多。&lt;/li>
+&lt;li>大模型的token消耗比较可观，完成一个任务，其实会分解多数十个不同请求，而每个请求的token消耗也是数千计，实用付费模型的话，成本高昂&lt;/li>
+&lt;/ol>
+&lt;p>下图是Azure后台查看的我试验期间的token消耗，比较可观。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526-4.png"
+width="1524"
+height="388"
+srcset="https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526-4_hu_e0d7e868c2da13d7.png 480w, https://chengxiaqiucao.github.io/post/097-magenticui%E8%AF%84%E6%B5%8B/snap_20250526-4_hu_5ac4275b5ccc0967.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="392"
+data-flex-basis="942px"
+>&lt;/p>
+&lt;p>总之，Magentic UI 的发展方向值得期待，但当下还需要多等待它的进一步完善。&lt;/p>
+&lt;hr></description></item><item><title>mem0，让AI拥有记忆，打造个性化助手的基石</title><link>https://chengxiaqiucao.github.io/post/098-mem0/</link><pubDate>Tue, 27 May 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/098-mem0/</guid><description>&lt;p>在AI大模型飞速发展的今天，各类智能应用层出不穷。然而，当前许多大型语言模型（LLMs）仍面临一个核心挑战：&lt;strong>记忆的缺失&lt;/strong>。也就是它们往往是“无状态”的，很多AI工具从性能考虑，有较严格的上下文窗口限定，超过这个窗口的历史交互信息就会被遗弃。导致AI无法在不同会话甚至同一会话的复杂交互中持续记住上下文，对话缺乏连贯性，并经常出现信息重复，无法处理长期任务。&lt;/p>
+&lt;p>对于一个个性化的AI助手，如果每次交流它都“失忆”，不能指导你的偏好和习惯，这种体验无疑是令人沮丧的。正是为了解决这一痛点，一个名为 &lt;code>Mem0&lt;/code> 的开源项目应运而生。它旨在为AI应用提供可扩展、持久且可插拔的记忆能力，让你的AI真正拥有“大脑”。&lt;/p>
+&lt;p>其实在我们之前的文章中介绍过的Browser-Use这个开源项目，就使用了 &lt;code>Mem0&lt;/code> 来实现任务记忆。&lt;/p>
+&lt;p>本篇我们就来详细介绍下 &lt;code>Mem0&lt;/code> 的核心理念、技术特点。&lt;/p>
+&lt;h2 id="为什么ai需要记忆">为什么AI需要“记忆”？
+&lt;/h2>&lt;p>当前LLMs的强大主要体现在其对单次输入的高效处理能力上。它们能够生成流畅的文本、回答复杂的问题，但这些能力往往局限于当前的“提示”（prompt）窗口内。一旦对话结束或上下文超出窗口限制，之前的交互信息就会被遗忘。&lt;/p>
+&lt;p>这种“无状态”的特性，导致了以下几个问题：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>上下文丢失&lt;/strong>：长时间对话中，AI无法记住早期内容，导致重复提问或理解偏差。&lt;/li>
+&lt;li>&lt;strong>个性化缺失&lt;/strong>：AI无法基于用户的历史行为和偏好提供定制化服务。&lt;/li>
+&lt;li>&lt;strong>长期任务受限&lt;/strong>：对于需要多轮交互、信息累积才能完成的任务（如项目管理、复杂规划），无记忆的AI难以胜任。&lt;/li>
+&lt;li>&lt;strong>效率低下&lt;/strong>：用户不得不反复提供背景信息，降低了交互效率。&lt;/li>
+&lt;/ul>
+&lt;p>Mem0 的出现，则弥补了这一“记忆鸿沟”，让AI能够积累经验、学习成长。&lt;/p>
+&lt;h2 id="mem0-是什么">Mem0 是什么？
+&lt;/h2>&lt;p>&lt;strong>Mem0&lt;/strong> 是一个开源的、模块化的框架，专为赋予LLMs&lt;strong>可扩展、持久且可插拔&lt;/strong>的记忆能力而设计。 它将AI的记忆抽象为不同的层级，并提供了一套统一的API，使得开发者能够轻松地为任何LLM应用添加记忆功能。&lt;/p>
+&lt;p>简单来说，Mem0 就是AI应用的一个外置“记忆库”。它能够捕获、存储和检索AI与用户交互过程中产生的所有相关信息，并在需要时将其注入到LLMs的上下文中，从而实现更连贯、更智能的对话和任务执行。&lt;/p>
+&lt;h2 id="mem0-的核心特性说明">Mem0 的核心特性说明
+&lt;/h2>&lt;p>Mem0 的强大之处在于其精心设计的架构和丰富的功能集：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>分层记忆架构&lt;/strong>：Mem0 将记忆分为不同类型，以适应不同的需求：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>短暂记忆 (Ephemeral Memory)&lt;/strong>：存储短期的、会话内的上下文信息，类似于人类的短期记忆。&lt;/li>
+&lt;li>&lt;strong>长期记忆 (Long-Term Memory)&lt;/strong>：存储重要的、需要长期保留的知识和经验，通过语义嵌入实现高效检索。&lt;/li>
+&lt;li>&lt;strong>归档记忆 (Archival Memory)&lt;/strong>：用于备份和审计，确保所有交互都有迹可循。&lt;/li>
+&lt;li>&lt;strong>知识记忆 (Knowledge Memory)&lt;/strong>：专为存储外部知识库设计，例如文档、网页等。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>高度可插拔（Pluggable）&lt;/strong>：Mem0 提供了灵活的集成能力，支持与多种主流LLM服务（如OpenAI、Anthropic、Groq等）和向量数据库（如Qdrant、Pinecone、ChromaDB等）无缝协作。 这意味着开发者可以根据自己的需求和偏好，自由选择后端服务。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>多租户支持&lt;/strong>：Mem0 支持多租户架构，允许为不同的用户或应用实例创建独立的记忆空间，确保数据隔离和安全性，这对于构建SaaS产品尤为重要。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>开发者友好&lt;/strong>：提供简洁易用的Python SDK，并计划支持JavaScript/TypeScript，大大降低了开发者集成记忆功能的门槛。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>与主流框架集成&lt;/strong>：原生支持 LangChain、LlamaIndex 等流行的LLM应用开发框架，加速了开发流程。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="browser-use-对-mem0-的应用分析">Browser-Use 对 Mem0 的应用分析
+&lt;/h2>&lt;p>&lt;strong>Browser-Use&lt;/strong> 旨在让AI agent能够像人类一样，在浏览器中执行复杂的任务。它利用了Mem0 来赋予AI agent “记忆”能力，在执行任务时，可以根据设定，记录多达100甚至更多的操作步骤详细信息，作为后续步骤的参考。&lt;/p>
+&lt;p>通过集成 Mem0，Browser-Use 项目中的AI agent获得了以下关键能力：&lt;/p>
+&lt;h3 id="浏览历史记忆与导航优化">&lt;strong>浏览历史记忆与导航优化&lt;/strong>
+&lt;/h3>&lt;p>AI agent访问过的每一个URL、每一个交互（点击、输入），都可以通过Mem0存储为&lt;strong>短暂记忆&lt;/strong>或转化为&lt;strong>长期记忆&lt;/strong>。&lt;/p>
+&lt;p>当用户要求agent “&lt;code>回到之前搜索的结果页面&lt;/code>” 时，agent不再需要从头开始搜索，而是可以直接从Mem0中检索历史URL并导航过去，大大提升了效率和用户体验。&lt;/p>
+&lt;h3 id="复杂任务的上下文保持">&lt;strong>复杂任务的上下文保持&lt;/strong>
+&lt;/h3>&lt;p>比如一个AI agent需要完成一个跨多个页面的在线购物流程：搜索商品 -&amp;gt; 添加购物车 -&amp;gt; 填写地址 -&amp;gt; 支付。&lt;/p>
+&lt;p>Mem0 可以在每一步都存储当前的页面状态、用户输入、商品详情等&lt;strong>短暂记忆&lt;/strong>。即使流程中断，agent也能从Mem0中加载之前的上下文，准确地从中断处继续，而不是“失忆”重来。&lt;/p>
+&lt;p>例如，agent可以记住在某个商品页面上用户选择的颜色和尺码，即使跳转到购物车页面后又返回，这些信息依然存在。&lt;/p>
+&lt;h3 id="用户操作模式与偏好学习">&lt;strong>用户操作模式与偏好学习&lt;/strong>：
+&lt;/h3>&lt;p>如果用户经常让AI agent在特定网站上执行相似的任务（如每天早上查看某个新闻网站的头条），Mem0 可以将这些高频行为模式转化为&lt;strong>长期记忆&lt;/strong>。&lt;/p>
+&lt;p>未来，AI agent可以更智能地预测用户需求，甚至主动推荐或预加载相关内容，实现真正的个性化浏览器操作体验。&lt;/p>
+&lt;h3 id="多会话任务的持久性">&lt;strong>多会话任务的持久性&lt;/strong>：
+&lt;/h3>&lt;p>对于需要几天才能完成的复杂研究任务（如收集某个主题的资料），AI agent可以将每个浏览会话中的关键发现、已访问的资源和任务进度存储在Mem0的&lt;strong>长期记忆&lt;/strong>中。&lt;/p>
+&lt;p>即使关闭浏览器，下一次启动时，agent也能加载这些记忆，继续之前的研究，确保任务的连续性和完整性。&lt;/p>
+&lt;blockquote>
+&lt;p>通过上述剖析，我们可以清晰地看到 Mem0 如何帮助 Browser-Use 项目中的AI agent从一个“即用即弃”的工具，转变为一个能够理解浏览器环境、记住历史操作、并持续执行复杂任务的智能助手。
+它让AI agent不再仅仅是机械地执行指令，而是能够积累经验、适应环境、并提供更流畅、更人性化的自动化浏览体验。&lt;/p>&lt;/blockquote>
+&lt;h3 id="总结">总结
+&lt;/h3>&lt;p>在构建真正智能、能够进行复杂交互的AI应用时，记忆能力是不可或缺的一环。&lt;strong>Mem0&lt;/strong> 作为一款专注于为LLMs提供可扩展、持久且可插拔记忆的开源框架，无疑为开发者们提供了强大的工具。它通过分层记忆、灵活的集成能力和开发者友好的设计，极大地简化了AI记忆功能的实现。&lt;/p>
+&lt;p>无论是赋能像 Browser-Use 这样的AI浏览器agent，使其在复杂的网页交互中拥有持久记忆，还是构建更聪明的个人助手、客服机器人，Mem0 都能提供坚实的基础。&lt;/p>
+&lt;p>对于希望打造个性化助手或让自己的AI Agent更贴合实际应用场景，Mem0是一个不可不了解的AI生态工具。&lt;/p></description></item><item><title>打造个人知识库，wsl+ollama部署deepseek与vscode集成</title><link>https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/</link><pubDate>Thu, 15 May 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-3.png" alt="Featured image of post 打造个人知识库，wsl+ollama部署deepseek与vscode集成" />&lt;p>目前大模型应用如火如荼，各大LLM如&lt;code>Deepseek&lt;/code>也都提供了在线的助手服务，结合&lt;code>mcp-server&lt;/code>还可以进一步拓展到本地的工具能力。&lt;/p>
+&lt;p>但对于一些和本地业务和数据强相关的资料，在线的大模型训练数据集一般并不能涵盖，特别还有一些敏感或对安全要求很高的数据，使用在线大模型并不现实。所以我们个人应用和实际工作中，本地部署大模型并加入本地知识库也是一个刚性需求。&lt;/p>
+&lt;p>本文就记录下在WSL中通过Ollama和CherryStudio搭建本地大模型，并将本地模型集成到VsCode的AI助手的过程分享。&lt;/p>
+&lt;h2 id="ollama简介">Ollama简介
+&lt;/h2>&lt;p>Ollama 是一个基于Go 语言开发的简单易用的本地大语言模型运行框架，专为在本地机器上便捷部署和运行大型语言模型（LLM）而设计。Ollama 是 &lt;strong>Omni-Layer Learning Language Acquisition Model（全方位学习语言接受模型）&lt;/strong> 的简写。&lt;/p>
+&lt;h2 id="deepseek本地模型及运行配置">Deepseek本地模型及运行配置
+&lt;/h2>&lt;p>Deepseek目前根据本地部署包含的参数集大小，又包含 &lt;strong>1.5B&lt;/strong> 到 &lt;strong>671B&lt;/strong> 等多个版本，参数集越大则AI越智能，但相应地对硬件要求则越高。&lt;/p>
+&lt;p>一般对应不同deepseek模型版本，推荐的硬件配置如下：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>模型型号&lt;/th>
+&lt;th>CPU&lt;/th>
+&lt;th>内存&lt;/th>
+&lt;th>硬盘&lt;/th>
+&lt;th>显存&lt;/th>
+&lt;th>适用场景&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>DeepSeek-R1-1.5B&lt;/td>
+&lt;td>4 核&lt;/td>
+&lt;td>8 GB+&lt;/td>
+&lt;td>3 GB+&lt;/td>
+&lt;td>非必需（若需 CPU 加速可选 GTX 1650）&lt;/td>
+&lt;td>个人使用，如笔记本电脑、台式电脑等&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-7B&lt;/td>
+&lt;td>8 核&lt;/td>
+&lt;td>16 GB+&lt;/td>
+&lt;td>8 GB+&lt;/td>
+&lt;td>8 GB+显存（如 RTX 3070/4060）&lt;/td>
+&lt;td>中小型企业本地开发&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-8B&lt;/td>
+&lt;td>8 核&lt;/td>
+&lt;td>16 GB+&lt;/td>
+&lt;td>8 GB+&lt;/td>
+&lt;td>8 GB+显存&lt;/td>
+&lt;td>中小型企业本地开发（提升精度的轻量级任务）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-14B&lt;/td>
+&lt;td>12 核&lt;/td>
+&lt;td>32 GB+&lt;/td>
+&lt;td>15 GB+&lt;/td>
+&lt;td>16 GB+显存（如RTX 4090 或 A5000）&lt;/td>
+&lt;td>中小型企业本地开发（中量级任务）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-32B&lt;/td>
+&lt;td>16 核&lt;/td>
+&lt;td>64 GB+&lt;/td>
+&lt;td>30 GB+&lt;/td>
+&lt;td>24 GB+显存（如 A100 40 GB 或 RTX 3090）&lt;/td>
+&lt;td>专业领域任务，如医疗、科研、法律&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-70B&lt;/td>
+&lt;td>32 核&lt;/td>
+&lt;td>128 GB+&lt;/td>
+&lt;td>70 GB+&lt;/td>
+&lt;td>多卡并行（如 2x A100 80GB 或 4x RTX 4090）&lt;/td>
+&lt;td>大型企业或科研机构，专业领域任务处理&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-671B（满血版）&lt;/td>
+&lt;td>64 核&lt;/td>
+&lt;td>512 GB+&lt;/td>
+&lt;td>300 GB+&lt;/td>
+&lt;td>多卡并行（如 8x A100/H100）&lt;/td>
+&lt;td>国家级科研任务处理&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>对我们个人用户来说，根据自己的电脑配置情况，通常选择1.5B到14B。 当然如果不是高频使用本地模型，个人建议可以将配置和推荐模型降一档匹配。&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="利用ollama在wsl中部署本地deepseek">利用Ollama在WSL中部署本地Deepseek
+&lt;/h2>&lt;p>因为笔者当前主要是希望将一些本地数据接入Deepseek，也没有高频使用本地LLM的需求。所有这里我选择部署 &lt;strong>DeepSeek-R1-14B&lt;/strong>， 另外为了避免每次启动电脑都因为LLM运行占用大量资源，所以这里我希望在Windows电脑的WSL下运行LLM&lt;/p>
+&lt;h3 id="wsl配置">WSL配置
+&lt;/h3>&lt;p>如果当前系统还没有启用WSL，可以先启用（过程不再详述， Win11中运行WSL install [对应Linux发行版] 即可安装）&lt;/p>
+&lt;p>通过命令行查看&lt;strong>WSL&lt;/strong>状态:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">C&lt;span class="p">:&lt;/span>&lt;span class="nl">\qiucao&lt;/span>&lt;span class="c1">&amp;gt;wsl --status&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">默认分发: Ubuntu-24.04
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">默认版本: 2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>WSL默认的网络模式是NAT，这里可以通过&lt;code>WSL Setting&lt;/code>程序，修改下当前配置，改为&lt;code>Mirrored&lt;/code>镜像模式，共用宿主机网络。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-1.png"
+width="1607"
+height="969"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-1_hu_251e83a643f91563.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-1_hu_d3b3405b54f8e912.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="165"
+data-flex-basis="398px"
+>&lt;/p>
+&lt;h3 id="安装ollama">安装Ollama
+&lt;/h3>&lt;p>进入Ollama官网(&lt;a class="link" href="https://ollama.com/" target="_blank" rel="noopener"
+>https://ollama.com/&lt;/a>)下载界面, 因为我们是在WSL中部署，所以选择Linux安装。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419.png"
+width="1885"
+height="936"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419_hu_99722e55ae18c4a1.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419_hu_89a14deb9f0b4320.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="201"
+data-flex-basis="483px"
+>&lt;/p>
+&lt;p>执行如下命令，等待下载并自动安装完成。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">curl -fsSL https://ollama.com/install.sh &lt;span class="p">|&lt;/span> sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 安装完成查看版本&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">~$ ollama --version
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ollama version is 0.6.5
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="部署deepseek">部署deepseek
+&lt;/h3>&lt;p>完成ollama安装后，就可以根据Ollama提供的大模型清单，选择对应大模型进行安装。目前支持的大模型清单，可以从官网如下地址查询：https://ollama.com/library&lt;/p>
+&lt;p>执行如下命令下载并运行deepseek&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">ollama run deepseek-r1:14b
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_deepseek.png"
+width="1193"
+height="243"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_deepseek_hu_1026ff78b8603fed.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_deepseek_hu_9d7ff43704722fde.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="490"
+data-flex-basis="1178px"
+>&lt;/p>
+&lt;p>安装成功后可以提问测试一下deepseek是否已正常提供服务&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-2.png"
+width="1404"
+height="158"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-2_hu_ed2f4389c23dba39.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-2_hu_82a3907315705e92.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="888"
+data-flex-basis="2132px"
+>&lt;/p>
+&lt;h3 id="添加知识库分析模型">添加知识库分析模型
+&lt;/h3>&lt;p>至此，Deepseek其实已在本地部署。但如果要通过Deepseek使用本地数据和文档，我们还需要部署一个&lt;strong>语义向量模型&lt;/strong>（Embedding Model），用来将本地数据转化为大模型可分析的知识库数据。这里我们选择 &lt;strong>bge-m3&lt;/strong> 模型，这是一个通用向量模型，可以支持多语言、长文本和多种检索方式。&lt;/p>
+&lt;p>执行：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">ollama pull bge-m3
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_bge.png"
+width="1141"
+height="198"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_bge_hu_63310f4bc6d28a9e.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_bge_hu_9a9373e160733582.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="576"
+data-flex-basis="1383px"
+>&lt;/p>
+&lt;h2 id="用cherry-studio管理知识库并提供本地交互界面">用Cherry Studio管理知识库并提供本地交互界面
+&lt;/h2>&lt;p>安装完Deepseek后，虽然我们可以在命令界面下和deepseek进行交互，但还是不够友好，包括对本地知识库的管理也不够方便。所以这里我们还可以安装一个开源的本地AI助手和知识库客户端Cherry Studio。从官网（https://cherry-ai.com）下载windows版本安装即可。
+&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-3.png"
+width="1869"
+height="861"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-3_hu_162bef18952f99b6.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-3_hu_de42598554b32e8a.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="217"
+data-flex-basis="520px"
+>&lt;/p>
+&lt;p>打开Cherry Studio，按如下步骤添加我们刚刚通过ollama部署的Deepseek&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry.png"
+width="1337"
+height="821"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry_hu_650d185a5428fb5.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry_hu_2420da097208e561.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="162"
+data-flex-basis="390px"
+>&lt;/p>
+&lt;p>会看到已经安装好的模型，添加进来
+&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry_model.png"
+width="972"
+height="659"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry_model_hu_1427909c6f167c6d.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry_model_hu_50b783a5da211168.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="147"
+data-flex-basis="353px"
+>
+然后就可以利用Cherry Studio的知识库管理，将我们需要加入的本地文档纳入大模型的数据集中。这里包括直接添加文件、直接指定目录、从网站采集等多种方式，非常方便。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/add_knowledge.png"
+width="1347"
+height="828"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/add_knowledge_hu_a4e9beef670ffd2f.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/add_knowledge_hu_1187620292c81a03.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="162"
+data-flex-basis="390px"
+>&lt;/p>
+&lt;h2 id="集成本地deepseek到vscode">集成本地Deepseek到vscode
+&lt;/h2>&lt;p>而有了本地的LLM后，如果我们希望在vscode中使用，可以利用vscode 的 &lt;code>AI Toolkit&lt;/code> 插件，按如下方式添加本地LLM&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_1.png"
+width="1914"
+height="959"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_1_hu_833830a04db48530.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_1_hu_f4c99c1236cd540c.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="199"
+data-flex-basis="478px"
+>&lt;/p>
+&lt;p>vscode中测试下本地库的能力&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_2.png"
+width="1433"
+height="1009"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_2_hu_7715fc702df564d2.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_2_hu_c5b07401fbe6ecb3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="142"
+data-flex-basis="340px"
+>&lt;/p>
+&lt;p>以上就是我们部署本地Deepseek的实践分享&lt;/p></description></item><item><title>测试开发如何善用Cursor？</title><link>https://chengxiaqiucao.github.io/post/093-cursor%E7%9A%8412rules/</link><pubDate>Tue, 13 May 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/093-cursor%E7%9A%8412rules/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/093-cursor%E7%9A%8412rules/cursor.png" alt="Featured image of post 测试开发如何善用Cursor？" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>很多刚接触 AI 辅助编程的小伙伴应该都听说过 &lt;code>Cursor&lt;/code> 的强大，对初学者而言，免费版Cursor的免费额度也足够让大家体验它的强悍能力。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/093-cursor%E7%9A%8412rules/cursor.png"
+width="1412"
+height="640"
+srcset="https://chengxiaqiucao.github.io/post/093-cursor%E7%9A%8412rules/cursor_hu_cadbb1d864670952.png 480w, https://chengxiaqiucao.github.io/post/093-cursor%E7%9A%8412rules/cursor_hu_916744822785806f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="220"
+data-flex-basis="529px"
+>&lt;/p>
+&lt;p>可是在实际应用过程中，从我的实际经验，如果只是把它当作一个沟通对象，像和人沟通那样来完成开发任务，却会浪费大量时间在纠正它的理解偏差，而且极大概率在某一次对话后，把原来的成果改得面目全非，大量努力付诸东流。&lt;/p>
+&lt;h2 id="cursor的12条军规">Cursor的12条军规
+&lt;/h2>&lt;p>其实 Cursor 是否能更有效地发挥作用，跟它的使用方式有很大关系。Cursor的首席设计师 &lt;strong>Ryo Lu&lt;/strong> 早前曾在 X 上给出善用 Cursor 的12条军规：&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/093-cursor%E7%9A%8412rules/cursor_12_rules.png"
+width="737"
+height="1465"
+srcset="https://chengxiaqiucao.github.io/post/093-cursor%E7%9A%8412rules/cursor_12_rules_hu_3a464fc067e74c07.png 480w, https://chengxiaqiucao.github.io/post/093-cursor%E7%9A%8412rules/cursor_12_rules_hu_ef78950da28db6be.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="50"
+data-flex-basis="120px"
+>&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>明确项目规则：&lt;/strong> 在项目开始前，设置5-10条清晰的项目规则，让Cursor了解你的代码结构和约束。对于现有代码库，可以尝试使用&lt;code>/generate rules&lt;/code>命令来生成规则。&lt;/li>
+&lt;li>&lt;strong>具体化提示：&lt;/strong> 在提示中要非常具体，详细说明技术栈、期望行为和限制，就像编写一个迷你规范。&lt;/li>
+&lt;li>&lt;strong>按文件操作：&lt;/strong> 每次处理一小部分，生成、测试并审查，保持专注。&lt;/li>
+&lt;li>&lt;strong>测试先行：&lt;/strong> 优先编写测试，锁定测试用例，然后生成代码直到所有测试通过。&lt;/li>
+&lt;li>&lt;strong>严格审查与修正：&lt;/strong> 始终审查AI的输出，并手动修复任何错误，然后将这些修正作为示例告知Cursor。&lt;/li>
+&lt;li>&lt;strong>限定作用域：&lt;/strong> 使用&lt;code>@ file&lt;/code>, &lt;code>@ folders&lt;/code>, &lt;code>@ git&lt;/code>等命令来将Cursor的注意力限制在代码库的特定部分。&lt;/li>
+&lt;li>&lt;strong>提供完整上下文：&lt;/strong> 将设计文档和清单保存在&lt;code>.cursor/&lt;/code>目录下，以便Cursor代理能够充分理解下一步需要做什么。&lt;/li>
+&lt;li>&lt;strong>直接修改错误代码：&lt;/strong> 如果生成的代码有误，直接手动修改。Cursor从编辑中学习的速度比从解释中学习更快。&lt;/li>
+&lt;li>&lt;strong>利用聊天历史：&lt;/strong> 使用聊天历史来迭代旧的提示，而无需从头开始。&lt;/li>
+&lt;li>&lt;strong>明智选择模型：&lt;/strong> 根据需求有目的地选择模型。例如，Gemini适用于追求精确性，而Claude适用于需要更广泛知识的场景。&lt;/li>
+&lt;li>&lt;strong>处理新栈或不熟悉栈：&lt;/strong> 在处理新或不熟悉的技术栈时，粘贴相关文档链接。让Cursor逐行解释所有错误和修复方法。&lt;/li>
+&lt;li>&lt;strong>优化大型项目性能：&lt;/strong> 对于大型项目，让其在夜间进行索引，并限制上下文范围以保持性能的流畅性。&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">Using Cursor well = fast, clean code.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Using it wrong = AI spaghetti you’ll be cleaning up all week.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Here’s how to actually use it right:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1. Set 5-10 clear project rules upfront so Cursor knows your structure and constraints. Try /generate rules for existing codebases.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2. Be specific in prompts. Spell out tech stack, behavior, and constraints like a mini spec.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">3. Work file by file; generate, test, and review in small, focused chunks.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">4. Write tests first, lock them, and generate code until all tests pass.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">5. Always review AI output and hard‑fix anything that breaks, then tell Cursor to use them as examples.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">6. Use @ file, @ folders, @ git to scope Cursor’s attention to the right parts of your codebase.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">7. Keep design docs and checklists in .cursor/ so the agent has full context on what to do next.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">8. If code is wrong, just write it yourself. Cursor learns faster from edits than explanations.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">9. Use chat history to iterate on old prompts without starting over.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">10. Choose models intentionally. Gemini for precision, Claude for breadth.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">11. In new or unfamiliar stacks, paste in link to documentation. Make Cursor explain all errors and fixes line by line.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">12.Let big projects index overnight and limit context scope to keep performance snappy.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Structure and control wins (for now)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Treat Cursor agent like a powerful junior — it can go far, fast, if you show it the way.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="测试开发如何善用cursor">测试开发如何善用Cursor?
+&lt;/h2>&lt;p>而作为一个测试开发或自动化测试工程师，我们在编写相关测试脚本或工具时，如何善用 Cursor 更好帮助我们提升效率和产出呢？本文我们参照以上 12 条规则，总结相关的实践指南。&lt;/p>
+&lt;h3 id="初始化与上下文构建将cursor训练成测试领域专家">初始化与上下文构建——将Cursor训练成“测试领域专家”
+&lt;/h3>&lt;p>在项目启动或介入初期，首要任务是让Cursor充分理解当前测试环境的规范与约束。高质量的上下文输入，是高质量代码输出的前提。&lt;/p>
+&lt;h4 id="明确项目测试规则与约定-规则1">明确项目测试规则与约定 (规则1)
+&lt;/h4>&lt;p>在自动化测试项目中，代码规范、框架选型和设计模式的统一至关重要。基于&lt;code>规则1：明确项目规则&lt;/code> ，我们可以利用&lt;code>.cursor/rules.md&lt;/code>文件，将这些隐性的团队知识显性化，为Cursor提供一份清晰的行动纲领 。而对于存量项目，还可先使用&lt;code>/generate rules&lt;/code>命令初步提炼规则，再进行人工增补。&lt;/p>
+&lt;p>&lt;strong>实践案例&lt;/strong>：在一个基于Python Flask的Web项目中，测试技术栈为Pytest与Selenium。可以在&lt;code>.cursor/rules.md&lt;/code>中定义如下规则：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-mysql" data-lang="mysql">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># .cursor/rules.md
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">cite_start&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="err">所有单元测试文件命名为&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="n">test_&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">py&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">UI测试文件命名为&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="n">ui_test_&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">py&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">cite_start&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="err">测试函数必须以&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="n">test_&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="err">开头&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">cite_start&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="err">使用&lt;/span>&lt;span class="n">Pytest&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">fixture进行测试环境的设置与销毁&lt;/span>&lt;span class="err">（&lt;/span>&lt;span class="n">setup&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">and&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">teardown&lt;/span>&lt;span class="err">）&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">cite_start&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="n">UI测试遵循Page&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Object模式&lt;/span>&lt;span class="err">，页面对象进行封装&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">cite_start&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="err">避免使用硬编码等待，优先采用&lt;/span>&lt;span class="n">WebDriver的显式等待机制&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">cite_start&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="err">测试报告统一使用&lt;/span>&lt;span class="n">Allure框架生成&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="提供详尽的指令以模拟测试场景-规则2">提供详尽的指令以模拟“测试场景” (规则2)
+&lt;/h4>&lt;p>与AI的交互质量直接决定输出代码的质量。自动化测试的指令尤其需要精确性，因为它必须完整描述被测功能、输入数据、预期行为乃至异常路径。&lt;/p>
+&lt;p>&lt;strong>实践案例&lt;/strong>：为用户登录功能编写集成测试。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>效果不佳的指令&lt;/strong>：&lt;code>写一个登录测试。&lt;/code>&lt;/li>
+&lt;li>&lt;strong>结构清晰的指令&lt;/strong>：&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">请使用Pytest框架，为Flask应用的用户登录功能（端点为POST /api/login，接收username和password）编写集成测试。需要覆盖以下三个场景：
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1. 成功登录 (使用admin/password123)；
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2. 密码错误 (使用admin/wrongpass)；
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">3. 用户不存在 (使用nonexistent/anypass)。对于成功场景，断言HTTP状态码为200且响应中包含非空的token。对于失败场景，断言状态码为401。
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="迭代式开发与修正实现测试代码的持续集成">迭代式开发与修正——实现“测试代码的持续集成”
+&lt;/h3>&lt;p>将复杂的测试任务分解，通过“生成-验证-修正”的敏捷循环进行开发，是确保代码质量和项目进度的有效策略。&lt;/p>
+&lt;h4 id="小步快跑增量验证-规则3">小步快跑，增量验证 (规则3)
+&lt;/h4>&lt;p>应规避一次性生成整个复杂模块所有测试的诱惑。&lt;/p>
+&lt;p>正确的做法是将任务分解为最小可验证单元，逐个击破。&lt;/p>
+&lt;p>例如，在为一组RESTful API编写测试时，应按“创建用户 -&amp;gt; 获取用户 -&amp;gt; 更新用户 -&amp;gt; 删除用户”的逻辑顺序，逐一生成和验证测试代码&lt;/p>
+&lt;p>这种方式有助于快速定位问题，避免错误的累积。&lt;/p>
+&lt;h4 id="测试驱动开发tdd的应用-规则4">测试驱动开发（TDD）的应用 (规则4)
+&lt;/h4>&lt;p>测试驱动开发是保障代码质量的经典模式，Cursor可以成为该模式的强大加速器。工程师先定义函数的预期行为（即编写测试用例），再让AI生成满足这些测试的实现代码。&lt;/p>
+&lt;p>&lt;strong>实践案例&lt;/strong>：实现一个折扣计算函数&lt;code>calculate_discount(price, discount_rate)&lt;/code>。&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>定义测试&lt;/strong>: 首先要求Cursor：&lt;code>生成一个Pytest测试用例，用于测试calculate_discount函数。当price=100, discount_rate=0.1时，预期返回值为90；当discount_rate为负数时，应抛出ValueError异常。&lt;/code>&lt;/li>
+&lt;li>&lt;strong>生成实现&lt;/strong>: 在测试代码&lt;code>test_calculate_discount.py&lt;/code>生成后，运行它（此时会失败），然后对Cursor发出新指令：&lt;code>请根据刚才生成的测试用例，实现calculate_discount函数的功能。&lt;/code>&lt;/li>
+&lt;li>&lt;strong>验证闭环&lt;/strong>: Cursor生成函数实现后，再次运行测试，直至全部通过。&lt;/li>
+&lt;/ol>
+&lt;h4 id="主动纠正教学相长-规则5">主动纠正，教学相长 (规则5)
+&lt;/h4>&lt;p>需要注意的是，AI生成的代码并非永远正确，而工程师的审查和修正是最后一道防线。直接在代码中修正错误，是训练Cursor最有效的方式，远胜于用自然语言向其解释。&lt;/p>
+&lt;p>&lt;strong>实践案例&lt;/strong>：
+比如Cursor在生成的UI测试中，使用了一个不稳定且错误的XPath定位器&lt;code>//button[@id='submit']&lt;/code>。在测试运行失败后，我们可以直接手动将其修改为正确的定位器，例如 &lt;code>//input[@value='Login']&lt;/code>。修正后，可以在聊天中备注一句以强化其学习：&lt;code>“我已修正登录按钮的定位器，新的定位器更准确。请在后续任务中参考此模式。”&lt;/code> 。&lt;/p>
+&lt;h3 id="精细化管理实现测试资源的智能调度">精细化管理——实现“测试资源的智能调度”
+&lt;/h3>&lt;p>在大型项目中，如何让Cursor聚焦于正确的信息，是决定其效率和相关性的关键。&lt;/p>
+&lt;h4 id="精准限定上下文范围-规则6">精准限定上下文范围 (规则6)
+&lt;/h4>&lt;p>在庞大的代码库中，测试任务往往只与特定模块或服务相关。通过使用&lt;code>@folders&lt;/code>或&lt;code>@file&lt;/code>命令，可以显著缩小Cursor的分析范围，让其专注于必要的上下文。&lt;/p>
+&lt;p>&lt;strong>实践案例&lt;/strong>：
+当为&lt;code>user_service&lt;/code>微服务编写API测试时，所有相关代码位于&lt;code>services/user_service/&lt;/code>目录。此时，应在提问前先输入&lt;code>@folders services/user_service/&lt;/code>，然后再描述具体的测试需求。&lt;/p>
+&lt;h4 id="沉淀项目知识以辅助决策-规则7">沉淀项目知识以辅助决策 (规则7)
+&lt;/h4>&lt;p>可以将测试策略、UI定位器优先级、数据模拟规范等关键信息沉淀为文档，并存放于&lt;code>.cursor/&lt;/code>目录中。这相当于为Cursor提供了一套“项目级知识库”。&lt;/p>
+&lt;p>&lt;strong>实践案例&lt;/strong>：
+创建&lt;code>.cursor/ui_locators_priority.md&lt;/code>文件，内容为：“UI元素定位优先顺序：ID &amp;gt; Name &amp;gt; CSS Selector &amp;gt; XPath”。在提问时便可引用：&lt;code>请参考.cursor/ui_locators_priority.md中的策略，为注册页面的‘提交’按钮生成Selenium定位代码。&lt;/code>。&lt;/p>
+&lt;h3 id="问题解决与效率优化化身测试效率加速器">问题解决与效率优化——化身“测试效率加速器”
+&lt;/h3>&lt;p>掌握高级用法，能进一步将Cursor从日常助手，转变为解决复杂问题和加速学习的利器。&lt;/p>
+&lt;h4 id="智能选择ai模型-规则10">智能选择AI模型 (规则10)
+&lt;/h4>&lt;p>不同的AI模型具有不同的能力侧重。根据测试任务的特性选择合适的模型，可以事半功倍。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Gemini (精度优先)&lt;/strong>：适用于生成语法要求严格的单元测试、算法校验、或使用特定框架（如React Testing Library）的精细化测试代码。&lt;/li>
+&lt;li>&lt;strong>Claude (广度优先)&lt;/strong>：更适合需要理解大量上下文的场景，如根据API文档生成全面的集成测试、设计端到端（E2E）测试场景，或在不熟悉的代码库中探索和建议测试点。&lt;/li>
+&lt;/ul>
+&lt;h4 id="利用文档快速掌握新技术-规则11">利用文档快速掌握新技术 (规则11)
+&lt;/h4>&lt;p>当团队引入新的测试框架（如Playwright）时，工程师可以利用Cursor快速跨越学习曲线。&lt;/p>
+&lt;p>&lt;strong>实践案例&lt;/strong>：
+直接向Cursor提供Playwright官方文档链接，并要求其生成示例代码。当生成的代码运行出错时，可以粘贴错误信息并提问：“这是运行Playwright脚本时出现的错误，请根据官方文档逐行解释错误原因，并提供修复建议。”。&lt;/p>
+&lt;h4 id="限制上下文范围-规则12">限制上下文范围 (规则12)
+&lt;/h4>&lt;p>当项目代码量比较大时，通过过夜索引，并限制上下文范围。&lt;/p>
+&lt;p>&lt;strong>实践案例&lt;/strong>：&lt;/p>
+&lt;p>在处理大型测试项目时，允许Cursor在后台处理索引，到第二天再进行具体的代码生成，从而保持性能流畅。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 优先索引核心模块&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">@folder tests/unit
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 延迟加载集成测试&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">@defer tests/integration
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="总结">总结
+&lt;/h2>&lt;p>对于我们实际工作而言，成功运用Cursor的本质，是一个从“指令下达者”转变为“智能协作者”和“知识引导者”的过程。着眼点在于突出其 &lt;strong>智能协作、知识沉淀和效率提升&lt;/strong> 的系统性作用。&lt;/p></description></item></channel></rss>

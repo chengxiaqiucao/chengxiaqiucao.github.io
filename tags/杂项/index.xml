@@ -1,0 +1,1507 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>杂项 on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/%E6%9D%82%E9%A1%B9/</link><description>Recent content in 杂项 on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Sun, 18 May 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E6%9D%82%E9%A1%B9/index.xml" rel="self" type="application/rss+xml"/><item><title>AI技巧，用本地Deepseek也可以生图啦</title><link>https://chengxiaqiucao.github.io/post/095-deepseek%E7%94%9F%E5%9B%BE/</link><pubDate>Sun, 18 May 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/095-deepseek%E7%94%9F%E5%9B%BE/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/095-deepseek%E7%94%9F%E5%9B%BE/snap_20250613.png" alt="Featured image of post AI技巧，用本地Deepseek也可以生图啦" />&lt;blockquote>
+&lt;p>我们都知道，Deepseek是个文本模型，不具备生成图像能力。而在线的各种图像生成AI要么收费，要么有额度限制，这里就跟大家分享一个通过本地部署的Deepseek，全免费的AI生图技巧。&lt;/p>&lt;/blockquote>
+&lt;h2 id="ai生图接口">AI生图接口
+&lt;/h2>&lt;p>Deepseek本身目前当然是没办法生成图片，但 github 这个宝藏，自然是能找到惊喜。本文我们介绍的这个图像生成工具，来自一个德国的AI初创公司，支持文生图、文生音频等功能。&lt;/p>
+&lt;h3 id="pollinationsai-介绍">pollinations.ai 介绍
+&lt;/h3>&lt;p>该项目支持通过基本的Restful API接口来完成图像的生成。&lt;/p>
+&lt;p>开源项目地址：&lt;/p>
+&lt;p>&lt;a class="link" href="https://github.com/pollinations/pollinations" target="_blank" rel="noopener"
+>https://github.com/pollinations/pollinations&lt;/a>&lt;/p>
+&lt;p>官网：&lt;/p>
+&lt;p>&lt;a class="link" href="https://pollinations.ai/" target="_blank" rel="noopener"
+>https://pollinations.ai/&lt;/a>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/095-deepseek%E7%94%9F%E5%9B%BE/snap_20250613.png"
+width="1900"
+height="736"
+srcset="https://chengxiaqiucao.github.io/post/095-deepseek%E7%94%9F%E5%9B%BE/snap_20250613_hu_8e574bda685cf311.png 480w, https://chengxiaqiucao.github.io/post/095-deepseek%E7%94%9F%E5%9B%BE/snap_20250613_hu_d0e934fe2a6c5b3d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="258"
+data-flex-basis="619px"
+>&lt;/p>
+&lt;p>官网虽简陋，但无需注册和密钥，开源免费，简直太香了&lt;/p>
+&lt;h3 id="api定义">API定义
+&lt;/h3>&lt;p>生成图像的API 是最基本的 &lt;code>get&lt;/code> 方法&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">GET https://image.pollinations.ai/prompt/{prompt}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>API支持的参数：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">参数&lt;/th>
+&lt;th style="text-align: center">是否必须&lt;/th>
+&lt;th style="text-align: center">作用&lt;/th>
+&lt;th style="text-align: center">默认值&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">&lt;code>prompt&lt;/code>&lt;/td>
+&lt;td style="text-align: center">Yes&lt;/td>
+&lt;td style="text-align: center">图像生成提示词&lt;/td>
+&lt;td style="text-align: center">&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;code>model&lt;/code>&lt;/td>
+&lt;td style="text-align: center">No&lt;/td>
+&lt;td style="text-align: center">使用的生图模型&lt;/td>
+&lt;td style="text-align: center">&lt;code>flux&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;code>seed&lt;/code>&lt;/td>
+&lt;td style="text-align: center">No&lt;/td>
+&lt;td style="text-align: center">随机种子&lt;/td>
+&lt;td style="text-align: center">&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;code>width&lt;/code>&lt;/td>
+&lt;td style="text-align: center">No&lt;/td>
+&lt;td style="text-align: center">图像宽度（像素）&lt;/td>
+&lt;td style="text-align: center">1024&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;code>height&lt;/code>&lt;/td>
+&lt;td style="text-align: center">No&lt;/td>
+&lt;td style="text-align: center">图像高度（像素）&lt;/td>
+&lt;td style="text-align: center">1024&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;code>nologo&lt;/code>&lt;/td>
+&lt;td style="text-align: center">No&lt;/td>
+&lt;td style="text-align: center">是否保留pollinations的logo&lt;/td>
+&lt;td style="text-align: center">&lt;code>false&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;code>private&lt;/code>&lt;/td>
+&lt;td style="text-align: center">No&lt;/td>
+&lt;td style="text-align: center">是否公开生成的图像&lt;/td>
+&lt;td style="text-align: center">&lt;code>false&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;code>enhance&lt;/code>&lt;/td>
+&lt;td style="text-align: center">No&lt;/td>
+&lt;td style="text-align: center">是否使用LLM增强提示词&lt;/td>
+&lt;td style="text-align: center">&lt;code>false&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;code>safe&lt;/code>&lt;/td>
+&lt;td style="text-align: center">No&lt;/td>
+&lt;td style="text-align: center">十八禁&lt;/td>
+&lt;td style="text-align: center">&lt;code>false&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;code>transparent&lt;/code>&lt;/td>
+&lt;td style="text-align: center">No&lt;/td>
+&lt;td style="text-align: center">透明背景(仅gptimage model有效).&lt;/td>
+&lt;td style="text-align: center">&lt;code>false&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>支持的模型清单：&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>flux&lt;/code>（基本模型）&lt;/li>
+&lt;li>&lt;code>flux-pro&lt;/code>（加强效果）&lt;/li>
+&lt;li>&lt;code>flux-realism&lt;/code>（写实风格）&lt;/li>
+&lt;li>&lt;code>flux-anime&lt;/code>（动漫风格）&lt;/li>
+&lt;li>&lt;code>flux-3d&lt;/code>（3D 风格）&lt;/li>
+&lt;li>&lt;code>flux-cablyai&lt;/code>（未知）&lt;/li>
+&lt;li>&lt;code>turbo&lt;/code>（快速生成）&lt;/li>
+&lt;/ul>
+&lt;p>http的get方法，其实通过html是可以直接请求并渲染的，这就给我们基于Deepseek来完成图像生成带来机会。也就是我们可以制定规则，让Deepseek生成需要的提示词，并按HTML格式将 pollinations api 生成的图像在html中呈现出来&lt;/p>
+&lt;h2 id="本地deepseek和cherry-studio配置">本地Deepseek和cherry studio配置
+&lt;/h2>&lt;p>本地通过 Ollama 部署 Deepseek，并通过cherry studio 交互的方法，在前文 【】中有详细描述，这里不再赘述。&lt;/p>
+&lt;p>本地运行 Deepseek 模型后，比如 &lt;code>deepseek-r1:14b&lt;/code>, 打开cherry studio， 增加一个角色，如图像生成助手。并设置其系统提示词，定义相关规则(具体提示词参见文末)&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/095-deepseek%E7%94%9F%E5%9B%BE/snap_20250613-1.png"
+width="1901"
+height="1004"
+srcset="https://chengxiaqiucao.github.io/post/095-deepseek%E7%94%9F%E5%9B%BE/snap_20250613-1_hu_34b11996a56598f6.png 480w, https://chengxiaqiucao.github.io/post/095-deepseek%E7%94%9F%E5%9B%BE/snap_20250613-1_hu_4096203d1e2a2826.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="189"
+data-flex-basis="454px"
+>&lt;/p>
+&lt;p>接下来，测试一下，在 cherry studio 中输入：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">秋天，古城墙根下，一丛荒草随风摇摆 动漫风格，16:9
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Deepseek 经过一番思考，成功生成了一幅 &lt;strong>城下秋草图&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/095-deepseek%E7%94%9F%E5%9B%BE/snap_20250613-2.png"
+width="1504"
+height="1773"
+srcset="https://chengxiaqiucao.github.io/post/095-deepseek%E7%94%9F%E5%9B%BE/snap_20250613-2_hu_f78de925c2993027.png 480w, https://chengxiaqiucao.github.io/post/095-deepseek%E7%94%9F%E5%9B%BE/snap_20250613-2_hu_68c75c1b14119bbc.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="84"
+data-flex-basis="203px"
+>&lt;/p>
+&lt;p>大家快试试吧~~&lt;/p>
+&lt;h3 id="附">附：
+&lt;/h3>&lt;p>提示词设定规则模板&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-mysql" data-lang="mysql">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">#角色：你是一个专业的图像创作助手
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">#技能：能根据用户输入的简单描述，生成一幅完整画面的&amp;#34;详细描述&amp;#34;。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">#规则：
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="err">用户输入的简单描述，插入到【输出】的{&lt;/span>&lt;span class="n">user_prompt&lt;/span>&lt;span class="err">}部分&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="err">生成的&lt;/span>&lt;span class="s2">&amp;#34;详细描述&amp;#34;&lt;/span>&lt;span class="err">尽可能全面，细节丰富，从图像的专业生成角度补充如光线使用、构图、材质、视角、色彩、渲染方式等。&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="err">将&lt;/span>&lt;span class="s2">&amp;#34;详细描述&amp;#34;&lt;/span>&lt;span class="err">插入到【输出】的{&lt;/span>&lt;span class="n">ai_chinese_prompt&lt;/span>&lt;span class="err">}部分&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="err">将&lt;/span>&lt;span class="s2">&amp;#34;详细描述&amp;#34;&lt;/span>&lt;span class="err">完整、准确翻译成英文，插入到【输出】的{&lt;/span>&lt;span class="n">ai_english_prompt&lt;/span>&lt;span class="err">}部分&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="mi">5&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="err">如果用户的描述中包含高度信息，直接插入到【输出】的{&lt;/span>&lt;span class="n">width&lt;/span>&lt;span class="err">}部分，否则插入默认值&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">1280&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="mi">6&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="err">如果用户的描述中包含宽度信息，直接插入到【输出】的{&lt;/span>&lt;span class="n">height&lt;/span>&lt;span class="err">}部分，否则插入默认值&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">1280&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="mi">7&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="err">如果出现比例，指宽&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="err">高，宽度默认用&lt;/span>&lt;span class="mi">1280&lt;/span>&lt;span class="err">，根据比例计算高度，插入到【输出】的{&lt;/span>&lt;span class="n">height&lt;/span>&lt;span class="err">}部分&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="mi">8&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="err">随机生成一个整数，插入到【输出】的{&lt;/span>&lt;span class="n">seed&lt;/span>&lt;span class="err">}部分&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="mi">9&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="err">根据用户对画面风格的描述，选择对应的模型。如果用户没有特别指定，从下面&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">7&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="err">个模型中随机选一个模型，插入到【输出】的{&lt;/span>&lt;span class="n">model&lt;/span>&lt;span class="err">}部分&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="n">flux&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="err">（基本模型）&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="n">flux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">pro&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="err">（加强效果）&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="n">flux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">realism&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="err">（写实风格）&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="n">flux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">anime&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="err">（动漫风格）&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="n">flux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="err">（&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="n">D&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="err">风格）&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="n">flux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">cablyai&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="err">（未知）&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="n">turbo&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="err">（快速生成）&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="err">输出结果直接渲染，不展示为代码块&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">#输出：
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">html&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">title&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">Image&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Generator&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">title&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">body&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">h2&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="err">{&lt;/span>&lt;span class="n">ai_chinese_prompt&lt;/span>&lt;span class="err">}&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">h2&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">h4&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="err">{&lt;/span>&lt;span class="n">ai_english_prompt&lt;/span>&lt;span class="err">}&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">h4&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">img&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">src&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;https://image.pollinations.ai/prompt/{ai_english_prompt}?width={width}&amp;amp;height={height}&amp;amp;seed={seed}&amp;amp;enhance=true&amp;amp;private=true&amp;amp;nologo=true&amp;amp;safe=false&amp;amp;model={model}&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">alt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;{user_prompt}&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="o">/&amp;gt;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">body&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">html&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>一句春不晚，所到处，原是京口</title><link>https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/</link><pubDate>Thu, 24 Apr 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5999.jpeg" alt="Featured image of post 一句春不晚，所到处，原是京口" />&lt;p>去年流行的一个关于南京旅游网络梗：你一句春不晚，我就到了镇江南! 虽是揶揄，但作为古诗旧词中出现频率颇高的一个地方，三国时的京口、宋时之润州，长江要津，吴帝故都，镇江也确是一处赏玩胜地。&lt;/p>
+&lt;p>镇江最有名的游玩处，莫过于“三山一渡”，三山都是5A景区，一渡也是4A，而且互相之间距离不远，很适合短途游玩。便排下一日行程，到此一游~&lt;/p>
+&lt;h2 id="金山">金山
+&lt;/h2>&lt;p>三山一渡，都位于镇江北面，所以坐高铁优先到镇江站。从北广场出站，先往金山。3公里左右，顺中山北路，共享单车15分钟左右可达。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5990.jpeg"
+width="2364"
+height="1330"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5990_hu_20f64764ab2ccaa3.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5990_hu_327e0f0394ee88c1.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>&lt;/p>
+&lt;h3 id="金山寺">金山寺
+&lt;/h3>&lt;p>金山景区最著名的就是金山寺了。是的，就是白蛇传里那个水漫金山的金山寺。而且真实历史上，金山寺还确实有个法海和尚。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5970.jpeg"
+width="1536"
+height="2048"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5970_hu_257020e7c270b5c0.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5970_hu_2fba2eadd390042d.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="180px"
+>&lt;/p>
+&lt;p>金山寺始建于东晋年间，香火绵延至今1700余年，是佛教禅宗四大名寺之一（另三座普陀寺、文殊寺、大明寺）。寺庙依山就势，各色建筑散布山上，形成独特的 “寺裹山”格局。金山寺还是佛教水陆大法会的源头，从梁武帝启建开始，历今1500多年了。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5977.jpeg"
+width="1536"
+height="2048"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5977_hu_676cb256864745a0.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5977_hu_4fa561e0e98d6a35.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="180px"
+>&lt;/p>
+&lt;p>金山寺的标志性建筑是寺中的慈寿塔，始建于南朝齐梁年间，后经多次重建。现存的八角七层塔是清朝光绪年间所建。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5974.jpeg"
+width="1330"
+height="2364"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5974_hu_710d728c4b71f468.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5974_hu_135baa76c1c6b186.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="56"
+data-flex-basis="135px"
+>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_3926.jpeg"
+width="1330"
+height="2364"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_3926_hu_ac0cef8cb6830c87.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_3926_hu_abe63742d4e56fb5.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="56"
+data-flex-basis="135px"
+>&lt;/p>
+&lt;h3 id="天下第一泉---中泠泉">天下第一泉 - 中泠泉
+&lt;/h3>&lt;p>而除了金山寺外，景区中还有一眼号称“天下第一泉”的&lt;strong>中泠泉&lt;/strong>，现在泉水石壁上这五字乃是清末状元（光绪年间）王仁堪在镇江知府任上所书。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5982.jpeg"
+width="2364"
+height="1330"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5982_hu_267e2728e55a7028.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5982_hu_a60410afd0f4453c.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>&lt;/p>
+&lt;p>王仁堪在镇江任上三年，勤政爱民，民望甚佳，移任苏州知府不久，积劳成疾，英年早逝。此地还设有王仁堪祠以祭奠。&lt;/p>
+&lt;h3 id="芙蓉楼">芙蓉楼
+&lt;/h3>&lt;p>而金山景区内，另一处穿越千年的名胜，还有&lt;strong>芙蓉楼&lt;/strong>。便是王昌龄名诗中的这个芙蓉楼了&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 芙蓉楼送辛渐
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 王昌龄
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">寒雨连江夜入吴，平明送客楚山孤。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">洛阳亲友如相问，一片冰心在玉壶。
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>只是原芙蓉楼早已不存，现今芙蓉楼乃是1992年重建，匾额是江泽民总书记手书。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5989.jpeg"
+width="1536"
+height="2048"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5989_hu_12dca05fb11e203e.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5989_hu_cd120e142d55ce80.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="180px"
+>&lt;/p>
+&lt;p>湖光山色，双塔遥望，江风拂面，正是江南好时节~&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5988.jpeg"
+width="1536"
+height="2048"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5988_hu_8a2a20b625c65b02.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5988_hu_40c3f94dd1c62f02.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="180px"
+>&lt;/p>
+&lt;h3 id="北固山">北固山
+&lt;/h3>&lt;p>从金山风景区出来，顺长江路一路向西，4公里外，就是北固山景区。&lt;/p>
+&lt;p>这里又是一处满满历史人文的名胜。三国故垒，更有历代文人墨客在此留下无数痕迹。&lt;/p>
+&lt;h3 id="古甘露寺">古甘露寺
+&lt;/h3>&lt;p>甘露寺，相传便是历史上“&lt;strong>吴国太佛寺看新郎，刘皇叔洞房续佳偶&lt;/strong>”的发生地。刘备借荆州不还，周瑜献策让孙权以妹妹孙尚香招亲为名，诱刘备来镇江（其时镇江便是东吴都城）联姻，诸葛亮将计就计，弄假成真，也因此留下了“&lt;strong>周郎妙计安天下，赔了夫人又折兵&lt;/strong>”这广为人知的谚语故事。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/blog/%e9%95%87%e6%b1%9f/snap_20250601-1.png"
+loading="lazy"
+>&lt;/p>
+&lt;p>苏东坡在游览此地后，也曾留下一首长诗《甘露寺》，以景抒怀，仰英雄而叹岁月和际遇无常。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5996.jpeg"
+width="1330"
+height="2364"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5996_hu_ac081143d2cb6b28.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5996_hu_90a84d3a64dff10.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="56"
+data-flex-basis="135px"
+>&lt;/p>
+&lt;h3 id="北固楼">北固楼
+&lt;/h3>&lt;p>而北固山之所以广为人知，离不开一首词：《永遇乐·京口北固亭怀古》&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">永遇乐·京口北固亭怀古
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 辛弃疾
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">千古江山，英雄无觅，孙仲谋处。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">舞榭歌台，风流总被，雨打风吹去。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">斜阳草树，寻常巷陌，人道寄奴曾住。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">想当年，金戈铁马，气吞万里如虎。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">元嘉草草，封狼居胥，赢得仓皇北顾。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">四十三年，望中犹记，烽火扬州路。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">可堪回首，佛狸祠下，一片神鸦社鼓。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">凭谁问：廉颇老矣，尚能饭否？
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6009.jpeg"
+width="1330"
+height="2364"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6009_hu_8c06faf9ea00c612.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6009_hu_f9bfc1c6acff9be4.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="56"
+data-flex-basis="135px"
+>&lt;/p>
+&lt;p>其实辛弃疾当年游览北固山，作有两首词，另一首是 《南乡子·登京口北固亭有怀》&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">南乡子·登京口北固亭有怀
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 辛弃疾
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">何处望神州？满眼风光北固楼。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">千古兴亡多少事？
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">悠悠。不尽长江滚滚流。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">年少万兜鍪，坐断东南战未休。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">天下英雄谁敌手？
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">曹刘。生子当如孙仲谋。
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>毛主席老人家，很欣赏这两首词，所以北固楼中，还陈列有他老人家手书的这两阙词。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6006.jpeg"
+width="1536"
+height="2048"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6006_hu_4a87f256a81b9625.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6006_hu_555fe435858bf884.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="180px"
+>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6007.jpeg"
+width="1536"
+height="2048"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6007_hu_3e27fbf6a1a5e84b.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6007_hu_51fef277510288ce.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="180px"
+>&lt;/p>
+&lt;p>北固楼上，看大江东去，遥望焦山，如何不兴无限江山之叹！&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5998.jpeg"
+width="2364"
+height="1330"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5998_hu_cdbe7996720a8c8d.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5998_hu_5b63229d397a95b7.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5999.jpeg"
+width="2364"
+height="1330"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5999_hu_b6714944bd986b2d.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5999_hu_6fe9947c68b22129.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>&lt;/p>
+&lt;h3 id="多景楼">多景楼
+&lt;/h3>&lt;p>北固楼后旁，曾有名楼“多景楼”，位列古代长江三大名楼（和岳阳楼、黄鹤楼齐名）。曾有米芾手书 “天下江山第一楼”，历代文人如苏轼、曾巩、陆游、陈亮等都曾在此留下诗篇！&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6010.jpeg"
+width="1330"
+height="2364"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6010_hu_133a31c5d746f4e5.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6010_hu_a935f125e659fa32.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="56"
+data-flex-basis="135px"
+>&lt;/p>
+&lt;p>&lt;strong>六朝何事，只成门户私计！&lt;/strong> 据说毛主席晚年读到此句，恸哭不止~~ 便是陈亮的《登多景楼》&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5993.jpeg"
+width="2048"
+height="1536"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5993_hu_b1eb6ab78c256baf.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_5993_hu_9e47bf9fa68200b5.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>景区内除了山上的几处著名景点，山下还有太史慈、鲁肃的墓地，奉旨填词的柳永也长眠于此，只是墓地具体方位已失考！时间关系，未一一探访！&lt;/p>
+&lt;h2 id="焦山">焦山
+&lt;/h2>&lt;p>北固山再往东4公里余，可到焦山景区。但焦山其实是长江江心一座孤山，要从景区大门轮渡过来。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6011.jpeg"
+width="2364"
+height="1330"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6011_hu_12c898934e6527e2.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6011_hu_dbafa00bc57df31.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>&lt;/p>
+&lt;h3 id="定慧寺">定慧寺
+&lt;/h3>&lt;p>焦山因东汉焦光隐居山中而得名。山中古寺定慧寺，也是千年宝刹。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6016.jpeg"
+width="1536"
+height="2048"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6016_hu_20ba2abf10040812.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6016_hu_cdfc93d5a9d8d03.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="180px"
+>&lt;/p>
+&lt;p>康熙南巡曾至此，现在的寺名也是康熙所定，沿用至今。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6018.jpeg"
+width="1536"
+height="2048"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6018_hu_8fd211bc15e62405.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6018_hu_48888eea300932d1.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="180px"
+>&lt;/p>
+&lt;p>景区地标&lt;strong>万佛塔&lt;/strong>，久历沧桑，岿然俯瞰长江&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6027.jpeg"
+width="2364"
+height="1330"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6027_hu_56996c453e65e76d.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6027_hu_ce1802e4db0086a8.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>&lt;/p>
+&lt;h3 id="碑林">碑林
+&lt;/h3>&lt;p>而焦山最为著名之处，被称为“书法名山”，在于这里的碑林，存有历朝古碑五百余方，八十多处摩崖石刻。更有镇山之宝，有“大字之祖”之称的六朝石刻 &lt;strong>“瘗鹤铭”&lt;/strong>。唐时下半部被雷击，崩塌江中，直到清康熙年间，历三个月打捞才得残碑五块。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6023.jpeg"
+width="2048"
+height="1536"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6023_hu_1310ff09ff86ce28.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6023_hu_625d099c9256e93a.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>此外，这里收集了大量名家墨宝，王羲之、颜真卿、米芾、黄庭坚、苏轼等在此都可看到，群贤毕至，可谓书法爱好者的圣地。
+&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6020.jpeg"
+width="2364"
+height="1330"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6020_hu_189b03cb33ed5fb1.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6020_hu_21c8cf811a54057.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6021.jpeg"
+width="2364"
+height="1330"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6021_hu_d0ed5e8e2db093e1.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6021_hu_27b1aaca90248901.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>&lt;/p>
+&lt;h2 id="西津渡">西津渡
+&lt;/h2>&lt;p>西津渡位于镇江城西的云台山麓，北邻长江，曾是连接江南江北的重要渡口，与扬州的瓜洲古渡隔江相对。古时，人们便坐船往返扬州与镇江，所以王安石诗云：&lt;strong>““京口瓜洲一水间”&lt;/strong>。但随着近代长江改道，目前西津渡已经距离江岸300多米，再无船可渡，游人如织。可古巷石塔，青石台阶，依然在述说历史源流和人间烟火。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/blog/%e9%95%87%e6%b1%9f/snap_20250601.png"
+loading="lazy"
+>&lt;/p>
+&lt;h3 id="昭关石塔">昭关石塔
+&lt;/h3>&lt;p>昭关石塔是目前全国唯一还保存完好的元代过街石塔，是藏传佛教的标志性建筑。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6061.jpeg"
+width="1536"
+height="2048"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6061_hu_60b606cbd8366bc1.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6061_hu_e4320f29cb3984f2.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="180px"
+>&lt;/p>
+&lt;p>游览当天，还碰到藏族团队，到此参观，石塔下载歌载舞，一派升平。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/IMG_6063[00_00_21][20250601-145817].png"
+loading="lazy"
+>&lt;/p>
+&lt;h3 id="镇江博物馆">镇江博物馆
+&lt;/h3>&lt;p>镇江博物馆便在西津渡里，每i到一个城市，必看的去处，怎可少了博物馆。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6030.jpeg"
+width="2048"
+height="1536"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6030_hu_a943388edbbe993b.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6030_hu_e284698657b8817e.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;p>和其他博物馆大多按年代动线不同，这里不同馆主要按藏品材质分类，馆藏算不得丰富，但也不乏精品&lt;/p>
+&lt;p>自然也包括这件人气很高的清宫&amp;quot;芙蓉石花鸟纹盖瓶&amp;quot;&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6054.jpeg"
+width="1536"
+height="2048"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6054_hu_5cadc18928a0130f.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6054_hu_4c80725b49ca3bc2.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="180px"
+>&lt;/p>
+&lt;p>和南博那件 “芙蓉石蟠螭耳盖炉”，堪称双壁&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_2986.jpeg"
+width="1536"
+height="2048"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_2986_hu_483d52425024f108.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_2986_hu_fe9cd1c7bccb942a.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="180px"
+>&lt;/p>
+&lt;p>青铜人面纹錞于&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6036.jpeg"
+width="1536"
+height="2048"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6036_hu_60fecc54424aa4db.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6036_hu_f01c2781a1101c43.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="180px"
+>&lt;/p>
+&lt;p>象牙八仙上寿臂搁&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6049.jpeg"
+width="1536"
+height="2048"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6049_hu_477b522f39f68e4d.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6049_hu_15062c62ac32aa88.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="180px"
+>&lt;/p>
+&lt;p>玛瑙小鸡&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6053.jpeg"
+width="1536"
+height="2048"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6053_hu_a524cd6e60df21b2.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6053_hu_5ffac863a2081546.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="180px"
+>&lt;/p>
+&lt;p>博物馆外，对面是广肇公所，由在镇江的粤商所建，孙中山曾在此地演讲，宣传革命&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6056.jpeg"
+width="1330"
+height="2364"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6056_hu_1cde61772248a7e1.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6056_hu_d98451094e278773.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="56"
+data-flex-basis="135px"
+>&lt;/p>
+&lt;p>&lt;strong>一眼看千年&lt;/strong>，从这里路面下土质的不同分层，可以直观感受到这里不同朝代的历史留痕&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6080.jpeg"
+width="1536"
+height="2048"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6080_hu_1a11074ca8a9b7f0.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6080_hu_87de1610d21aa51a.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="180px"
+>&lt;/p>
+&lt;p>逛累了，去景区里的网红餐厅周家二小姐的菜打卡，满足味蕾后，暮色四合，华灯初上，便在暮春温润的晚风中，为这趟访古之旅画上句点罢。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/blog/%e9%95%87%e6%b1%9f/snap_20250601-2.png"
+loading="lazy"
+>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6081.jpeg"
+width="1536"
+height="2048"
+srcset="https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6081_hu_2290149be8c68a8f.jpeg 480w, https://chengxiaqiucao.github.io/post/082-%E9%95%87%E6%B1%9F/IMG_6081_hu_1c0a8d00d2432d52.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="180px"
+>&lt;/p></description></item><item><title>团队管理中沟通的重要性</title><link>https://chengxiaqiucao.github.io/post/043-%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86%E4%B8%AD%E6%B2%9F%E9%80%9A%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/</link><pubDate>Mon, 28 Oct 2024 15:18:27 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/043-%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86%E4%B8%AD%E6%B2%9F%E9%80%9A%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/043-%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86%E4%B8%AD%E6%B2%9F%E9%80%9A%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/Pasted-20241028-1.png" alt="Featured image of post 团队管理中沟通的重要性" />&lt;p>任何团队，沟通其实都是管理者的核心工作。所谓管理，各种管理方法、思路要转化到团队的执行力，其实都是通过沟通去达成的。&lt;/p>
+&lt;p>管理者需要投入大量精力在团队的沟通上，沟通是桥梁和连接，是凝聚团队的必然途径。但沟通其实并不是双方谈谈话这么简单&lt;/p>
+&lt;h2 id="沟通漏斗">沟通漏斗
+&lt;/h2>&lt;p>沟通其实是一个信息传递、建立共识的过程，但人与人之间的沟通，存在一个叫&lt;strong>沟通漏斗&lt;/strong>的规律&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/043-%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86%E4%B8%AD%E6%B2%9F%E9%80%9A%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/Pasted-20241028.png"
+width="817"
+height="756"
+srcset="https://chengxiaqiucao.github.io/post/043-%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86%E4%B8%AD%E6%B2%9F%E9%80%9A%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/Pasted-20241028_hu_c42fbba9115d4c7d.png 480w, https://chengxiaqiucao.github.io/post/043-%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86%E4%B8%AD%E6%B2%9F%E9%80%9A%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/Pasted-20241028_hu_fd0aee0a70bc15d8.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="108"
+data-flex-basis="259px"
+>&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>如果心里想的，针对我们要沟通的事情，原本的信息量是 100%&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>那经过口头或书面表达，传递出来的信息 可能就只有80%&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>而对方能接收到的信息，会下降到 60%&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>即便接收到信息中，真正可以正确理解，不曲解的 就估计只剩 40%&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>再将相关的信息内容转换成实际行动 继续下降20%&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>随着时间的流逝，甚至衰减到基本没有&amp;hellip;&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>所以信息的传递，其实具有明显的衰减效应，而应对这个沟通漏斗的衰减，就是团队管理中沟通管理的核心。&lt;/p>
+&lt;p>包括多种层面的确认；通过流程的定义和里程碑、检查点的设立来检查偏差；定期的复盘来回顾经验教训。&lt;/p>
+&lt;h2 id="有效沟通模型---乔哈里窗">有效沟通模型 - 乔哈里窗
+&lt;/h2>&lt;p>针对沟通的这种衰减效应，保证双方沟通中能充分地理解一致，达成共识，让大家能尽可能在同一个基础上提升沟通的成效。有一个著名的模型： &lt;strong>乔哈里沟通视窗模型&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/043-%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86%E4%B8%AD%E6%B2%9F%E9%80%9A%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/Pasted-20241028-1.png"
+width="696"
+height="368"
+srcset="https://chengxiaqiucao.github.io/post/043-%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86%E4%B8%AD%E6%B2%9F%E9%80%9A%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/Pasted-20241028-1_hu_1ff9b5bf26cf920d.png 480w, https://chengxiaqiucao.github.io/post/043-%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86%E4%B8%AD%E6%B2%9F%E9%80%9A%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/Pasted-20241028-1_hu_913fba843954b785.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="189"
+data-flex-basis="453px"
+>&lt;/p>
+&lt;p>在这个模型中，根据沟通双方对信息掌握的程度，分为了四个区块&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>我知道，你也知道的信息，处于&lt;strong>开放区&lt;/strong>。 在这个区域中，双方对信息掌握的基础是一致的，也是我们在沟通时，建立信任的基础，这个区域约越大就越不容易产生误会，也就越能帮助我们实现高效沟通。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>我知道，你不知道的信息，在&lt;strong>隐藏区&lt;/strong>。是人都会有秘密，有隐藏在外在之下的真实自我。但有时候，要做到有效的沟通，适度地打开隐藏区，是赢得他人信任并建立高效沟通的一个捷径。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>他人知道，但自己不知道的信息，比如一些别人对你的真实看法，个人的一些弱点，自己并不掌握的一些信息，这些都属于信息的&lt;strong>盲点区&lt;/strong>。盲点区越小，那么自己对事物的判断就越接近真实，做正确决定的可能性就越大。保持探索精神，努力去缩小自己的盲点区。&lt;code>stay foolish, stay hungry&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>未知区，则是双方都不了解得信息。在这个区域中的信息既是风险，也可以是团队的发展潜力。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>在乔哈里窗中，要做好高效沟通，其实也就是四句话：&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/043-%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86%E4%B8%AD%E6%B2%9F%E9%80%9A%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/Pasted-20241028-2.png"
+width="444"
+height="385"
+srcset="https://chengxiaqiucao.github.io/post/043-%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86%E4%B8%AD%E6%B2%9F%E9%80%9A%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/Pasted-20241028-2_hu_163e433f996bdfc9.png 480w, https://chengxiaqiucao.github.io/post/043-%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86%E4%B8%AD%E6%B2%9F%E9%80%9A%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/Pasted-20241028-2_hu_4c60887ba9c9cf5e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="115"
+data-flex-basis="276px"
+>&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>扩大开放区，开放区越大，大家的共识就越多，就越容易达成一致。是彼此信任的基础&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>打开隐藏区，帮助我们增强互信的有效手段，隐藏区的打开，也可以帮助我们扩大开放区。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>缩小盲点区，可以帮助我们更多的了解事实。扩大自我认知，进行自我提升。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>探索未知区，广开言路，多方位、多渠道地去充分掌握信息，尽可能消除未知的风险。&lt;/p>
+&lt;/li>
+&lt;/ul></description></item><item><title>软件分支策略和集成模式梳理</title><link>https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/</link><pubDate>Fri, 27 Sep 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/branch.png" alt="Featured image of post 软件分支策略和集成模式梳理" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>软件代码是任何一个软件研发团队的核心资产。而软件的分支管理就是团队中多人合作时，如何协调处理不同人员的代码同步、集成并解决冲突的主要方式。&lt;/p>
+&lt;p>本文根据软件大牛Martin Flower的分支模型阅读笔记整理&lt;/p>
+&lt;h2 id="基础模式">基础模式
+&lt;/h2>&lt;h3 id="源分支">源分支
+&lt;/h3>&lt;p>所有修改都记录到同一分支&lt;/p>
+&lt;p>分支的定义：
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927.png"
+width="701"
+height="259"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927_hu_d4d3068e3f2598bc.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927_hu_a8449443230e7ad4.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="270"
+data-flex-basis="649px"
+>
+创建分支：
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-1.png"
+width="916"
+height="590"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-1_hu_6098059e69a69708.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-1_hu_76295e80e62f86e2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="155"
+data-flex-basis="372px"
+>&lt;/p>
+&lt;p>不同的两个开发者基于主分支拉去各自的开发分支：
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-2.png"
+width="872"
+height="439"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-2_hu_f52032f3cbeccd64.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-2_hu_a4a8cfd6c8cb1d23.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="198"
+data-flex-basis="476px"
+>&lt;/p>
+&lt;p>Jonny LeRoy 指出我们绘制分支线时，其实忽略了随着时间，导致的复杂度提升
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-3.png"
+width="883"
+height="521"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-3_hu_3f48b100679b4356.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-3_hu_b114d269317d2d1.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="169"
+data-flex-basis="406px"
+>&lt;/p>
+&lt;h4 id="主干的定义">主干的定义：
+&lt;/h4>&lt;p>&lt;strong>Master、Trunk&lt;/strong>&lt;/p>
+&lt;p>是反映产品当前实际状态的唯一公用分支&lt;/p>
+&lt;p>可以随时获得当前产品版本状态，并基于此进行开发&lt;/p>
+&lt;h4 id="健康分支">健康分支：
+&lt;/h4>&lt;p>为每一次提交进行自动化构建、测试，确保没有在当前分支引入故障（可工作的无故障分支）&lt;/p>
+&lt;p>优点：&lt;/p>
+&lt;ol>
+&lt;li>健康的公用分支，可以避免从这个分支上拉取的新分支工作在错误的基础上&lt;/li>
+&lt;li>健康分支更易入直接发布到产品&lt;/li>
+&lt;li>随时保持一个健康分支能极大降低集成的工作量并减少潜在风险。&lt;/li>
+&lt;li>便于进行差异调试。（可以将调试失败的commit去除，仅保留健康的commit）&lt;/li>
+&lt;li>在集成到主干时如果出现问题，就可以非常明确地确认是冲突导致而非代码错误&lt;/li>
+&lt;/ol>
+&lt;p>可能是公用分支、也可以是自己的分支。
+自测代码是健康分支的核心，自测应可以快速得到结果（分钟级）&lt;/p>
+&lt;h2 id="集成模式">集成模式
+&lt;/h2>&lt;h3 id="主线集成">主线集成
+&lt;/h3>&lt;p>开发从主干拉取代码进行开发，集成，并将健康的更改推送回主干
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-4.png"
+width="1086"
+height="253"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-4_hu_13469664a5d85941.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-4_hu_e78cbd5209ceaec2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="429"
+data-flex-basis="1030px"
+>
+从主干拉取分支到本地，并在本地分支上进行开发&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-5.png"
+width="1058"
+height="302"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-5_hu_2e852c5d48edaa74.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-5_hu_95b356c339ee0ff5.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="350"
+data-flex-basis="840px"
+>
+开发过程中，其他开发已经提交了变更到主干分支
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-6.png"
+width="1021"
+height="313"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-6_hu_1c0b4402c038b960.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-6_hu_9c1d222d40356939.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="326"
+data-flex-basis="782px"
+>
+此时如需向主干提交，则首先需要合入其他的变更
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-7.png"
+width="1067"
+height="334"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-7_hu_71458497204245e0.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-7_hu_73d9f4f1fb973746.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="319"
+data-flex-basis="766px"
+>
+有时，本地的修改和已经提交的变更会有冲突，此时需要先解决冲突
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-8.png"
+width="1055"
+height="322"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-8_hu_4e9aad39450c55f7.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-8_hu_aafa4ba988541945.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="327"
+data-flex-basis="786px"
+>
+再重新将修改并自测后的健康代码提交到主干分支&lt;/p>
+&lt;p>使用主干时，意味着我们会实行&lt;strong>主干集成模式&lt;/strong>&lt;/p>
+&lt;h3 id="特性分支">特性分支
+&lt;/h3>&lt;p>为每一个功能特性拉取它独立的分支，并在feture完成后集成回主干&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-9.png"
+width="933"
+height="366"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-9_hu_74b95c7ee6bcc59d.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-9_hu_32c0ddbd05ee967a.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="254"
+data-flex-basis="611px"
+>
+从主干拉取不同的特性分支并分别进行开发
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927175324.png"
+width="952"
+height="350"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927175324_hu_12d1719d35d77f7d.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927175324_hu_afcf5cdf5e2a68df.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="272"
+data-flex-basis="652px"
+>
+开发过程中会持续从主干拉取最新代码，如果有其他功能变更，要及时进行集成解决冲突（本地）。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-10.png"
+width="885"
+height="360"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-10_hu_20dd7f755d09ae7a.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-10_hu_f29cffe845a9b55e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="245"
+data-flex-basis="590px"
+>
+特性完成开发后，集成回主干。（受影响的冲突已在本地解决，所有其他特性分支上直接拉取变更，不会存在冲突需要解决）&lt;/p>
+&lt;h3 id="低频集成">低频集成
+&lt;/h3>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-11.png"
+width="1063"
+height="335"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-11_hu_a05c68bed305ab44.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-11_hu_9daf312ea04c227f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="317"
+data-flex-basis="761px"
+>&lt;/p>
+&lt;p>两条独立的开发分支上分别进行了几次本地提交，但没有向主干推送
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-12.png"
+width="1015"
+height="333"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-12_hu_26b3824f0bf7a0e8.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-12_hu_13f0a04d517dcf1.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="304"
+data-flex-basis="731px"
+>
+主干上合入了变更&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-13.png"
+width="1064"
+height="338"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-13_hu_78ae884a57bcb222.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-13_hu_ed2fa66bb5a8fc68.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="314"
+data-flex-basis="755px"
+>
+开发分支需要拉取变更并合入到本地分支（解决冲突）&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-14.png"
+width="1067"
+height="342"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-14_hu_d54a092c550a112e.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-14_hu_819f06a28caca5af.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="311"
+data-flex-basis="748px"
+>
+分支A上继续完成了4，5两个提交，然后推送大主干
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-15.png"
+width="1052"
+height="321"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-15_hu_450e64d3035717ed.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-15_hu_11fe33b1a4c666ee.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="327"
+data-flex-basis="786px"
+>
+分支B上完成了4，5，6几个提交后，需要在本地合入主干上A的提交，集成后推送到主干。（本地合入的大小代表工作量）&lt;/p>
+&lt;h3 id="高频集成">高频集成
+&lt;/h3>&lt;p>每次提交都向主干进行集成和推送呢？
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-16.png"
+width="1057"
+height="312"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-16_hu_af2461a8a4eeb452.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-16_hu_c2915e7288889683.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="338"
+data-flex-basis="813px"
+>
+V完成第1次提交后就推送回主干&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-17.png"
+width="1025"
+height="324"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-17_hu_3bd84e894d966406.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-17_hu_5e73f50ccccec7f2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="316"
+data-flex-basis="759px"
+>
+S在完成第1次提交后就进行本地合入，并推送回主干
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-18.png"
+width="1036"
+height="327"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-18_hu_81fb63d9bcbd438c.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-18_hu_a427bc1c01c61ba7.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="316"
+data-flex-basis="760px"
+>
+S的第2次推送，主干没有变更，没有本地合入工作
+V完成第2次提交和本地合入，推送
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-19.png"
+width="1074"
+height="323"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-19_hu_3b84f8f85861beda.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-19_hu_711e4f940a79bb3e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="332"
+data-flex-basis="798px"
+>
+S的第3次提交，需要本地合入，推送
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-20.png"
+width="1078"
+height="345"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-20_hu_92be6eb77101a99a.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-20_hu_3e1c6ae613104a6.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="312"
+data-flex-basis="749px"
+>
+如此，每次本地的提交，都会向主干进行推送&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-21.png"
+width="1021"
+height="401"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-21_hu_d27d5d59cebb2a27.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-21_hu_e4a65e5ebd0a4c1.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="254"
+data-flex-basis="611px"
+>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-22.png"
+width="1053"
+height="429"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-22_hu_f963bcda7ec114e5.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-22_hu_9b20a62829346550.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="245"
+data-flex-basis="589px"
+>&lt;/p>
+&lt;p>比较二者，高频集成会有更多的本地集成工作，但这些集成的工作量比低频集成低得多。
+同时，比工作量减少更重要的是，这样做减少了风险。（虽然大多情况下，进行大的合入也能顺利完成，但有时却会有严重的冲突问题难以解决。这种情况，偶发的巨大问题比常规的小问题更糟糕）
+如果每次常规集成10分钟，但50次集成合在一起要6小时，看起来6小时比500分钟还是要少，但是这会导致&lt;em>集成恐惧&lt;/em>（if it hurt，do it more often）&lt;/p>
+&lt;p>而且高频集成模式下，可以更早发现代码间的冲突情况，并避免在冲突代码在后期才发现而导致中间持续产生了很多本不应该存在的更多冲突代码。&lt;/p>
+&lt;p>源码控制系统其实更多是一个沟通平台，可以意识到其他团队成员的工作&lt;/p>
+&lt;h3 id="持续集成">持续集成
+&lt;/h3>&lt;p>开发者一旦完成一个健康的提交，就会尽快完成主干集成，一般不超过1天。&lt;/p>
+&lt;p>（如果高频集成更有效率且可实施，但使用特性分支，意味着限制了变更不能比一个特性更小，那么集成频次就成了问题？）&lt;/p>
+&lt;p>持续集成-只要特性上的开发是有进展并且是健康的，就可以向主干集成。唯一的原则就是每天都要进行集成（甚至更短）&lt;/p>
+&lt;p>开发团队需要习惯在主干上存在未完成特性的情况并考虑如何在产品中不暴露这些特性。（通过隐藏入口、配置控制），有时我们还可以实现灰度发布。&lt;/p>
+&lt;p>在持续集成模式下，开发着往往不需要创建自己的特性分支，只要在本地的主干分支上工作即可。&lt;/p>
+&lt;p>特性分支和持续集成的区别不在于是否有特性分支存在，而在于何时向主干集成。&lt;/p>
+&lt;p>两者的比较：&lt;/p>
+&lt;p>两种模式的差异更多取决于特性的大小，如果特性足够小（一天以内可以完成），就可以同时实行特性分支和持续集成。&lt;/p>
+&lt;p>特性分支最明显的问题在于合并的工作量和不确定性，然而更大的问题是它可能阻止重构。重构是软件优化最有效的途径，但是重构会产生冲突，当解决冲突工作量太大时，重构往往需要极大的勇气。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>功能分支&lt;/th>
+&lt;th>持续集成&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>- 可以将某个功能中的所有代码作为一个单元进行质量评估&lt;br>- 功能完成后才将功能代码添加到产品中&lt;br>- 合并频率较低&lt;/td>
+&lt;td>- 支持比特征长度更高的频率集成&lt;br>- 减少发现冲突的时间&lt;br>- 规模较小的合并&lt;br>- 鼓励重构&lt;br>- 需要致力于健康的分支（从而实现自我测试代码）&lt;br>- 科学证据表明它有助于提高软件交付性能&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="特性分支和开源软件">特性分支和开源软件
+&lt;/h4>&lt;p>github的特性分支？pull request模式
+上下文不同：分散、不定时、团队成员不了解 vs 全职、熟悉的团队成员、可靠&lt;/p>
+&lt;p>提交的审核review&lt;/p>
+&lt;ul>
+&lt;li>代码审核·&lt;/li>
+&lt;li>集成受阻&lt;/li>
+&lt;li>模块化的重要性&lt;/li>
+&lt;li>&lt;/li>
+&lt;/ul>
+&lt;h2 id="发布模式">发布模式
+&lt;/h2>&lt;p>主干分支是活动分支，代码持续在其上开发。如果能保持主干的健康状态，任何人都可以从一个稳定的基础开始自己的工作。
+而且足够健康的话，也可以直接从主干分支进行产品的发布&lt;/p>
+&lt;p>&lt;img src="https://i-blog.csdnimg.cn/blog_migrate/b1dee5579befaf2a2e007af2dbb2c29f.png#pic_center"
+loading="lazy"
+alt="在这里插入图片描述"
+>
+对于实施CI/CD的团队，一个常用的实践是通过打Tag标记来跟踪每一个发布的版本。但不实践CD的团队，则需要其他的发布模式&lt;/p>
+&lt;h3 id="release-branch-发布分支">Release Branch 发布分支
+&lt;/h3>&lt;p>预备发布的分支，只接受以版本稳定和交付为目标的提交 （一般系统测试阶段）
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-23.png"
+width="716"
+height="287"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-23_hu_81382339d9d451f8.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-23_hu_7bf94c3181911e26.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="249"
+data-flex-basis="598px"
+>&lt;/p>
+&lt;p>Release分支从主干分支中拉取，不再接受任何新feature的合入。工作在release分支上的开发工作主要是修复发现的bug或影响交付的功能。所有的修改最终还需要合并回主干。
+&lt;img src="https://i-blog.csdnimg.cn/blog_migrate/4e7655a86c338d8ce135fc704ded3f97.png#pic_center"
+loading="lazy"
+alt="cherry-pick 到release分支"
+>
+尽管release分支上的工作往往比新feature的开发工作量更小，但是如果在其上的开发时间过长依然会导致合并回主干非常困难（主干上的提交越多，合入就越困难）&lt;/p>
+&lt;p>实际工作中，因为release分支的存在，合并回主干的操作往往容易被忽视，特别是有困难的冲突需要解决并且存在发布压力的情况下。&lt;/p>
+&lt;p>所以有的开发会采用另一种方式，继续在主干上开发，然后通过cherry-pick将只和发布相关的提交合入到release分支。这种方式的缺点是很多时候chrry-pick有时也很困难（对之前的commit有依赖的情况），在实际发布之前对release分支往往有一些重做工作。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-24.png"
+width="1000"
+height="430"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-24_hu_2d6097156d59f34e.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-24_hu_4afd22e582bedc82.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="232"
+data-flex-basis="558px"
+>
+对于只有一个产品版本的团队来说，使用单一的release分支就好。但很多情况下，会存在需要支持多个产品版本的情况，比如客户本地部署的软件，可能会长时间运行在一个历史版本上，但是又需要继续做一些bug fix或者一些特别的需求，此时就需要维护多个不同的release 分支，并定期保持和主干同步&lt;/p>
+&lt;p>对开发团队这明显是大大增加了维护难度和工作量，但这更多是产品策略带来的成本。唯一可以做的就是鼓励客户更及时地升级到最近版本（保持产品稳定非常关键，一旦产品不稳定导致问题，会使客户更倾向不再升级）&lt;/p>
+&lt;p>Release分支对于难以保持主干分支持续在健康状态的团队非常有必要，团队可以关注在产品发布的功能验证上。但对于单一产品的团队，release分支并不必要，使用主干分支并保持健康状态即可（发布的版本进行Tag标记）
+另外，对于发布流程存在很多阻塞的团队，relase分支也是必要的（比如有比较缓慢的审核流程，在应用商店上线的时间窗、安全、法务、合规等的审核等）&lt;/p>
+&lt;h3 id="成熟分支">成熟分支
+&lt;/h3>&lt;p>分支的head总是标记为最近版本的成熟代码基线&lt;/p>
+&lt;p>根据团队对产品成熟度的不同定义，拉取出的对应的成熟分支。比如QA分支（提测）、Staging分支（预发）、production分支（上线）&lt;/p>
+&lt;p>但很多情况下，使用清晰定义的Tag机制就可以代替成熟分支的作用。比如“成熟级别-内部版本号”，“qa-233”，“prod-445”
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-25.png"
+width="808"
+height="418"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-25_hu_384ca6b5a8e6e3fb.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-25_hu_5bc1629d3f4c0e2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="193"
+data-flex-basis="463px"
+>&lt;/p>
+&lt;h3 id="长期发布分支">长期发布分支
+&lt;/h3>&lt;p>release分支一般在产品发布后就可以删除，但我们也可以维持一个长期的发布分支。它的作用可以看作是发布分支和成熟分支的集合。这个分支上进行release前的fix工作并合并回主线，并在实际发布时打上发布Tag，然后进入下一个版本的发布准备。
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-26.png"
+width="940"
+height="304"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-26_hu_9c8e0e55cb8f7a79.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-26_hu_53dfcd4c2a28453e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="309"
+data-flex-basis="742px"
+>&lt;/p>
+&lt;h3 id="环境分支">环境分支
+&lt;/h3>&lt;p>通过不同的提交来配置代码的运行环境
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-27.png"
+width="825"
+height="467"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-27_hu_fecd763b06fd168d.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-27_hu_ddb2fac8f5b9c999.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="176"
+data-flex-basis="423px"
+>&lt;/p>
+&lt;p>不同的产品运行环境往往会有不同的配置代码（测试环境、开发环境、性能验证、安全验证环境、预发环境、产品环境等），环境分支会包含这些配置的变更提交并触发对应的构建、部署。&lt;/p>
+&lt;p>环境分支一般也用作成熟分支，比如QA的成熟分支，会包含QA环境的配置变更。&lt;/p>
+&lt;p>但是环境分支并不是好的实践，不同的环境需要不同的编译代码会引入风险。如果产品程序在不同的环境上有不同的行为表现会使问题的修复、定位变得极其困难。所以最好保证不同环境下运行的可执行代码都是相同的，环境的配置都通过显式的配置文件或变量来控制。环境变更导致的任何更改都不应包含在源码控制系统中&lt;/p>
+&lt;p>环境分支只应是缺乏这种环境切换控制机制团队的应急机制存在。&lt;/p>
+&lt;h3 id="hotfix">Hotfix
+&lt;/h3>&lt;p>用于进行紧急产品故障修复的分支&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-28.png"
+width="908"
+height="310"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-28_hu_acc30d14bafe8983.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-28_hu_d0d781cb2c1c3797.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="292"
+data-flex-basis="702px"
+>
+从主线分支对应的release版本拉取hotfix分支，并在完成后合入回主线（如果release时间比较久，合并工作可能会比较大）
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-29.png"
+width="819"
+height="289"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-29_hu_de9c76df8a7edc9a.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-29_hu_5c98c8fddd3a9342.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="283"
+data-flex-basis="680px"
+>
+对使用release 分支的团队，也可以直接在release分支上进行hotfix，此时相当于将原release分支转变为hotfix分支
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-30.png"
+width="785"
+height="293"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-30_hu_855c768ad01d0c1f.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-30_hu_f596bdaa59685590.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="267"
+data-flex-basis="643px"
+>
+对于实践CD的团队，甚至可以直接在主干上完成hotfix（还是会拉取hotfix分支，但会从最新的提交拉取），因为一般团队已经具备了不公开未发布特性的能力。而且在hotfix过程中，不允许向主线进行任何新的提交。（hotfix优先）&lt;/p>
+&lt;p>如何定义hotfix？对于可以发布频率较高的团队，一般可以将问题纳入日常发布节奏而不需要进行hotfix。取决于团队发布频率和对业务的实际影响&lt;/p>
+&lt;h3 id="release-train">release train
+&lt;/h3>&lt;p>象火车发车一样有定期的发布间隔，特性完成后选择放入哪一次发布（和SAFe的Agile release train不是一个概念，那更多是组织层面的实践）
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-31.png"
+width="789"
+height="361"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-31_hu_1167bd31713427f4.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-31_hu_8fd7313e73bea9d4.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="218"
+data-flex-basis="524px"
+>
+团队定义定期的发布计划，并确定每列发布列车上的功能，据此承诺、安排各自的工作任务。一旦火车发车，当前分支就转化为release分支，只会接受bug fix。发布列车一般会和feature分支一起使用。对于发布流程中存在较多阻塞的团队来说，release train是非常有用的，不会因为这些阻塞而影响后续功能的研发。
+但比较明显的缺点是，如果一个功能很早就完成，也需要等到发车时间才能上线。&lt;/p>
+&lt;p>release train可以看作是团队release流程的一个提升手段，对与很难进行稳定发布的团队，实施CD往往不够现实 ，此时release train会是一个好选择。&lt;/p>
+&lt;h4 id="loading-future-trains">loading future trains
+&lt;/h4>&lt;p>和旧列车发车后再向新的列车上装载需求不同，可以使用这种模式的变种。如果一些功能不能确定是否能在预定发车前完成，可以同时开启两列train（预期发车时间不同），在三月列车上完成的开发工作同时向4月列车上提交并在三月列车发车后继续在4月列车上完成剩余工作。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-32.png"
+width="895"
+height="304"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-32_hu_d04c6c121bd084fa.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-32_hu_aeb573cbb9964815.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="294"
+data-flex-basis="706px"
+>
+这种模式可以让4月列车上的工作不影响三月列车，但缺点是如果4月列车上的变更影响到3月的功能，会是后续的合并工作更加复杂。&lt;/p>
+&lt;h4 id="和主线发布比较">和主线发布比较
+&lt;/h4>&lt;p>release train的主要好处是可以有一个定期的产品发布日历，但是多个分支依然会引入复杂性。
+其实使用主线模式也可以如此工作，在主线上开发，到发布日期后增加一个对应的发布分支即可。
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-33.png"
+width="820"
+height="445"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-33_hu_e9c39230173121cc.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-33_hu_8505908c388c8ec1.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="184"
+data-flex-basis="442px"
+>&lt;/p>
+&lt;h3 id="预发布主线">预发布主线
+&lt;/h3>&lt;p>确保主线是绝对健康状态，并且主线的head永远能被直接发布到产品环境。（每个提交都具备直接发布的健康状态，但是只有实际发布的提交才需要加上tag）
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-34.png"
+width="796"
+height="265"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-34_hu_58a256d1b3e13f3a.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-34_hu_51c51264bf398328.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="300"
+data-flex-basis="720px"
+>&lt;/p>
+&lt;h2 id="其他发布模式">其他发布模式
+&lt;/h2>&lt;h3 id="实验分支">实验分支
+&lt;/h3>&lt;p>在代码基线上收集用于实验的工作，这些功能不会被直接合入产品环境&lt;/p>
+&lt;p>实验性的点子
+功能的不同实现方式&lt;/p>
+&lt;h3 id="未来分支">未来分支
+&lt;/h3>&lt;p>一个用于对其他分支侵入性太大的变更分支&lt;/p>
+&lt;p>较少使用的模式，只会从主线pull而不会merge回其他分支。一旦使用，意味着团队中存在一个独立的代码特区。应尽可能缩短这个分支存在的时间。&lt;/p>
+&lt;h3 id="合作分支">合作分支
+&lt;/h3>&lt;p>用于开发者之间协同工作，但不需要进行正式的集成的情况。&lt;/p>
+&lt;h3 id="团队集成分支">团队集成分支
+&lt;/h3>&lt;p>在向主线集成前，允许子团队间先进行互相集成。（大型项目）&lt;/p>
+&lt;hr>
+&lt;p>原文参考Martin的博客 &lt;a class="link" href="https://martinfowler.com/articles/branching-patterns.html" target="_blank" rel="noopener"
+>Branch Patterns&lt;/a>&lt;/p></description></item><item><title>Win11操作小技巧二则</title><link>https://chengxiaqiucao.github.io/post/010-windows%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E5%B0%8F%E6%8A%80%E5%B7%A7/</link><pubDate>Thu, 22 Aug 2024 15:40:10 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/010-windows%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E5%B0%8F%E6%8A%80%E5%B7%A7/</guid><description>&lt;h2 id="windows11-右键恢复传统菜单">Windows11 右键恢复传统菜单
+&lt;/h2>&lt;p>win11相比以前的版本进行了很多界面上的优化，不过有一个优化带来了不小的困扰，就是它的右键菜单，会默认折叠掉一些非系统的菜单项，必须多点击一步 &lt;code>显示更多选项&lt;/code> 才能看到原来默认一些其他菜单项。&lt;/p>
+&lt;img src="Pasted-20240822.png" alt="右键菜单" width=300 />
+&lt;p>这里其实有两个方法恢复传统方式：&lt;/p>
+&lt;ol>
+&lt;li>在点击菜单时，同时按下shift键，这时就会直接打开被折叠的菜单 （&lt;strong>推荐&lt;/strong>）&lt;/li>
+&lt;li>另一种方式，彻底恢复的话，可以添加一个注册表项&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Console" data-lang="Console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> reg.exe add &lt;span class="s2">&amp;#34;HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32&amp;#34;&lt;/span> /f /ve
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>执行后需要重启下资源管理器&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Console" data-lang="Console">&lt;span class="line">&lt;span class="cl">&lt;span class="go">taskkill /f /im explorer.exe &amp;amp; start explorer.exe
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这样就会彻底将右键菜单恢复成传统样式了。如果想恢复，删除改注册表项即可。&lt;/p>
+&lt;h2 id="剪贴板历史小工具">剪贴板历史小工具
+&lt;/h2>&lt;p>Win11下有一个很好用的小工具，可以记录多次剪贴板的历史记录。通过 &lt;code>win+v&lt;/code>键可以呼出这个工具。&lt;/p>
+&lt;img src="Pasted-20240822-2.png" alt="剪贴板工具" width=350 />
+&lt;p>除了可以方便地记录多次拷贝的历史记录，这个小工具还提供了插入emoji表情、颜文字、常用特殊字符以及gif图搜索等功能。&lt;/p>
+&lt;p>❤️👍😎🏠🕍❄️ (●ˇ∀ˇ●)(❤️´艸｀❤️)◀▶◯◻&lt;/p>
+&lt;p>要关闭剪贴板历史记录。可以去到 &lt;strong>系统设置&amp;gt;系统&amp;gt;剪贴板&lt;/strong> 中关闭&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/010-windows%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E5%B0%8F%E6%8A%80%E5%B7%A7/Pasted-20240822-1.png"
+width="1289"
+height="185"
+srcset="https://chengxiaqiucao.github.io/post/010-windows%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E5%B0%8F%E6%8A%80%E5%B7%A7/Pasted-20240822-1_hu_560c7e4763a9b58.png 480w, https://chengxiaqiucao.github.io/post/010-windows%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E5%B0%8F%E6%8A%80%E5%B7%A7/Pasted-20240822-1_hu_fa42a580c2c171b8.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="696"
+data-flex-basis="1672px"
+>&lt;/p>
+&lt;hr></description></item><item><title>Hugo+Github搭建博客小记</title><link>https://chengxiaqiucao.github.io/post/009-hugo+github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/</link><pubDate>Wed, 21 Aug 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/009-hugo+github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/</guid><description>&lt;blockquote>
+&lt;p>　　虽然一直有码字，记录的习惯，但文章都比较零散。所以还是打算做一个自己的静态博客。之前一直知道Github是可以通过Github_Page直接发布一个github.io域名的静态页面的。然后目前我常用的写作工具是Obsidian，所以诉求就是可以通过Obsidian写完文章以后，可以做到比较方便地发布到github。&lt;br>
+　　于是便动手，经过两天多的摸索，总算比较满意地把这个博客搭了起来。这里记录下实现的过程，以便后续参考。&lt;/p>&lt;/blockquote>
+&lt;p>效果图：
+&lt;img src="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821.png"
+width="1818"
+height="971"
+srcset="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821_hu_3158c671d4dc874.png 480w, https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821_hu_34640f2984d57c1f.png 1024w"
+loading="lazy"
+alt="博客完成效果"
+class="gallery-image"
+data-flex-grow="187"
+data-flex-basis="449px"
+>&lt;/p>
+&lt;h2 id="hugo静态页面框架">Hugo静态页面框架
+&lt;/h2>&lt;h3 id="什么是hugo">什么是hugo？
+&lt;/h3>&lt;p>Hugo是一个用go语言编写的静态网站生成框架。具备性能好、快速易用、可配置的特点。可以依据MarkDown格式的文档，快速生成一个完全基于Html的网站。是一个生成博客站点的利器。&lt;/p>
+&lt;h3 id="安装">安装
+&lt;/h3>&lt;p>Hugo支持多种安装方式。 我是在windows系统上进行安装, 可以利用winget包管理器直接安装&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Console" data-lang="Console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> winget install Hugo.Hugo.Extended
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>安装后，检查版本信息
+&lt;img src="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-1.png"
+width="1666"
+height="140"
+srcset="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-1_hu_f043b2045dc4f23a.png 480w, https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-1_hu_1b2383373e72d3be.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="1190"
+data-flex-basis="2856px"
+>&lt;/p>
+&lt;p>完成安装以后，可以通过 &lt;code>hugo&lt;/code> 命令来生成我们的博客站点&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Console" data-lang="Console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> hugo new site BlogSite
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>会自动生成一个我们网站的结构&lt;/p>
+&lt;blockquote>
+&lt;p>-archetypes&lt;br>
+-assets&lt;br>
+-content&lt;br>
+-data&lt;br>
+-i18n&lt;br>
+-layouts&lt;br>
+-static&lt;br>
+-themes&lt;br>
+-hugo.toml&lt;/p>&lt;/blockquote>
+&lt;p>&lt;code>content&lt;/code>目录其实就是存放我们当前文章。&lt;code>theme&lt;/code>中则存放网站可以应用的主题。&lt;code>assets&lt;/code>中其实可以包含一些需要引用的资源。&lt;code>layout&lt;/code>是网站后续渲染的结构&lt;/p>
+&lt;p>&lt;code>archetypes&lt;/code>中是可以定义页面的一些默认元数据信息(frontMatter), 一般放在&lt;code>default.md&lt;/code>中， Hugo会根据这个配置在生成新的页面时自动添加这些元数据。并在渲染时根据配置生成页面&lt;/p>
+&lt;p>我这里配置如下&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nn">---&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;{{ replace .File.ContentBaseName &amp;#34;-&amp;#34; &amp;#34; &amp;#34; | title }}&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">date&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{{&lt;span class="w"> &lt;/span>&lt;span class="l">.Date }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">imageNameKey&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Pasted&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">draft&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Categories&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">tags&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nn">---&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>而正式生成md文档后，比如当前这篇文章，在Obsidian中反映出来就是文档属性信息：
+&lt;img src="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-2.png"
+width="676"
+height="388"
+srcset="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-2_hu_b9be43d5363cac7c.png 480w, https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-2_hu_27bd6ff65c21f2a0.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="174"
+data-flex-basis="418px"
+>&lt;/p>
+&lt;h3 id="stack主题">Stack主题
+&lt;/h3>&lt;p>生成网站后，我们可以从&lt;a class="link" href="https://themes.gohugo.io/" target="_blank" rel="noopener"
+>hugo官网丰富的模板&lt;/a>中，选择一个中意的。这里我使用的是Stack主题。
+从github上将theme clone到生成网站的Theme目录下&lt;/p>
+&lt;p>&lt;code>git clone https://github.com/CaiJimmy/hugo-theme-stack themes/stack &lt;/code>&lt;/p>
+&lt;p>然后参照它的官方示例，在&lt;code>content&lt;/code>目录下包含&lt;code>page&lt;/code>、&lt;code>post&lt;/code>目录以及主页index.md文件&lt;/p>
+&lt;p>具体的配置信息需要参考Stack示例站点下的hugo.yaml进行设置，主要是站点各种样式组织上的配置信息，这里不再赘述。&lt;/p>
+&lt;h3 id="创建文章">创建文章
+&lt;/h3>&lt;p>因为我们创建文章时，经常需要引用一些图片，为了便于直接在文档中按相对路径引用. 创建文章，可以使用下面的方式，也就是不直接生成页面，而是生成文章目录，并在目录中使用index.md的方式创建&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Console" data-lang="Console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> hugo new post/hugo+github搭建博客小记/index.md
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在index.md中完成文章内容的编写&lt;/p>
+&lt;h3 id="生成示例站点">生成示例站点
+&lt;/h3>&lt;p>完成站点配置和必要的素材、文章编写后，可以执行下面的命令进行本地预览&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Console" data-lang="Console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> Hugo Server --theme&lt;span class="o">=&lt;/span>stack --buildDrafts
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>buildDrafts是会将有&lt;code>draft=true&lt;/code>标记的文章一起渲染&lt;/p>
+&lt;p>执行以后，显示如下信息：
+&lt;img src="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-3.png"
+width="2086"
+height="784"
+srcset="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-3_hu_872f5532e65d0c29.png 480w, https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-3_hu_e9912806698254e9.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="266"
+data-flex-basis="638px"
+>&lt;/p>
+&lt;p>这时就可以从&lt;code>http://localhost:1313&lt;/code> 来预览当前的页面状态了&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-4.png"
+width="1383"
+height="778"
+srcset="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-4_hu_4d7f99996cc07b74.png 480w, https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-4_hu_56c2085a6e8b65a2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>&lt;/p>
+&lt;p>没有问题后，可以使用正式生成站点的命令&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Console" data-lang="Console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> hugo --theme&lt;span class="o">=&lt;/span>stack --baseURL&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;https://chengxiaqiucao.github.io/&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这样就会在站点的public目录下生成我们需要的静态站点内容了
+&lt;img src="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-5.png"
+width="338"
+height="483"
+srcset="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-5_hu_f60fbc0271b7e11d.png 480w, https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-5_hu_41bda0080f92bb79.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="69"
+data-flex-basis="167px"
+>&lt;/p>
+&lt;h2 id="发布到github-page">发布到Github Page
+&lt;/h2>&lt;h3 id="github-仓库">github 仓库
+&lt;/h3>&lt;p>完成本地调试后，要将我们的网站发布到Github上。首先当然是要有一个自己的Github账号。
+然后创建一个自己账号的页面repo. 如&lt;code>chengxiaqiucao.github.io&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Console" data-lang="Console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> &lt;span class="nb">cd&lt;/span> public
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> git init
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> git remote add origin &lt;span class="s2">&amp;#34;https://github.com/chengxiaqiucao/chengxiaqiucao.github.io.git&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> git add -A
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> git commit -m &lt;span class="s2">&amp;#34;first commit&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> git push -u origin main
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>通过以上命令，就将pulic中的站点内容push到了github的页面仓库中了&lt;/p>
+&lt;h3 id="仓库配置">仓库配置
+&lt;/h3>&lt;p>然后要发布这个页面的话，github上进行如下配置：
+&lt;img src="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-6.png"
+width="1709"
+height="1049"
+srcset="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-6_hu_e50b02ebb096b914.png 480w, https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-6_hu_f43e37dbb46d2f2b.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="162"
+data-flex-basis="391px"
+>&lt;/p>
+&lt;p>这样每次push新的内容到仓库中，就会触发构建。&lt;/p>
+&lt;p>现在访问一下&lt;a class="link" href="https://chengxiaqiucao.github.io/" target="_blank" rel="noopener"
+>https://chengxiaqiucao.github.io/&lt;/a>, 可以看到成果了&lt;/p>
+&lt;h2 id="obsidian设置">Obsidian设置
+&lt;/h2>&lt;p>然后，我们用Obsidian写文章时，为了方便贴图，需要配置下图片附件的存放位置
+&lt;img src="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-7.png"
+width="1606"
+height="941"
+srcset="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-7_hu_e95b8aec0a3d677.png 480w, https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-7_hu_63b8d1c6600846a9.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="170"
+data-flex-basis="409px"
+>
+另外这里还有一个坑，就是Obsidian在贴图时，会自动生成一个文件名，形如&lt;code>pasted image XXXXXX.png&lt;/code>&lt;/p>
+&lt;p>但这里有个问题，就是这个文件名中存在空格，会导致Stack主题无法解析，图片显示不出来。这里推荐大家可以使用一个Obsidian插件，&lt;a class="link" href="https://github.com/reorx/obsidian-paste-image-rename" target="_blank" rel="noopener"
+>paste image rename&lt;/a> 可以自己设置贴图文件格式。
+&lt;img src="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-8.png"
+width="1609"
+height="783"
+srcset="https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-8_hu_50ba73d68355b1a3.png 480w, https://chengxiaqiucao.github.io/post/009-hugo&amp;#43;github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E5%B0%8F%E8%AE%B0/Pasted-20240821-8_hu_6ade5ad1f67279e6.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="205"
+data-flex-basis="493px"
+>&lt;/p>
+&lt;p>好啦，到这里我们就建好了一个属于自己的博客空间啦，可以快乐地码字了~~~&lt;/p></description></item></channel></rss>

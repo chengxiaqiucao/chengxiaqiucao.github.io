@@ -1,0 +1,676 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Python on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/python/</link><description>Recent content in Python on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Sat, 15 Feb 2025 19:13:42 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/python/index.xml" rel="self" type="application/rss+xml"/><item><title>还在用print大法调试代码？换个玩法</title><link>https://chengxiaqiucao.github.io/post/055-debug%E5%B7%A5%E5%85%B7pysnooper/</link><pubDate>Sat, 15 Feb 2025 19:13:42 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/055-debug%E5%B7%A5%E5%85%B7pysnooper/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/055-debug%E5%B7%A5%E5%85%B7pysnooper/Pasted-20250215.png" alt="Featured image of post 还在用print大法调试代码？换个玩法" />&lt;h2 id="为什么需要pysnooper">为什么需要PySnooper？
+&lt;/h2>&lt;p>在Python开发过程中，print调试法和断点调试法是最常用的调试手段。但面对复杂逻辑时，传统方法存在明显不足：&lt;/p>
+&lt;ul>
+&lt;li>print语句需要手动添加/删除，破坏代码整洁性&lt;/li>
+&lt;li>IDE断点调试在远程服务器场景难以使用&lt;/li>
+&lt;li>多线程/异步场景调试困难&lt;/li>
+&lt;/ul>
+&lt;p>PySnooper通过智能日志记录机制，实现了&lt;strong>零侵入式调试&lt;/strong>，提供了另一种直观、便利地观测调试手段&lt;/p>
+&lt;h2 id="核心功能详解">核心功能详解
+&lt;/h2>&lt;h3 id="1-智能上下文追踪">1. 智能上下文追踪
+&lt;/h3>&lt;p>比如我们编写一个递归函数&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pysnooper&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pysnooper.snoop&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>输出示例：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="p">(&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">venv&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">:&lt;/span>\&lt;span class="n">Chengxiaqiucao&lt;/span>\&lt;span class="n">AI&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">python&lt;/span> &lt;span class="n">ai_test&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Source&lt;/span> &lt;span class="n">path&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">...&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">:&lt;/span>\&lt;span class="n">Chengxiaqiucao&lt;/span>\&lt;span class="n">AI&lt;/span>\&lt;span class="n">ai_test&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Starting&lt;/span> &lt;span class="k">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">3&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.353061&lt;/span> &lt;span class="n">call&lt;/span> &lt;span class="mi">9&lt;/span> &lt;span class="k">def&lt;/span> &lt;span class="nf">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357038&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">10&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357103&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">13&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Starting&lt;/span> &lt;span class="k">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357159&lt;/span> &lt;span class="n">call&lt;/span> &lt;span class="mi">9&lt;/span> &lt;span class="k">def&lt;/span> &lt;span class="nf">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357220&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">10&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357291&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">13&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Starting&lt;/span> &lt;span class="k">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357348&lt;/span> &lt;span class="n">call&lt;/span> &lt;span class="mi">9&lt;/span> &lt;span class="k">def&lt;/span> &lt;span class="nf">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357421&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">10&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357460&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">11&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357501&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">11&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Return&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Elapsed&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">00.000248&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357716&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">13&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Return&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Elapsed&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">00.000649&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357843&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">13&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Return&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="mi">6&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Elapsed&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">00.005107&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>自动记录函数调用栈和代码执行路径，支持递归函数追踪&lt;/p>
+&lt;h3 id="2-变量监控">2. 变量监控
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pysnooper.snoop&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">watch&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;result&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;len(data)&amp;#39;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">process_data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">item&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">data&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">processed&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">item&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">result&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">processed&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nb">sum&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">result&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>监控特点：&lt;/p>
+&lt;ul>
+&lt;li>支持表达式监控（如&lt;code>len(data)&lt;/code>)&lt;/li>
+&lt;li>实时显示变量类型&lt;/li>
+&lt;li>数值变化提示&lt;/li>
+&lt;/ul>
+&lt;h3 id="3-上下文管理模式输出到文件">3. 上下文管理模式、输出到文件
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 上下文管理器模式&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">with&lt;/span> &lt;span class="n">pysnooper&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">snoop&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">output&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;/var/log/debug.log&amp;#39;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">critical_operation&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="4-多处跟踪时指定前缀">4. 多处跟踪时指定前缀
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pysnooper.snoop&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">prefix&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;[add]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">a&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">a&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">b&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pysnooper.snoop&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">prefix&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;[main]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">7&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">result&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Final result: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">result&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>输出时会显示指定的不同前缀&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">29&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">01.818895&lt;/span> &lt;span class="n">call&lt;/span> &lt;span class="mi">17&lt;/span> &lt;span class="k">def&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">29&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">01.819578&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">18&lt;/span> &lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">7&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Source&lt;/span> &lt;span class="n">path&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">...&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">:&lt;/span>\&lt;span class="n">Chengxiaqiucao&lt;/span>\&lt;span class="n">AI&lt;/span>\&lt;span class="n">ai_test&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Starting&lt;/span> &lt;span class="k">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="n">a&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">5&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Starting&lt;/span> &lt;span class="k">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="n">b&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">7&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">29&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">01.819791&lt;/span> &lt;span class="n">call&lt;/span> &lt;span class="mi">13&lt;/span> &lt;span class="k">def&lt;/span> &lt;span class="nf">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">a&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">29&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">01.820558&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">14&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">a&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">b&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">29&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">01.820758&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">14&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">a&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">b&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Return&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="mi">12&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Elapsed&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">00.001314&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="n">New&lt;/span> &lt;span class="k">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">.......&lt;/span> &lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">12&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">29&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">01.821253&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">19&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">result&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">29&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">01.821503&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">19&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">result&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="n">Return&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="mi">12&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="n">Elapsed&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">00.002834&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Final&lt;/span> &lt;span class="n">result&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">12&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="5-设置跟踪深度">5. 设置跟踪深度
+&lt;/h3>&lt;p>如果代码中牵涉多层函数调用，还可以通过指定记录深度，默认深度为 &lt;strong>1&lt;/strong>，灵活结合&lt;code>depth&lt;/code>参数，可以帮助我们重点查看关注部分&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pysnooper.snoop&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">depth&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">outer_function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">inner_function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pysnooper.snoop&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">depth&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">inner_function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">y&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">y&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">outer_function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Outer function result: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">result&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>输出：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">Starting&lt;/span> &lt;span class="k">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="n">x&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">10&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">37&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">49.360851&lt;/span> &lt;span class="n">call&lt;/span> &lt;span class="mi">9&lt;/span> &lt;span class="k">def&lt;/span> &lt;span class="nf">outer_function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">37&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">49.361569&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">10&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">inner_function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Source&lt;/span> &lt;span class="n">path&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">...&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">:&lt;/span>\&lt;span class="n">Chengxiaqiucao&lt;/span>\&lt;span class="n">ai&lt;/span>\&lt;span class="n">ai_test&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Starting&lt;/span> &lt;span class="k">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="n">y&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">11&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">37&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">49.361734&lt;/span> &lt;span class="n">call&lt;/span> &lt;span class="mi">13&lt;/span> &lt;span class="k">def&lt;/span> &lt;span class="nf">inner_function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">y&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">37&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">49.362077&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">14&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">y&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">37&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">49.362184&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">14&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">y&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Return&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="mi">22&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Elapsed&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">00.000589&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">37&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">49.362380&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">10&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">inner_function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Return&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="mi">22&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Elapsed&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">00.001683&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Outer&lt;/span> &lt;span class="n">function&lt;/span> &lt;span class="n">result&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">22&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="总结">总结
+&lt;/h2>&lt;p>有了这个工具， 我们在调试时，特别是在一些服务器上进行代码调测，就可以通过一行装饰代码实现运行变量和过程的监测了，远离print大法的繁杂啦！&lt;/p></description></item><item><title>用Typer快速开发python命令行应用</title><link>https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/</link><pubDate>Thu, 19 Sep 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Typer.png" alt="Featured image of post 用Typer快速开发python命令行应用" />&lt;p>在Python语言中，开发命令行程序，最基本的方式是通过Python标准库argparse来进行命令行参数和各种交互定义。但相对来说还比较复杂，一些常用的场景也需要我们单独封装。&lt;/p>
+&lt;p>本文我们介绍另一个非常强大，也非常容易上手使用的python命令行工具库&lt;code>typer&lt;/code>，看看如何利用它来帮我们快速完成一个命令行应用的实现。&lt;/p>
+&lt;h2 id="安装和基本使用">安装和基本使用
+&lt;/h2>&lt;h3 id="安装">安装
+&lt;/h3>&lt;p>&lt;code>typer&lt;/code> 是一个由 热门开源web接口框架 &lt;code>FastAPI&lt;/code>推出的命令行实现工具。和其他 python 第三方库类似，安装很方便。&lt;/p>
+&lt;p>&lt;code>pip instal typer&lt;/code>&lt;/p>
+&lt;h3 id="基本用法">基本用法
+&lt;/h3>&lt;h4 id="姿势一">姿势一
+&lt;/h4>&lt;p>编写一个最基本的&lt;code>hello world&lt;/code>程序user_typer.py&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;hello world!&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="vm">__name__&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;__main__&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>直接通过&lt;code>typer&lt;/code>命令调用
+运行：&lt;/p>
+&lt;blockquote>
+&lt;p>Demo&amp;gt;typer use_typer.py run&lt;/p>
+&lt;p>hello world!&lt;/p>&lt;/blockquote>
+&lt;h4 id="姿势二">姿势二
+&lt;/h4>&lt;p>也可以在代码中引入typer，然后用它的&lt;code>run&lt;/code>方法直接在程序中调用&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">typer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;hello world!&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="vm">__name__&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;__main__&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>运行：&lt;/p>
+&lt;blockquote>
+&lt;p>Demo&amp;gt;python use_typer.py&lt;/p>
+&lt;p>hello world!&lt;/p>&lt;/blockquote>
+&lt;h3 id="姿势三">姿势三
+&lt;/h3>&lt;p>或者将程序声明为一个应用，然后用注解指定应用的每一个支持的命令&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">typer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">app&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Typer&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@app.command&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;hello world!&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="vm">__name__&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;__main__&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">app&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>运行：&lt;/p>
+&lt;blockquote>
+&lt;p>Demo&amp;gt;python use_typer.py&lt;/p>
+&lt;p>hello world!&lt;/p>&lt;/blockquote>
+&lt;p>而且运行 &lt;code>python user_typer.py --help&lt;/code>， 可以看到已经自动生成了必要的帮助说明。
+&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919.png"
+width="1345"
+height="388"
+srcset="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919_hu_2fa62d7f18696dcb.png 480w, https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919_hu_45c50febc1b01535.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="346"
+data-flex-basis="831px"
+>&lt;/p>
+&lt;p>这里我们在main函数中加了一个参数，可以看到&lt;code>typer&lt;/code> 其实还会自动将对应的函数携带的参数解析为命令参数，无需重新定义。&lt;/p>
+&lt;h2 id="命令帮助和默认值">命令帮助和默认值
+&lt;/h2>&lt;p>当然作为命令行程序，命令的帮助信息定义是一个重要部分。&lt;/p>
+&lt;p>&lt;code>typer&lt;/code>也提供了很方便的添加命令和参数帮助的途径。
+比如我们再添加一个命令&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;问候指定的小伙伴&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">hello&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">Annotated&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nb">str&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Argument&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;被问候的伙伴姓名&amp;#34;&lt;/span>&lt;span class="p">)]&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;城下秋草&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 这里也可以直接作为命令帮助，和command的help参数作用一样，
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 但优先级没有command注解高
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> &amp;#34;&amp;#34;&amp;#34;&lt;/span> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;你好，&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>命令本身的帮助信息可以直接在command注解中通过help参数说明，或者也可以通过函数本身的docstring，typer也会把它解析为命令帮助。但如果command注解中已经指定，则会以command注解中指定的帮助信息为准&lt;/p>
+&lt;p>而指定的参数&lt;code>name&lt;/code>, 这里是通过python的类型扩展库，再通过&lt;code>type.Argument&lt;/code>的help参数来指定，并且同时还可以指定参数的默认值。
+&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-1.png"
+width="1341"
+height="449"
+srcset="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-1_hu_f08e2c676030f08f.png 480w, https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-1_hu_357071c5656faf8.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="298"
+data-flex-basis="716px"
+>&lt;/p>
+&lt;h2 id="可选参数和参数名">可选参数和参数名
+&lt;/h2>&lt;p>这里我们通过&lt;code>type.Argument&lt;/code>指定的参数，其实是必填参数。那如果我们希望某一个参数是可选的呢？ 这里&lt;code>typer&lt;/code>中是根据两个不同类型来区分。定义上来说，&lt;/p>
+&lt;ul>
+&lt;li>typer.Argument 是必选&lt;/li>
+&lt;li>typer.Option 是可选&lt;/li>
+&lt;/ul>
+&lt;p>对应到帮助信息中的 &lt;code>Arguments&lt;/code> 和 &lt;code>Options&lt;/code> 两个不同的pannel。 但是否必须输入，其实是根据是否指定了对应参数的默认值来确认的，如果没有指定默认值，那么就代表这个参数是必须输入的。&lt;/p>
+&lt;p>另外 Option 和 Argument 的不同还在于 Option 是需要指定option名称, 也就是形如 &lt;code>--name&lt;/code>, &lt;code>--help&lt;/code> 这用带 &lt;code>--&lt;/code> 或者 &lt;code>-&lt;/code> 短参数标记&lt;/p>
+&lt;p>默认 &lt;code>typer.Option&lt;/code>是直接将参数名转化为长标记，也可以自行指定其他别名。 同时也可以指定指定短标记&lt;/p>
+&lt;p>比如我们可以再增加一个参数 &lt;code>last_name&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;问候指定的小伙伴&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">hello&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">last_name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">Annotated&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nb">str&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Option&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;--last&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;-l&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;被问候的人员姓什么&amp;#34;&lt;/span>&lt;span class="p">)],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">Annotated&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nb">str&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Argument&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;被问候的伙伴名称&amp;#34;&lt;/span>&lt;span class="p">)]&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;城下秋草&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 这里也可以直接作为命令帮助，和command的help参数作用一样，
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 但优先级没有command注解高
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> &amp;#34;&amp;#34;&amp;#34;&lt;/span> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;你好，&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">last_name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-2.png"
+width="1341"
+height="466"
+srcset="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-2_hu_71cd3fd796b29070.png 480w, https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-2_hu_4a98f92b294e86f2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="287"
+data-flex-basis="690px"
+>&lt;/p>
+&lt;h2 id="更丰富的界面增强">更丰富的界面增强
+&lt;/h2>&lt;p>&lt;code>typer&lt;/code> 除了在参数定义上的灵活简便外，对于交互界面也提供了很多增强&lt;/p>
+&lt;h3 id="颜色和结构化数据的显示支持">颜色和结构化数据的显示支持
+&lt;/h3>&lt;p>比如针对命令行，不同颜色的信息区分，这里它利用了另一个第三方库 &lt;code>rich&lt;/code>， 可以简单地用rich库中的print方法替代掉python官方的简单打印语句，实现更丰富的颜色控制和结构化数据展示等&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;显示结构数据:&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;不同颜色和emoji:&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;[bold red]警告！[/bold red] [green]数据data[/green] 不匹配！ :boom:&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="vm">__name__&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;__main__&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>执行效果
+&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-3.png"
+width="873"
+height="343"
+srcset="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-3_hu_54cd16203d6bee9a.png 480w, https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-3_hu_1e8a516a57de7f6b.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="254"
+data-flex-basis="610px"
+>&lt;/p>
+&lt;h3 id="提示信息">提示信息
+&lt;/h3>&lt;p>&lt;code>typer.Option&lt;/code> 可以支持转为提示模式，也就是对于需要的参数，可以提示输入&lt;/p>
+&lt;p>比如上面的例子，加上&lt;code>prompt=True&lt;/code>就会在没有输入参数时提示输入&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;问候指定的小伙伴&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">hello&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">last_name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">Annotated&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nb">str&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Option&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;--last&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;-l&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;被问候的人员姓什么&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">prompt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>运行：
+&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/prompt.gif"
+width="1322"
+height="223"
+srcset="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/prompt_hu_177ed65dd34495e3.gif 480w, https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/prompt_hu_d62cb5b52ed8fdd7.gif 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="592"
+data-flex-basis="1422px"
+>&lt;/p>
+&lt;h3 id="密码和信息隐藏">密码和信息隐藏
+&lt;/h3>&lt;p>对于一些密码类的参数，还支持隐藏和确认的选项，比如我们增加一个passwd参数&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;问候指定的小伙伴&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">hello&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">last_name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">Annotated&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nb">str&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Option&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;--last&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;-l&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;被问候的人员姓什么&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">prompt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)]&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;黄&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">passwd&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">Annotated&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nb">str&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Option&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">prompt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">confirmation_prompt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">hide_input&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)]&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">None&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">Annotated&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nb">str&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Argument&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;被问候的伙伴名称&amp;#34;&lt;/span>&lt;span class="p">)]&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;城下秋草&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 这里也可以直接作为命令帮助，和command的help参数作用一样，
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 但优先级没有command注解高
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> &amp;#34;&amp;#34;&amp;#34;&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="n">passwd&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;123&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;你好，&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">last_name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;[bold red]密码输入错误，不能展示！[/bold red]&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-4.png"
+width="862"
+height="430"
+srcset="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-4_hu_88cb267dd82dc4f2.png 480w, https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-4_hu_148d29d9437420f1.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="200"
+data-flex-basis="481px"
+>&lt;/p>
+&lt;h3 id="进度条实现">进度条实现
+&lt;/h3>&lt;p>typer还能比较方便地支持进度条类的信息交互，同样可以利用rich中progress的增强&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">rich.progress&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">track&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">running&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">total&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">value&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">track&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">100&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">description&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;正在执行中....&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Fake processing time &lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">time&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mf">0.01&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">total&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;已处理 &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">total&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> 任务&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="vm">__name__&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;__main__&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">running&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/progress.gif"
+width="1322"
+height="223"
+srcset="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/progress_hu_fa1a7907cc9d420d.gif 480w, https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/progress_hu_681bc0034e86b2ba.gif 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="592"
+data-flex-basis="1422px"
+>&lt;/p>
+&lt;h2 id="多层命令嵌套">多层命令嵌套
+&lt;/h2>&lt;p>对于多层的命令嵌套，&lt;code>typer&lt;/code>当然也提供了良好的支持。这里是通过声明不同的应用，再利用&lt;code>add_typer&lt;/code>方法完成层级的关联。&lt;/p>
+&lt;p>官方给出的示例体现的很清楚&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">typer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">app&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Typer&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">items_app&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Typer&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">app&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_typer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">items_app&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;items&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">users_app&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Typer&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">app&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_typer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">users_app&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;users&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@items_app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;create&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">items_create&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Creating item: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@items_app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;delete&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">items_delete&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Deleting item: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@items_app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;sell&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">items_sell&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Selling item: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@users_app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;create&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">users_create&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user_name&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Creating user: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">user_name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@users_app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;delete&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">users_delete&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user_name&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Deleting user: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">user_name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="vm">__name__&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;__main__&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">app&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>用&lt;code>--help&lt;/code>看一下这样处理的效果
+&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-5.png"
+width="1261"
+height="827"
+srcset="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-5_hu_fc72b3a1775b3f9.png 480w, https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-5_hu_12c6c8203e565afb.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="152"
+data-flex-basis="365px"
+>&lt;/p>
+&lt;hr>
+&lt;p>以上就是关于命令行工具 &lt;code>typer&lt;/code>的用法梳理。&lt;/p></description></item></channel></rss>
