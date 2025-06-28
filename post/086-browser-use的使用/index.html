@@ -1,0 +1,414 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="前言 在之前关于 AI 测试相关的几篇文章中，我们分别介绍了通过 playwright-mcp，以及 midscene.js、magentic ui 等几个不同的 AI 浏览器工具，实现 AI 驱动自动化测试的方法介绍。而其实在这些不断涌现的新工具出现之前，还有一个更早推出（2024.11），也同样还在不断完善的AI浏览器驱动工具 Browser Use，其工具实现思路，为后来的相关工具提供了很多借鉴。 而经过半年多40多个版本的迭代，目前最新版本 0.2.5，工具功能也日臻完善。\n"><title>AI智能驱动浏览器工具Browser Use详解</title><link rel=canonical href=https://chengxiaqiucao.github.io/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/><link rel=stylesheet href=/scss/style.min.d6334826c849a420a2748e4872b915ae516105f86c3993d9bad2032725f784b8.css><meta property='og:title' content="AI智能驱动浏览器工具Browser Use详解"><meta property='og:description' content="前言 在之前关于 AI 测试相关的几篇文章中，我们分别介绍了通过 playwright-mcp，以及 midscene.js、magentic ui 等几个不同的 AI 浏览器工具，实现 AI 驱动自动化测试的方法介绍。而其实在这些不断涌现的新工具出现之前，还有一个更早推出（2024.11），也同样还在不断完善的AI浏览器驱动工具 Browser Use，其工具实现思路，为后来的相关工具提供了很多借鉴。 而经过半年多40多个版本的迭代，目前最新版本 0.2.5，工具功能也日臻完善。\n"><meta property='og:url' content='https://chengxiaqiucao.github.io/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/'><meta property='og:site_name' content='秋 草 观 “测” 台'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='AI测试'><meta property='article:tag' content='测试工具'><meta property='article:published_time' content='2025-04-30T00:00:00+00:00'><meta property='article:modified_time' content='2025-04-30T00:00:00+00:00'><meta property='og:image' content='https://chengxiaqiucao.github.io/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-1.png'><meta name=twitter:title content="AI智能驱动浏览器工具Browser Use详解"><meta name=twitter:description content="前言 在之前关于 AI 测试相关的几篇文章中，我们分别介绍了通过 playwright-mcp，以及 midscene.js、magentic ui 等几个不同的 AI 浏览器工具，实现 AI 驱动自动化测试的方法介绍。而其实在这些不断涌现的新工具出现之前，还有一个更早推出（2024.11），也同样还在不断完善的AI浏览器驱动工具 Browser Use，其工具实现思路，为后来的相关工具提供了很多借鉴。 而经过半年多40多个版本的迭代，目前最新版本 0.2.5，工具功能也日臻完善。\n"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://chengxiaqiucao.github.io/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-1.png'></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/automnGrass_hu_5e44a092fd905642.png width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>秋 草 观 “测” 台</a></h1><h2 class=site-description>Testing is not just checking...</h2></div></header><ol class=menu-social><li><a href=https://github.com/chengxiaqiucao target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://space.bilibili.com/472272606 target=_blank title=Bilibili rel=me><!doctype html><svg t="1750732982440" class="icon" viewBox="0 0 1024 1024" p-id="4593" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632 444.330667 256h135.296l138.368-138.325333A42.666667 42.666667.0 01778.368 178.048L700.330667 256H789.333333A149.333333 149.333333.0 01938.666667 405.333333v341.333334A149.333333 149.333333.0 01789.333333 896H234.666667A149.333333 149.333333.0 0185.333333 746.666667V405.333333A149.333333 149.333333.0 01234.666667 256h88.96L245.632 177.962667a42.666667 42.666667.0 0160.373333-60.373334zm483.328 223.701333H234.666667a64 64 0 00-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0057.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0063.701334-57.856L853.333333 746.666667V405.333333a64 64 0 00-64-64zm-448 128A42.666667 42.666667.0 01384 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666666-42.666667zm341.333334.0A42.666667 42.666667.0 01725.333333 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666667-42.666667z" p-id="4594" fill="#8a8a8a"/></svg></a></li><li><a href=https://www.zhihu.com/people/qiucao target=_blank title=zhihu rel=me><!doctype html><svg t="1750733049138" class="icon" viewBox="0 0 1024 1024" p-id="5820" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M570.581333 806.272h61.952L652.928 876.117333 764.074667 806.272h130.986666V230.186667h-324.48V806.272zM636.501333 292.693333h192.64V743.68h-73.898666l-73.813334 46.378667L668.032 743.808l-31.530667-.128V292.736zM515.754667 493.738667H377.429333a2999.466667 2999.466667.0 005.802667-194.56h135.338667S523.776 239.445334 495.872 240.128H261.76c9.216-34.730667 20.821333-70.613333 34.688-107.690667.0.0-63.701333.0-85.333333 57.130667C202.112 213.12 176.128 303.786667 129.877333 396.416c15.573333-1.706667 67.114667-3.114667 97.450667-58.794667 5.589333-15.616 6.656-17.621333 13.568-38.485333h76.373333c0 27.776-3.157333 177.109333-4.437333 194.474667h-138.24c-31.104.0-41.173333 62.549333-41.173333 62.549333h173.482666C295.253333 688.256 232.789333 799.573333 119.466667 887.466667c54.186667 15.488 108.202667-2.432 134.912-26.197334.0.0 60.8-55.338667 94.122666-183.381333L491.264 849.834667s20.906667-71.168-3.285333-105.856c-20.053333-23.637333-74.24-87.552-97.322667-110.72l-38.698667 30.72c11.52-36.992 18.474667-72.96 20.821334-107.690667h163.072s-.213333-62.549333-20.053334-62.549333z" p-id="5821" fill="#8a8a8a"/></svg></a></li><li><a href=mailto:%20danmyw@qq.com target=_blank title=e-mail rel=me><!doctype html><svg t="1750733089669" class="icon" viewBox="0 0 1451 1024" p-id="6983" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759.0 97.881301C0 3.997201 71.046997.0 71.046997.0H474.477909 961.649408h399.992405s71.046998 3.997201 71.046998 97.881301L771.345323 681.472759S764.482731 685.154773 753.594283 688.65053V688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858V688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759zm53.281707 130.131124C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633.0 212.052267.0 212.052267V942.809523S0 1024 83.726336 1024H682.532949 753.579947h595.368192C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523V212.052267S893.138176 701.759633 817.019477 767.734955c-39.771477 34.470494-74.671786 43.295855-98.955861 43.868928z" fill="#8a8a8a" p-id="6984"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>主页</span></a></li><li><a href=/page/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>检索</span></a></li><li><a href=/page/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>链接</span></a></li><li><a href=/page/about/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>关于</span></a></li><li><a href=/page/releases/><svg class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M9.828 9.172a4 4 0 100 5.656A10 10 0 0012 12a10 10 0 012.172-2.828 4 4 0 110 5.656A10 10 0 0112 12 10 10 0 009.828 9.172"/></svg>
+<span>热门开源</span></a></li><li class=menu-bottom-section><ol class=menu><li id=i18n-switch><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg>
+<select name=language title=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://chengxiaqiucao.github.io/en/>English</option><option value=https://chengxiaqiucao.github.io/ selected>中文</option></select></li><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#前言>前言</a></li><li><a href=#browser-use简介>browser-use简介</a></li><li><a href=#实现原理>实现原理</a></li><li><a href=#核心架构解析>核心架构解析</a><ol><li><a href=#agent-层决策中枢><strong>Agent 层</strong>（决策中枢）</a></li><li><a href=#controller-层指令转换器><strong>Controller 层</strong>（指令转换器）</a></li><li><a href=#dom-解析引擎><strong>DOM 解析引擎</strong></a></li><li><a href=#browser-接口层><strong>Browser 接口层</strong></a></li><li><a href=#架构图>架构图</a></li></ol></li><li><a href=#部署安装>部署安装</a></li><li><a href=#通过web界面使用>通过web界面使用</a><ol><li><a href=#启动界面>启动界面</a></li><li><a href=#llm配置>LLM配置</a></li><li><a href=#运行过程>运行过程</a></li></ol></li><li><a href=#python脚本调用>Python脚本调用</a></li><li><a href=#总结>总结</a></li><li><a href=#mermaid-架构图>Mermaid 架构图</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/><img src=/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-1_hu_cc01f56ef9806712.png srcset="/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-1_hu_cc01f56ef9806712.png 800w, /post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-1_hu_e63f263c8680131a.png 1600w" width=800 height=276 loading=lazy alt="Featured image of post AI智能驱动浏览器工具Browser Use详解"></a></div><div class=article-details><header class=article-category><a href=/categories/%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7/ style=background-color:#c6fad2;color:#000>测试工具</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/>AI智能驱动浏览器工具Browser Use详解</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Apr 30, 2025</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 9 分钟</time></div></footer></div></header><section class=article-content><h2 id=前言>前言</h2><p>在之前关于 AI 测试相关的几篇文章中，我们分别介绍了通过 <code>playwright-mcp</code>，以及 <code>midscene.js</code>、<code>magentic ui</code> 等几个不同的 AI 浏览器工具，实现 AI 驱动自动化测试的方法介绍。而其实在这些不断涌现的新工具出现之前，还有一个更早推出（2024.11），也同样还在不断完善的AI浏览器驱动工具 <code>Browser Use</code>，其工具实现思路，为后来的相关工具提供了很多借鉴。 而经过半年多40多个版本的迭代，目前最新版本 <code>0.2.5</code>，工具功能也日臻完善。</p><p>本文，我们就再来对这个 AI 浏览器做一个系统的介绍。</p><h2 id=browser-use简介>browser-use简介</h2><p>browser-use 的定位是提供一个简易且功能强大的，将不同AI Agent和浏览器连接起来的方案，实现基于AI的智能化浏览器自动化。</p><p>它是一个基于Python的开源库，在github上已有超过 <strong>61K</strong> 的Stars，可以说是备受关注。</p><p>主要依托 <strong>Playwright/Puppeteer</strong> 的浏览器控制能力和 AI 大模型的推理分析能力，完成让 AI 从资讯助手向辅助执行的转变。在其之后，mcp大行其道，包括后续的其他各种浏览器AI驱动，也都能看到 browser-use 方案的影子。</p><h2 id=实现原理>实现原理</h2><p><strong>browser-use</strong> 的实现，其实是通过 <strong>Langchain</strong> 和 <strong>LLM 大语言模型</strong>实现的一个 <strong>AI Agent</strong> 智能体，来理解网页内容并进一步生成操作指令。项目底层依赖 <strong>Playwright</strong> 框架实现浏览器自动化操作，支持多浏览器（如 Chromium、Firefox 等），能够模拟真实用户的点击、输入、导航等行为。</p><p>基于 AI 能力，系统能够自动识别网页中的可交互元素（如按钮、输入框等），并结合上下文的理解生成对应的交互逻辑，提升自动化效率，实现基于 AI 的浏览器智能。</p><h2 id=核心架构解析>核心架构解析</h2><p>browser-use 通过分层架构实现 AI Agent 与浏览器的深度集成，其核心架构不同分层的主要作用如下：</p><h3 id=agent-层决策中枢><strong>Agent 层</strong>（决策中枢）</h3><p>这一层，主要负责任务流程编排与决策制定。通过实现小型状态机管理任务流程， 并与 LLM（如 OpenAI）进行交互获取决策指令。</p><h3 id=controller-层指令转换器><strong>Controller 层</strong>（指令转换器）</h3><p>这一层负责将高级决策转化为具体浏览器操作指令， 支持 DOM 操作、页面导航等基础动作，也提供对多标签页交互逻辑的管理。</p><h3 id=dom-解析引擎><strong>DOM 解析引擎</strong></h3><p>在这一层对网页结构与内容实时解析，包括提供视觉识别能力（OCR 支持），完成对可操作的网页元素映射关系的构建。</p><h3 id=browser-接口层><strong>Browser 接口层</strong></h3><p>在这一层，基于Playwright框架实际驱动浏览器行为，除了内置的无头模式控制，也可以通过指定浏览器路径和用户浏览器进行交互。</p><h3 id=架构图>架构图</h3><p><img src=/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529.png width=761 height=638 srcset="/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529_hu_12b6a65ba38f36d8.png 480w, /post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529_hu_e32f6c65fd498b79.png 1024w" loading=lazy class=gallery-image data-flex-grow=119 data-flex-basis=286px></p><h2 id=部署安装>部署安装</h2><p>建议使用 python 包管理工具 <strong>uv</strong> 进行安装部署</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=n>uv</span> <span class=n>venv</span> <span class=p>-</span><span class=n>-python</span> <span class=mf>3.11</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>venv</span><span class=p>\</span><span class=n>Scripts</span><span class=p>\</span><span class=n>activate</span>
+</span></span><span class=line><span class=cl><span class=n>uv</span> <span class=n>pip</span> <span class=n>install</span> <span class=nb>browser-use</span>
+</span></span><span class=line><span class=cl><span class=n>playwright</span> <span class=n>install</span> <span class=p>-</span><span class=n>-with-deps</span>
+</span></span></code></pre></td></tr></table></div></div><p>工具需要使用对应大模型的API KEY, 定义在<code>.env</code> 环境配置文件中, 支持各大主流LLM:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>OPENAI_API_KEY=
+</span></span><span class=line><span class=cl>ANTHROPIC_API_KEY=
+</span></span><span class=line><span class=cl>AZURE_OPENAI_ENDPOINT=
+</span></span><span class=line><span class=cl>AZURE_OPENAI_KEY=
+</span></span><span class=line><span class=cl>GOOGLE_API_KEY=
+</span></span><span class=line><span class=cl>DEEPSEEK_API_KEY=
+</span></span><span class=line><span class=cl>GROK_API_KEY=
+</span></span><span class=line><span class=cl>NOVITA_API_KEY=
+</span></span></code></pre></td></tr></table></div></div><h2 id=通过web界面使用>通过web界面使用</h2><p>browser-use 本身也提供了一个 Web UI 界面来直接调用，它也需要单独安装， 在 venv下继续执行：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>git</span> <span class=n>clone</span> <span class=n>https</span><span class=err>:</span><span class=p>//</span><span class=n>github</span><span class=p>.</span><span class=n>com</span><span class=p>/</span><span class=nb>browser-use</span><span class=p>/</span><span class=nb>web-ui</span><span class=p>.</span><span class=py>git</span>
+</span></span><span class=line><span class=cl><span class=nb>cd web-ui</span>
+</span></span><span class=line><span class=cl><span class=n>uv</span> <span class=n>pip</span> <span class=n>install</span> <span class=n>-r</span> <span class=n>requirements</span><span class=p>.</span><span class=py>txt</span>
+</span></span><span class=line><span class=cl><span class=n>python</span> <span class=n>webui</span><span class=p>.</span><span class=py>py</span> <span class=p>-</span><span class=n>-ip</span> <span class=mf>127.0</span><span class=p>.</span><span class=py>0</span><span class=p>.</span><span class=py>1</span> <span class=p>-</span><span class=n>-port</span> <span class=mf>7788</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=启动界面>启动界面</h3><p>运行成功后，会看到如下 web-ui 的界面，<code>Agent Settings</code> 可以在界面上配置使用的LLM，<code>Browser Settings</code> 配置浏览器的交互方式，<code>Run Agent</code> 是实际调用大模型和浏览器完成自动化任务的交互界面和结果记录
+<img src=/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-3.png width=1446 height=731 srcset="/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-3_hu_62263a26fba44e16.png 480w, /post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-3_hu_14e2c77e39afdc04.png 1024w" loading=lazy class=gallery-image data-flex-grow=197 data-flex-basis=474px></p><h3 id=llm配置>LLM配置</h3><p>这里使用的是本地部署的Ollama+Deepseek-r1:14b</p><p><img src=/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-4.png width=1238 height=775 srcset="/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-4_hu_ea62e7ead95668ac.png 480w, /post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-4_hu_1bec7f4e2b18ab45.png 1024w" loading=lazy class=gallery-image data-flex-grow=159 data-flex-basis=383px></p><h3 id=运行过程>运行过程</h3><p><img src=/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-5.png width=1257 height=826 srcset="/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-5_hu_197e74af798b61b1.png 480w, /post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-5_hu_91ab40dd48765c25.png 1024w" loading=lazy class=gallery-image data-flex-grow=152 data-flex-basis=365px></p><p>实际调用的浏览器和运行日志：</p><p><img src=/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-2.png width=1896 height=1015 srcset="/post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-2_hu_d336a8b779971127.png 480w, /post/086-browser-use%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250529-2_hu_1a928ad7d8ee6553.png 1024w" loading=lazy class=gallery-image data-flex-grow=186 data-flex-basis=448px></p><p>整个执行过程还会生成一个 gif 图：
+<img src=/browseruse-web-ui.gif loading=lazy></p><h2 id=python脚本调用>Python脚本调用</h2><p>除了通过 Web-UI 来完成任务，当然更多的情况下是通过代码调用，比如如下代码通过 Deepseek的官方API调用，包括了输出格式的定义</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span><span class=lnt>78
+</span><span class=lnt>79
+</span><span class=lnt>80
+</span><span class=lnt>81
+</span><span class=lnt>82
+</span><span class=lnt>83
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>langchain_deepseek</span> <span class=kn>import</span> <span class=n>ChatDeepSeek</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>browser_use</span> <span class=kn>import</span> <span class=n>Agent</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>pydantic</span> <span class=kn>import</span> <span class=n>SecretStr</span><span class=p>,</span> <span class=n>BaseModel</span><span class=p>,</span> <span class=n>ValidationError</span><span class=p>,</span> <span class=n>field_validator</span><span class=p>,</span> <span class=n>ConfigDict</span><span class=p>,</span> <span class=n>Field</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>dotenv</span> <span class=kn>import</span> <span class=n>load_dotenv</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>os</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>asyncio</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>typing</span> <span class=kn>import</span> <span class=n>List</span><span class=p>,</span><span class=n>Optional</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>browser_use</span> <span class=kn>import</span> <span class=n>Controller</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>json</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 统一模型输出定义</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>PostItem</span><span class=p>(</span><span class=n>BaseModel</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>model_config</span> <span class=o>=</span> <span class=n>ConfigDict</span><span class=p>(</span><span class=n>extra</span><span class=o>=</span><span class=s2>&#34;ignore&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>post_title</span><span class=p>:</span> <span class=nb>str</span>  
+</span></span><span class=line><span class=cl>    <span class=n>post_url</span><span class=p>:</span> <span class=nb>str</span>
+</span></span><span class=line><span class=cl>    <span class=n>num_comments</span><span class=p>:</span> <span class=nb>int</span>
+</span></span><span class=line><span class=cl>    <span class=n>hours_since_post</span><span class=p>:</span> <span class=nb>int</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=nd>@field_validator</span><span class=p>(</span><span class=s1>&#39;num_comments&#39;</span><span class=p>,</span> <span class=s1>&#39;hours_since_post&#39;</span><span class=p>,</span> <span class=n>mode</span><span class=o>=</span><span class=s1>&#39;before&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>convert_numbers</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=n>value</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;确保数值字段转换为整数&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>value</span><span class=p>,</span> <span class=nb>str</span><span class=p>)</span> <span class=ow>and</span> <span class=n>value</span><span class=o>.</span><span class=n>isdigit</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=nb>int</span><span class=p>(</span><span class=n>value</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>value</span> <span class=ow>or</span> <span class=mi>0</span>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>Posts</span><span class=p>(</span><span class=n>BaseModel</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>posts</span><span class=p>:</span> <span class=nb>list</span><span class=p>[</span><span class=n>PostItem</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=n>total</span><span class=p>:</span> <span class=nb>int</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 结果解析函数</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>parse_result</span><span class=p>(</span><span class=n>result</span><span class=p>:</span> <span class=nb>str</span> <span class=o>|</span> <span class=nb>dict</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Posts</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;安全解析结果数据&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>result</span><span class=p>,</span> <span class=nb>str</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>data</span> <span class=o>=</span> <span class=n>json</span><span class=o>.</span><span class=n>loads</span><span class=p>(</span><span class=n>result</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>data</span> <span class=o>=</span> <span class=n>result</span>
+</span></span><span class=line><span class=cl>            
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=s2>&#34;Parsed data:&#34;</span><span class=p>,</span> <span class=n>data</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>Posts</span><span class=o>.</span><span class=n>model_validate</span><span class=p>(</span><span class=n>data</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=p>(</span><span class=n>json</span><span class=o>.</span><span class=n>JSONDecodeError</span><span class=p>,</span> <span class=n>ValidationError</span><span class=p>)</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;解析错误: </span><span class=si>{</span><span class=nb>type</span><span class=p>(</span><span class=n>e</span><span class=p>)</span><span class=o>.</span><span class=vm>__name__</span><span class=si>}</span><span class=s2>: </span><span class=si>{</span><span class=n>e</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=c1># 非json格式，直接返回结果</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>result</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>controller</span> <span class=o>=</span> <span class=n>Controller</span><span class=p>(</span><span class=n>output_model</span><span class=o>=</span><span class=n>Posts</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>load_dotenv</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>api_key</span> <span class=o>=</span> <span class=n>os</span><span class=o>.</span><span class=n>getenv</span><span class=p>(</span><span class=s2>&#34;DEEPSEEK_API_KEY&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Initialize the model</span>
+</span></span><span class=line><span class=cl><span class=n>llm</span><span class=o>=</span><span class=n>ChatDeepSeek</span><span class=p>(</span><span class=n>base_url</span><span class=o>=</span><span class=s1>&#39;https://api.deepseek.com/v1&#39;</span><span class=p>,</span> <span class=n>model</span><span class=o>=</span><span class=s1>&#39;deepseek-reasoner&#39;</span><span class=p>,</span> <span class=n>api_key</span><span class=o>=</span><span class=n>SecretStr</span><span class=p>(</span><span class=n>api_key</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>async</span> <span class=k>def</span> <span class=nf>main</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=c1># Create agent with the model</span>
+</span></span><span class=line><span class=cl>    <span class=n>agent</span> <span class=o>=</span> <span class=n>Agent</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=n>task</span><span class=o>=</span><span class=s2>&#34;测试saucedemo.com网站standard_user的登录功能, 使用不同密码(secret_sauce,空密码)，登录成功则验证完成，否则需要输出错误信息。测试结果需要包含以下信息：</span><span class=se>\n</span><span class=s2>1. 登录是否成功</span><span class=se>\n</span><span class=s2>2. 如果登录失败，错误信息是什么</span><span class=se>\n</span><span class=s2>&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>llm</span><span class=o>=</span><span class=n>llm</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>use_vision</span><span class=o>=</span><span class=kc>False</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>history</span>  <span class=o>=</span> <span class=k>await</span> <span class=n>agent</span><span class=o>.</span><span class=n>run</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>result</span> <span class=o>=</span> <span class=n>history</span><span class=o>.</span><span class=n>final_result</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>parsed</span> <span class=o>=</span> <span class=n>parse_result</span><span class=p>(</span><span class=n>result</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>parsed</span><span class=o>.</span><span class=n>posts</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>post</span> <span class=ow>in</span> <span class=n>parsed</span><span class=o>.</span><span class=n>posts</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;</span><span class=se>\n</span><span class=s1>--------------------------------&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;Title:            </span><span class=si>{</span><span class=n>post</span><span class=o>.</span><span class=n>post_title</span><span class=si>}</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;URL:              </span><span class=si>{</span><span class=n>post</span><span class=o>.</span><span class=n>post_url</span><span class=si>}</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;Comments:         </span><span class=si>{</span><span class=n>post</span><span class=o>.</span><span class=n>num_comments</span><span class=si>}</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;Hours since post: </span><span class=si>{</span><span class=n>post</span><span class=o>.</span><span class=n>hours_since_post</span><span class=si>}</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=n>result</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 异步主函数</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=vm>__name__</span> <span class=o>==</span> <span class=s2>&#34;__main__&#34;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>asyncio</span><span class=o>.</span><span class=n>run</span><span class=p>(</span><span class=n>main</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;程序运行时出错: </span><span class=si>{</span><span class=n>e</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>执行也是通过playwright打开浏览器，效果和web-ui类似。</p><p>程序输出如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span><span class=lnt>78
+</span><span class=lnt>79
+</span><span class=lnt>80
+</span><span class=lnt>81
+</span><span class=lnt>82
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>C:\qiucao\AI\browser_use&gt;python app.py
+</span></span><span class=line><span class=cl>WARNING  [agent] ⚠️ DeepSeek models do not support use_vision=True yet. Setting use_vision=False for now...
+</span></span><span class=line><span class=cl>INFO     [agent] 🧠 Starting an agent with main_model=deepseek-reasoner +rawtools +memory, planner_model=None, extraction_model=deepseek-reasoner
+</span></span><span class=line><span class=cl>INFO     [mem0.vector_stores.faiss] Loaded FAISS index from /tmp/mem0_384_faiss/mem0.faiss with 0 vectors
+</span></span><span class=line><span class=cl>INFO     [mem0.vector_stores.faiss] Loaded FAISS index from C:\Users\weiwe\.mem0\migrations_faiss/mem0_migrations.faiss with 1 vectors
+</span></span><span class=line><span class=cl>INFO     [agent] 🚀 Starting task: 测试saucedemo.com网站standard_user的登录功能, 使用不同密码(secret_sauce,空密码)，登录成功则验证完成，否则需要输出错误信息。测试结果需要包含以下信息：
+</span></span><span class=line><span class=cl>1. 登录是否成功
+</span></span><span class=line><span class=cl>2. 如果登录失败，错误信息是什么
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>INFO     [agent] 📍 Step 1
+</span></span><span class=line><span class=cl>INFO     [agent] 🤷 Eval: Unknown - Just started the task. No previous actions taken.
+</span></span><span class=line><span class=cl>INFO     [agent] 🧠 Memory: Starting task: Test login functionality on saucedemo.com for user &#39;standard_user&#39; with two password cases. 0 out of 2 password tests completed. First need to navigate to login page.
+</span></span><span class=line><span class=cl>INFO     [agent] 🎯 Next goal: Navigate to saucedemo.com login page to begin testing
+</span></span><span class=line><span class=cl>INFO     [agent] 🛠️  Action 1/1: {&#34;go_to_url&#34;:{&#34;url&#34;:&#34;https://www.saucedemo.com&#34;}}
+</span></span><span class=line><span class=cl>INFO     [controller] 🔗  Navigated to https://www.saucedemo.com
+</span></span><span class=line><span class=cl>INFO     [agent] 📍 Step 2
+</span></span><span class=line><span class=cl>INFO     [agent] 👍 Eval: Success - Navigation to saucedemo.com completed successfully. Login page is loaded with required input fields visible.
+</span></span><span class=line><span class=cl>INFO     [agent] 🧠 Memory: 0 out of 2 password tests completed. Starting first test case: username &#39;standard_user&#39; with valid password &#39;secret_sauce&#39;. Will verify login success by checking URL change to /inventory.html after submission.
+</span></span><span class=line><span class=cl>INFO     [agent] 🎯 Next goal: Execute first login test with valid credentials and verify success
+</span></span><span class=line><span class=cl>INFO     [agent] 🛠️  Action 1/3: {&#34;input_text&#34;:{&#34;index&#34;:0,&#34;text&#34;:&#34;standard_user&#34;}}
+</span></span><span class=line><span class=cl>INFO     [agent] 🛠️  Action 2/3: {&#34;input_text&#34;:{&#34;index&#34;:1,&#34;text&#34;:&#34;secret_sauce&#34;}}
+</span></span><span class=line><span class=cl>INFO     [agent] 🛠️  Action 3/3: {&#34;click_element_by_index&#34;:{&#34;index&#34;:2}}
+</span></span><span class=line><span class=cl>INFO     [controller] ⌨️  Input standard_user into index 0
+</span></span><span class=line><span class=cl>INFO     [controller] ⌨️  Input secret_sauce into index 1
+</span></span><span class=line><span class=cl>INFO     [controller] 🖱️  Clicked button with index 2:
+</span></span><span class=line><span class=cl>INFO     [agent] 📍 Step 3
+</span></span><span class=line><span class=cl>WARNING  [message_manager] Failed to parse model output: {
+</span></span><span class=line><span class=cl>  &#34;current_state&#34;: {
+</span></span><span class=line><span class=cl>    &#34;evaluation_previous_goal&#34;: &#34;Success - First test case completed: Login with username &#39;standard_user&#39; and password &#39;secret_sauce&#39; was successful. Verified by URL change to /inventory.html and presence of product listings.&#34;,
+</span></span><span class=line><span class=cl>    &#34;memory&#34;: &#34;1 out of 2 password tests completed. First test successful. Next: Test with empty password. Need to logout before second test.&#34;,
+</span></span><span class=line><span class=cl>    &#34;next_goal&#34;: &#34;Logout to return to login page for second test case&#34;
+</span></span><span class=line><span class=cl>  },
+</span></span><span class=line><span class=cl>  &#34;action&#34;: [
+</span></span><span class=line><span class=cl>    {&#34;click_element_by_index&#34;: {&#34;index&#34;: 0}},  // Open menu
+</span></span><span class=line><span class=cl>    {&#34;wait&#34;: {&#34;seconds&#34;: 2}},  // Wait for menu animation
+</span></span><span class=line><span class=cl>    {&#34;click_element_by_index&#34;: {&#34;index&#34;: 34}}  // Logout (assuming logout appears at index 34 after menu opens)
+</span></span><span class=line><span class=cl>  ]
+</span></span><span class=line><span class=cl>} Expecting value: line 8 column 48 (char 532)
+</span></span><span class=line><span class=cl>WARNING  [agent] Failed to parse model output: content=&#39;{\n  &#34;current_state&#34;: {\n    &#34;evaluation_previous_goal&#34;: &#34;Success - First test case completed: Login with username \&#39;standard_user\&#39; and password \&#39;secret_sauce\&#39; was successful. Verified by URL change to /inventory.html and presence of product listings.&#34;,\n    &#34;memory&#34;: &#34;1 out of 2 password tests completed. First test successful. Next: Test with empty password. Need to logout before second test.&#34;,\n    &#34;next_goal&#34;: &#34;Logout to return to login page for second test case&#34;\n  },\n  &#34;action&#34;: [\n    {&#34;click_element_by_index&#34;: {&#34;index&#34;: 0}},  // Open menu\n    {&#34;wait&#34;: {&#34;seconds&#34;: 2}},  // Wait for menu animation\n    {&#34;click_element_by_index&#34;: {&#34;index&#34;: 34}}  // Logout (assuming logout appears at index 34 after menu opens)\n  ]\n}&#39; additional_kwargs={&#39;refusal&#39;: None, &#39;reasoning_content&#39;: &#39;We are on the inventory page after successful login with the first password (secret_sauce). This indicates that the first test case (valid password) was successful.\n Now, we need to test the second case: empty password. \n However, we are currently logged in. We must first log out to return to the login page.\n\n Steps:\n 1. Open the menu (index 0: button with text &#34;Open Menu&#34;)\n 2. In the menu, there should be a logout option. We need to find the logout link.\n\n But note: the interactive elements provided are only for the current viewport. The menu is not open, so the logout link is not visible yet.\n\n After clicking the menu button, the menu will open and we can see the logout link. Then we can click it.\n\n However, the current action sequence can only include actions that are based on the current state (before opening the menu). So we can only plan to click the menu button now, and then in the next step we will see the updated elements including the logout link.\n\n Alternatively, we could use a longer sequence? But the problem is that after clicking the menu, the page changes (menu opens) so the state updates and we get new interactive elements. Therefore, we should only click the menu now and then in the next step we will see the logout link.\n\n But note: the task requires testing two cases. We have done one (with valid password) and now we need to do the second (empty password). We must log out first.\n\n Plan:\n Step 1: Click the menu button (index 0)\n Step 2: After the menu opens, we expect to see a logout link. Then click that logout link to return to the login page.\n\n However, the current response can only include one step because the state will change after clicking the menu. So we do:\n\n Action: [{&#34;click_element_by_index&#34;: {&#34;index&#34;: 0}}]\n\n Then in the next step, we will see the menu and the logout link, and then we can click logout.\n\n But note: the task history memory is now at step 3/100. We have to remember that we are in the middle of the second test case.\n\n We have to update the memory: \n   First test case: valid password -&gt; successful login (we are on inventory page)\n   Now we are going to log out to test the second case.\n\n Let\&#39;s write the state accordingly.&#39;} response_metadata={&#39;token_usage&#39;: {&#39;completion_tokens&#39;: 678, &#39;prompt_tokens&#39;: 4236, &#39;total_tokens&#39;: 4914, &#39;completion_tokens_details&#39;: {&#39;accepted_prediction_tokens&#39;: None, &#39;audio_tokens&#39;: None, &#39;reasoning_tokens&#39;: 495, &#39;rejected_prediction_tokens&#39;: None}, &#39;prompt_tokens_details&#39;: {&#39;audio_tokens&#39;: None, &#39;cached_tokens&#39;: 3072}, &#39;prompt_cache_hit_tokens&#39;: 3072, &#39;prompt_cache_miss_tokens&#39;: 1164}, &#39;model_name&#39;: &#39;deepseek-reasoner&#39;, &#39;system_fingerprint&#39;: &#39;fp_393bca965e_prod0425fp8&#39;, &#39;id&#39;: &#39;68127967-53c3-4329-a9fe-01feb6090fc4&#39;, &#39;finish_reason&#39;: &#39;stop&#39;, &#39;logprobs&#39;: None} id=&#39;run-c6f0d672-4dd5-4ea7-b269-9c908f5aef4e-0&#39; usage_metadata={&#39;input_tokens&#39;: 4236, &#39;output_tokens&#39;: 678, &#39;total_tokens&#39;: 4914, &#39;input_token_details&#39;: {&#39;cache_read&#39;: 3072}, &#39;output_token_details&#39;: {&#39;reasoning&#39;: 495}} Could not parse response.
+</span></span><span class=line><span class=cl>ERROR    [agent] ❌ Result failed 1/3 times:
+</span></span><span class=line><span class=cl> Could not parse response.
+</span></span><span class=line><span class=cl>INFO     [agent] 📍 Step 3
+</span></span><span class=line><span class=cl>INFO     [agent] 👍 Eval: Success - First test case completed successfully. Login with valid password &#39;secret_sauce&#39; succeeded as confirmed by URL change to /inventory.html and visible product listings.
+</span></span><span class=line><span class=cl>INFO     [agent] 🧠 Memory: 1 out of 2 password tests completed (valid password successful). Remaining: test with empty password. Need to logout before next test.
+</span></span><span class=line><span class=cl>INFO     [agent] 🎯 Next goal: Logout to return to login page for second test case
+</span></span><span class=line><span class=cl>INFO     [agent] 🛠️  Action 1/2: {&#34;click_element_by_index&#34;:{&#34;index&#34;:0}}
+</span></span><span class=line><span class=cl>INFO     [agent] 🛠️  Action 2/2: {&#34;wait&#34;:{&#34;seconds&#34;:2}}
+</span></span><span class=line><span class=cl>INFO     [controller] 🖱️  Clicked button with index 0: Open Menu
+</span></span><span class=line><span class=cl>INFO     [controller] 🕒  Waiting for 2 seconds
+</span></span><span class=line><span class=cl>INFO     [agent] 📍 Step 4
+</span></span><span class=line><span class=cl>INFO     [agent] 👍 Eval: Success - Menu opened successfully after login. Logout option is visible at index 2.
+</span></span><span class=line><span class=cl>INFO     [agent] 🧠 Memory: 1 out of 2 password tests completed (valid password successful). Need to logout for second test with empty password. Next: click logout button.
+</span></span><span class=line><span class=cl>INFO     [agent] 🎯 Next goal: Logout to return to login page for second password test case
+</span></span><span class=line><span class=cl>INFO     [agent] 🛠️  Action 1/1: {&#34;click_element_by_index&#34;:{&#34;index&#34;:2}}
+</span></span><span class=line><span class=cl>INFO     [controller] 🖱️  Clicked button with index 2: Logout
+</span></span><span class=line><span class=cl>INFO     [agent] 📍 Step 5
+</span></span><span class=line><span class=cl>INFO     [agent] 👍 Eval: Success - Successfully logged out and returned to login page. All interactive elements for testing are available.
+</span></span><span class=line><span class=cl>INFO     [agent] 🧠 Memory: 1 out of 2 password tests completed (valid password successful). Remaining test: username &#39;standard_user&#39; with empty password. After submission, need to capture error message if login fails.
+</span></span><span class=line><span class=cl>INFO     [agent] 🎯 Next goal: Execute second test case with empty password and capture results
+</span></span><span class=line><span class=cl>INFO     [agent] 🛠️  Action 1/3: {&#34;input_text&#34;:{&#34;index&#34;:0,&#34;text&#34;:&#34;standard_user&#34;}}
+</span></span><span class=line><span class=cl>INFO     [agent] 🛠️  Action 2/3: {&#34;input_text&#34;:{&#34;index&#34;:1,&#34;text&#34;:&#34;&#34;}}
+</span></span><span class=line><span class=cl>INFO     [agent] 🛠️  Action 3/3: {&#34;click_element_by_index&#34;:{&#34;index&#34;:2}}
+</span></span><span class=line><span class=cl>INFO     [controller] ⌨️  Input standard_user into index 0
+</span></span><span class=line><span class=cl>INFO     [controller] ⌨️  Input  into index 1
+</span></span><span class=line><span class=cl>INFO     [controller] 🖱️  Clicked button with index 2:
+</span></span><span class=line><span class=cl>INFO     [agent] 📍 Step 6
+</span></span><span class=line><span class=cl>INFO     [agent] 👍 Eval: Success - Second test case completed: Login failed as expected with empty password. Error message &#39;Epic sadface: Password is required&#39; is visible on page.
+</span></span><span class=line><span class=cl>INFO     [agent] 🧠 Memory: 2 out of 2 password tests completed: 1) Valid password &#39;secret_sauce&#39; - login succeeded 2) Empty password - login failed with error. No remaining tests.
+</span></span><span class=line><span class=cl>INFO     [agent] 🎯 Next goal: Compile final test results and complete task
+</span></span><span class=line><span class=cl>INFO     [agent] 🛠️  Action 1/1: {&#34;done&#34;:{&#34;text&#34;:&#34;测试结果：\n1. 测试用例1 (密码: secret_sauce):\n   - 登录成功: 是\n   - 错误信息: 无\n\n2. 测试用例2 (密码: 空):\n   - 登录成功: 否\n   - 错误信息: \&#34;Epic sadface: Password is required\&#34;&#34;,&#34;success&#34;:true}}
+</span></span><span class=line><span class=cl>INFO     [agent] 📄 Result: 测试结果：
+</span></span><span class=line><span class=cl>1. 测试用例1 (密码: secret_sauce):
+</span></span><span class=line><span class=cl>   - 登录成功: 是
+</span></span><span class=line><span class=cl>   - 错误信息: 无
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>2. 测试用例2 (密码: 空):
+</span></span><span class=line><span class=cl>   - 登录成功: 否
+</span></span><span class=line><span class=cl>   - 错误信息: &#34;Epic sadface: Password is required&#34;
+</span></span><span class=line><span class=cl>INFO     [agent] ✅ Task completed
+</span></span><span class=line><span class=cl>INFO     [agent] ✅ Successfully
+</span></span><span class=line><span class=cl>INFO     [agent] 📝 Total input tokens used (approximate): 33168
+</span></span><span class=line><span class=cl>INFO     [agent] Agent run telemetry logged.
+</span></span></code></pre></td></tr></table></div></div><p>从以上输出，可见Browser-Use 将任务分解为了6步：</p><ol><li>开始任务，访问网站 <a class=link href=https://www.saucedemo.com target=_blank rel=noopener>https://www.saucedemo.com</a></li><li>输入正常用户 standard_user/secret_sauce，点击登录按钮</li><li>点击登出（未发现登出按钮，重试）</li><li>点击菜单后登出</li><li>使用空密码重新登录</li><li>测试完成，获取输出结果</li></ol><h2 id=总结>总结</h2><p>通过以上案例，可以看到，<strong>Browser-Use</strong> 可以有效借助 LLM根据我们输入的提示词，分解任务，实现对页面的有效解析并完成执行，获取结果。</p><p>执行效率上来说，API调用相对还是比较慢，对于复杂任务，会耗时较长。而在任务开始后，我们并无法干预后续执行路径（除非强制中断），这也是后续如 <strong>Magentic UI</strong> 这样工具的重点优化方向。</p><p>但 Browser-Use 的优点是已经较为成熟，对本地大模型和多种在线大模型都有良好支持，社区实践也较多，利用它辅助完成自动化测试也已有较多实践，包括系统提示词的优化。是我们利用AI辅助自动化测试的一个较好方向。</p><hr><h2 id=mermaid-架构图>Mermaid 架构图</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>graph TD
+</span></span><span class=line><span class=cl>    A[AI Agent] --&gt;|决策指令| B(Controller)
+</span></span><span class=line><span class=cl>    B --&gt;|DOM操作指令| C[DOM 解析引擎]
+</span></span><span class=line><span class=cl>    C --&gt;|网页内容| D[Browser 接口]
+</span></span><span class=line><span class=cl>    D --&gt;|浏览器交互| E[Chrome/Edge]
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    subgraph 功能模块
+</span></span><span class=line><span class=cl>        B --&gt; 多标签管理
+</span></span><span class=line><span class=cl>        C --&gt; 视觉识别(OCR)
+</span></span><span class=line><span class=cl>        D --&gt; 真实用户行为模拟
+</span></span><span class=line><span class=cl>    end
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    style A fill:#FFE4B5,stroke:#333
+</span></span><span class=line><span class=cl>    style E fill:#98FB98,stroke:#333
+</span></span></code></pre></td></tr></table></div></div></section><footer class=article-footer><section class=article-tags><a href=/tags/ai%E6%B5%8B%E8%AF%95/>AI测试</a>
+<a href=/tags/%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7/>测试工具</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/post/072-%E5%BE%AE%E8%BD%AF%E5%B7%B2%E5%8F%91%E5%B8%83playwright-mcp/><div class=article-image><img src=/post/072-%E5%BE%AE%E8%BD%AF%E5%B7%B2%E5%8F%91%E5%B8%83playwright-mcp/Pasted-20250402.edb9525a16cda48c1d70d1a55f9e35ca_hu_e06fb7fef1ae29f3.png width=250 height=150 loading=lazy alt="Featured image of post 微软已发布Playwright Mcp" data-hash="md5-7blSWhbNpIwdcNGlX541yg=="></div><div class=article-details><h2 class=article-title>微软已发布Playwright Mcp</h2></div></a></article><article class=has-image><a href=/post/006-ai-testing-by-testgpt/><div class=article-image><img src=/post/006-ai-testing-by-testgpt/20230626_203935.0a5b0cb11f1bea6aeed7b5f7eda7e61d_hu_bb433231e336eb1a.png width=250 height=150 loading=lazy alt="Featured image of post AI测试之TestGPT" data-hash="md5-ClsMsR8b6mru17X37afmHQ=="></div><div class=article-details><h2 class=article-title>AI测试之TestGPT</h2></div></a></article><article class=has-image><a href=/post/102-%E5%B8%B8%E7%94%A8%E6%88%AA%E5%9B%BE%E5%B7%A5%E5%85%B7/><div class=article-image><img src=/post/102-%E5%B8%B8%E7%94%A8%E6%88%AA%E5%9B%BE%E5%B7%A5%E5%85%B7/title.cf97208ffd802c434978703e1237880e_hu_43e17b197ea96d71.png width=250 height=150 loading=lazy alt="Featured image of post 提升工作效率的秘密！自用截图工具分享，长图&动态图轻松搞定" data-hash="md5-z5cgj/2ALENJeHA+EjeIDg=="></div><div class=article-details><h2 class=article-title>提升工作效率的秘密！自用截图工具分享，长图&动态图轻松搞定</h2></div></a></article><article><a href=/post/090-bruno%E8%BF%9B%E9%98%B6/><div class=article-details><h2 class=article-title>可以抛弃postman啦, API测试工具Bruno实用教程(二)：进阶篇</h2></div></a></article><article><a href=/post/088-bruno%E5%9F%BA%E7%A1%80/><div class=article-details><h2 class=article-title>Postman最佳平替, API测试工具Bruno实用教程(一)：基础篇</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2023 -
+2025 |by 城下秋草（公众号： 秋草说测试）</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
