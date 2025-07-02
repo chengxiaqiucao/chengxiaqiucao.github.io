@@ -1,0 +1,596 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Selenium on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/selenium/</link><description>Recent content in Selenium on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Mon, 23 Sep 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/selenium/index.xml" rel="self" type="application/rss+xml"/><item><title>用SeleniumBase制作产品Demo</title><link>https://chengxiaqiucao.github.io/post/019-%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/</link><pubDate>Mon, 23 Sep 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/019-%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/019-%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/seleniumBase.png" alt="Featured image of post 用SeleniumBase制作产品Demo" />&lt;p>Selenium作为目前最为流程的开源Web自动化测试框架，已经发展了20年。功能强大，它的webdriver协议也已经成为自动化测试领域的一个事实标准。而基于Selenium这个框架，又诞生出很多基于它封装的拓展框架。比如本文我们介绍的SeleniumBase&lt;/p>
+&lt;h2 id="seleniumbase是什么">SeleniumBase是什么？
+&lt;/h2>&lt;p>SeleniumBase是一个基于Selenium框架基础上，进一步进行了脚本增强的Python库。
+在Selenium原有的功能基础上，简化了自动化脚本的编写和调用方式，并且和&lt;code>pytest&lt;/code>框架进行了深度集成。最主要的是它提供了多种不同的脚本模式, 包括脚本录制、运行慢放、运行中Debug，以及我们本文要介绍的演示功能。&lt;/p>
+&lt;p>虽然SeleniumBase十分强大，但底层自动化的实现逻辑上依然沿用Selenium的主要特性。所以这里我们不特别介绍SeleniumBase在自动化脚本编写上的封装。但这个库有一个非常棒的地方是它通过JS的注入让自动化运行过程更加直观和便于展示。&lt;/p>
+&lt;p>比如我们下面看到的演示制作&lt;/p>
+&lt;h2 id="通过自动化脚本完成演示的优点">通过自动化脚本完成演示的优点
+&lt;/h2>&lt;p>作为测试工程师，特别是随着现在敏捷研发的流行，迭代结束通常都有个迭代回顾和演示环节。而作为测试工程师，很多迭代中的功能演示这个工作是由我们来完成的。&lt;/p>
+&lt;p>包括有时在向客户、领导介绍产品功能时，通过实际的产品操作来说明功能也必不可少。&lt;/p>
+&lt;p>但实际操作中，如果能提前将一些需要说明的重点，在自动化测试执行的同时展示出来，效果就非常好，并且还能避免一些临时的误操作。&lt;/p>
+&lt;p>所以SeleniumBase的这个功能就能在这里发挥优势了&lt;/p>
+&lt;h2 id="用seleniumbase制作产品演示流程">用SeleniumBase制作产品演示流程
+&lt;/h2>&lt;p>先看一下用SeleniumBase完成的我的博客网站的中一个开源更新信息的演示&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/019-%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/demo.gif"
+width="1677"
+height="968"
+srcset="https://chengxiaqiucao.github.io/post/019-%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/demo_hu_2e4c9c956c45faf4.gif 480w, https://chengxiaqiucao.github.io/post/019-%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/demo_hu_6cff5250efc55fe.gif 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="173"
+data-flex-basis="415px"
+>&lt;/p>
+&lt;p>其实它的原理也比较简单，就是通过它封装的&lt;code>BaseCase&lt;/code>类，在对应的操作步骤执行同时，注入封装好的Js来突出执行的元素，给出一些指引提示。&lt;/p>
+&lt;p>这里对应的基类中的&lt;code>create_introjs_tour()&lt;/code>方法，创建演示导引。这里它还有不同的js主题选择，非常强大。&lt;/p>
+&lt;p>然后就是&lt;code>add_tour_step()&lt;/code>添加步骤，&lt;code>play_tour() &lt;/code>执行步骤.&lt;/p>
+&lt;p>对应的演示生成代码：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">seleniumbase&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">BaseCase&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">BaseCase&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="vm">__name__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="vm">__file__&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">MyTourClass&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">BaseCase&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">test_blog_tour&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;https://chengxiaqiucao.github.io/&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">wait_for_element&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[class=&amp;#34;site-logo&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">set_introjs_colors&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;#f34565&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;#c55409&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">create_introjs_tour&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="c1">#&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_tour_step&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;Selenium Base制作Demo演示&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">title&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;城下秋草的Demo&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_tour_step&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;查看热门开源项目&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;#main-menu &amp;gt; li:nth-child(6) &amp;gt; a&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">play_tour&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">highlight_click&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;#main-menu &amp;gt; li:nth-child(6) &amp;gt; a&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">wait_for_element&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[class=&amp;#34;article-title&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">create_introjs_tour&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_tour_step&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;选择Selenium项目查看&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;#seleniumpageselenium-10 &amp;gt; a&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">play_tour&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">highlight_click&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;#seleniumpageselenium-10 &amp;gt; a&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ad_block&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">wait_for_element&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[class=&amp;#34;section-title&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">create_introjs_tour&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_tour_step&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;返回主页&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;[class=&amp;#34;site-logo&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">play_tour&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">highlight_click&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[class=&amp;#34;site-logo&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">wait_for_element&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[title=&amp;#34;搜索&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">create_introjs_tour&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_tour_step&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;3秒停顿后继续...&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_tour_step&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;开始下一个演示:&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">play_tour&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">interval&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>而实际演示的注入Js，我们还可以通过&lt;code>self.export_tour&lt;/code>这个语句导出对应的js脚本，便于后续直接使用。&lt;/p>
+&lt;p>类似的还有他的Demo模式，其实和演示导引模式比较类似，只是更多时自动把自动化执行步骤放慢并高亮，突出验证点。&lt;/p>
+&lt;p>以上就是关于SeleniumBase库这个帅气功能的分享~&lt;/p></description></item><item><title>Selenium Manager用法详解</title><link>https://chengxiaqiucao.github.io/post/013-selenium-manager/</link><pubDate>Sat, 07 Sep 2024 18:03:04 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/013-selenium-manager/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/013-selenium-manager/Se-m.png" alt="Featured image of post Selenium Manager用法详解" />&lt;p>Selenium诞生于2004年，以其开源、功能全面长期以来长期排名Web 自动化测试工具领域的Top1，是目前最主流的Web自动化测试工具，而Selenium的核心Webdriver 更是作为W3C的通行标准，被各类工具广泛参照。可以说是目前web自动化测试的事实标准。&lt;/p>
+&lt;h2 id="selenium-4带来的变化">Selenium 4带来的变化
+&lt;/h2>&lt;p>Selenium本身经过多年的演进，目前已经发布到V4.24版本。 虽然目前网上还广泛流传V3版本相关的用法和资料，但Selenium 4 其实是一个非常大的更新版本。它的几个核心组件都进行的极大程度的重构。&lt;/p>
+&lt;ul>
+&lt;li>WebDriver 从原先的Json Wire Protocol 切换为了W3C的标准定义&lt;/li>
+&lt;li>Selenium IDE 完成重构和功能优化&lt;/li>
+&lt;li>Selenium Grid 完成重构，支持更灵活的云服务架构&lt;/li>
+&lt;/ul>
+&lt;p>此外Selenium 4中还引入了一个很重要的工具，也就是本篇我们要重点来介绍的Selenium Manager（实际是V4.6才引入，到V4.12 功能才基本完备&lt;/p>
+&lt;h2 id="原先的浏览器驱动方式带来的问题">原先的浏览器驱动方式带来的问题
+&lt;/h2>&lt;p>要了解Selenium Manager，我们还是要先了解下Selenium的工作原理。&lt;/p>
+&lt;h3 id="selenium工作原理">Selenium工作原理
+&lt;/h3>&lt;p>下图是官网给的Selenium本地运行的基本架构。
+&lt;img src="https://chengxiaqiucao.github.io/post/013-selenium-manager/Pasted-20240908.png"
+width="895"
+height="426"
+srcset="https://chengxiaqiucao.github.io/post/013-selenium-manager/Pasted-20240908_hu_67d2139d6f95dc8e.png 480w, https://chengxiaqiucao.github.io/post/013-selenium-manager/Pasted-20240908_hu_24c48f0d0b3dfa92.png 1024w"
+loading="lazy"
+alt="Selenium工作原理"
+class="gallery-image"
+data-flex-grow="210"
+data-flex-basis="504px"
+>&lt;/p>
+&lt;p>可以看到，Selenium实际上完成自动化，是通过webdriver协议驱动不同类型的浏览器（Chrome、Firefox、IE、Edge、Safari等）完成指定的动作，以此达到自动化执行的目的。&lt;/p>
+&lt;p>而驱动浏览器的关键，是和浏览器对应的浏览器Driver驱动，比如Chrome对应的ChromeDriver， FireFox对应的GecoDriver等。&lt;/p>
+&lt;p>而Selenium本身，则是基于WebDriver协议和浏览器Driver完成交互。&lt;/p>
+&lt;h3 id="导致的问题">导致的问题
+&lt;/h3>&lt;p>这个架构和工作原理虽然清晰，但是有一个问题，就是浏览器的版本是不断更新的。而&lt;strong>浏览器驱动版本需要和浏览器版本匹配&lt;/strong>，不匹配的驱动和浏览器版本，共同工作可能存在各种预期外的异常，所以Selenium要正常工作，再用Selenium库完成编码前，首先就是要保证浏览器驱动和浏览器版本的部署和匹配。&lt;/p>
+&lt;p>但浏览器版本和对应的驱动，通常都是由浏览器厂商维护的。&lt;/p>
+&lt;p>所以这里的自动化测试环境准备就会变得比较复杂，要安装对应被测版本的浏览器，同时还要找到对应这个版本的驱动，再把相关路径配置给Selenium，然后Selenium才能完成正常的驱动。&lt;/p>
+&lt;p>此外，浏览器的版本，一般还有&lt;strong>自动更新功能&lt;/strong>，可能在用户没感知的情况，其实版本已经变化了，但此时驱动版本并不会同步更新，所以也&lt;strong>导致驱动和浏览器版本不匹配&lt;/strong>的潜在问题。&lt;/p>
+&lt;p>这个问题，其实长期没有得到很好地解决，Selenium 3和Selenium 4的早期版本，我们部署Selenium 自动化环境，浏览器版本和驱动版本的获取和匹配一直是一个比较麻烦的工作，也因此劝退了不少自动化测试小白。&lt;/p>
+&lt;h3 id="chrome对驱动问题的应对">Chrome对驱动问题的应对
+&lt;/h3>&lt;p>既然这个问题由来已久，浏览器厂商其实也意识到驱动和浏览器版本不匹配，给自动化测试带来的困扰。&lt;/p>
+&lt;p>以Chrome为例，我们去到 &lt;a class="link" href="https://developer.chrome.com/docs/chromedriver/downloads" target="_blank" rel="noopener"
+>ChromeDriver官方下载&lt;/a> 网址的话，会看到这样的页面&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/013-selenium-manager/Pasted-20240910.png"
+width="1414"
+height="850"
+srcset="https://chengxiaqiucao.github.io/post/013-selenium-manager/Pasted-20240910_hu_99a015979c895c61.png 480w, https://chengxiaqiucao.github.io/post/013-selenium-manager/Pasted-20240910_hu_1752da553fa19ff2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="166"
+data-flex-basis="399px"
+>&lt;/p>
+&lt;p>可以看到，这里对Chrome Driver的下载只提供到了114版本，而最新的Chrome其实已经到了128版本。
+对于115版本以后，Chrome浏览器其实调整了driver的发布策略，也就是Chrome driver会跟随 Chrome for Testing 版本同步发布。严格保证driver和浏览器版本的同步匹配。&lt;/p>
+&lt;p>那这里为什么有一个Chrome for Testing版本呢？&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/013-selenium-manager/Pasted-20240910-1.png"
+width="1325"
+height="1054"
+srcset="https://chengxiaqiucao.github.io/post/013-selenium-manager/Pasted-20240910-1_hu_8aca57dd3ae6ffd5.png 480w, https://chengxiaqiucao.github.io/post/013-selenium-manager/Pasted-20240910-1_hu_7555cd5fbe7ad730.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="125"
+data-flex-basis="301px"
+>
+我们之前提到，浏览器版本，会有自动更新，如果进行自动更新，driver版本不会同步更新，所以导致dirver和浏览器的不匹配。&lt;/p>
+&lt;p>所以Chrome for Testing与正式版本的主要区别，其实就是 &lt;strong>for Testing版本是不会进行自动更新&lt;/strong>的。&lt;/p>
+&lt;p>这样，再加上版本号和浏览器版本的共用，就能很方便地保证浏览器和驱动的一致。&lt;/p>
+&lt;h3 id="selenium应对驱动匹配问题的解决方案">Selenium应对驱动匹配问题的解决方案
+&lt;/h3>&lt;p>那上面是浏览器对驱动匹配问题给出的解决方法，但其实还是没有完全解决浏览器、Driver需要分别获取和指定的问题。那么Selenium官方对这个问题的解决方案，就是Selenium Manager。它其实是一个包含在Selenium库中，无需额外安装的可执行程序。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/013-selenium-manager/Pasted-20240910-2.png"
+width="569"
+height="685"
+srcset="https://chengxiaqiucao.github.io/post/013-selenium-manager/Pasted-20240910-2_hu_b973f3c21ba7130e.png 480w, https://chengxiaqiucao.github.io/post/013-selenium-manager/Pasted-20240910-2_hu_4e91fb5ba571ea38.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="83"
+data-flex-basis="199px"
+>&lt;/p>
+&lt;p>我们目前使用Selenium V4来执行一个简单的自动化测试脚本的话:&lt;/p>
+&lt;p>比如通过百度，搜索&lt;code>城下秋草 测试&lt;/code>, 代码如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">selenium&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">webdriver&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">selenium.webdriver.common.by&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">By&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">time&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">sleep&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_baidu_search&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">option&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">webdriver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ChromeOptions&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">option&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">browser_version&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;117&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">driver&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">webdriver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Chrome&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">options&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">option&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">driver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;https://www.baidu.com&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">driver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">find_element&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">By&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ID&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s1">&amp;#39;kw&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">send_keys&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;城下秋草 测试&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">driver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">find_element&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">By&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ID&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s1">&amp;#39;su&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">click&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">driver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">close&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>只要安装了Selenium库，执行的时候，就可以正常地驱动, 并不需要特别地去获取驱动和配置。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/013-selenium-manager/run.gif"
+width="1554"
+height="935"
+srcset="https://chengxiaqiucao.github.io/post/013-selenium-manager/run_hu_af9dd9ccf17addd3.gif 480w, https://chengxiaqiucao.github.io/post/013-selenium-manager/run_hu_18b3de2fd3398769.gif 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="166"
+data-flex-basis="398px"
+>&lt;/p>
+&lt;h2 id="selenium-4-启动自动化执行源码分析">Selenium 4 启动自动化执行源码分析
+&lt;/h2>&lt;p>这里我们从Selenium的Python源码来分析下它的启动过程：&lt;/p>
+&lt;p>&lt;code>driver = webdriver.Chrome(options=option) &lt;/code>&lt;/p>
+&lt;p>这行代码其实会调用Slenium库中Chromium基础浏览器的webdriver初始化代码，位置在&lt;code>.venv/Lib/site-packages/selenium/webdriver/chromium/webdriver.py&lt;/code>&lt;/p>
+&lt;p>初始化时，可以看到，会通过DriverFinder方法来获取浏览器和Driver的路径&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">finder&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">DriverFinder&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">service&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">options&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="n">finder&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get_browser_path&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">options&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">binary_location&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">finder&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get_browser_path&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">options&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">browser_version&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kc">None&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">service&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">path&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">finder&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get_driver_path&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">service&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">start&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>而获取路径的方法，其实就是调用了SeleniumManager模块的binary_paths方法&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">get_browser_path&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_binary_paths&lt;/span>&lt;span class="p">()[&lt;/span>&lt;span class="s2">&amp;#34;browser_path&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">get_driver_path&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_binary_paths&lt;/span>&lt;span class="p">()[&lt;/span>&lt;span class="s2">&amp;#34;driver_path&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">_binary_paths&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="nb">dict&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_paths&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;driver_path&amp;#34;&lt;/span>&lt;span class="p">]:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_paths&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">output&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">SeleniumManager&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">binary_paths&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_to_args&lt;/span>&lt;span class="p">())&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_paths&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>而SeleniumManager模块，则会执行SeleniumManager的二进制程序，根据相关参数，获取浏览器和驱动版本。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">_run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">List&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nb">str&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="nb">dict&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;Executes the Selenium Manager Binary.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> :Args: - args: the components of the command being executed. :Returns: The log string containing the driver location. &amp;#34;&amp;#34;&amp;#34;&lt;/span> &lt;span class="n">command&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34; &amp;#34;&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">join&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">logger&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">debug&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;Executing process: &lt;/span>&lt;span class="si">%s&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">command&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">try&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">platform&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;win32&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">completed_proc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">subprocess&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">capture_output&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">creationflags&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">subprocess&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">CREATE_NO_WINDOW&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">completed_proc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">subprocess&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">capture_output&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">stdout&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">completed_proc&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">stdout&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">decode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;utf-8&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">rstrip&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">stderr&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">completed_proc&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">stderr&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">decode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;utf-8&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">rstrip&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">output&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">json&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">loads&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stdout&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="n">stdout&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="s2">&amp;#34;logs&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[],&lt;/span> &lt;span class="s2">&amp;#34;result&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{}}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">except&lt;/span> &lt;span class="ne">Exception&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">err&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">raise&lt;/span> &lt;span class="n">WebDriverException&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Unsuccessful command executed: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">command&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kn">from&lt;/span> &lt;span class="nn">err&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">SeleniumManager&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_process_logs&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">output&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;logs&amp;#34;&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">output&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;result&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">completed_proc&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">returncode&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">raise&lt;/span> &lt;span class="n">WebDriverException&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Unsuccessful command executed: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">command&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">; code: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">completed_proc&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">returncode&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">result&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">stderr&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">result&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>所以，目前的Selenium 4版本执行时，会通过SeleniumManager程序来确定需要的浏览器和对应的driver版本。&lt;/p>
+&lt;h2 id="selenium-manager-命令行程序">Selenium Manager 命令行程序
+&lt;/h2>&lt;p>而通过SeleniumManager，根据我们配置的浏览器类型和版本，它可以自动的匹配相关的driver版本，并自行联网，获取相关驱动和浏览器版本的文件，供Selenium调用。
+比如上例中，我们指定了浏览器版本为 &lt;code>117&lt;/code>, 执行以后，在用户目录的 &lt;code>.cache\selenium&lt;/code>目录下其实就会保存下载的浏览器和对应的驱动版本。下图是当前执行更新的117 版本的驱动。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/013-selenium-manager/Pasted-20240910-3.png"
+width="1135"
+height="395"
+srcset="https://chengxiaqiucao.github.io/post/013-selenium-manager/Pasted-20240910-3_hu_e3b82242381f862f.png 480w, https://chengxiaqiucao.github.io/post/013-selenium-manager/Pasted-20240910-3_hu_d437668ab8fc231f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="287"
+data-flex-basis="689px"
+>&lt;/p>
+&lt;p>这里Selenium调用的是Selenium-manager这个命令行程序&lt;/p>
+&lt;p>我们可以直接执行这个程序，加上&lt;code>--help&lt;/code>看一下支持的参数&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;span class="lnt">59
+&lt;/span>&lt;span class="lnt">60
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">selenium&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">manager&lt;/span> &lt;span class="mf">0.4&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mi">24&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Selenium&lt;/span> &lt;span class="n">Manager&lt;/span> &lt;span class="n">is&lt;/span> &lt;span class="n">a&lt;/span> &lt;span class="n">CLI&lt;/span> &lt;span class="k">tool&lt;/span> &lt;span class="n">that&lt;/span> &lt;span class="n">automatically&lt;/span> &lt;span class="n">manages&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">browser&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">driver&lt;/span> &lt;span class="n">infrastructure&lt;/span> &lt;span class="n">required&lt;/span> &lt;span class="n">by&lt;/span> &lt;span class="n">Selenium&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Usage&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">selenium&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">manager&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">OPTIONS&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Options&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">browser&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">BROWSER&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Browser&lt;/span> &lt;span class="n">name&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">chrome&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">firefox&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">edge&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">iexplorer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">safari&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">safaritp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="ow">or&lt;/span> &lt;span class="n">webview2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">driver&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">DRIVER&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Driver&lt;/span> &lt;span class="n">name&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">chromedriver&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">geckodriver&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">msedgedriver&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">IEDriverServer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="ow">or&lt;/span> &lt;span class="n">safaridriver&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">grid&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">GRID_VERSION&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Selenium&lt;/span> &lt;span class="n">Grid&lt;/span>&lt;span class="o">.&lt;/span> &lt;span class="n">If&lt;/span> &lt;span class="n">version&lt;/span> &lt;span class="n">is&lt;/span> &lt;span class="ow">not&lt;/span> &lt;span class="n">provided&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">latest&lt;/span> &lt;span class="n">version&lt;/span> &lt;span class="n">is&lt;/span> &lt;span class="n">downloaded&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">driver&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">version&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">DRIVER_VERSION&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Driver&lt;/span> &lt;span class="n">version&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">g&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">106.0&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mf">5249.61&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.31&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">etc&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">browser&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">version&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">BROWSER_VERSION&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Major&lt;/span> &lt;span class="n">browser&lt;/span> &lt;span class="n">version&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">g&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">105&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">106&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">etc&lt;/span>&lt;span class="o">.&lt;/span> &lt;span class="n">Also&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">beta&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">dev&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">canary&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="ow">or&lt;/span> &lt;span class="n">nightly&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="ow">and&lt;/span> &lt;span class="n">esr&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="ow">in&lt;/span> &lt;span class="n">Firefox&lt;/span>&lt;span class="o">-&lt;/span> &lt;span class="n">are&lt;/span> &lt;span class="n">accepted&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">browser&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">path&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">BROWSER_PATH&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Browser&lt;/span> &lt;span class="n">path&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">absolute&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">browser&lt;/span> &lt;span class="n">version&lt;/span> &lt;span class="n">detection&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">g&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">usr&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">bin&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">google&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">chrome&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;/Applications/Google Chrome.app/Contents/MacOS/Google Chrome&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;C:\Program Files\Google\Chrome\Application\chrome.exe&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">driver&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">mirror&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">url&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">DRIVER_MIRROR_URL&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Mirror&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">driver&lt;/span> &lt;span class="n">repositories&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">g&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">https&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">//&lt;/span>&lt;span class="n">registry&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">npmmirror&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/-/&lt;/span>&lt;span class="n">binary&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">chromedriver&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">browser&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">mirror&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">url&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">BROWSER_MIRROR_URL&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Mirror&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">browser&lt;/span> &lt;span class="n">repositories&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">output&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">OUTPUT&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Output&lt;/span> &lt;span class="n">type&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">LOGGER&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">using&lt;/span> &lt;span class="n">INFO&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">WARN&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">etc&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">JSON&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">custom&lt;/span> &lt;span class="n">JSON&lt;/span> &lt;span class="n">notation&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">SHELL&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">Unix&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">like&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="ow">or&lt;/span> &lt;span class="n">MIXED&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">INFO&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">WARN&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DEBUG&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">etc&lt;/span>&lt;span class="o">.&lt;/span> &lt;span class="n">to&lt;/span> &lt;span class="n">stderr&lt;/span> &lt;span class="ow">and&lt;/span> &lt;span class="n">minimal&lt;/span> &lt;span class="n">JSON&lt;/span> &lt;span class="n">to&lt;/span> &lt;span class="n">stdout&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">default&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">LOGGER&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">os&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="ne">OS&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Operating&lt;/span> &lt;span class="n">system&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">windows&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">linux&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="ow">or&lt;/span> &lt;span class="n">macos&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">arch&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">ARCH&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">System&lt;/span> &lt;span class="n">architecture&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">x32&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">x64&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="ow">or&lt;/span> &lt;span class="n">arm64&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">proxy&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">PROXY&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HTTP&lt;/span> &lt;span class="n">proxy&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">network&lt;/span> &lt;span class="n">connection&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">g&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">https&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">//&lt;/span>&lt;span class="n">myproxy&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">net&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">8080&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">timeout&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">TIMEOUT&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Timeout&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">network&lt;/span> &lt;span class="n">requests&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="ow">in&lt;/span> &lt;span class="n">seconds&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">default&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">300&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">ttl&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">TTL&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">TTL&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">time&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">to&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">live&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">discovered&lt;/span> &lt;span class="n">versions&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">online&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">of&lt;/span> &lt;span class="n">drivers&lt;/span> &lt;span class="ow">and&lt;/span> &lt;span class="n">browsers&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">default&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">3600&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">cache&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">path&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">CACHE_PATH&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Local&lt;/span> &lt;span class="n">folder&lt;/span> &lt;span class="n">used&lt;/span> &lt;span class="n">to&lt;/span> &lt;span class="n">store&lt;/span> &lt;span class="n">downloaded&lt;/span> &lt;span class="n">assets&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">drivers&lt;/span> &lt;span class="ow">and&lt;/span> &lt;span class="n">browsers&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">local&lt;/span> &lt;span class="n">metadata&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="ow">and&lt;/span> &lt;span class="n">configuration&lt;/span> &lt;span class="n">file&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">default&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="o">~/.&lt;/span>&lt;span class="n">cache&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">selenium&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">clear&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">cache&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Clear&lt;/span> &lt;span class="n">cache&lt;/span> &lt;span class="n">folder&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">~/.&lt;/span>&lt;span class="n">cache&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">selenium&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">clear&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">metadata&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Clear&lt;/span> &lt;span class="n">metadata&lt;/span> &lt;span class="n">file&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">~/.&lt;/span>&lt;span class="n">cache&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">selenium&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">selenium&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">manager&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">json&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">debug&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Display&lt;/span> &lt;span class="n">DEBUG&lt;/span> &lt;span class="n">messages&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">trace&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Display&lt;/span> &lt;span class="n">TRACE&lt;/span> &lt;span class="n">messages&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="nb">log&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">level&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">LOG_LEVEL&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Level&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">output&lt;/span> &lt;span class="n">messages&lt;/span>&lt;span class="o">.&lt;/span> &lt;span class="n">The&lt;/span> &lt;span class="n">possible&lt;/span> &lt;span class="n">values&lt;/span> &lt;span class="n">are&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">info&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">debug&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">trace&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">warn&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">error&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">offline&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Offline&lt;/span> &lt;span class="n">mode&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">disabling&lt;/span> &lt;span class="n">network&lt;/span> &lt;span class="n">requests&lt;/span> &lt;span class="ow">and&lt;/span> &lt;span class="n">downloads&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">force&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">browser&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">download&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Force&lt;/span> &lt;span class="n">to&lt;/span> &lt;span class="n">download&lt;/span> &lt;span class="n">browser&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">even&lt;/span> &lt;span class="n">when&lt;/span> &lt;span class="n">browser&lt;/span> &lt;span class="n">is&lt;/span> &lt;span class="n">already&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">system&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">avoid&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">browser&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">download&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Avoid&lt;/span> &lt;span class="n">to&lt;/span> &lt;span class="n">download&lt;/span> &lt;span class="n">browser&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">even&lt;/span> &lt;span class="n">when&lt;/span> &lt;span class="n">browser&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">version&lt;/span> &lt;span class="n">is&lt;/span> &lt;span class="n">specified&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">language&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">binding&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">LANGUAGE_BINDING&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Selenium&lt;/span> &lt;span class="n">language&lt;/span> &lt;span class="n">bindings&lt;/span> &lt;span class="n">that&lt;/span> &lt;span class="n">invokes&lt;/span> &lt;span class="n">Selenium&lt;/span> &lt;span class="n">Manager&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">g&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Java&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">JavaScript&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Python&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DotNet&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Ruby&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">avoid&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">stats&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Avoid&lt;/span> &lt;span class="n">sends&lt;/span> &lt;span class="n">usage&lt;/span> &lt;span class="n">statistics&lt;/span> &lt;span class="n">to&lt;/span> &lt;span class="n">plausible&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">io&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span>&lt;span class="n">h&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">help&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Print&lt;/span> &lt;span class="n">help&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span>&lt;span class="n">V&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">version&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Print&lt;/span> &lt;span class="n">version&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>我们可以执行看一下这里输出信息，其实selenium在执行时就是调用的这个命令行程序&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">selenium&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">manager&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exe&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">browser&lt;/span> &lt;span class="n">firefox&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">debug&lt;/span> &lt;span class="c1">#debug参数显示详细输出&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">35&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">56.007&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">DEBUG&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">geckodriver&lt;/span> &lt;span class="ow">not&lt;/span> &lt;span class="n">found&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">PATH&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 首先在系统Path路径中根据指定的浏览器判断是否存在驱动&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">35&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">56.010&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">DEBUG&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">firefox&lt;/span> &lt;span class="ow">not&lt;/span> &lt;span class="n">found&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">PATH&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 同样根据Path路径中是否包含firefox浏览器安装路径&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">35&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">56.010&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">DEBUG&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Running&lt;/span> &lt;span class="n">command&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">REG&lt;/span> &lt;span class="n">QUERY&lt;/span> &lt;span class="n">HKCU&lt;/span>\&lt;span class="n">Software&lt;/span>\&lt;span class="n">Mozilla&lt;/span>\&lt;span class="n">Mozilla&lt;/span> &lt;span class="n">Firefox&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">v&lt;/span> &lt;span class="n">CurrentVersion&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">35&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">56.034&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">DEBUG&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Output&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">35&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">56.036&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">DEBUG&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">firefox&lt;/span> &lt;span class="ow">not&lt;/span> &lt;span class="n">found&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">system&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 通过注册表查找firefox浏览器安装路径&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">35&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">56.037&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">DEBUG&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Required&lt;/span> &lt;span class="n">browser&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">firefox&lt;/span> &lt;span class="mf">130.0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">--&lt;/span> &lt;span class="err">未指定浏览器版本，根据联网信息获取最新版本&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">35&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">56.037&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">DEBUG&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Downloading&lt;/span> &lt;span class="n">firefox&lt;/span> &lt;span class="mf">130.0&lt;/span> &lt;span class="n">from&lt;/span> &lt;span class="n">https&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">//&lt;/span>&lt;span class="n">ftp&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">mozilla&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">org&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">pub&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">firefox&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">releases&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mf">130.0&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">win64&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">en&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">US&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Firefox&lt;/span>&lt;span class="o">%&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="n">Setup&lt;/span>&lt;span class="o">%&lt;/span>&lt;span class="mf">20130.0&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exe&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 从官网下载&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">36&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">13.320&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">DEBUG&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">firefox&lt;/span> &lt;span class="mf">130.0&lt;/span> &lt;span class="n">is&lt;/span> &lt;span class="n">available&lt;/span> &lt;span class="n">at&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">:&lt;/span>\&lt;span class="n">Users&lt;/span>\&lt;span class="n">Administrator&lt;/span>\&lt;span class="o">.&lt;/span>&lt;span class="n">cache&lt;/span>\&lt;span class="n">selenium&lt;/span>\&lt;span class="n">firefox&lt;/span>\&lt;span class="n">win64&lt;/span>\&lt;span class="mf">130.0&lt;/span>\&lt;span class="n">firefox&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exe&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 完成下载&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">36&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">14.367&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">DEBUG&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Valid&lt;/span> &lt;span class="n">geckodriver&lt;/span> &lt;span class="n">versions&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">firefox&lt;/span> &lt;span class="mi">130&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;0.35.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;0.34.0&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 获取可用driver 版本&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">36&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">14.369&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">DEBUG&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Required&lt;/span> &lt;span class="n">driver&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">geckodriver&lt;/span> &lt;span class="mf">0.35&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">36&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">14.372&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">DEBUG&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Downloading&lt;/span> &lt;span class="n">geckodriver&lt;/span> &lt;span class="mf">0.35&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mi">0&lt;/span> &lt;span class="n">from&lt;/span> &lt;span class="n">https&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">//&lt;/span>&lt;span class="n">github&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">mozilla&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">geckodriver&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">releases&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">download&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">v0&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mf">35.0&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">geckodriver&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">v0&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mf">35.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">win64&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">zip&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 下载对应driver&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">36&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">18.238&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">INFO&lt;/span> &lt;span class="p">]&lt;/span> &lt;span class="n">Driver&lt;/span> &lt;span class="n">path&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">:&lt;/span>\&lt;span class="n">Users&lt;/span>\&lt;span class="n">Administrator&lt;/span>\&lt;span class="o">.&lt;/span>&lt;span class="n">cache&lt;/span>\&lt;span class="n">selenium&lt;/span>\&lt;span class="n">geckodriver&lt;/span>\&lt;span class="n">win64&lt;/span>\&lt;span class="mf">0.35&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mi">0&lt;/span>\&lt;span class="n">geckodriver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exe&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">36&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">18.239&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">INFO&lt;/span> &lt;span class="p">]&lt;/span> &lt;span class="n">Browser&lt;/span> &lt;span class="n">path&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">:&lt;/span>\&lt;span class="n">Users&lt;/span>\&lt;span class="n">Administrator&lt;/span>\&lt;span class="o">.&lt;/span>&lt;span class="n">cache&lt;/span>\&lt;span class="n">selenium&lt;/span>\&lt;span class="n">firefox&lt;/span>\&lt;span class="n">win64&lt;/span>\&lt;span class="mf">130.0&lt;/span>\&lt;span class="n">firefox&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exe&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 输出browser和driver路径，其实selenium调用时的返回值就是这个信息&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>而除了Browser和Driver外，Selenium-manager其实还支持grid版本的下载。通过&lt;code>--grid&lt;/code> 参数就可以直接下载grid的最新版本。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">selenium&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">manager&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exe&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">grid&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">debug&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">47&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">41.793&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">DEBUG&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Sending&lt;/span> &lt;span class="n">stats&lt;/span> &lt;span class="n">to&lt;/span> &lt;span class="n">Plausible&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Props&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="n">browser&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;grid&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">browser_version&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">os&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;windows&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">arch&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;amd64&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">lang&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">selenium_version&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;4.24&amp;#34;&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">47&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">41.795&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">DEBUG&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">grid&lt;/span> &lt;span class="ow">not&lt;/span> &lt;span class="n">found&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">system&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">47&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">43.667&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">DEBUG&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Required&lt;/span> &lt;span class="n">driver&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">selenium&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">server&lt;/span> &lt;span class="mf">4.24&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">47&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">43.669&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">DEBUG&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Downloading&lt;/span> &lt;span class="n">selenium&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">server&lt;/span> &lt;span class="mf">4.24&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mi">0&lt;/span> &lt;span class="n">from&lt;/span> &lt;span class="n">https&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">//&lt;/span>&lt;span class="n">github&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">SeleniumHQ&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">selenium&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">releases&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">download&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">selenium&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mf">4.24&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">selenium&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">server&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mf">4.24&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mf">0.j&lt;/span>&lt;span class="n">ar&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">2024&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">09&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="n">T13&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">47&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">51.547&lt;/span>&lt;span class="n">Z&lt;/span> &lt;span class="n">INFO&lt;/span> &lt;span class="p">]&lt;/span> &lt;span class="n">Driver&lt;/span> &lt;span class="n">path&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">:&lt;/span>\&lt;span class="n">Users&lt;/span>\&lt;span class="n">Administrator&lt;/span>\&lt;span class="o">.&lt;/span>&lt;span class="n">cache&lt;/span>\&lt;span class="n">selenium&lt;/span>\&lt;span class="n">grid&lt;/span>\&lt;span class="mf">4.24&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mi">0&lt;/span>\&lt;span class="n">selenium&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">server&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mf">4.24&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mf">0.j&lt;/span>&lt;span class="n">ar&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>通过以上介绍，可以看出，通过引入Selenium-manager，Selenium在环境准备时已经可以非常灵活地实现对浏览器、驱动包括grid server等资源的自动获取和配置，极大提升了使用Selenium的便利性。&lt;/p></description></item></channel></rss>
