@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Docker on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/docker/</link><description>Recent content in Docker on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Sat, 24 May 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/docker/index.xml" rel="self" type="application/rss+xml"/><item><title> 自动化测试中应用Docker的正反两面</title><link>https://chengxiaqiucao.github.io/post/096-docker%E5%9C%A8%E8%87%AA%E5%8A%A8%E5%8C%96/</link><pubDate>Sat, 24 May 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/096-docker%E5%9C%A8%E8%87%AA%E5%8A%A8%E5%8C%96/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/096-docker%E5%9C%A8%E8%87%AA%E5%8A%A8%E5%8C%96/Docker%E8%87%AA%E5%8A%A8%E5%8C%96.png" alt="Featured image of post 自动化测试中应用Docker的正反两面" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>自动化测试是现如今软件研发中不可或缺的重要环节。而为了确保测试环境的一致性、简化配置并加速测试的反馈，Docker 技术被广泛应用于测试自动化框架，进行容器化封装。&lt;/p>
+&lt;p>通常的共识是：一旦测试套件被 Docker 化，即可实现 &lt;strong>“一次构建，处处运行”&lt;/strong> 的理想状态，彻底消除环境差异带来的测试不确定性。&lt;/p>
+&lt;p>然而，在实际工程实践中，Docker 化是否真的能完美保障测试执行的一致性？本篇我们将深入探讨 Docker 在自动化测试应用中的承诺与现实，揭示那些可能导致“一致性幻象”的关键因素，并提供相应的规避策略。&lt;/p>
+&lt;h2 id="docker-的承诺环境封装与一致性">Docker 的承诺：环境封装与一致性
+&lt;/h2>&lt;p>Docker 的核心价值在于通过镜像（Image）封装应用的完整运行环境（操作系统层、运行时、库、工具、代码及配置）。其工作流程通常为：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>构建镜像&lt;/strong>：在开发环境（如开发者本地PC）中，通过 Dockerfile 定义依赖安装和配置步骤，构建包含测试套件及其运行环境的镜像。&lt;/li>
+&lt;li>&lt;strong>分发镜像&lt;/strong>：将构建好的镜像推送到镜像仓库（如 Docker Hub, Artifactory）。&lt;/li>
+&lt;li>&lt;strong>运行容器&lt;/strong>：在目标环境（CI/CD 流水线、其他开发者机器、生产前环境等）中拉取该镜像并实例化为容器执行测试。&lt;/li>
+&lt;/ol>
+&lt;p>理论上，此流程应确保无论底层宿主机的具体配置如何，容器内部的测试执行环境始终保持一致，从而消除开发者 &lt;strong>“在我机器上能跑”&lt;/strong> 的经典问题，实现测试结果的可靠复现。&lt;/p>
+&lt;h2 id="现实一致性的幻想">现实：一致性的幻想
+&lt;/h2>&lt;p>理想丰满，现实骨感。尽管 Docker 提供了强大的环境隔离能力，但以下因素仍可能破坏测试的绝对一致性，形成“幻象”：&lt;/p>
+&lt;h3 id="跨平台的宿主架构差异">跨平台的宿主架构差异
+&lt;/h3>&lt;p>在 x86 架构宿主机上构建的镜像，在基于 ARM 架构的 CI 节点（如 Apple Silicon M1/M2）上运行时，可能导致依赖特定 CPU 指令集的二进制文件、包含 C 扩展的 Python 包等运行异常或崩溃，致使本地通过的测试在 CI 失败。&lt;/p>
+&lt;blockquote>
+&lt;p>原因：Docker 容器共享宿主机的内核。不同 CPU 架构（x86_64 vs arm64）的指令集不兼容。&lt;/p>&lt;/blockquote>
+&lt;h4 id="如何解决">如何解决？
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>多架构镜像构建&lt;/strong>：使用 &lt;code>docker buildx&lt;/code> 工具构建支持多平台（如 linux/amd64, linux/arm64）的镜像。&lt;/li>
+&lt;li>&lt;strong>显式指定平台&lt;/strong>：在运行或构建时通过 &lt;code>--platform&lt;/code> 参数强制指定目标平台（如 &lt;code>docker run --platform linux/amd64 my-test-image&lt;/code>）。&lt;/li>
+&lt;/ul>
+&lt;h3 id="外部依赖">外部依赖
+&lt;/h3>&lt;p>测试容器内运行良好，但若测试用例需要访问容器外的真实服务（数据库、API、S3、需 VPN 访问的内部系统），则测试结果可能受外部服务的状态、网络延迟、DNS 解析差异、防火墙规则或 VPN 连接状态影响而波动。&lt;/p>
+&lt;blockquote>
+&lt;p>原因：Docker 容器化的是测试套件本身，而非其依赖的所有外部系统。网络请求突破了容器的隔离边界。&lt;/p>&lt;/blockquote>
+&lt;h4 id="如何解决-1">如何解决？
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>依赖容器化&lt;/strong>：使用 Docker Compose 在测试运行时动态拉起所需的外部服务（如数据库、Mock 服务器）作为独立的容器，并与测试容器建立内部网络连接。&lt;/li>
+&lt;li>&lt;strong>Mock/Stub 技术&lt;/strong>：在单元测试和集成测试中广泛应用 Mock 和 Stub 技术替代真实的外部依赖调用。&lt;/li>
+&lt;li>&lt;strong>网络环境控制&lt;/strong>：严格管理测试环境的网络配置（DNS、代理、防火墙），确保其可预测性。&lt;/li>
+&lt;/ul>
+&lt;h3 id="宿主操作系统差异">宿主操作系统差异
+&lt;/h3>&lt;p>在 Linux 宿主机上运行正常的挂载卷（Volume Mounts）操作或网络访问（&lt;code>localhost&lt;/code>），在 macOS 或 Windows（通过 Docker Desktop）上可能出现文件权限错误、符号链接失效、换行符（CRLF vs LF）问题、&lt;code>inotify&lt;/code> 事件监听失效，或 &lt;code>localhost&lt;/code> 指向歧义。&lt;/p>
+&lt;blockquote>
+&lt;p>原因：虽然容器内 OS 一致，但 Docker 与宿主 OS 交互的机制存在差异：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>文件卷挂载&lt;/strong>：涉及主机文件系统到容器文件系统的映射，不同 OS 对文件权限、元数据、事件通知的支持不同。&lt;/li>
+&lt;li>&lt;strong>网络模型&lt;/strong>：在 Linux 上，容器网络通常更直接集成；在 macOS/Windows 上，Docker Desktop 使用虚拟机桥接，访问宿主机服务需使用特殊主机名 &lt;code>host.docker.internal&lt;/code> 而非 &lt;code>localhost&lt;/code>。&lt;/li>
+&lt;/ul>&lt;/blockquote>
+&lt;h4 id="如何解决-2">如何解决？
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>理解平台差异&lt;/strong>：明确意识到 Docker 并非完全 OS 无关，其行为受宿主机影响。&lt;/li>
+&lt;li>&lt;strong>谨慎使用挂载卷&lt;/strong>：避免测试核心逻辑过度依赖主机卷挂载，尤其对于写操作（如生成报告、缓存）。优先使用容器内路径或复制（&lt;code>COPY&lt;/code>）机制。如需挂载，注意文件权限和换行符问题。&lt;/li>
+&lt;li>&lt;strong>使用正确的网络访问方式&lt;/strong>：在容器内访问宿主机服务时，统一使用 &lt;code>host.docker.internal&lt;/code>（Mac/Windows）或了解 Docker 网络模式（bridge/host）下的服务访问规则（Compose 服务名）。避免硬编码 &lt;code>localhost&lt;/code>。&lt;/li>
+&lt;/ul>
+&lt;h3 id="资源约束">资源约束
+&lt;/h3>&lt;p>在资源充沛的本地开发机（如 16 核 32GB RAM）上测试通过，但在资源受限的 CI 节点（可能 CPU 被限流、内存不足、或与其他任务共享资源）上运行时，测试因超时、资源竞争（CPU、IO）而失败或变得不稳定（Flaky）。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>原因&lt;/strong>：Docker 容器共享宿主机的物理资源（CPU、内存、磁盘 IO、网络带宽）。CI 环境的资源配额通常低于开发机且存在竞争。&lt;/p>&lt;/blockquote>
+&lt;h4 id="如何解决-3">如何解决？
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>资源限制与监控&lt;/strong>：在 Docker 运行命令或 Compose 文件中为测试容器明确设置资源限制（&lt;code>--cpus&lt;/code>, &lt;code>--memory&lt;/code>），使其更接近 CI 环境。监控 CI 节点的资源使用情况。&lt;/li>
+&lt;li>&lt;strong>性能优化&lt;/strong>：优化测试用例和框架本身，减少资源消耗（如并行化控制、避免内存泄漏、优化 I/O 操作）。&lt;/li>
+&lt;li>&lt;strong>选择匹配的 CI 环境&lt;/strong>：确保 CI 环境的基础资源配置能满足测试运行的最低要求。&lt;/li>
+&lt;/ul>
+&lt;h3 id="可变依赖与版本漂移latest标签的隐患">可变依赖与版本漂移：“latest”标签的隐患
+&lt;/h3>&lt;p>镜像构建时使用基础镜像标签 &lt;code>FROM python:latest&lt;/code> 或未严格锁定依赖版本 &lt;code>pip install -r requirements.txt&lt;/code>（未使用 &lt;code>pip freeze&lt;/code> 或版本锁文件），导致后续构建的镜像因底层依赖（Python 解释器、库）的意外升级而引入不兼容或 Bug，破坏测试稳定性。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>原因&lt;/strong>：依赖项的“latest”标签或未锁定的版本号会随时间推移指向新版本，带来不确定性。&lt;/p>&lt;/blockquote>
+&lt;h4 id="如何解决-4">如何解决？
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>严格版本锁定&lt;/strong>：在 Dockerfile 中使用确定版本的基础镜像标签（如 &lt;code>FROM python:3.11-slim&lt;/code>）。使用版本锁文件（如 &lt;code>requirements.txt&lt;/code> 明确每个依赖的版本号，或使用 &lt;code>poetry.lock&lt;/code>/&lt;code>Pipfile.lock&lt;/code>）管理依赖项。&lt;/li>
+&lt;li>&lt;strong>可重现的构建&lt;/strong>：确保基于相同的锁文件，每次构建都能生成完全一致的镜像。定期有计划地更新依赖版本并重新测试验证。&lt;/li>
+&lt;/ul>
+&lt;h2 id="理性看待docker-的价值与工程实践">理性看待Docker 的价值与工程实践
+&lt;/h2>&lt;p>尽管存在上述诸多问题，我们还是&lt;strong>不应否定 Docker 在测试自动化中的巨大价值&lt;/strong>。它在环境标准化、简化依赖管理、让CI/CD流水线更易管理等方面，依然有着不可替代的优势。&lt;/p>
+&lt;p>所以应用Docker，关键在于理解：&lt;strong>Docker 是实现一致性的强大工具，但非一劳永逸的“银弹”&lt;/strong>。技术的应用还是需要通过良好的工程实践和有效约束发挥作用！&lt;/p>
+&lt;h2 id="总结">&lt;strong>总结&lt;/strong>
+&lt;/h2>&lt;p>Docker 为测试自动化环境的一致性筑起了一道坚固的“围栏”，极大地提升了测试的可信度和效率。然而，“围栏”并非密不透风。&lt;/p>
+&lt;p>宿主架构差异、外部依赖渗透、OS 交互特性、资源竞争以及依赖版本漂移等因素，都可能悄然侵蚀预期的绝对一致性。&lt;/p>
+&lt;p>实现真正可靠的 Docker 化测试自动化，不仅需要熟练运用 Docker 技术本身，更要求我们秉持严谨的工程实践——明确环境边界、严格依赖管理、优化资源利用、持续监控改进。唯有如此，我们才能有效破除“一致性幻象”，让 Docker 真正成为保障软件质量的坚实基石。&lt;/p>
+&lt;p>所以，下次当我们听到 “&lt;strong>没问题，它已经 通过Docker容器化了&lt;/strong>”，不妨多问一句：&lt;/p>
+&lt;ul>
+&lt;li>它运行在什么架构上？&lt;/li>
+&lt;li>依赖是否锁定？&lt;/li>
+&lt;li>网络和文件访问是如何处理的？&lt;/li>
+&lt;li>资源足够吗？&lt;/li>
+&lt;/ul>
+&lt;p>知己知彼，方能运筹帷幄。&lt;/p>
+&lt;hr></description></item><item><title>搭建基于https的Docker私有仓库</title><link>https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/</link><pubDate>Tue, 11 Feb 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/docker%E4%BB%93%E5%BA%93.png" alt="Featured image of post 搭建基于https的Docker私有仓库" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>在我们日常工作中，基于Docker技术进行开发、测试环境的快速部署和管理已经非常普遍，而对于我们自己的产品研发来说，必然就离不开很多私有的docker镜像管理，更加上docker官方镜像仓库的访问困难，在我们的研发环境中的搭建私有docker镜像仓库就成为一个普遍需求。&lt;/p>
+&lt;h2 id="搭建私有docker镜像仓库的基本方法---http">搭建私有docker镜像仓库的基本方法 - http
+&lt;/h2>&lt;p>搭建docker私有镜像仓库的基础方法，其实非常简便，也是大家网上搜索最容易找到的方案。&lt;/p>
+&lt;p>直接通过 docker 启动它的仓库镜像 registry 即可&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">docker&lt;/span> &lt;span class="n">run&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">d&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">restart&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">always&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">name&lt;/span> &lt;span class="n">registry&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span>&lt;span class="n">p&lt;/span> &lt;span class="mi">5100&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">5000&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span>&lt;span class="n">v&lt;/span> &lt;span class="n">registry&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="k">var&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">lib&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">registry&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">registry&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>&amp;ndash;restart&lt;/strong> 设置在仓库异常时自动重启仓库，保证可用性
+&lt;strong>&amp;ndash;name&lt;/strong> 设置仓库名称
+&lt;strong>&amp;ndash;p&lt;/strong> 内部仓库服务端口5000映射到宿主机5100端口
+&lt;strong>&amp;ndash;v&lt;/strong> 仓库存储持久化到数据卷&lt;/p>
+&lt;p>镜像启动完成以后，通过浏览器访问一下这台宿主机5100端口的 &lt;code>v2&lt;/code> 接口，可以正常显示一个空的 json 字串，表示仓库已经可以正常提供服务&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212.png"
+width="653"
+height="186"
+srcset="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212_hu_1c442ea7ed3a7900.png 480w, https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212_hu_3bfbbbdad98e8cca.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="351"
+data-flex-basis="842px"
+>&lt;/p>
+&lt;p>但这时，如果我们通过 &lt;code>docker push&lt;/code> 命令向这个私有仓库上传镜像，会得到一个提示默认协议https不匹配的提示。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-1.png"
+width="1513"
+height="107"
+srcset="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-1_hu_47792a33861a55bb.png 480w, https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-1_hu_c877914cc7e69b67.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="1414"
+data-flex-basis="3393px"
+>&lt;/p>
+&lt;p>这里我们还需要通过docker配置使其接受http协议，Linux 系统下通常在 &lt;code>/etc/docker/daemon.json&lt;/code> 这个docker守护进程配置文件中。&lt;/p>
+&lt;p>在其中添加私有镜像服务器地址:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;insecure-registries&amp;#34;&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;192.168.101.67:5100&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="err">,&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>如果是在windows中使用docker desktop，在docker engine中进行配置&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-2.png"
+width="1720"
+height="799"
+srcset="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-2_hu_693d6cf7528172d8.png 480w, https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-2_hu_a3fbb14c4f02522f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="215"
+data-flex-basis="516px"
+>&lt;/p>
+&lt;p>重启docker引擎后，就可以正常对刚搭建的私有参考进行push和pull操作了。&lt;/p>
+&lt;p>但是，虽然基于http协议的基础镜像仓库能满足我们日常的基本使用要求，但如果我们的产品项目不是个小型项目，牵涉多个docker镜像联动和多个节点的话，一般会需要使用docker集群。&lt;/p>
+&lt;p>docker官方的集群系统docker swarm使用也非常简便，但docker swarm中对于私有镜像仓库，出于安全考虑，是需要强制通过 &lt;code>https&lt;/code> 协议访问的，因此，我们本文的重点，还是介绍下如何搭建一个基于&lt;code>https&lt;/code> 协议的私有镜像仓库&lt;/p>
+&lt;h2 id="https协议镜像仓库的要求">https协议镜像仓库的要求
+&lt;/h2>&lt;p>&lt;code>https&lt;/code> 协议相对于 &lt;code>http&lt;/code> 协议，主要就是提供了传输安全性上的保护。关于 https协议原理的详细说明，可以参看我前面的文章&lt;/p>
+&lt;p>&lt;a class="link" href="https://chengxiaqiucao.github.io/post/21-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/" target="_blank" rel="noopener"
+>大话HTTPS协议，理解SSL、TLS和HTTP的关系&lt;/a>&lt;/p>
+&lt;p>因此，我们要搭建基于 https 协议的镜像仓库，复杂的地方主要是解决https协议要求的相关认证和鉴权上的要求。主要包括：&lt;/p>
+&lt;ul>
+&lt;li>生成证书和访问密钥，非生产环境一般使用自签名证书。&lt;/li>
+&lt;li>配置镜像仓库启动时挂载证书&lt;/li>
+&lt;li>配置访问节点对证书的信任&lt;/li>
+&lt;li>加入集群，推送、拉取docker镜像&lt;/li>
+&lt;/ul>
+&lt;h2 id="集群中部署私有镜像仓库">集群中部署私有镜像仓库
+&lt;/h2>&lt;p>下面，我们逐步详细说明部署过程&lt;/p>
+&lt;h3 id="自签名证书生成">自签名证书生成
+&lt;/h3>&lt;h4 id="生成根证书私钥和证书">生成根证书私钥和证书
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">openssl req -newkey rsa:4096 -nodes -sha256 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -keyout ca.key -x509 -days &lt;span class="m">3650&lt;/span> -out ca.crt &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -subj &lt;span class="s2">&amp;#34;/C=CN/ST=Beijing/L=Beijing/O=Qiucao Inc./CN=Qiucao Root CA&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="生成服务器私钥和-csr">生成服务器私钥和 CSR
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">openssl req -newkey rsa:4096 -nodes -sha256 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -keyout registry.key -out registry.csr &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -subj &lt;span class="s2">&amp;#34;/C=CN/ST=Beijing/L=Beijing/O=Qiucao Inc./CN=qiucao.com&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="使用根证书签发服务器证书">使用根证书签发服务器证书
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">openssl x509 -req -days &lt;span class="m">3650&lt;/span> -in registry.csr -CA ca.crt -CAkey ca.key &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -CAcreateserial -out registry.crt -extfile &amp;lt;&lt;span class="o">(&lt;/span>&lt;span class="nb">printf&lt;/span> &lt;span class="s2">&amp;#34;subjectAltName=DNS:qiucao.com&amp;#34;&lt;/span>&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>通过以上操作，会生成我们需要的证书清单&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>ca.crt&lt;/code>：根证书&lt;/li>
+&lt;li>&lt;code>registry.crt&lt;/code>：服务器证书&lt;/li>
+&lt;li>&lt;code>registry.key&lt;/code>：服务器私钥&lt;/li>
+&lt;/ul>
+&lt;h3 id="配置镜像registry">配置镜像Registry
+&lt;/h3>&lt;p>在swarm集群中启用Registry仓库，可以通过&lt;code>docker compose&lt;/code>， 先配置compose启动文件&lt;/p>
+&lt;p>docker-compose.yml&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">services&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">registry&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">registry:2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ports&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s2">&amp;#34;5100:5000&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">environment&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">REGISTRY_HTTP_TLS_CERTIFICATE&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/certs/registry.crt&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">REGISTRY_HTTP_TLS_KEY&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/certs/registry.key&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/var/lib/registry&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">volumes&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">./certs:/certs&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">/var/docker-registry:/var/lib/registry&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">networks&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">registry-net&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">networks&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">registry-net&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">driver&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">overlay&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>然后通过 &lt;code>docker stack&lt;/code> 在集群中启用仓库&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 创建 overlay 网络&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker network create -d overlay registry-net
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 部署 Registry 服务&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker stack deploy -c docker-compose.yml registry
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这样，我们就启用了支持认证的仓库&lt;/p>
+&lt;h3 id="配置访问节点信任证书">配置访问节点信任证书
+&lt;/h3>&lt;p>但仓库支持认证，要在访问时能正常对服务进行认证，在客户节点上，还有一个操作，也就是需要信任仓库的自签名证书&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">mkdir -p /etc/docker/certs.d/qiucao.com:5100
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp ca.crt /etc/docker/certs.d/qiucao.com:5100/ca.crt
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>重启本地docker服务，以加载信任证书&lt;/p>
+&lt;h3 id="验证仓库镜像拉取">验证仓库镜像拉取
+&lt;/h3>&lt;p>然后，在客户机上，我们就可以通过私有仓库来完成镜像的拉取了&lt;/p>
+&lt;p>这里还有一个步骤，就是我们配置的仓库地址是 &lt;code>qiucao.com&lt;/code>，并不是一个实际存在的公共网络域名，所以这里我们还应该在本地的 &lt;code>/etc/hosts&lt;/code>中添加对域名的解析&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">192.168.101.67 qiucao.com
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>然后执行命令&lt;code> docker pull&lt;/code> 拉取仓库中的镜像，可以成功完成镜像的拉取&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-3.png"
+width="1366"
+height="450"
+srcset="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-3_hu_acda33db5f33567e.png 480w, https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-3_hu_48c07b002de8afd.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="303"
+data-flex-basis="728px"
+>&lt;/p>
+&lt;hr>
+&lt;p>更多关于docker使用和体系化的测试技能提升，可了解我的测试课程，回复 &lt;code>大纲&lt;/code> 了解课程详细内容。&lt;/p></description></item></channel></rss>
