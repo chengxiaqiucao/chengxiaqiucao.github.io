@@ -1,0 +1,1498 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Pytest on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/pytest/</link><description>Recent content in Pytest on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Tue, 22 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/pytest/index.xml" rel="self" type="application/rss+xml"/><item><title>本地定制Pytest插件及发布指南</title><link>https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/</link><pubDate>Tue, 22 Jul 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250721-2.png" alt="Featured image of post 本地定制Pytest插件及发布指南" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>&lt;code>PyTest&lt;/code> 是目前自动化测试领域使用非常广泛的一个测试框架，基于Python脚本的自动化，通常都会结合该框架完成测试脚本的管理和运行调度。&lt;/p>
+&lt;p>而Pytest之所以强大，除了前面我们介绍过它的Fixture夹具功能，还有一个很重要的方面就是它强大的生态，也就是它非常强大的插件支持。仅官方显示的插件清单已有1600多个&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250720.png"
+width="1357"
+height="704"
+srcset="https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250720_hu_906ee6e0f07ffdbb.png 480w, https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250720_hu_bfb32424d6bfcca5.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="192"
+data-flex-basis="462px"
+>&lt;/p>
+&lt;p>而实际工作中，除了通过Pytest丰富的插件生态完成增强外，对于我们的一些个性化需求，我们要自行完成插件开发其实也非常方便，当然这也是Pytest 插件生态能如此繁荣的基础。&lt;/p>
+&lt;p>本文我们就结合一个基本案例介绍下如何完成Pytest的本地插件开发。&lt;/p>
+&lt;h2 id="pytest-插件的实现原理">Pytest 插件的实现原理
+&lt;/h2>&lt;p>Pytest的插件机制，其实主要是通过它提供的钩子函数(hook)和命令行扩展来实现的。&lt;/p>
+&lt;h3 id="钩子函数">钩子函数
+&lt;/h3>&lt;p>钩子函数是 Pytest 提供的一类特殊函数，允许插件在特定的测试事件发生时执行自定义代码。常用的钩子函数包括如：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>pytest_addoption&lt;/code>&lt;/strong>: 用于添加命令行选项。&lt;/li>
+&lt;li>&lt;strong>&lt;code>pytest_configure&lt;/code>&lt;/strong>: 在测试运行之前进行配置。&lt;/li>
+&lt;li>&lt;strong>&lt;code>pytest_runtest_setup&lt;/code>&lt;/strong>: 在每个测试用例执行之前调用。&lt;/li>
+&lt;li>&lt;strong>&lt;code>pytest_runtest_teardown&lt;/code>&lt;/strong>: 在每个测试用例执行之后调用。&lt;/li>
+&lt;li>&lt;strong>&lt;code>pytest_sessionfinish&lt;/code>&lt;/strong>: 在测试会话结束时调用。&lt;/li>
+&lt;/ul>
+&lt;h3 id="命令行选项">命令行选项
+&lt;/h3>&lt;p>通过 &lt;code>pytest_addoption&lt;/code> 钩子，插件可以定义自定义的命令行选项。这使得用户在运行测试时可以控制插件的行为。例如，可以添加一个选项来启用或禁用某些功能。&lt;/p>
+&lt;h3 id="配置对象">配置对象
+&lt;/h3>&lt;p>在钩子函数中，插件可以访问 Pytest 的配置对象（&lt;code>config&lt;/code>），该对象包含命令行选项、测试上下文和其他配置信息。通过配置对象，插件可以获取用户输入的选项并相应地调整其行为。&lt;/p>
+&lt;h3 id="数据存储">数据存储
+&lt;/h3>&lt;p>插件可以在钩子函数中使用配置对象来存储和管理数据。例如，可以在 &lt;code>pytest_configure&lt;/code> 中初始化一个列表，在每个测试用例执行后将数据存储到这个列表中，最终在 &lt;code>pytest_sessionfinish&lt;/code> 中输出结果。&lt;/p>
+&lt;h3 id="hookimpl-装饰器">hookimpl 装饰器
+&lt;/h3>&lt;p>Pytest中，钩子函数可以使用 &lt;code>@pytest.hookimpl&lt;/code> 装饰器来控制钩子的执行顺序和行为。主要参数包括：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>tryfirst&lt;/code>&lt;/strong>: 如果设置为 &lt;code>True&lt;/code>，该钩子将在其他同类钩子之前运行。通常在需要优先处理特定逻辑时使用。&lt;/li>
+&lt;li>&lt;strong>&lt;code>trylast&lt;/code>&lt;/strong>: 与 &lt;code>tryfirst&lt;/code> 相反，设置为 &lt;code>True&lt;/code> 则该钩子将在其他同类钩子之后运行。&lt;/li>
+&lt;/ul>
+&lt;p>通过这种方式，插件可以精确控制在测试执行过程中的各个阶段插入自定义逻辑。&lt;/p>
+&lt;h2 id="实操案例">实操案例
+&lt;/h2>&lt;p>本文我们将开发一个本地的Pytest 插件，用来记录每个测试用例的执行时间，并在测试结束后提供汇总统计信息。&lt;/p>
+&lt;h3 id="环境准备">环境准备
+&lt;/h3>&lt;p>创建一个新的目录用于你的插件：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">mkdir pytest_timing_plugin
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> pytest_timing_plugin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="插件实现代码">插件实现代码
+&lt;/h3>&lt;p>在插件目录中，创建一个名为 &lt;code>pytest_timing_plugin.py&lt;/code> 的文件：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># pytest_timing_plugin.py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pytest&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">time&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">pytest_addoption&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">parser&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">parser&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">addoption&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;--timing&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">action&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;store_true&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;Enable timing report&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.hookimpl&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">tryfirst&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">pytest_configure&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">getoption&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;timing&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_timing_data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_total_duration&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mf">0.0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.hookimpl&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">tryfirst&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">pytest_runtest_setup&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">getoption&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;timing&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">start_time&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">time&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.hookimpl&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">tryfirst&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">pytest_runtest_teardown&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">getoption&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;timing&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">duration&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">time&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">start_time&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_timing_data&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">append&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">nodeid&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">duration&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_total_duration&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="n">duration&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.hookimpl&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">tryfirst&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">pytest_sessionfinish&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">session&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">exitstatus&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">session&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">getoption&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;timing&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">Timing Report:&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">test_id&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">duration&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">session&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_timing_data&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">test_id&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">duration&lt;/span>&lt;span class="si">:&lt;/span>&lt;span class="s2">.4f&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> seconds&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Total Duration: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">session&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_total_duration&lt;/span>&lt;span class="si">:&lt;/span>&lt;span class="s2">.4f&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> seconds&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;code>pytest_addoption&lt;/code>: 添加 &lt;code>--timing&lt;/code> 选项来启用时间记录。&lt;/li>
+&lt;li>&lt;code>pytest_runtest_setup&lt;/code>: 在每个测试开始时记录开始时间。&lt;/li>
+&lt;li>&lt;code>pytest_runtest_teardown&lt;/code>: 在每个测试结束时计算并记录持续时间，并累加到总持续时间。&lt;/li>
+&lt;li>&lt;code>pytest_sessionfinish&lt;/code>: 在测试会话结束时打印每个测试的执行时间报告以及总执行时间。&lt;/li>
+&lt;/ul>
+&lt;h3 id="准备测试文件">准备测试文件
+&lt;/h3>&lt;p>在相同目录下，创建一个测试文件 &lt;code>test_sample.py&lt;/code>：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># test_sample.py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">time&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_example_1&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">time&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="kc">True&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_example_2&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">time&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="kc">True&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_example_3&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">time&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mf">1.5&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="kc">True&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="打包插件">打包插件
+&lt;/h2>&lt;p>如果我们希望将插件分享给其他人，可以将其进行打包。创建一个 &lt;code>setup.py&lt;/code> 文件：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># setup.py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">setuptools&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">setup&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">setup&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;pytest-timing-plugin&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">version&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;0.1&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">description&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;A pytest plugin to measure and report test execution time&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">py_modules&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;pytest_timing_plugin&amp;#39;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">entry_points&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;pytest11&amp;#39;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;timing_plugin = pytest_timing_plugin&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在插件目录下，运行：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">pip install .
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>即在本地Pytest环境中包含了我们刚才开发的插件了。&lt;/p>
+&lt;h3 id="运行测试">运行测试
+&lt;/h3>&lt;p>使用 &lt;code>pytest&lt;/code> 命令运行测试，同时传递自定义选项：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">pytest --timing
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>运行结果：&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250721.png"
+width="1204"
+height="583"
+srcset="https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250721_hu_96b78ce7a98ec1f.png 480w, https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250721_hu_69a23f36bca9d3d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="206"
+data-flex-basis="495px"
+>&lt;/p>
+&lt;h2 id="发布插件">发布插件
+&lt;/h2>&lt;p>而如果我们希望在更大范围，公开发布我们开发的插件，可以发布到 &lt;code>PyPI&lt;/code> 上，得到更广泛传播和应用。&lt;/p>
+&lt;h3 id="发布准备">发布准备
+&lt;/h3>&lt;p>安装相关发布工具：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">pip install setuptools twine
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>&lt;code>setuptools&lt;/code>&lt;/strong>: 用于打包 Python 项目&lt;/li>
+&lt;li>&lt;strong>&lt;code>twine&lt;/code>&lt;/strong>: 用于上传包到 PyPI&lt;/li>
+&lt;/ul>
+&lt;p>并将代码上传到开源平台如&lt;code>Github&lt;/code>&lt;/p>
+&lt;h3 id="准备setuppy">准备&lt;code>setup.py&lt;/code>
+&lt;/h3>&lt;p>补充内容如下，包含源码项目：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># setup.py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">setuptools&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">setup&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">setup&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;pytest-timing-plugin&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">version&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;0.5&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1"># 更新版本号&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">description&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;A pytest plugin to measure and report test execution time&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">py_modules&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;pytest_timing_plugin&amp;#39;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">entry_points&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;pytest11&amp;#39;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;timing_plugin = pytest_timing_plugin&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">author&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;城下秋草&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">author_email&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;your.email@example.com&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">url&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;https://github.com/chengxiaqiucao/pytest-timing-plugin&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">classifiers&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;Programming Language :: Python :: 3&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;Framework :: Pytest&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;License :: OSI Approved :: MIT License&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="创建-readme">创建 &lt;code>README&lt;/code>
+&lt;/h3>&lt;p>创建一个 &lt;code>README.md&lt;/code> 文件，描述插件的功能和用法。&lt;/p>
+&lt;h3 id="构建分发包">构建分发包
+&lt;/h3>&lt;p>在插件目录下，运行以下命令以生成分发包：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">python setup.py sdist bdist_wheel
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这会在 &lt;code>dist&lt;/code> 目录中生成 &lt;code>.tar.gz&lt;/code> 和 &lt;code>.whl&lt;/code> 文件。&lt;/p>
+&lt;h3 id="发布到-pypi">发布到 PyPI
+&lt;/h3>&lt;p>使用 &lt;code>twine&lt;/code> 上传包到 PyPI。首先，当然我们首先需要在 &lt;a class="link" href="https://pypi.org/account/register/" target="_blank" rel="noopener"
+>PyPI&lt;/a> 拥有一个账户。&lt;/p>
+&lt;p>然后，运行以下命令：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">python -m twine upload dist/*
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>按要求输入PyPI 的API Token，完成上传&lt;/p>
+&lt;p>完成后 PyPI 官网即可查询到该插件&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250721-2.png"
+width="1601"
+height="613"
+srcset="https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250721-2_hu_f5aaff7e3847ec15.png 480w, https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250721-2_hu_308adf9d752b572f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="261"
+data-flex-basis="626px"
+>&lt;/p>
+&lt;h3 id="验证安装">验证安装
+&lt;/h3>&lt;p>上传成功后，可以通过以下命令在其他环境中安装插件：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">pip install pytest-timing-plugin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="更新插件">更新插件
+&lt;/h3>&lt;p>如果需要更新插件，只需在 &lt;code>setup.py&lt;/code> 中更新版本号，重新生成分发包，然后再次使用 &lt;code>twine&lt;/code> 上传即可。&lt;/p>
+&lt;hr>
+&lt;p>以上就是关于 Pytest 插件开发的实际案例分享&lt;/p></description></item><item><title>Pytest_mock详解</title><link>https://chengxiaqiucao.github.io/post/057-pytest_mock%E8%AF%A6%E8%A7%A3/</link><pubDate>Sun, 23 Feb 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/057-pytest_mock%E8%AF%A6%E8%A7%A3/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/057-pytest_mock%E8%AF%A6%E8%A7%A3/pytest-mock.png" alt="Featured image of post Pytest_mock详解" />&lt;hr>
+&lt;h1 id="使用-pytest-mock-进行-python-高级单元测试与模拟">使用 pytest-mock 进行 Python 高级单元测试与模拟
+&lt;/h1>&lt;h2 id="一单元测试与模拟的意义">一、单元测试与模拟的意义
+&lt;/h2>&lt;p>在软件开发中，单元测试用于验证代码逻辑的正确性。但实际项目中，代码常依赖外部服务（如数据库、API、文件系统）。直接测试这些依赖会导致：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>测试速度变慢&lt;/strong>&lt;/li>
+&lt;li>&lt;strong>测试结果不可控&lt;/strong>&lt;/li>
+&lt;li>&lt;strong>产生副作用&lt;/strong>（如真实发送邮件）&lt;/li>
+&lt;/ol>
+&lt;p>&lt;strong>模拟（Mocking）&lt;/strong> 技术通过创建虚拟对象替代真实依赖，使测试聚焦于当前单元的逻辑。&lt;/p>
+&lt;hr>
+&lt;h2 id="二环境安装">二、环境安装
+&lt;/h2>&lt;p>使用 &lt;code>pytest&lt;/code> 和 &lt;code>pytest-mock&lt;/code> 插件：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">pip install pytest pytest-mock
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;h2 id="三基础用法示例">三、基础用法示例
+&lt;/h2>&lt;h3 id="场景邮件发送服务">场景：邮件发送服务
+&lt;/h3>&lt;p>假设我们有一个邮件发送类 &lt;code>EmailSender&lt;/code>：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># email_sender.py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">EmailSender&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">send&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">to&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">subject&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">body&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># 真实发送邮件的逻辑&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="kc">True&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>测试时不应实际发送邮件。使用 &lt;code>pytest-mock&lt;/code> 模拟 &lt;code>send&lt;/code> 方法：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># test_email_sender.py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_send_email&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">mocker&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mock_send&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">mocker&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">patch&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;email_sender.EmailSender.send&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sender&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">EmailSender&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">sender&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">send&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;user@example.com&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Hello&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Test email&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mock_send&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">assert_called_once_with&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;user@example.com&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Hello&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Test email&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">result&lt;/span> &lt;span class="ow">is&lt;/span> &lt;span class="kc">True&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>代码解析：&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>mocker.patch&lt;/code> 替换了 &lt;code>EmailSender.send&lt;/code> 方法&lt;/li>
+&lt;li>验证方法是否以正确参数被调用&lt;/li>
+&lt;li>断言返回值为 &lt;code>True&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h2 id="四高级模拟技巧">四、高级模拟技巧
+&lt;/h2>&lt;h3 id="1-模拟返回值">1. 模拟返回值
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_mock_return_value&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">mocker&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mocker&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">patch&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;module.Class.method&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">return_value&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;mocked_response&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">instance&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">Class&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">instance&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">method&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;mocked_response&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="2-模拟抛出异常">2. 模拟抛出异常
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_mock_exception&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">mocker&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mocker&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">patch&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;module.Class.method&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">side_effect&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="ne">Exception&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;DB Error&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">instance&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">Class&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">with&lt;/span> &lt;span class="n">pytest&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">raises&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="ne">Exception&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">match&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;DB Error&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">instance&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">method&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="3-模拟连续调用">3. 模拟连续调用
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_multiple_returns&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">mocker&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mock_method&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">mocker&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">patch&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;module.Class.method&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mock_method&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">side_effect&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">30&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">Class&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">method&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">10&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">Class&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">method&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">20&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">Class&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">method&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">30&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="4-模拟属性与方法链">4. 模拟属性与方法链
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_chained_methods&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">mocker&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mock_instance&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">mocker&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">MagicMock&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mock_instance&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">method1&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">method2&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">method3&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">return_value&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;final&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">mock_instance&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">method1&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">method2&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">method3&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;final&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mock_instance&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">method1&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">assert_called_once&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;h2 id="五模拟复杂场景">五、模拟复杂场景
+&lt;/h2>&lt;h3 id="场景api-客户端测试">场景：API 客户端测试
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># api_client.py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">requests&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">APIClient&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">get_user_data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">user_id&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">response&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">requests&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;https://api.example.com/users/&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">user_id&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">json&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>测试时模拟 &lt;code>requests.get&lt;/code>：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_api_client&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">mocker&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mock_response&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">mocker&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">MagicMock&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mock_response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">json&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">return_value&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="s2">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;John&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mock_get&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">mocker&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">patch&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;requests.get&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">return_value&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">mock_response&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">client&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">APIClient&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">client&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get_user_data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mock_get&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">assert_called_once_with&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;https://api.example.com/users/1&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">data&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="s2">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;John&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;h2 id="六最佳实践与注意事项">六、最佳实践与注意事项
+&lt;/h2>&lt;ol>
+&lt;li>
+&lt;p>&lt;strong>精确断言&lt;/strong>：不仅要验证是否调用，还要检查参数&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">mock_method&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">assert_called_with&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">arg1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">arg2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">expected_value&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>使用 &lt;code>autospec&lt;/code>&lt;/strong>：保持模拟对象与原对象接口一致&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">mocker&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">patch&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;module.Class&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">autospec&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>避免过度模拟&lt;/strong>：核心业务逻辑尽量使用真实对象&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>清理模拟&lt;/strong>：使用 &lt;code>mocker&lt;/code> Fixture 自动清理，避免测试污染&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;h2 id="七总结">七、总结
+&lt;/h2>&lt;p>通过 &lt;code>pytest-mock&lt;/code> 我们可以：&lt;/p>
+&lt;ul>
+&lt;li>✅ 隔离测试环境&lt;/li>
+&lt;li>✅ 模拟各种边界条件&lt;/li>
+&lt;li>✅ 验证对象交互行为&lt;/li>
+&lt;li>✅ 提升测试执行速度&lt;/li>
+&lt;/ul>
+&lt;p>掌握模拟技术能显著提高测试覆盖率与代码质量。建议结合 &lt;a class="link" href="https://pytest-mock.readthedocs.io/" target="_blank" rel="noopener"
+>官方文档&lt;/a> 深入学习更复杂的使用场景。&lt;/p>
+&lt;hr></description></item><item><title>Pytest中自动指定可引用fixture</title><link>https://chengxiaqiucao.github.io/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/</link><pubDate>Tue, 24 Sep 2024 13:16:16 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/pytest.png" alt="Featured image of post Pytest中自动指定可引用fixture" />&lt;p>在我们使用 Pytest 框架进行自动化测试时，强大的 fixture 夹具为框架的灵活应用提供了极大的便利。比如我们可以利用 fixture 的&lt;code>autouse&lt;/code>属性，使它在测试方法的不同范围层级上自动生效。但如果要引用fixture的返回，我们通常还是要明确指定，稍显麻烦&lt;/p>
+&lt;h2 id="autouse指定fixture但还是需要显式携带为参数才可调用">autouse指定fixture，但还是需要显式携带为参数才可调用
+&lt;/h2>&lt;p>以&lt;code>Selenium&lt;/code> 自动化时最常用的&lt;code>webdriver&lt;/code>为例， 实现自动化时，因为&lt;code>webdriver&lt;/code> 对象通常会在整个执行期间都生效，而且会频繁地进行调用。&lt;/p>
+&lt;p>通常的做法是可以在 &lt;code>conftest.py&lt;/code> 文件中编写一个session层级的通用&lt;code>driver&lt;/code>夹具，设置 &lt;code>autouse&lt;/code>为启用：&lt;/p>
+&lt;p>conftest.py&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.fixture&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">scope&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;session&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">autouse&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">driver&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">option&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">webdriver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ChromeOptions&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">driver&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">webdriver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Chrome&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">options&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">option&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">driver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">implicitly_wait&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">driver&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">webdriver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Chrome&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">yield&lt;/span> &lt;span class="n">driver&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>然后我们在另一个测试文件中，编写测试类和测试方法时，就可以直接引用这个driver夹具&lt;/p>
+&lt;p>test_auto_driver.py&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">TestDriver&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">Test_open_blog&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">driver&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">driver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;https://chengxiaqiucao.github.io/&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">driver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">title&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;秋 草 观 “测” 台&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>但如果整个测试工程比较大，类似的测试类、测试方法比较多的时候，每定义一次测试方法都要指定这个通用fixture，才能引用driver对象，是不是总感觉不太优雅？&lt;/p>
+&lt;h2 id="pytest内置fixture-request">Pytest内置Fixture： Request
+&lt;/h2>&lt;p>其实大家学习过通过Fixture来参数化的方法的话，应该知道通过Fixture进行参数化，是通过pytest的一个内部fixture &lt;code>request&lt;/code>来完成的。 &lt;code>request&lt;/code>应该是pytest中最为重要的一个内置夹具了。而利用这个fixture，我们其实可以实现隐式地将一些通用fixture默认地传递给各个测试类&lt;/p>
+&lt;h3 id="request简介">request简介
+&lt;/h3>&lt;p>通过官方文档的介绍：&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-3.png"
+width="1213"
+height="1095"
+srcset="https://chengxiaqiucao.github.io/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-3_hu_aa5f1cd9761ceafd.png 480w, https://chengxiaqiucao.github.io/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-3_hu_b31f5cd2ca5d515.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="110"
+data-flex-basis="265px"
+>&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;code>request&lt;/code> 是一个用于提供当前测试方法上下文信息，以及通过&lt;code>param&lt;/code>参数实现参数化的一个内置夹具。&lt;/p>&lt;/blockquote>
+&lt;p>利用request，我们可以在运行过程中获取当前fixture的诸多上下文信息。比如夹具名称、路径、当前的session、模块、类信息等。&lt;/p>
+&lt;p>下图是引用fixture时，断点得到的request对象属性&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924.png"
+width="1355"
+height="691"
+srcset="https://chengxiaqiucao.github.io/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924_hu_2ee7ab2b93f4c91b.png 480w, https://chengxiaqiucao.github.io/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924_hu_b588ca3f4a739db8.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="196"
+data-flex-basis="470px"
+>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-1.png"
+width="1319"
+height="852"
+srcset="https://chengxiaqiucao.github.io/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-1_hu_de92f0068af4a231.png 480w, https://chengxiaqiucao.github.io/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-1_hu_ce13ff45ec2fa7a.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="154"
+data-flex-basis="371px"
+>&lt;/p>
+&lt;p>那上例中作为一个在session级别生效的通用的fixture，我们可以通过它的session属性，获取当前session中的所有类，再将driver对象赋值给相关类属性，这样我们在定义测试类时，就可以无需另外指定fixture，直接通过类属性根据需要引用即可。&lt;/p>
+&lt;h2 id="实现fixture自动赋值到类属性">实现fixture自动赋值到类属性
+&lt;/h2>&lt;p>所以修改上面案例的代码如下：&lt;/p>
+&lt;p>conftest.py&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.fixture&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">scope&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;session&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">autouse&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">driver&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">request&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 自动应用fixture，并设置到调用的类属性中
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> :param request: pytest内置fixture，用于获取fixture的上下文
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> :return:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> &amp;#34;&amp;#34;&amp;#34;&lt;/span> &lt;span class="n">driver&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">webdriver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Chrome&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">try&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">session&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">request&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">node&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">item&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">session&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">items&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">cls&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">getparent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pytest&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Class&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">setattr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">cls&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">obj&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;driver&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">driver&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">yield&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">finally&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">driver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">quit&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这里我们将driver对象添加为类属性，而fixture本身不再yield任何对象返回&lt;/p>
+&lt;p>相应的，测试脚本中，直接通过&lt;code>self.driver&lt;/code> 易用类属性即可&lt;/p>
+&lt;p>test_auto_driver.py&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">TestDriver&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">Test_open_blog&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">driver&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">driver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;https://chengxiaqiucao.github.io/&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">driver&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">title&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;秋 草 观 “测” 台&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>执行效果, 用例同样正确完成执行。
+&lt;img src="https://chengxiaqiucao.github.io/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-2.png"
+width="1945"
+height="651"
+srcset="https://chengxiaqiucao.github.io/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-2_hu_8791a67de0cd1d45.png 480w, https://chengxiaqiucao.github.io/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/Pasted-20240924-2_hu_74a33ecf2f3b37cf.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="298"
+data-flex-basis="717px"
+>&lt;/p>
+&lt;p>以上~~&lt;/p></description></item><item><title>Pytest中fixture的范围</title><link>https://chengxiaqiucao.github.io/post/018-pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/</link><pubDate>Wed, 28 Aug 2024 20:33:52 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/018-pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/</guid><description>&lt;p>pytest作为Python技术栈下最主流的测试框架，功能极为强大和灵活。其中Fixture夹具是它的核心。而且pytest中对Fixture的作用范围也做了不同区分，能为我们利用fixture带来很好地灵活性。&lt;/p>
+&lt;p>下面我们就来了解下这里不同scope的作用&lt;/p>
+&lt;h2 id="fixture的scope定义">fixture的scope定义
+&lt;/h2>&lt;p>首先根据官网的说明，Pytest中fixture的作用范围支持5种设定，分别是&lt;code>function&lt;/code>(默认值), &lt;code>classs&lt;/code>, &lt;code>module&lt;/code>, &lt;code>package&lt;/code>, &lt;code>session&lt;/code>&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">&lt;strong>作用范围&lt;/strong>&lt;/th>
+&lt;th style="text-align: left">&lt;strong>说明&lt;/strong>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>function&lt;/strong>&lt;/td>
+&lt;td style="text-align: left">默认值，对每个测试方法（函数）生效，生命周期在测试方法级别&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>class&lt;/strong>&lt;/td>
+&lt;td style="text-align: left">对测试类生效，生命周期在测试类级别&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>module&lt;/strong>&lt;/td>
+&lt;td style="text-align: left">对测试模块生效，生命周期在模块（文件）级别&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>package&lt;/strong>&lt;/td>
+&lt;td style="text-align: left">对测试包生效，生命周期在测试包（目录）级别&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>session&lt;/strong>&lt;/td>
+&lt;td style="text-align: left">对测试会话生效，生命周期在会话（一次pytest运行）级别&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>下面结合代码来说明，假设目前有这样的代码结构&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/018-pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/Pasted-20240901.png"
+width="421"
+height="401"
+srcset="https://chengxiaqiucao.github.io/post/018-pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/Pasted-20240901_hu_8a3c9ede1d3d44ec.png 480w, https://chengxiaqiucao.github.io/post/018-pytest%E4%B8%ADfixture%E7%9A%84%E8%8C%83%E5%9B%B4/Pasted-20240901_hu_ac4e7b7b7a6300b8.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="104"
+data-flex-basis="251px"
+>&lt;/p>
+&lt;p>&lt;code>run_params&lt;/code>是被测方法&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">deal_params&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">p&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;input :&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">p&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nb">type&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">p&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="ow">is&lt;/span> &lt;span class="nb">int&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">p&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="mi">10&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nb">type&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">p&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="ow">is&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">p&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="mi">3&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nb">type&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">p&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">tuple&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">list&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="s2">&amp;#34;_&amp;#34;&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">join&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">p&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">raise&lt;/span> &lt;span class="ne">TypeError&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>test_ch_param&lt;/code>, &lt;code>test_fixture_scope&lt;/code>中分别定义了参数化和在测试类中的不同测试方法&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pytest&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.mark.parametrize&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;param&amp;#34;&lt;/span>&lt;span class="p">,[&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;城下秋草&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;软件测试&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;示例&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;代码&amp;#34;&lt;/span>&lt;span class="p">)])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_params_mark&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">param&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">deal_params&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">param&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pytest&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">TestFixtureScope1&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">test_int&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">deal_params&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">20&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">test_str&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">deal_params&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;秋草&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;秋草秋草秋草&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">TestFixtureScope2&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">test_list&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">deal_params&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="s2">&amp;#34;城下&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;秋草&amp;#34;&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;城下_秋草&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">test_dict&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">with&lt;/span> &lt;span class="n">pytest&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">raises&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="ne">TypeError&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">deal_params&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="s2">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;秋草&amp;#34;&lt;/span>&lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在公共方法文件&lt;code>conftest.py&lt;/code>中定义fixture: &lt;code>prepare&lt;/code>， 设置了&lt;code>autouse=True&lt;/code>，即会根据fixture的设置范围自动应用&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.fixture&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">autouse&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">scope&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;function&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">prepare&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;-----some setup actions.....&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">yield&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;-----some teardown actions!!&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这里我们分别调整&lt;code>prepare&lt;/code>的scope为不同取值，然后得到对应的输出&lt;/p>
+&lt;h3 id="function">function
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="go">(.venv) C:\Chengxiaqiucao
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">pytest
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">======================================== test session starts =========================================
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">collected 8 items
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[10] -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :10
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">100
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[城下秋草] -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :城下秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">城下秋草城下秋草城下秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[软件测试] -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :软件测试
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">软件测试软件测试软件测试
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[param3] -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :(&amp;#39;示例&amp;#39;, &amp;#39;代码&amp;#39;)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">示例_代码
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_int -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :2
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_str -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_list -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :[&amp;#39;城下&amp;#39;, &amp;#39;秋草&amp;#39;]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_dict -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :{&amp;#39;name&amp;#39;: &amp;#39;秋草&amp;#39;}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">========================================= 8 passed in 0.27s ==========================================
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>fixture运行了8次&lt;/p>
+&lt;h3 id="class">class
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="go">(.venv) C:\Chengxiaqiucao
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">pytest
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">======================================== test session starts =========================================
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">collected 8 items
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[10] -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :10
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">100
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[城下秋草] -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :城下秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">城下秋草城下秋草城下秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[软件测试] -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :软件测试
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">软件测试软件测试软件测试
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[param3] -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :(&amp;#39;示例&amp;#39;, &amp;#39;代码&amp;#39;)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">示例_代码
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_int -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :2
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_str input :秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_list -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :[&amp;#39;城下&amp;#39;, &amp;#39;秋草&amp;#39;]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_dict input :{&amp;#39;name&amp;#39;: &amp;#39;秋草&amp;#39;}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">========================================= 8 passed in 0.27s ==========================================
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>test_ch_param&lt;/code>中的测试方法，因为直接定义在文件中，也属于类级别，所以每次赋值参数，fixture也被调用。 而 &lt;code>test_fixture_scope&lt;/code>中明确定义了两个测试类，所以运行了2次&lt;/p>
+&lt;h3 id="module">module
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="go">(.venv) C:\Chengxiaqiucao
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">pytest
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">======================================== test session starts =========================================
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">collected 8 items
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[10] -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :10
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">100
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[城下秋草] input :城下秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">城下秋草城下秋草城下秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[软件测试] input :软件测试
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">软件测试软件测试软件测试
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[param3] input :(&amp;#39;示例&amp;#39;, &amp;#39;代码&amp;#39;)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">示例_代码
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_int -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :2
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_str input :秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_list input :[&amp;#39;城下&amp;#39;, &amp;#39;秋草&amp;#39;]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_dict input :{&amp;#39;name&amp;#39;: &amp;#39;秋草&amp;#39;}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">========================================= 8 passed in 0.27s ==========================================
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>修改为module范围后，可以看到，每个模块文件调用了一次fixture&lt;/p>
+&lt;h3 id="package">package
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="go">(.venv) C:\Chengxiaqiucao
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">pytest
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">======================================== test session starts =========================================
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">collected 8 items
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[10] -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :10
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">100
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[城下秋草] input :城下秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">城下秋草城下秋草城下秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[软件测试] input :软件测试
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">软件测试软件测试软件测试
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[param3] input :(&amp;#39;示例&amp;#39;, &amp;#39;代码&amp;#39;)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">示例_代码
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_int input :2
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_str input :秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_list input :[&amp;#39;城下&amp;#39;, &amp;#39;秋草&amp;#39;]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_dict input :{&amp;#39;name&amp;#39;: &amp;#39;秋草&amp;#39;}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">========================================= 8 passed in 0.27s ==========================================
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>修改为package， 这是因为两个测试文件位于同一个package内， 所以运行了一次&lt;/p>
+&lt;h3 id="session">session
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="go">(.venv) C:\Chengxiaqiucao
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">pytest
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">======================================== test session starts =========================================
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">collected 8 items
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[10] -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :10
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">100
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[城下秋草] input :城下秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">城下秋草城下秋草城下秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[软件测试] input :软件测试
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">软件测试软件测试软件测试
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[param3] input :(&amp;#39;示例&amp;#39;, &amp;#39;代码&amp;#39;)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">示例_代码
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_int input :2
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_str input :秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_list input :[&amp;#39;城下&amp;#39;, &amp;#39;秋草&amp;#39;]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_dict input :{&amp;#39;name&amp;#39;: &amp;#39;秋草&amp;#39;}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">========================================= 8 passed in 0.27s ==========================================
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>最后，当设置为session时，也就是运行pytest的一次执行会话，才会触发一次fixture调用&lt;/p>
+&lt;p>所以可以看到，我们通过fixture的不同scope定义，可以根据需要，来确定我们编写的fixture夹具的作用范围。有很好的灵活性&lt;/p>
+&lt;h2 id="复杂fixture的scope灵活定义">复杂fixture的scope灵活定义
+&lt;/h2>&lt;p>有时在实际使用的时候，特别是我们的一些fixture初始化工作比较复杂但同时在不同作用范围下都可能会用到，这时如果仅仅因为针对不同的作用范围，就要编写多个不同的fixture，代码就显得比较冗余。这时可以怎么处理呢？ 其实可以利用上下文contextmanager来灵活实现&lt;/p>
+&lt;p>比如我们再编写一个fixture的基本代码上下文:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@contextmanager&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">fixture_base&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;~~~~~base fixture setup actions.....&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">yield&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;~~~~~base fixture teardown actions!!&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>然后针对不同的fixture，我们就可以根据不同的scope来定义不同的fixture并调用这里的context实现。 比如我们再定义一个scope为package的fixture&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.fixture&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">autouse&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">scope&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;package&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">fixture_module&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 对于复杂的fixture但希望灵活处理scope，可以将公共代码放到一个contextmanager中，
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 再针对不同scope定义相关对应fixture
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> &amp;#34;&amp;#34;&amp;#34;&lt;/span> &lt;span class="k">with&lt;/span> &lt;span class="n">fixture_base&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">result&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">yield&lt;/span> &lt;span class="n">result&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>👍👍这个方法来自pytest的社区总结，&lt;a class="link" href="https://github.com/pytest-dev/pytest/issues/3425" target="_blank" rel="noopener"
+>原始问题链接&lt;/a>&lt;/p>
+&lt;h2 id="不同scope的执行顺序">不同scope的执行顺序
+&lt;/h2>&lt;p>上面例子中我们其实看到package和session的执行效果，因为测试方法都在同一个package中，所以效果上没什么差异。但其实不同scope也是有执行顺序的&lt;/p>
+&lt;p>顺序总结如下：&lt;/p>
+&lt;p>&lt;code>session&lt;/code> &amp;gt; &lt;code>package&lt;/code> &amp;gt; &lt;code>module&lt;/code> &amp;gt; &lt;code>class&lt;/code> &amp;gt; &lt;code>function&lt;/code>&lt;/p>
+&lt;p>这里增加到两个fixture以后，执行的结果：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="go">(.venv) C:\Chengxiaqiucao
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">pytest
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">======================================== test session starts =========================================
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">collected 8 items
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[10] -----some setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">~~~~~base fixture setup actions.....
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">input :10
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">100
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[城下秋草] input :城下秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">城下秋草城下秋草城下秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[软件测试] input :软件测试
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">软件测试软件测试软件测试
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_ch_parm.py::test_params_mark[param3] input :(&amp;#39;示例&amp;#39;, &amp;#39;代码&amp;#39;)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">示例_代码
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_int input :2
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope1::test_str input :秋草
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_list input :[&amp;#39;城下&amp;#39;, &amp;#39;秋草&amp;#39;]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BlogDemo/testDemo/test_fixture_scope.py::TestFixtureScope2::test_dict input :{&amp;#39;name&amp;#39;: &amp;#39;秋草&amp;#39;}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PASSED~~~~~base fixture teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">-----some teardown actions!!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">========================================= 8 passed in 0.27s ==========================================
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>可以看到 &lt;code>session&lt;/code> 比 &lt;code>package&lt;/code> 更早执行，同时更晚被销毁。&lt;/p>
+&lt;p>那么以上就是关于pytest scope作用范围的总结&lt;/p>
+&lt;hr>
+&lt;p>推广下我的测试课程，感兴趣的小伙伴可以通过以下链接了解下哦&lt;/p>
+&lt;p>❤️❤️❤️❤️ &lt;a class="link" href="https://coding.imooc.com/class/chapter/885.html#Anchor" target="_blank" rel="noopener"
+>城下秋草的测试职业进阶提升课&lt;/a> ❤️❤️❤️❤️&lt;/p></description></item><item><title>Pytest使用Fixture进行参数化及中文乱码问题</title><link>https://chengxiaqiucao.github.io/post/016-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/</link><pubDate>Sat, 24 Aug 2024 00:11:46 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/016-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/016-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824.png" alt="Featured image of post Pytest使用Fixture进行参数化及中文乱码问题" />&lt;p>我们知道，Pytest是Python技术栈下进行自动化测试的主流测试框架。支持灵活的测试发现、执行策略，强大的Fixture夹具和丰富的插件支持。&lt;/p>
+&lt;p>除了通过pytest的parametrize标签进行参数化外，我们通过fixture的param参数也可以比较方便地实现参数化测试的功能&lt;/p>
+&lt;h2 id="fixture参数化实现">fixture参数化实现
+&lt;/h2>&lt;p>假设我们有如下一段待测代码，根据传入参数的不同类型得到不同的输出&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">deal_params&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">p&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nb">type&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">p&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="ow">is&lt;/span> &lt;span class="nb">int&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">p&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="mi">10&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nb">type&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">p&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="ow">is&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;输入了:&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">p&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nb">type&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">p&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">tuple&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">list&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="s2">&amp;#34;_&amp;#34;&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">join&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">p&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">raise&lt;/span> &lt;span class="ne">TypeError&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>然后我们编写对应的测试代码，首先定义fixture，设定params参数列表， 再通过fixture本身的request获取param. 比如这里定义几个参数。当然此外我们还定义了fixture的前置和后置动作。测试方法就是调用被测函数执行。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.fixture&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">params&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;城下秋草&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;软件测试&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;示例&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;代码&amp;#34;&lt;/span>&lt;span class="p">)])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">fix_env&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">request&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">yield&lt;/span> &lt;span class="n">request&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">param&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_params&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fix_env&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">deal_params&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fix_env&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>运行得到如下输出：
+&lt;img src="https://chengxiaqiucao.github.io/post/016-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824.png"
+width="1662"
+height="651"
+srcset="https://chengxiaqiucao.github.io/post/016-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824_hu_b3f7c4f763755d74.png 480w, https://chengxiaqiucao.github.io/post/016-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824_hu_cd86833d9f435279.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="255"
+data-flex-basis="612px"
+>
+可以看到，虽然参数化成功运行，但这里有个问题，就是输出的结果中，用例ID这里，显示的是乱码.
+根据pytest的ID生成规则，如果是字符或数字，会显示传入的参数本身（当然也可以利用ids参数重新指定参数的对应ID），如果是元组、列表或字典，则会显示fixture的name+参数序号，比如这里的&lt;code>fix_env3&lt;/code>&lt;/p>
+&lt;p>那这里的字符是中文，显示成了unicode转义前的编码，所以还是中文转换有问题。也就是Pytest对于fixture参数的处理，默认会使用Ascii编码来进行显示，而对于中文，我们是希望用unicode编码显示。&lt;/p>
+&lt;h3 id="中文乱码解决方案一">中文乱码解决方案一
+&lt;/h3>&lt;p>所以，这里解决这个问题的第一个方法是可以利用Pytest的fixture集中配置文件&lt;code>conftest.py&lt;/code>， 在其中利用Pytest的hook机制，修改用例收集方法中生成用例ID的部分. 对应代码：&lt;/p>
+&lt;p>用例文件的同级conftest.py中定义：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">pytest_collection_modifyitems&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">items&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># item表示收集到的测试用例，对他进行重新编码处理&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">item&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">items&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">name&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">encode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;utf-8&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">decode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;unicode-escape&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_nodeid&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_nodeid&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">encode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;utf-8&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">decode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;unicode-escape&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>再次执行，可以看到已经正常显示了中文
+&lt;img src="https://chengxiaqiucao.github.io/post/016-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824-1.png"
+width="1489"
+height="637"
+srcset="https://chengxiaqiucao.github.io/post/016-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824-1_hu_dbc7eaf59afca481.png 480w, https://chengxiaqiucao.github.io/post/016-pytest%E5%8F%82%E6%95%B0%E5%8C%96%E6%97%B6%E7%9A%84%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/Pasted-20240824-1_hu_240c886563d2159f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="233"
+data-flex-basis="561px"
+>&lt;/p>
+&lt;h3 id="中文乱码解决方案二">中文乱码解决方案二
+&lt;/h3>&lt;p>除了通过修改hook来对用例ID进行重新编码处理外，其实Pytest本身也提供了一个配置参数。只是这个配置并不是官方推荐的解决方法。在某些操作系统上的特定情形下，使用这个配置，可能会导致一些异常bug。但笔者在windows和Ubuntu上测试是没有问题的。&lt;/p>
+&lt;p>这里对应的配置是：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ini" data-lang="ini">&lt;span class="line">&lt;span class="cl">&lt;span class="na">disable_test_id_escaping_and_forfeit_all_rights_to_community_support&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">True&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>从这个超长的配置名称也可以看出，就是禁用testID的转义但同时放弃了社区支持 😂😂&lt;/p>
+&lt;p>在pytest.ini中加上这个配置，不使用上面hook的话，也能得到中文正常显示的效果。&lt;/p>
+&lt;hr>
+&lt;p>以上就是关于Pytest中参数化中文显示时，可能遇到的乱码问题的解决方案。&lt;/p>
+&lt;p>我的测试职业进阶提升课程正在慕课网火热推广中，感兴趣的小伙伴可以以下链接了解下哦&lt;/p>
+&lt;p>❤️❤️❤️❤️ &lt;a class="link" href="https://coding.imooc.com/class/chapter/885.html#Anchor" target="_blank" rel="noopener"
+>城下秋草的测试职业进阶提升课&lt;/a> ❤️❤️❤️❤️&lt;/p>
+&lt;hr></description></item></channel></rss>

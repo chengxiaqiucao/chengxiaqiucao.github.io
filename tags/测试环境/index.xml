@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>测试环境 on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83/</link><description>Recent content in 测试环境 on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Thu, 15 May 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83/index.xml" rel="self" type="application/rss+xml"/><item><title>打造个人知识库，wsl+ollama部署deepseek与vscode集成</title><link>https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/</link><pubDate>Thu, 15 May 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-3.png" alt="Featured image of post 打造个人知识库，wsl+ollama部署deepseek与vscode集成" />&lt;p>目前大模型应用如火如荼，各大LLM如&lt;code>Deepseek&lt;/code>也都提供了在线的助手服务，结合&lt;code>mcp-server&lt;/code>还可以进一步拓展到本地的工具能力。&lt;/p>
+&lt;p>但对于一些和本地业务和数据强相关的资料，在线的大模型训练数据集一般并不能涵盖，特别还有一些敏感或对安全要求很高的数据，使用在线大模型并不现实。所以我们个人应用和实际工作中，本地部署大模型并加入本地知识库也是一个刚性需求。&lt;/p>
+&lt;p>本文就记录下在WSL中通过Ollama和CherryStudio搭建本地大模型，并将本地模型集成到VsCode的AI助手的过程分享。&lt;/p>
+&lt;h2 id="ollama简介">Ollama简介
+&lt;/h2>&lt;p>Ollama 是一个基于Go 语言开发的简单易用的本地大语言模型运行框架，专为在本地机器上便捷部署和运行大型语言模型（LLM）而设计。Ollama 是 &lt;strong>Omni-Layer Learning Language Acquisition Model（全方位学习语言接受模型）&lt;/strong> 的简写。&lt;/p>
+&lt;h2 id="deepseek本地模型及运行配置">Deepseek本地模型及运行配置
+&lt;/h2>&lt;p>Deepseek目前根据本地部署包含的参数集大小，又包含 &lt;strong>1.5B&lt;/strong> 到 &lt;strong>671B&lt;/strong> 等多个版本，参数集越大则AI越智能，但相应地对硬件要求则越高。&lt;/p>
+&lt;p>一般对应不同deepseek模型版本，推荐的硬件配置如下：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>模型型号&lt;/th>
+&lt;th>CPU&lt;/th>
+&lt;th>内存&lt;/th>
+&lt;th>硬盘&lt;/th>
+&lt;th>显存&lt;/th>
+&lt;th>适用场景&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>DeepSeek-R1-1.5B&lt;/td>
+&lt;td>4 核&lt;/td>
+&lt;td>8 GB+&lt;/td>
+&lt;td>3 GB+&lt;/td>
+&lt;td>非必需（若需 CPU 加速可选 GTX 1650）&lt;/td>
+&lt;td>个人使用，如笔记本电脑、台式电脑等&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-7B&lt;/td>
+&lt;td>8 核&lt;/td>
+&lt;td>16 GB+&lt;/td>
+&lt;td>8 GB+&lt;/td>
+&lt;td>8 GB+显存（如 RTX 3070/4060）&lt;/td>
+&lt;td>中小型企业本地开发&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-8B&lt;/td>
+&lt;td>8 核&lt;/td>
+&lt;td>16 GB+&lt;/td>
+&lt;td>8 GB+&lt;/td>
+&lt;td>8 GB+显存&lt;/td>
+&lt;td>中小型企业本地开发（提升精度的轻量级任务）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-14B&lt;/td>
+&lt;td>12 核&lt;/td>
+&lt;td>32 GB+&lt;/td>
+&lt;td>15 GB+&lt;/td>
+&lt;td>16 GB+显存（如RTX 4090 或 A5000）&lt;/td>
+&lt;td>中小型企业本地开发（中量级任务）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-32B&lt;/td>
+&lt;td>16 核&lt;/td>
+&lt;td>64 GB+&lt;/td>
+&lt;td>30 GB+&lt;/td>
+&lt;td>24 GB+显存（如 A100 40 GB 或 RTX 3090）&lt;/td>
+&lt;td>专业领域任务，如医疗、科研、法律&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-70B&lt;/td>
+&lt;td>32 核&lt;/td>
+&lt;td>128 GB+&lt;/td>
+&lt;td>70 GB+&lt;/td>
+&lt;td>多卡并行（如 2x A100 80GB 或 4x RTX 4090）&lt;/td>
+&lt;td>大型企业或科研机构，专业领域任务处理&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-671B（满血版）&lt;/td>
+&lt;td>64 核&lt;/td>
+&lt;td>512 GB+&lt;/td>
+&lt;td>300 GB+&lt;/td>
+&lt;td>多卡并行（如 8x A100/H100）&lt;/td>
+&lt;td>国家级科研任务处理&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>对我们个人用户来说，根据自己的电脑配置情况，通常选择1.5B到14B。 当然如果不是高频使用本地模型，个人建议可以将配置和推荐模型降一档匹配。&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="利用ollama在wsl中部署本地deepseek">利用Ollama在WSL中部署本地Deepseek
+&lt;/h2>&lt;p>因为笔者当前主要是希望将一些本地数据接入Deepseek，也没有高频使用本地LLM的需求。所有这里我选择部署 &lt;strong>DeepSeek-R1-14B&lt;/strong>， 另外为了避免每次启动电脑都因为LLM运行占用大量资源，所以这里我希望在Windows电脑的WSL下运行LLM&lt;/p>
+&lt;h3 id="wsl配置">WSL配置
+&lt;/h3>&lt;p>如果当前系统还没有启用WSL，可以先启用（过程不再详述， Win11中运行WSL install [对应Linux发行版] 即可安装）&lt;/p>
+&lt;p>通过命令行查看&lt;strong>WSL&lt;/strong>状态:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">C&lt;span class="p">:&lt;/span>&lt;span class="nl">\qiucao&lt;/span>&lt;span class="c1">&amp;gt;wsl --status&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">默认分发: Ubuntu-24.04
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">默认版本: 2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>WSL默认的网络模式是NAT，这里可以通过&lt;code>WSL Setting&lt;/code>程序，修改下当前配置，改为&lt;code>Mirrored&lt;/code>镜像模式，共用宿主机网络。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-1.png"
+width="1607"
+height="969"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-1_hu_251e83a643f91563.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-1_hu_d3b3405b54f8e912.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="165"
+data-flex-basis="398px"
+>&lt;/p>
+&lt;h3 id="安装ollama">安装Ollama
+&lt;/h3>&lt;p>进入Ollama官网(&lt;a class="link" href="https://ollama.com/" target="_blank" rel="noopener"
+>https://ollama.com/&lt;/a>)下载界面, 因为我们是在WSL中部署，所以选择Linux安装。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419.png"
+width="1885"
+height="936"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419_hu_99722e55ae18c4a1.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419_hu_89a14deb9f0b4320.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="201"
+data-flex-basis="483px"
+>&lt;/p>
+&lt;p>执行如下命令，等待下载并自动安装完成。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">curl -fsSL https://ollama.com/install.sh &lt;span class="p">|&lt;/span> sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 安装完成查看版本&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">~$ ollama --version
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ollama version is 0.6.5
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="部署deepseek">部署deepseek
+&lt;/h3>&lt;p>完成ollama安装后，就可以根据Ollama提供的大模型清单，选择对应大模型进行安装。目前支持的大模型清单，可以从官网如下地址查询：https://ollama.com/library&lt;/p>
+&lt;p>执行如下命令下载并运行deepseek&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">ollama run deepseek-r1:14b
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_deepseek.png"
+width="1193"
+height="243"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_deepseek_hu_1026ff78b8603fed.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_deepseek_hu_9d7ff43704722fde.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="490"
+data-flex-basis="1178px"
+>&lt;/p>
+&lt;p>安装成功后可以提问测试一下deepseek是否已正常提供服务&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-2.png"
+width="1404"
+height="158"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-2_hu_ed2f4389c23dba39.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-2_hu_82a3907315705e92.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="888"
+data-flex-basis="2132px"
+>&lt;/p>
+&lt;h3 id="添加知识库分析模型">添加知识库分析模型
+&lt;/h3>&lt;p>至此，Deepseek其实已在本地部署。但如果要通过Deepseek使用本地数据和文档，我们还需要部署一个&lt;strong>语义向量模型&lt;/strong>（Embedding Model），用来将本地数据转化为大模型可分析的知识库数据。这里我们选择 &lt;strong>bge-m3&lt;/strong> 模型，这是一个通用向量模型，可以支持多语言、长文本和多种检索方式。&lt;/p>
+&lt;p>执行：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">ollama pull bge-m3
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_bge.png"
+width="1141"
+height="198"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_bge_hu_63310f4bc6d28a9e.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_bge_hu_9a9373e160733582.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="576"
+data-flex-basis="1383px"
+>&lt;/p>
+&lt;h2 id="用cherry-studio管理知识库并提供本地交互界面">用Cherry Studio管理知识库并提供本地交互界面
+&lt;/h2>&lt;p>安装完Deepseek后，虽然我们可以在命令界面下和deepseek进行交互，但还是不够友好，包括对本地知识库的管理也不够方便。所以这里我们还可以安装一个开源的本地AI助手和知识库客户端Cherry Studio。从官网（https://cherry-ai.com）下载windows版本安装即可。
+&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-3.png"
+width="1869"
+height="861"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-3_hu_162bef18952f99b6.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-3_hu_de42598554b32e8a.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="217"
+data-flex-basis="520px"
+>&lt;/p>
+&lt;p>打开Cherry Studio，按如下步骤添加我们刚刚通过ollama部署的Deepseek&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry.png"
+width="1337"
+height="821"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry_hu_650d185a5428fb5.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry_hu_2420da097208e561.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="162"
+data-flex-basis="390px"
+>&lt;/p>
+&lt;p>会看到已经安装好的模型，添加进来
+&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry_model.png"
+width="972"
+height="659"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry_model_hu_1427909c6f167c6d.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry_model_hu_50b783a5da211168.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="147"
+data-flex-basis="353px"
+>
+然后就可以利用Cherry Studio的知识库管理，将我们需要加入的本地文档纳入大模型的数据集中。这里包括直接添加文件、直接指定目录、从网站采集等多种方式，非常方便。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/add_knowledge.png"
+width="1347"
+height="828"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/add_knowledge_hu_a4e9beef670ffd2f.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/add_knowledge_hu_1187620292c81a03.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="162"
+data-flex-basis="390px"
+>&lt;/p>
+&lt;h2 id="集成本地deepseek到vscode">集成本地Deepseek到vscode
+&lt;/h2>&lt;p>而有了本地的LLM后，如果我们希望在vscode中使用，可以利用vscode 的 &lt;code>AI Toolkit&lt;/code> 插件，按如下方式添加本地LLM&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_1.png"
+width="1914"
+height="959"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_1_hu_833830a04db48530.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_1_hu_f4c99c1236cd540c.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="199"
+data-flex-basis="478px"
+>&lt;/p>
+&lt;p>vscode中测试下本地库的能力&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_2.png"
+width="1433"
+height="1009"
+srcset="https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_2_hu_7715fc702df564d2.png 480w, https://chengxiaqiucao.github.io/post/094-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_2_hu_c5b07401fbe6ecb3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="142"
+data-flex-basis="340px"
+>&lt;/p>
+&lt;p>以上就是我们部署本地Deepseek的实践分享&lt;/p></description></item><item><title>搭建基于https的Docker私有仓库</title><link>https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/</link><pubDate>Tue, 11 Feb 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/docker%E4%BB%93%E5%BA%93.png" alt="Featured image of post 搭建基于https的Docker私有仓库" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>在我们日常工作中，基于Docker技术进行开发、测试环境的快速部署和管理已经非常普遍，而对于我们自己的产品研发来说，必然就离不开很多私有的docker镜像管理，更加上docker官方镜像仓库的访问困难，在我们的研发环境中的搭建私有docker镜像仓库就成为一个普遍需求。&lt;/p>
+&lt;h2 id="搭建私有docker镜像仓库的基本方法---http">搭建私有docker镜像仓库的基本方法 - http
+&lt;/h2>&lt;p>搭建docker私有镜像仓库的基础方法，其实非常简便，也是大家网上搜索最容易找到的方案。&lt;/p>
+&lt;p>直接通过 docker 启动它的仓库镜像 registry 即可&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">docker&lt;/span> &lt;span class="n">run&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">d&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">restart&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">always&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">name&lt;/span> &lt;span class="n">registry&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span>&lt;span class="n">p&lt;/span> &lt;span class="mi">5100&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">5000&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span>&lt;span class="n">v&lt;/span> &lt;span class="n">registry&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="k">var&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">lib&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">registry&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">registry&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>&amp;ndash;restart&lt;/strong> 设置在仓库异常时自动重启仓库，保证可用性
+&lt;strong>&amp;ndash;name&lt;/strong> 设置仓库名称
+&lt;strong>&amp;ndash;p&lt;/strong> 内部仓库服务端口5000映射到宿主机5100端口
+&lt;strong>&amp;ndash;v&lt;/strong> 仓库存储持久化到数据卷&lt;/p>
+&lt;p>镜像启动完成以后，通过浏览器访问一下这台宿主机5100端口的 &lt;code>v2&lt;/code> 接口，可以正常显示一个空的 json 字串，表示仓库已经可以正常提供服务&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212.png"
+width="653"
+height="186"
+srcset="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212_hu_1c442ea7ed3a7900.png 480w, https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212_hu_3bfbbbdad98e8cca.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="351"
+data-flex-basis="842px"
+>&lt;/p>
+&lt;p>但这时，如果我们通过 &lt;code>docker push&lt;/code> 命令向这个私有仓库上传镜像，会得到一个提示默认协议https不匹配的提示。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-1.png"
+width="1513"
+height="107"
+srcset="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-1_hu_47792a33861a55bb.png 480w, https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-1_hu_c877914cc7e69b67.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="1414"
+data-flex-basis="3393px"
+>&lt;/p>
+&lt;p>这里我们还需要通过docker配置使其接受http协议，Linux 系统下通常在 &lt;code>/etc/docker/daemon.json&lt;/code> 这个docker守护进程配置文件中。&lt;/p>
+&lt;p>在其中添加私有镜像服务器地址:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;insecure-registries&amp;#34;&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;192.168.101.67:5100&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="err">,&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>如果是在windows中使用docker desktop，在docker engine中进行配置&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-2.png"
+width="1720"
+height="799"
+srcset="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-2_hu_693d6cf7528172d8.png 480w, https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-2_hu_a3fbb14c4f02522f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="215"
+data-flex-basis="516px"
+>&lt;/p>
+&lt;p>重启docker引擎后，就可以正常对刚搭建的私有参考进行push和pull操作了。&lt;/p>
+&lt;p>但是，虽然基于http协议的基础镜像仓库能满足我们日常的基本使用要求，但如果我们的产品项目不是个小型项目，牵涉多个docker镜像联动和多个节点的话，一般会需要使用docker集群。&lt;/p>
+&lt;p>docker官方的集群系统docker swarm使用也非常简便，但docker swarm中对于私有镜像仓库，出于安全考虑，是需要强制通过 &lt;code>https&lt;/code> 协议访问的，因此，我们本文的重点，还是介绍下如何搭建一个基于&lt;code>https&lt;/code> 协议的私有镜像仓库&lt;/p>
+&lt;h2 id="https协议镜像仓库的要求">https协议镜像仓库的要求
+&lt;/h2>&lt;p>&lt;code>https&lt;/code> 协议相对于 &lt;code>http&lt;/code> 协议，主要就是提供了传输安全性上的保护。关于 https协议原理的详细说明，可以参看我前面的文章&lt;/p>
+&lt;p>&lt;a class="link" href="https://chengxiaqiucao.github.io/post/21-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/" target="_blank" rel="noopener"
+>大话HTTPS协议，理解SSL、TLS和HTTP的关系&lt;/a>&lt;/p>
+&lt;p>因此，我们要搭建基于 https 协议的镜像仓库，复杂的地方主要是解决https协议要求的相关认证和鉴权上的要求。主要包括：&lt;/p>
+&lt;ul>
+&lt;li>生成证书和访问密钥，非生产环境一般使用自签名证书。&lt;/li>
+&lt;li>配置镜像仓库启动时挂载证书&lt;/li>
+&lt;li>配置访问节点对证书的信任&lt;/li>
+&lt;li>加入集群，推送、拉取docker镜像&lt;/li>
+&lt;/ul>
+&lt;h2 id="集群中部署私有镜像仓库">集群中部署私有镜像仓库
+&lt;/h2>&lt;p>下面，我们逐步详细说明部署过程&lt;/p>
+&lt;h3 id="自签名证书生成">自签名证书生成
+&lt;/h3>&lt;h4 id="生成根证书私钥和证书">生成根证书私钥和证书
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">openssl req -newkey rsa:4096 -nodes -sha256 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -keyout ca.key -x509 -days &lt;span class="m">3650&lt;/span> -out ca.crt &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -subj &lt;span class="s2">&amp;#34;/C=CN/ST=Beijing/L=Beijing/O=Qiucao Inc./CN=Qiucao Root CA&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="生成服务器私钥和-csr">生成服务器私钥和 CSR
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">openssl req -newkey rsa:4096 -nodes -sha256 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -keyout registry.key -out registry.csr &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -subj &lt;span class="s2">&amp;#34;/C=CN/ST=Beijing/L=Beijing/O=Qiucao Inc./CN=qiucao.com&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="使用根证书签发服务器证书">使用根证书签发服务器证书
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">openssl x509 -req -days &lt;span class="m">3650&lt;/span> -in registry.csr -CA ca.crt -CAkey ca.key &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -CAcreateserial -out registry.crt -extfile &amp;lt;&lt;span class="o">(&lt;/span>&lt;span class="nb">printf&lt;/span> &lt;span class="s2">&amp;#34;subjectAltName=DNS:qiucao.com&amp;#34;&lt;/span>&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>通过以上操作，会生成我们需要的证书清单&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>ca.crt&lt;/code>：根证书&lt;/li>
+&lt;li>&lt;code>registry.crt&lt;/code>：服务器证书&lt;/li>
+&lt;li>&lt;code>registry.key&lt;/code>：服务器私钥&lt;/li>
+&lt;/ul>
+&lt;h3 id="配置镜像registry">配置镜像Registry
+&lt;/h3>&lt;p>在swarm集群中启用Registry仓库，可以通过&lt;code>docker compose&lt;/code>， 先配置compose启动文件&lt;/p>
+&lt;p>docker-compose.yml&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">services&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">registry&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">registry:2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ports&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s2">&amp;#34;5100:5000&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">environment&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">REGISTRY_HTTP_TLS_CERTIFICATE&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/certs/registry.crt&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">REGISTRY_HTTP_TLS_KEY&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/certs/registry.key&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/var/lib/registry&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">volumes&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">./certs:/certs&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">/var/docker-registry:/var/lib/registry&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">networks&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">registry-net&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">networks&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">registry-net&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">driver&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">overlay&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>然后通过 &lt;code>docker stack&lt;/code> 在集群中启用仓库&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 创建 overlay 网络&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker network create -d overlay registry-net
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 部署 Registry 服务&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker stack deploy -c docker-compose.yml registry
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这样，我们就启用了支持认证的仓库&lt;/p>
+&lt;h3 id="配置访问节点信任证书">配置访问节点信任证书
+&lt;/h3>&lt;p>但仓库支持认证，要在访问时能正常对服务进行认证，在客户节点上，还有一个操作，也就是需要信任仓库的自签名证书&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">mkdir -p /etc/docker/certs.d/qiucao.com:5100
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp ca.crt /etc/docker/certs.d/qiucao.com:5100/ca.crt
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>重启本地docker服务，以加载信任证书&lt;/p>
+&lt;h3 id="验证仓库镜像拉取">验证仓库镜像拉取
+&lt;/h3>&lt;p>然后，在客户机上，我们就可以通过私有仓库来完成镜像的拉取了&lt;/p>
+&lt;p>这里还有一个步骤，就是我们配置的仓库地址是 &lt;code>qiucao.com&lt;/code>，并不是一个实际存在的公共网络域名，所以这里我们还应该在本地的 &lt;code>/etc/hosts&lt;/code>中添加对域名的解析&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">192.168.101.67 qiucao.com
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>然后执行命令&lt;code> docker pull&lt;/code> 拉取仓库中的镜像，可以成功完成镜像的拉取&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-3.png"
+width="1366"
+height="450"
+srcset="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-3_hu_acda33db5f33567e.png 480w, https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-3_hu_48c07b002de8afd.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="303"
+data-flex-basis="728px"
+>&lt;/p>
+&lt;hr>
+&lt;p>更多关于docker使用和体系化的测试技能提升，可了解我的测试课程，回复 &lt;code>大纲&lt;/code> 了解课程详细内容。&lt;/p></description></item></channel></rss>

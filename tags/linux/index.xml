@@ -1,0 +1,629 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/linux/</link><description>Recent content in Linux on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Thu, 13 Mar 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>Linux文本处理三剑客 Sed</title><link>https://chengxiaqiucao.github.io/post/061-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/</link><pubDate>Thu, 13 Mar 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/061-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/061-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/sed3.webp" alt="Featured image of post Linux文本处理三剑客 Sed" />&lt;h1 id="前言">前言
+&lt;/h1>&lt;p>在本系列上一篇 【】，我们介绍了 Linux 三剑客中的 &lt;code>grep&lt;/code> 命令用法。而实际上，在三剑客中，&lt;code>grep&lt;/code> 只能算是小弟，它的作用更多只是通过正则表达式的加持，实现针对文本的模式查询。
+而三剑客中，真正重量级的命令是 &lt;code>sed&lt;/code> 和 &lt;code>awk&lt;/code>, &lt;code>sed&lt;/code> 其实是 &lt;code>stream editor（流编辑器）&lt;/code> 的缩写，因此，sed 命令它其实是能够起到文本编辑器的作用。本篇我们就来介绍这个 &lt;strong>伪装成Linux命令的编辑器&lt;/strong> &lt;code>sed&lt;/code>&lt;/p>
+&lt;h1 id="sed-命令概述">sed 命令概述
+&lt;/h1>&lt;p>&lt;code>sed&lt;/code>命令的语法如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">sed -命令参数 &amp;#39;操作指令&amp;#39; 文本文件或管道输入
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>sed&lt;/code> 是一个行编辑器，这里的操作指令会按行来对文本进行处理&lt;/p>
+&lt;h2 id="命令参数">命令参数
+&lt;/h2>&lt;p>它的命令参数主要有如下一些：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">&lt;strong>命令参数&lt;/strong>&lt;/th>
+&lt;th style="text-align: center">&lt;strong>含义&lt;/strong>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>-n&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">关闭默认输出&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>-r&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">支持正则表达式扩展&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>-i&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">直接对源文件进行操作&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>-e&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">指定操作指令（默认开启，可指定多个）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>-f&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">从文件读取操作指令&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="默认输出">默认输出
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;/root/p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 其实会显示passwd文件中所有行，其中包含root用户的行重复显示&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;/root/p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 加上-n参数，才会关闭sed本身的默认输出，这样才是通过p指令显示匹配的行&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="修改原文件">修改原文件
+&lt;/h3>&lt;p>实际工作中，&lt;code>-i&lt;/code> 参数是一个比较危险的参数，因为这个参数会直接修改原文件&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -i &lt;span class="s1">&amp;#39;/root/q&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 这个操作会导致passwd文件中只包含有root用户这一行，因为指令q会在匹配到行后直接退出&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 而sed这时的输出内容会直接写入原文件&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>比较安全的做法，可以在使用&lt;code>-i&lt;/code>参数时指定一个备份文件, 也就是在 &lt;code>-i&lt;/code> 后指定一个备份文件的后缀名&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -i.bak &lt;span class="s1">&amp;#39;/root/q&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 这个操作虽然还是会修改passwd文件，但在修改前会备份一个.bak文件，便于恢复&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="多重指令">多重指令
+&lt;/h3>&lt;p>&lt;code>sed&lt;/code> 命令的指令可以有多个，但又多个指令时，需要为每个指令指定一个&lt;code>-e&lt;/code>参数，如果只使用 1 个指令，则这个 &lt;code>-e&lt;/code> 可以忽略&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -e &lt;span class="s1">&amp;#39;=&amp;#39;&lt;/span> -e &lt;span class="s1">&amp;#39;/root/q&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># = 指令会输出当前处理行的行号&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>如果我们想重复指定 &lt;code>-e&lt;/code> ，也可以通过 &lt;code>;&lt;/code> 组合指令&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=;/root/q&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 和通过 -e 多重指定效果一样&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="操作指令说明">操作指令说明
+&lt;/h2>&lt;p>在上面的参数介绍中，我们其实已经使用了 如 &lt;code>p&lt;/code>, &lt;code>q&lt;/code> 等指令。&lt;/p>
+&lt;p>而这个操作指令，其实是由两部分组成，也就是&lt;strong>寻址部分&lt;/strong>和&lt;strong>操作部分&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>寻址： &lt;code>sed&lt;/code>命令是行处理命令，寻址其实就是指定要处理的行&lt;/li>
+&lt;li>操作： 针对匹配寻址规则的行要执行的操作&lt;/li>
+&lt;/ul>
+&lt;h3 id="寻址规则">寻址规则
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">&lt;strong>寻址格式&lt;/strong>&lt;/th>
+&lt;th style="text-align: center">&lt;strong>含义&lt;/strong>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>数字&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">指定行号匹配&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>m~n&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">从m行开始，按步长n匹配&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>$&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">匹配末行&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>/regex/&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">按正则匹配&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>m,n&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">从m行开始，匹配到n行&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>m,+n&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">从m行开始，再匹配n行&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;5p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 显示第 5 行内容&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;2~3p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 显示从第2行开始，步长3递进，即第 2,5,8,11,14.... 行内容&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;$p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 显示最后一行内容&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;/qiucao/p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 显示包含qiucao的行内容&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;5,8p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 显示第 5 行到第 8 行内容&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;5,+5p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 显示第 5,6,7,8,9,10行内容&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="操作指令">操作指令
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">&lt;strong>操作指令&lt;/strong>&lt;/th>
+&lt;th style="text-align: center">&lt;strong>含义&lt;/strong>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>p&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">&lt;strong>打印&lt;/strong>匹配行&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>=&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">输出匹配行行号&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>l&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">打印匹配行并显示&lt;strong>不可见字符&lt;/strong>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>s&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">&lt;strong>正则表达式&lt;/strong>匹配和替换&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>c&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">匹配行&lt;strong>整行&lt;/strong>替换&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>a&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">在匹配行&lt;strong>后&lt;/strong>追加内容&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>i&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">在匹配行&lt;strong>前&lt;/strong>追加内容&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>d&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">&lt;strong>删除&lt;/strong>匹配行&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>r&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">在匹配换行后追加内容（从文件中）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>w&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">将匹配行内容写入文件&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>q&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">匹配后退出，不再继续匹配&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;=;5p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 显示所有行号并打印第 5 行内容&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;=;5l&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 和上条命令类似，但行末的结束符($)也会打印出来&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -r &lt;span class="s1">&amp;#39;=;s/^m\w*/test/g&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 替换所有以m开头的用户名为test, 加/g的作用是在行内替换所有匹配字符，否则只替换第一个&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=;5c\测试一下&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 将第5行替换为 “测试一下”&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=;5a\测试一下&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 在第5行内容后追加一行&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=;5i\测试一下&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 在第5行内容前插入一行&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=;5d&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 删除第5行&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=;5r test.txt&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 从test.txt中读取一行并添加到第5行后&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=;5w test.txt&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 将第5行内容写入到test.txt&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h1 id="模式空间和保留空间">模式空间和保留空间
+&lt;/h1>&lt;p>上面介绍的操作指令，主要是针对行内操作的一些指令。 我们既然说 &lt;code>sed&lt;/code> 其实是一个编辑器，那么对于多行的文本编辑操作，比如整行的复制、粘贴、剪切等，当然也是支持的。&lt;/p>
+&lt;p>这就要说到 &lt;code>sed&lt;/code> 命令处理时，预留的两个内存空间了：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>模式空间&lt;/strong>： 存储当前处理行的内容，每完成一行的处理，处理完的内容放到这个空间中&lt;/li>
+&lt;li>&lt;strong>保留空间&lt;/strong>： 用于临时存储数据，可以认为是像剪切板一样的一个缓存空间，用于不同行内容的交换。初始默认只有一个 &lt;code>\n&lt;/code> 回车符&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">&lt;strong>操作指令&lt;/strong>&lt;/th>
+&lt;th style="text-align: center">&lt;strong>用法&lt;/strong>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>h&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">将模式空间内容复制到保留空间，替换原内容(\n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>H&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">追加模式空间内容到保留空间&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>g&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">保留空间内容复制到模式空间，覆盖原内容&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>G&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">保留空间内容追加到模式空间原内容后&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>x&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">交换模式空间和保留空间内容&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">n&lt;/td>
+&lt;td style="text-align: center">立即读取下一行，并复制到模式空间&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">N&lt;/td>
+&lt;td style="text-align: center">立即读取下一行，并追加到当前模式空间（常用于行合并）&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="示例">示例
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=;2h;3H;5x;8G&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 2h复制第2行到保留空间&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 3H复制第3行并追加到现有保留空间后&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 5x将当前模式空间和保留空间进行交换，复制的内容替换了原第 5 行的内容&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 8G将保留空间内容（原第5行模式空间内容）追加到当前模式空间即第8行内容后&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/061-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/Pasted-20250313.png"
+width="912"
+height="750"
+srcset="https://chengxiaqiucao.github.io/post/061-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/Pasted-20250313_hu_78e15c06a8259f1b.png 480w, https://chengxiaqiucao.github.io/post/061-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/Pasted-20250313_hu_ebdbabdd27bcb610.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="121"
+data-flex-basis="291px"
+>&lt;/p>
+&lt;h1 id="常用-sed-实操案例">常用 sed 实操案例
+&lt;/h1>&lt;h2 id="1-删除空白行">1. 删除空白行
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -i &lt;span class="s1">&amp;#39;/^\s*$/d&amp;#39;&lt;/span> test.txt
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 正则匹配仅包含空白字符的行并删除&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="2-给文件添加行号">2. 给文件添加行号
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=&amp;#39;&lt;/span> test.txt &lt;span class="p">|&lt;/span> sed &lt;span class="s1">&amp;#39;N;s/\n/\t/&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 先用sed命令获取行号，或加到每行默认输出前一行&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 通过管道传递到后一个sed命令，通过 N 指令合并两行，并将 回车符替换为制表符&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="3-提取所有图片链接">3. 提取所有图片链接
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -nr &lt;span class="s1">&amp;#39;s/.*src=&amp;#34;(.*\.png).*/\1/p&amp;#39;&lt;/span> source.html
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 正则表达式匹配图片链接，利用正则表达式分组保存路径并替换原有整行内容&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="4-提取log中异常行">4. 提取log中异常行
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;/ERROR/{=;p}&amp;#39;&lt;/span> app.log
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 匹配日志中包含ERROR字样的行并打印输出行号&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h1 id="结语">结语
+&lt;/h1>&lt;p>以上就是关于 linux 三剑客之 &lt;code>sed&lt;/code> 命令的系统梳理，后续还会继续带来 &lt;code>awk&lt;/code> 命令的总结！ 更多测试扩展技能，欢迎关注秋草的体系化提升课程，回复 &lt;code>大纲&lt;/code> 获取详细目录。&lt;/p></description></item><item><title>测试工程师进阶必学 - Linux三剑客（grep）</title><link>https://chengxiaqiucao.github.io/post/060-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/</link><pubDate>Thu, 20 Feb 2025 14:02:28 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/060-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/060-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/Pasted-20250310.png" alt="Featured image of post 测试工程师进阶必学 - Linux三剑客（grep）" />&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/060-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/Pasted-20250310.png"
+width="1379"
+height="583"
+srcset="https://chengxiaqiucao.github.io/post/060-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/Pasted-20250310_hu_5f3d8e3ae753f3ae.png 480w, https://chengxiaqiucao.github.io/post/060-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/Pasted-20250310_hu_a3750a6d12eb971d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="236"
+data-flex-basis="567px"
+>&lt;/p>
+&lt;h1 id="前言">前言
+&lt;/h1>&lt;p>&lt;code>grep&lt;/code> 是 Linux 三剑客（&lt;code>grep&lt;/code>, &lt;code>sed&lt;/code>, &lt;code>awk&lt;/code>）之一，用于在文件中搜索特定的文本模式。它不仅功能强大，而且非常灵活，能够处理各种文本搜索需求。下文我们梳理 &lt;code>grep&lt;/code> 命令的详细用法及进阶示例。&lt;/p>
+&lt;h1 id="基本用法">基本用法
+&lt;/h1>&lt;h2 id="基本搜索">基本搜索
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>用于在 &lt;code>filename&lt;/code> 文件中搜索包含 &lt;code>pattern&lt;/code> 的行，并打印出来。&lt;/p>
+&lt;h2 id="忽略大小写">忽略大小写
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -i &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>使用 &lt;code>-i&lt;/code> 选项忽略大小写。&lt;/p>
+&lt;h2 id="递归搜索">递归搜索
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -r &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> directory
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在 &lt;code>directory&lt;/code> 目录及其子目录中递归搜索包含 &lt;code>pattern&lt;/code> 的文件内容。&lt;/p>
+&lt;h2 id="显示行号">显示行号
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -n &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>使用 &lt;code>-n&lt;/code> 选项显示匹配行的行号。&lt;/p>
+&lt;h2 id="反向搜索显示不匹配的行">反向搜索（显示不匹配的行）
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -v &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>使用 &lt;code>-v&lt;/code> 选项显示不包含 &lt;code>pattern&lt;/code> 的行。&lt;/p>
+&lt;h2 id="显示文件名">显示文件名
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> file1 file2 file3
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>当搜索多个文件时，默认会显示匹配的文件名。使用 &lt;code>-H&lt;/code> 可以强制显示文件名，使用 &lt;code>-h&lt;/code> 可以隐藏文件名。&lt;/p>
+&lt;h1 id="进阶用法">进阶用法
+&lt;/h1>&lt;h2 id="使用正则表达式">使用正则表达式
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -E &lt;span class="s2">&amp;#34;pattern1|pattern2&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>使用 &lt;code>-E&lt;/code> 选项支持扩展正则表达式，例如 &lt;code>|&lt;/code> 表示或操作。&lt;/p>
+&lt;h2 id="计数匹配的行数">计数匹配的行数
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -c &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>使用 &lt;code>-c&lt;/code> 选项统计匹配的行数。&lt;/p>
+&lt;h2 id="只显示匹配的部分">只显示匹配的部分
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -o &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>使用 &lt;code>-o&lt;/code> 选项只显示匹配的部分，而不是整行内容。&lt;/p>
+&lt;h2 id="前后行显示">前后行显示
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -A &lt;span class="m">3&lt;/span> &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename &lt;span class="c1"># 显示匹配行及其后3行&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">grep -B &lt;span class="m">3&lt;/span> &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename &lt;span class="c1"># 显示匹配行及其前3行&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">grep -C &lt;span class="m">3&lt;/span> &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename &lt;span class="c1"># 显示匹配行及其前后各3行&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>-A&lt;/code>, &lt;code>-B&lt;/code>, &lt;code>-C&lt;/code> 选项分别用于显示匹配行之后、之前或前后的指定行数。&lt;/p>
+&lt;h2 id="从标准输入读取数据">从标准输入读取数据
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;some text&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> grep &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>grep&lt;/code> 可以从标准输入读取数据，这在管道操作中非常有用。&lt;/p>
+&lt;h2 id="使用固定字符串搜索提高性能">使用固定字符串搜索（提高性能）
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -F &lt;span class="s2">&amp;#34;fixed_string&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>使用 &lt;code>-F&lt;/code> 选项将 &lt;code>pattern&lt;/code> 视为固定字符串而非正则表达式，可以提高搜索性能。&lt;/p>
+&lt;h2 id="排除文件">排除文件
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -r --exclude&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;*.log&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> directory
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>使用 &lt;code>--exclude&lt;/code> 选项排除特定类型的文件。&lt;/p>
+&lt;h2 id="使用-perl-兼容正则表达式">使用 Perl 兼容正则表达式
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -P &lt;span class="s2">&amp;#34;\d+&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>使用 &lt;code>-P&lt;/code> 选项启用 Perl 兼容正则表达式，例如 &lt;code>\d+&lt;/code> 表示一个或多个数字。&lt;/p>
+&lt;h2 id="零宽断言">零宽断言
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -P &lt;span class="s1">&amp;#39;(?&amp;lt;=foo)bar&amp;#39;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>使用 Perl 兼容正则表达式支持零宽断言，例如 &lt;code>(?&amp;lt;=foo)bar&lt;/code> 匹配前面是 &lt;code>foo&lt;/code> 的 &lt;code>bar&lt;/code>。&lt;/p>
+&lt;h1 id="组合使用示例">组合使用示例
+&lt;/h1>&lt;h2 id="查找特定目录中的特定类型文件并搜索内容">查找特定目录中的特定类型文件并搜索内容
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -r --include&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;*.py&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;import&amp;#34;&lt;/span> /path/to/directory
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在 &lt;code>/path/to/directory&lt;/code> 目录中递归搜索所有 &lt;code>.py&lt;/code> 文件，查找包含 &lt;code>import&lt;/code> 的行。&lt;/p>
+&lt;h2 id="查找并显示匹配行及其前后两行">查找并显示匹配行及其前后两行
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -C &lt;span class="m">2&lt;/span> &lt;span class="s2">&amp;#34;error&amp;#34;&lt;/span> /var/log/syslog
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在 &lt;code>/var/log/syslog&lt;/code> 文件中查找包含 &lt;code>error&lt;/code> 的行，并显示其前后两行。&lt;/p>
+&lt;h2 id="统计包含特定单词的文件数量">统计包含特定单词的文件数量
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -rl &lt;span class="s2">&amp;#34;word&amp;#34;&lt;/span> /path/to/directory &lt;span class="p">|&lt;/span> wc -l
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在 &lt;code>/path/to/directory&lt;/code> 目录中递归搜索包含 &lt;code>word&lt;/code> 的文件，并统计文件数量。&lt;/p>
+&lt;h2 id="结语">结语
+&lt;/h2>&lt;p>通过这些示例，可以体会到 &lt;code>grep&lt;/code> 的强大能力和灵活性，也让它成为Linux中最实用的文本处理工具之一。&lt;/p></description></item></channel></rss>
