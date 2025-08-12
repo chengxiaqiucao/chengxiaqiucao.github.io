@@ -1,0 +1,996 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Playwright on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/playwright/</link><description>Recent content in Playwright on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Sun, 16 Mar 2025 13:32:58 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/playwright/index.xml" rel="self" type="application/rss+xml"/><item><title>Playwright新版本筛选功能</title><link>https://chengxiaqiucao.github.io/post/066-playwright%E6%96%B0%E7%89%88%E6%9C%AC%E7%AD%9B%E9%80%89%E5%8A%9F%E8%83%BD/</link><pubDate>Sun, 16 Mar 2025 13:32:58 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/066-playwright%E6%96%B0%E7%89%88%E6%9C%AC%E7%AD%9B%E9%80%89%E5%8A%9F%E8%83%BD/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/066-playwright%E6%96%B0%E7%89%88%E6%9C%AC%E7%AD%9B%E9%80%89%E5%8A%9F%E8%83%BD/playwright_logo.png" alt="Featured image of post Playwright新版本筛选功能" />&lt;hr>
+&lt;h3 id="前言">前言
+&lt;/h3>&lt;p>在进行软件测试，比如针对一个电商网站，你是否遇到过这些问题？&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>动态加载的商品列表&lt;/strong>：部分商品因缺货、促销结束或未登录状态被隐藏。&lt;/li>
+&lt;li>&lt;strong>悬浮显示的促销标签&lt;/strong>：仅当用户鼠标悬停时才会展示优惠信息。&lt;/li>
+&lt;li>&lt;strong>广告弹窗干扰&lt;/strong>：某些弹窗可能遮挡核心功能，但测试时需要确保主流程不受影响。&lt;/li>
+&lt;/ul>
+&lt;p>这些场景的共同点是：&lt;strong>页面元素可能存在于DOM中，但用户实际不可见&lt;/strong>， 比如设置CSS属性（&lt;code>display: none&lt;/code>、&lt;code>visibility: hidden&lt;/code>）。传统测试方法需要手动判断元素可见性，遍历或预先这对具体对象进行分支判断，比较复杂。&lt;/p>
+&lt;hr>
+&lt;h3 id="playwright-最新版本提供了一个简化方法">Playwright 最新版本提供了一个简化方法
+&lt;/h3>&lt;p>在最新更新的 Playwright V1.5.1 版本更新中，针对&lt;code>locator.filter()&lt;/code>方法新增了&lt;code>visible&lt;/code>选项，可以极大简化这部分操作。（&lt;em>目前针对node.js有此更新，Python语言尚未支持&lt;/em>）&lt;/p>
+&lt;p>其核心作用是：&lt;br>
+&lt;strong>仅筛选页面上用户实际可见的元素&lt;/strong>，自动忽略因CSS（如&lt;code>display: none&lt;/code>）或布局原因隐藏的元素。&lt;/p>
+&lt;p>&lt;strong>技术原理&lt;/strong>：&lt;br>
+Playwright通过计算元素的布局边界、透明度、层叠上下文等属性，判断元素是否在视口内且对用户可见。这与真实用户视角完全一致，避免因操作隐藏元素导致测试失败。&lt;/p>
+&lt;hr>
+&lt;h3 id="场景实战过滤可见商品">场景实战：过滤可见商品
+&lt;/h3>&lt;p>假设我们测试一个中文电商平台的**“限时秒杀”页面**，其HTML结构如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&amp;lt;!DOCTYPE html&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">head&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>限时秒杀&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">head&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">body&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;seckill-list&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c">&amp;lt;!-- 可见商品 --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">data-testid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;product-item&amp;#34;&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;product&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h3&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>【爆款】无线蓝牙耳机&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h3&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;price&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>促销价: ¥199&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>立即抢购&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">data-testid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;product-item&amp;#34;&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;product&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h3&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>智能手环&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h3&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;price&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>促销价: ¥299&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>立即抢购&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c">&amp;lt;!-- 隐藏商品（已抢光或未开始） --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">data-testid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;product-item&amp;#34;&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;product&amp;#34;&lt;/span> &lt;span class="na">style&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;display: none;&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h3&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>家用投影仪&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h3&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;price&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>促销价: ¥899&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>已售罄&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">data-testid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;product-item&amp;#34;&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;product&amp;#34;&lt;/span> &lt;span class="na">style&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;opacity: 0;&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h3&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>空气炸锅&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h3&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;price&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>促销价: ¥399&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>未开始&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">body&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="需求场景">&lt;strong>需求场景&lt;/strong>
+&lt;/h4>&lt;p>用户访问“限时秒杀”页面时，&lt;strong>仅展示可抢购的商品&lt;/strong>（前两项），隐藏已售罄或未开始的商品。我们需要验证：&lt;/p>
+&lt;ol>
+&lt;li>页面中用户可见的商品数量是否正确。&lt;/li>
+&lt;li>“立即抢购”按钮仅对可见商品生效。&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;h3 id="新旧方案对比">&lt;strong>新旧方案对比&lt;/strong>
+&lt;/h3>&lt;h4 id="旧方法手动遍历可见性检查">旧方法：手动遍历+可见性检查
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 旧方案示例
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">test&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">expect&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@playwright/test&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;验证可见商品数量&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">page&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">goto&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;https://mall.example.com/seckill&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">allProducts&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByTestId&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;product-item&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">all&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">visibleCount&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">product&lt;/span> &lt;span class="k">of&lt;/span> &lt;span class="nx">allProducts&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">await&lt;/span> &lt;span class="nx">product&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">isVisible&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">visibleCount&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">visibleCount&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">toBe&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// 断言可见商品为2个
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>痛点&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>需要手动遍历所有元素，代码冗余。&lt;/li>
+&lt;li>若商品数量动态变化（如分页加载），维护成本高。&lt;/li>
+&lt;/ul>
+&lt;h4 id="新方案一行代码过滤可见元素">&lt;strong>新方案：一行代码过滤可见元素&lt;/strong>
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 新方案示例
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">test&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">expect&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@playwright/test&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;验证可见商品数量&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">page&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">goto&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;https://mall.example.com/seckill&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">visibleProducts&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByTestId&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;product-item&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">filter&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">visible&lt;/span>: &lt;span class="kt">true&lt;/span> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 断言可见商品数量为2
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">visibleProducts&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">toHaveCount&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 断言所有可见商品均可点击“立即抢购”
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">visibleProducts&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByText&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;立即抢购&amp;#39;&lt;/span>&lt;span class="p">)).&lt;/span>&lt;span class="nx">toHaveCount&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>优势&lt;/strong>：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>代码简洁&lt;/strong>：无需循环，直接通过链式调用过滤。&lt;/li>
+&lt;li>&lt;strong>实时匹配&lt;/strong>：自动响应页面动态变化（如AJAX加载新商品）。&lt;/li>
+&lt;li>&lt;strong>精准断言&lt;/strong>：结合Playwright的软断言（Soft Assertions），可同时验证多个条件。&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;h3 id="扩展应用电商测试中的常见场景">&lt;strong>扩展应用：电商测试中的常见场景&lt;/strong>
+&lt;/h3>&lt;h4 id="场景1验证悬浮显示的促销标签">&lt;strong>场景1：验证悬浮显示的促销标签&lt;/strong>
+&lt;/h4>&lt;p>某些商品的“限时折扣”标签仅在鼠标悬停时显示。通过&lt;code>visible: true&lt;/code>可确保仅操作实际可见的元素：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 鼠标悬停后，验证促销标签可见
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">productCard&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByTestId&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;product-card&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">filter&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">visible&lt;/span>: &lt;span class="kt">true&lt;/span> &lt;span class="p">}).&lt;/span>&lt;span class="nx">first&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">await&lt;/span> &lt;span class="nx">productCard&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">hover&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">discountTag&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">productCard&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByText&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;限时5折&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">await&lt;/span> &lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">discountTag&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">toBeVisible&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="场景2过滤弹窗干扰">&lt;strong>场景2：过滤弹窗干扰&lt;/strong>
+&lt;/h4>&lt;p>若页面存在广告弹窗，可通过&lt;code>visible: true&lt;/code>跳过隐藏的弹窗元素：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 关闭可见的弹窗（忽略已隐藏的）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">activePopup&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByTestId&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;popup&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">filter&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">visible&lt;/span>: &lt;span class="kt">true&lt;/span> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">await&lt;/span> &lt;span class="nx">activePopup&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">isVisible&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">activePopup&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByText&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;关闭&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">click&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;h3 id="结语">结语
+&lt;/h3>&lt;p>通过这个 &lt;code>Playwright&lt;/code> 更新的实用功能，可以较大简化我们在进行自动化测试时编写的复杂度，也可以看到，作为势头正劲的新一代web测试工具，Playwright的不断升级优化还是很贴合实际且社区活跃，值得重点关注！&lt;/p>
+&lt;p>秋草也推出了一个 基于Pytest+Playwright的自动化框架实战课程，有兴趣的同学可关注：&lt;/p></description></item><item><title>用deepseek+vscode自动完成测试脚本</title><link>https://chengxiaqiucao.github.io/post/052-%E7%94%A8deepseek+vscode%E8%87%AA%E5%8A%A8%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95%E8%84%9A%E6%9C%AC/</link><pubDate>Fri, 31 Jan 2025 21:29:12 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/052-%E7%94%A8deepseek+vscode%E8%87%AA%E5%8A%A8%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95%E8%84%9A%E6%9C%AC/</guid><description>&lt;p>近几日Deepseek大火，我这里也尝试了一下，确实很强。而目前vscode的AI toolkit插件也已经集成了deepseek R1，这里就介绍下在vscode中利用deepseek帮助我们完成自动化测试脚本的实践分享&lt;/p>
+&lt;h2 id="安装ai-toolkit并启用deepseek">安装AI ToolKit并启用Deepseek
+&lt;/h2>&lt;p>微软官方提供了一个针对AI辅助的插件，也就是 &lt;strong>AI Toolkit for Visual Studio Code&lt;/strong>， 这个插件可以利用各种开源或商用的大模型，目前也已经集成了Deepseek R1模型，可以让我们在VS code中方便地利用Deepseek来帮助我们的代码开发&lt;/p>
+&lt;p>首先在插件中心中找到&lt;strong>AI Toolkit&lt;/strong>并完成安装&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/052-%E7%94%A8deepseek&amp;#43;vscode%E8%87%AA%E5%8A%A8%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95%E8%84%9A%E6%9C%AC/Pasted-20250131-1.png"
+width="1586"
+height="1180"
+srcset="https://chengxiaqiucao.github.io/post/052-%E7%94%A8deepseek&amp;#43;vscode%E8%87%AA%E5%8A%A8%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95%E8%84%9A%E6%9C%AC/Pasted-20250131-1_hu_21e0d5258939b6d2.png 480w, https://chengxiaqiucao.github.io/post/052-%E7%94%A8deepseek&amp;#43;vscode%E8%87%AA%E5%8A%A8%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95%E8%84%9A%E6%9C%AC/Pasted-20250131-1_hu_b96bba8591f888d8.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="134"
+data-flex-basis="322px"
+>&lt;/p>
+&lt;p>安装完成插件以后，在插件页面，选择catalog中的models模型页面，并通过筛选条件 &lt;code>hosted by Github&lt;/code>, 以及 &lt;code>publisher Deepseek&lt;/code> 使用Deepseek-R1模型&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/052-%E7%94%A8deepseek&amp;#43;vscode%E8%87%AA%E5%8A%A8%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95%E8%84%9A%E6%9C%AC/Pasted-20250131.png"
+width="1403"
+height="1040"
+srcset="https://chengxiaqiucao.github.io/post/052-%E7%94%A8deepseek&amp;#43;vscode%E8%87%AA%E5%8A%A8%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95%E8%84%9A%E6%9C%AC/Pasted-20250131_hu_75f3fee0b99aaf21.png 480w, https://chengxiaqiucao.github.io/post/052-%E7%94%A8deepseek&amp;#43;vscode%E8%87%AA%E5%8A%A8%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95%E8%84%9A%E6%9C%AC/Pasted-20250131_hu_ec9505cc538860aa.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="134"
+data-flex-basis="323px"
+>&lt;/p>
+&lt;h2 id="ai帮助生成脚本">AI帮助生成脚本
+&lt;/h2>&lt;p>有了deepseek模型后，我们就可以新建一个playgroud让deepseek帮助我们生成自动化脚本了，以下是我让Deepseek生成的针对saucedemo的测试脚本&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/052-%E7%94%A8deepseek&amp;#43;vscode%E8%87%AA%E5%8A%A8%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95%E8%84%9A%E6%9C%AC/Pasted-20250131-2.png"
+width="1196"
+height="657"
+srcset="https://chengxiaqiucao.github.io/post/052-%E7%94%A8deepseek&amp;#43;vscode%E8%87%AA%E5%8A%A8%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95%E8%84%9A%E6%9C%AC/Pasted-20250131-2_hu_de464dae80bb5d2a.png 480w, https://chengxiaqiucao.github.io/post/052-%E7%94%A8deepseek&amp;#43;vscode%E8%87%AA%E5%8A%A8%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95%E8%84%9A%E6%9C%AC/Pasted-20250131-2_hu_2b9c36158ae3ebfc.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="182"
+data-flex-basis="436px"
+>&lt;/p>
+&lt;h3 id="思考过程">思考过程
+&lt;/h3>&lt;p>嗯，我现在需要帮忙设计一个基于pytest和Playwright的自动化测试项目，针对saucedemo.com的登录和checkout流程，使用POM模式，用户数据放在user.yml里，还要包含异常场景。好的，我得一步一步来。&lt;/p>
+&lt;p>首先，应该确定项目的结构。POM模式的话，通常会有page对象、测试用例、配置文件、数据文件等。可能需要这样的目录结构：&lt;/p>
+&lt;ul>
+&lt;li>tests/
+&lt;ul>
+&lt;li>pages/
+&lt;ul>
+&lt;li>login_page.py&lt;/li>
+&lt;li>inventory_page.py&lt;/li>
+&lt;li>cart_page.py&lt;/li>
+&lt;li>checkout_page.py&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>test_login.py&lt;/li>
+&lt;li>test_checkout.py&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>conftest.py&lt;/li>
+&lt;li>user.yml&lt;/li>
+&lt;li>pytest.ini&lt;/li>
+&lt;/ul>
+&lt;p>然后，用户数据存在user.yml里，里面应该有不同的用户类型，比如标准用户，锁定用户，错误密码，没有用户等。然后测试用例要读取这些数据。&lt;/p>
+&lt;p>接下来是Page Object Model的实现。每个页面比如登录页、商品页，购物车页、结算页都有自己的类，封装元素和操作。比如LoginPage有用户名、密码输入框，登录按钮，错误提示的方法。&lt;/p>
+&lt;p>测试用例应该使用pytest的参数化来覆盖不同的用户场景。比如正常登录成功，无效密码，锁定用户等。同时，checkout流程需要正常流程的测试，可能还有填写信息不完整的情况。&lt;/p>
+&lt;p>然后考虑conftest.py里面设置Playwright的fixture，比如browser，page，以及各个page对象的fixture。比如，每次测试前都转到登录页，登录后到库存页，这样可以处理前置条件。&lt;/p>
+&lt;p>异常场景的话，例如登录时的各种错误信息，结账时的表单验证，比如必须填first name等。需要编写这些测试用例，并验证错误提示是否正确。&lt;/p>
+&lt;p>用户的数据如何加载呢？可能用pyYAML库来读取user.yml文件，里面分不同用户的数据。测试时用@pytest.mark.parametrize参数化输入不同的用户数据。&lt;/p>
+&lt;p>比如，用户数据分成valid_users，invalid_password，locked_user等键。在测试登录的时候，参数化这些情况，触发不同的测试用例。&lt;/p>
+&lt;p>在测试checkout流程时，可能需要先登录，然后添加商品到购物车，进入购物车，进入结算页，填写信息，完成checkout。这时候，正常的测试用例需要用有效的数据，而异常情况比如不填写某些字段需要验证错误提示。&lt;/p>
+&lt;p>还需要处理元素的选择器，Playwright的定位方法，比如使用CSS选择器或文本定位。例如，登录页可能通过id定位用户名和密码输入框。&lt;/p>
+&lt;p>此外，测试完成后需要清理状态吗？比如，购物车中的商品或者是否需要登出，或者每个测试用例之间保持独立，可能使用 fixtures 来确保各自的状态。&lt;/p>
+&lt;p>也可能需要处理异步操作，不过Playwright是自动处理等待的，所以在页面导航或元素点击时不需要额外处理。&lt;/p>
+&lt;p>现在，具体的步骤：&lt;/p>
+&lt;ol>
+&lt;li>创建项目结构，安装依赖：pytest, playwright, pyyaml。&lt;/li>
+&lt;li>编写user.yml，包含不同类型的用户数据。&lt;/li>
+&lt;li>实现各个页面的Page类，包含元素定位和操作方法。&lt;/li>
+&lt;li>在conftest.py中定义fixture，例如初始化page，创建各page对象的实例。&lt;/li>
+&lt;li>编写测试用例，参数化用户数据，覆盖正常和异常流程。&lt;/li>
+&lt;li>处理测试中的等待和断言，确保元素的存在或文本正确。&lt;/li>
+&lt;/ol>
+&lt;p>需要检查测试用例是否覆盖以下场景：&lt;/p>
+&lt;p>登录：&lt;/p>
+&lt;ul>
+&lt;li>正确用户密码登录成功。&lt;/li>
+&lt;li>错误密码提示错误信息。&lt;/li>
+&lt;li>锁定用户无法登录。&lt;/li>
+&lt;li>空用户名或密码提示错误。&lt;/li>
+&lt;/ul>
+&lt;p>Checkout：&lt;/p>
+&lt;ul>
+&lt;li>正常填写所有信息，完成订单。&lt;/li>
+&lt;li>必填字段缺失（如first name为空）提示错误。&lt;/li>
+&lt;li>取消订单流程。&lt;/li>
+&lt;/ul>
+&lt;p>现在，user.yml的结构应该是什么样的？&lt;/p>
+&lt;p>可能如下：&lt;/p>
+&lt;p>users: valid_user: username: standard_user password: secret_sauce invalid_password_user: username: standard_user password: wrongpass locked_user: username: locked_out_user password: secret_sauce missing_username: username: &amp;quot;&amp;quot; password: secret_sauce missing_password: username: standard_user password: &amp;quot;&amp;quot;&lt;/p>
+&lt;p>在测试登录的时候，参数化这些情况。比如，对于valid_user，应该登录成功，跳转到/inventory.html。对于invalid_password，显示Epic sadface: Username and password do not match。锁定的用户提示Epic sadface: Sorry, this user has been locked out。缺少用户名或密码提示相应的错误信息。&lt;/p>
+&lt;p>对于checkout流程，可行的步骤是：&lt;/p>
+&lt;p>登录后，添加一个商品到购物车，点击购物车图标，进入购物车页，点击checkout按钮，填写信息，继续，完成。&lt;/p>
+&lt;p>所以测试用例需要参数化填写的信息是否正确。例如：&lt;/p>
+&lt;p>正常情况下的信息：&lt;/p>
+&lt;p>first_name: John last_name: Doe zip: 12345&lt;/p>
+&lt;p>异常情况，比如不填first name，是否提示错误。&lt;/p>
+&lt;p>在编写这些测试时，需要使用页面对象的方法来完成每个步骤，比如添加商品，进入购物车，填写信息，继续按钮等。&lt;/p>
+&lt;p>可能的问题点：&lt;/p>
+&lt;p>元素的定位是否正确，特别是动态生成的内容或者异步加载的部分是否需要等待。不过Playwright有自动等待机制，所以选择元素时只要正确选择应该没问题。&lt;/p>
+&lt;p>需要断言的地方包括：登录后的页面URL是否正确，订单完成后的确认信息是否存在，错误提示是否显示正确的文本。&lt;/p>
+&lt;p>比如，登录成功后应该跳转到/inventory.html；checkout完成后应该显示“Thank you for your order”。&lt;/p>
+&lt;p>另外，可能需要清理购物车，但因为每个测试可能独立运行，或者每个测试都重新开始会话，所以在fixture中可以处理，如在每次测试前登录并重置状态？&lt;/p>
+&lt;p>或者使用类似于beforeEach的fixture，让每个测试用例开始时处于某个状态。比如，登录后的页面。&lt;/p>
+&lt;p>此外，测试购物流程需要添加商品到购物车，所以库存页面的类需要有添加商品的方法。&lt;/p>
+&lt;p>Page类示例：&lt;/p>
+&lt;p>InventoryPage可以有添加某个商品的方法，比如点击“Add to cart”按钮。比如，根据商品名称定位对应的按钮。不过这可能比较复杂，也许在页面上使用通用的方法。&lt;/p>
+&lt;p>或者，在InventoryPage中有方法add_item_to_cart(item_name)，用于点击对应商品的添加按钮。这时需要使用Playwright的定位方法，例如：&lt;/p>
+&lt;p>def add_item_to_cart(self, item_name): self.page.locator(f&amp;quot;text={item_name}&amp;quot;).locator(&amp;ldquo;xpath=..&amp;rdquo;).locator(&amp;ldquo;button&amp;rdquo;).click()&lt;/p>
+&lt;p>不过这可能需要根据实际的DOM结构来确定。可能需要inspector查看元素结构。&lt;/p>
+&lt;p>例如，每个商品项的结构可能类似：&lt;/p>
+&lt;div class="inventory_item"> &lt;div class="inventory_item_name">Sauce Labs Backpack&lt;/div> &lt;button class="btn btn_primary">Add to cart&lt;/button> &lt;/div>
+&lt;p>所以，找到对应的名称元素，然后找到其父级元素中的按钮。&lt;/p>
+&lt;p>或者，更简单的办法是每个商品的“Add to cart”按钮有不同的id，比如 add-to-cart-sauce-labs-backpack，或其他属性。需要看实际网站的结构。&lt;/p>
+&lt;p>登录后的页面可能有多个商品，每个商品对应的添加按钮可能需要通过其文本来定位对应的按钮。或者通过其他属性。&lt;/p>
+&lt;p>现在，需要实际查看saucedemo.com的结构。可能使用Playwright的代码生成功能来获取正确的选择器。&lt;/p>
+&lt;p>假设，例如，每个商品的“Add to cart”按钮的id是动态生成的或者类似，例如对于“Sauce Labs Backpack”，对应的按钮的id可能是add-to-cart-sauce-labs-backpack，那么可以直接通过这个id去定位。&lt;/p>
+&lt;p>这样的话，InventoryPage中可以有一个方法：&lt;/p>
+&lt;p>def add_product_to_cart(self, product_name): product_id = product_name.lower().replace(&amp;rsquo; &amp;lsquo;, &amp;lsquo;-&amp;rsquo;) self.page.click(f&amp;quot;#add-to-cart-{product_id}&amp;quot;)&lt;/p>
+&lt;p>当然，这需要查看实际的网站结构是否正确。&lt;/p>
+&lt;p>假设正确的商品example在这里是Sauce Labs Backpack，其id可能确实是这样的，这样方法可行。&lt;/p>
+&lt;p>另外，购物车图标上的数量是否正确，当商品添加后，购物车的图标显示数量为1。当进入购物车页，是否有对应的商品。&lt;/p>
+&lt;p>需要注意，每个操作之后的页面变化是否需要新的Page对象实例，比如在InventoryPage点击购物车后跳转到CartPage，所以该操作应该返回CartPage的实例，从而能够继续操作。&lt;/p>
+&lt;p>这样方法的返回值处理可能成为问题。比如：&lt;/p>
+&lt;p>在InventoryPage中的方法：&lt;/p>
+&lt;p>def go_to_cart(self): self.page.click(&amp;quot;.shopping_cart_link&amp;quot;) return CartPage(self.page)&lt;/p>
+&lt;p>类似这样，每个导航动作返回新的Page对象。&lt;/p>
+&lt;p>这会需要在各个页面的方法中处理返回相应的页面对象。&lt;/p>
+&lt;p>然后是测试流程的组装：&lt;/p>
+&lt;p>在测试checkout的时候，可能步骤很多，需要写一个大的测试用例，分步骤进行：&lt;/p>
+&lt;p>例如：&lt;/p>
+&lt;p>def test_checkout_process(login_page, inventory_page, checkout_data): # 登录 login_page.login(&amp;ldquo;standard_user&amp;rdquo;, &amp;ldquo;secret_sauce&amp;rdquo;) # 添加商品 inventory_page.add_product_to_cart(&amp;ldquo;Sauce Labs Backpack&amp;rdquo;) inventory_page.go_to_cart() # 进入购物车页面，点击checkout cart_page.click_checkout() # 填写checkout信息 checkout_page.fill_shipping_info(checkout_data) checkout_page.continue_to_overview() # 确认订单 checkout_page.finish_checkout() # 断言是否成功 assert checkout_page.get_order_confirmation() == &amp;ldquo;Thank you for your order!&amp;rdquo;&lt;/p>
+&lt;p>当然，这可能涉及到许多页面的跳转，每个页面之间需要用对应的方法来连接。&lt;/p>
+&lt;p>异常场景的话，比如在填写信息的时候不输入first name，点击continue时，出现错误提示。&lt;/p>
+&lt;p>此时，测试用例可能参数化不同的数据，比如：&lt;/p>
+&lt;p>@pytest.mark.parametrize(&amp;ldquo;first_name, last_name, zip_code, error_message&amp;rdquo;, [ (&amp;quot;&amp;quot;, &amp;ldquo;Doe&amp;rdquo;, &amp;ldquo;12345&amp;rdquo;, &amp;ldquo;Error: First Name is required&amp;rdquo;), (&amp;ldquo;John&amp;rdquo;, &amp;ldquo;&amp;rdquo;, &amp;ldquo;12345&amp;rdquo;, &amp;ldquo;Error: Last Name is required&amp;rdquo;), (&amp;ldquo;John&amp;rdquo;, &amp;ldquo;Doe&amp;rdquo;, &amp;ldquo;&amp;rdquo;, &amp;ldquo;Error: Postal Code is required&amp;rdquo;), ]) def test_checkout_missing_fields(&amp;hellip;, first_name, last_name, zip_code, error_message): # 填信息时，漏掉对应字段 checkout_page.fill_shipping_info(first_name, last_name, zip_code) checkout_page.continue_to_overview() assert checkout_page.get_error_message() == error_message&lt;/p>
+&lt;p>可能还需要考虑，错误信息提示元素的定位是否正确，以及当出现错误时是否阻止进入下一步。&lt;/p>
+&lt;p>现在，问题可能是如何组织这些数据和页面方法。&lt;/p>
+&lt;p>另外，关于用户数据的读取，测试用例需要从YAML文件中加载。可能的做法是在conftest.py里面写个fixture读取YAML的数据，然后参数化测试用例。&lt;/p>
+&lt;p>但pytest的参数化可能需要特定的方式处理，可能将YAML数据转换成测试参数。或者使用外部数据源来参数化测试。&lt;/p>
+&lt;p>例如，在conftest.py中读取user.yml的所有用户数据，并为登录测试创建一个参数化的fixture。&lt;/p>
+&lt;p>或者，可以在测试用例中直接读取YAML文件中的数据，并将其参数化。&lt;/p>
+&lt;p>比如：&lt;/p>
+&lt;p>import yaml&lt;/p>
+&lt;p>def load_users(): with open(&amp;lsquo;user.yml&amp;rsquo;) as f: data = yaml.safe_load(f) return data[&amp;lsquo;users&amp;rsquo;]&lt;/p>
+&lt;p>然后在测试用例中用：&lt;/p>
+&lt;p>@pytest.mark.parametrize(&amp;ldquo;user&amp;rdquo;, [ (&amp;ldquo;valid_user&amp;rdquo;), (&amp;ldquo;invalid_password_user&amp;rdquo;), (&amp;ldquo;locked_user&amp;rdquo;), # &amp;hellip; 其他情况 ], indirect=True) def test_login(login_page, user): login_page.login(user[&amp;lsquo;username&amp;rsquo;], user[&amp;lsquo;password&amp;rsquo;]) # 断言等操作&lt;/p>
+&lt;p>不过，如何将数据转换为参数可能需要更细致的处理，比如将各个用户数据提取成各个测试实例的参数。&lt;/p>
+&lt;p>可能更好的方法是将不同的用户情况分别写成不同的测试数据项。例如，把不同用户类型数据的键列出来，然后根据这些键从数据中加载相应的参数。&lt;/p>
+&lt;p>或者，在所有参数化时，导入所有用户数据作为参数。&lt;/p>
+&lt;p>比如：&lt;/p>
+&lt;p>import yaml import pytest&lt;/p>
+&lt;p>with open(&amp;lsquo;user.yml&amp;rsquo;) as f: user_data = yaml.safe_load(f)[&amp;lsquo;users&amp;rsquo;]&lt;/p>
+&lt;p>login_test_data = [ (user_data[&amp;lsquo;valid_user&amp;rsquo;], True, None), # 正常用户，登录成功，没有错误 (user_data[&amp;lsquo;invalid_password_user&amp;rsquo;], False, &amp;lsquo;Epic sadface: Username and password do not match&amp;rsquo;), (user_data[&amp;rsquo;locked_user&amp;rsquo;], False, &amp;lsquo;Epic sadface: Sorry, this user has been locked out.&amp;rsquo;), # &amp;hellip; 其他情况 ]&lt;/p>
+&lt;p>@pytest.mark.parametrize(&amp;ldquo;user, success, error_msg&amp;rdquo;, login_test_data) def test_login_user(login_page, user, success, error_msg): login_page.navigate() login_page.login(user[&amp;lsquo;username&amp;rsquo;], user[&amp;lsquo;password&amp;rsquo;]) if success: assert login_page.current_url == &amp;lsquo;&lt;a class="link" href="https://www.saucedemo.com/inventory.html%27" target="_blank" rel="noopener"
+>https://www.saucedemo.com/inventory.html'&lt;/a> else: assert login_page.get_error_message() == error_msg&lt;/p>
+&lt;p>这时候，需要在user.yml里的每个用户数据中有一个error键，或者在参数化的准备阶段处理错误信息的映射。&lt;/p>
+&lt;p>不过这样的参数方式可能更灵活，能够同时指定预期结果。&lt;/p>
+&lt;p>对于YAML的结构，可能需要更详细的数据项，每个用户数据包含预期的错误消息。&lt;/p>
+&lt;p>例如，user.yml部分内容：&lt;/p>
+&lt;p>valid_user: username: standard_user password: secret_sauce expected: success: true error: null&lt;/p>
+&lt;p>invalid_password_user: username: standard_user password: wrong expected: success: false error: &amp;ldquo;Epic sadface: Username and password do not match&amp;rdquo;&lt;/p>
+&lt;p>locked_user: username: locked_out_user password: secret_sauce expected: success: false error: &amp;ldquo;Epic sadface: Sorry, this user has been locked out.&amp;rdquo;&lt;/p>
+&lt;p>这样参数化时可以更具结构化。但在编写YAML时需要考虑每个用例的期望结果。&lt;/p>
+&lt;p>这样，测试用例的参数可能会是直接从YAML中读取的结构，然后通过解析不同的用户组生成测试用例参数。&lt;/p>
+&lt;p>不过，这可能有些复杂。另一个办法是，将每个测试案例定义为YAML中的一个项目，包含输入数据和预期结果。&lt;/p>
+&lt;p>总之，这部分的处理可能需要更多设计。&lt;/p>
+&lt;p>然后，关于Playwright的fixture设置，在conftest.py里可以使用pytest-playwright提供的fixture。例如，使用pytest-playwright插件中的page fixture。不过这可能需要安装pytest-playwright库，并调用playwright的安装步骤。&lt;/p>
+&lt;p>安装依赖包括：&lt;/p>
+&lt;p>pytest-playwright playwright pyyaml&lt;/p>
+&lt;p>执行playwright install安装浏览器。&lt;/p>
+&lt;p>然后，在conftest.py中，定义如何初始化各个page对象，并将它们作为fixture注入到测试用例中。&lt;/p>
+&lt;p>例如：&lt;/p>
+&lt;p>import pytest from playwright.sync_api import Page from pages.login_page import LoginPage from pages.inventory_page import InventoryPage&lt;/p>
+&lt;h5 id="其他页面的导入">其他页面的导入
+&lt;/h5>&lt;p>@pytest.fixture def login_page(page: Page): return LoginPage(page)&lt;/p>
+&lt;p>@pytest.fixture def inventory_page(page: Page): return InventoryPage(page)&lt;/p>
+&lt;p>等等。这样每个测试用例如果需要用到特定的页面对象，可以直接在参数中声明需要的fixture。&lt;/p>
+&lt;p>例如，一个测试用例函数可能接收login_page和inventory_page作为参数。&lt;/p>
+&lt;p>接下来，各个Page类的示例。&lt;/p>
+&lt;p>LoginPage类是这样的：&lt;/p>
+&lt;p>class LoginPage: def &lt;strong>init&lt;/strong>(self, page): self.page = page self.username_input = page.locator(&amp;quot;#user-name&amp;quot;) self.password_input = page.locator(&amp;quot;#password&amp;quot;) self.login_button = page.locator(&amp;quot;#login-button&amp;quot;) self.error_message = page.locator(&amp;quot;.error-message-container&amp;quot;)&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">def navigate(self):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> self.page.goto(&amp;#34;https://www.saucedemo.com&amp;#34;)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">def login(self, username, password):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> self.username_input.fill(username)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> self.password_input.fill(password)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> self.login_button.click()
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">def get_error_message(self):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> return self.error_message.inner_text()
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>但实际情况需要根据saucedemo.com的实际HTML结构调整选择器。比如，错误信息的元素可能是div.error-message-container带有data-test=&amp;ldquo;error&amp;quot;的属性，其文本可能在某个子元素内。&lt;/p>
+&lt;p>比如说，实际的网站中，错误信息的HTML可能是：&lt;/p>
+&lt;div class="error-message-container" data-test="error"> &lt;h3>Epic sadface: Username and password do not match any user in this service&lt;/h3> &lt;button class="error-button" data-test="关闭错误信息">&lt;/button> &lt;/div>
+&lt;p>那么，error_message的locator需要定位到h3元素的文本。或者，定位到整个容器，然后用inner_text()获取文本。&lt;/p>
+&lt;p>或者，正确的选择器可能是：&lt;/p>
+&lt;p>error_message = page.locator(&amp;rsquo;[data-test=&amp;ldquo;error&amp;rdquo;]&amp;rsquo;)&lt;/p>
+&lt;p>但Playwright支持多种选择方式，比如用data-testid属性等，所以在编写时需要查证正确的元素定位方式。&lt;/p>
+&lt;p>所以可能更好的方式是使用data-test属性来选择元素，例如登录页的数据测试属性：&lt;/p>
+&lt;p>用户名输入：data-test=&amp;ldquo;username&amp;rdquo;&lt;/p>
+&lt;p>密码输入：data-test=&amp;ldquo;password&amp;rdquo;&lt;/p>
+&lt;p>登录按钮：data-test=&amp;ldquo;login-button&amp;rdquo;&lt;/p>
+&lt;p>错误信息元素：data-test=&amp;ldquo;error&amp;rdquo;，所以其元素可以定位为：&lt;/p>
+&lt;p>self.error_message = page.locator(&amp;rsquo;[data-test=&amp;ldquo;error&amp;rdquo;]&amp;rsquo;)&lt;/p>
+&lt;p>然后其文本内容可以用error_message.inner_text()来获取，包含错误信息的关键部分。&lt;/p>
+&lt;p>至于其他页面，比如库存页面，购物车页等：&lt;/p>
+&lt;p>InventoryPage可能有添加商品到购物车的方法，跳转到购物车的方法，或许购物车数量的显示。例如：&lt;/p>
+&lt;p>class InventoryPage: def &lt;strong>init&lt;/strong>(self, page: Page): self.page = page&lt;/p>
+&lt;p>def add_product_to_cart(self, product_name):
+# 这里假设商品名称对应的添加按钮如何定位，假设data-test属性中有对应的add-to-cart按钮，例如 data-test=&amp;ldquo;add-to-cart-sauce-labs-backpack&amp;rdquo;
+product_id = product_name.lower().replace(&amp;rsquo; &amp;lsquo;, &amp;lsquo;-&amp;rsquo;)
+self.page.locator(f&amp;rsquo;[data-test=&amp;ldquo;add-to-cart-{product_id}&amp;rdquo;]&amp;rsquo;).click()&lt;/p>
+&lt;p>def get_cart_count(self):
+return self.page.locator(&amp;rsquo;.shopping_cart_badge&amp;rsquo;).inner_text()&lt;/p>
+&lt;p>def go_to_cart(self):
+self.page.locator(&amp;rsquo;.shopping_cart_link&amp;rsquo;).click()
+return CartPage(self.page)&lt;/p>
+&lt;p>CartPage类，可能有checkout按钮：&lt;/p>
+&lt;p>class CartPage: def &lt;strong>init&lt;/strong>(self, page: Page): self.page = page&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">def checkout(self):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> self.page.locator(&amp;#39;[data-test=&amp;#34;checkout&amp;#34;]&amp;#39;).click()
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> return CheckoutPage(self.page)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>CheckoutPage类：&lt;/p>
+&lt;p>class CheckoutPage: def &lt;strong>init&lt;/strong>(self, page: Page): self.page = page self.first_name_input = page.locator(&amp;rsquo;[data-test=&amp;ldquo;firstName&amp;rdquo;]&amp;rsquo;) self.last_name_input = page.locator(&amp;rsquo;[data-test=&amp;ldquo;lastName&amp;rdquo;]&amp;rsquo;) self.postal_code_input = page.locator(&amp;rsquo;[data-test=&amp;ldquo;postalCode&amp;rdquo;]&amp;rsquo;) self.continue_button = page.locator(&amp;rsquo;[data-test=&amp;ldquo;continue&amp;rdquo;]&amp;rsquo;) self.error_message = page.locator(&amp;rsquo;[data-test=&amp;ldquo;error&amp;rdquo;]&amp;rsquo;)&lt;/p>
+&lt;p>def fill_shipping_info(self, first_name, last_name, postal_code):
+self.first_name_input.fill(first_name)
+self.last_name_input.fill(last_name)
+self.postal_code_input.fill(postal_code)&lt;/p>
+&lt;p>def continue_to_overview(self):
+self.continue_button.click()&lt;/p>
+&lt;p>def get_error_message(self):
+return self.error_message.inner_text().strip()&lt;/p>
+&lt;p>然后，在完成信息填写后的页面，可能有finish按钮，在CheckoutOverviewPage类中：&lt;/p>
+&lt;p>class CheckoutOverviewPage: def &lt;strong>init&lt;/strong>(self, page: Page): self.page = page self.finish_button = page.locator(&amp;rsquo;[data-test=&amp;ldquo;finish&amp;rdquo;]&amp;rsquo;) self.confirmation_message = page.locator(&amp;rsquo;.complete-header&amp;rsquo;)&lt;/p>
+&lt;p>def finish_checkout(self):
+self.finish_button.click()&lt;/p>
+&lt;p>def get_confirmation_message(self):
+return self.confirmation_message.inner_text()&lt;/p>
+&lt;p>当然，这些需要根据实际页面的结构进行调整，比如确认信息的元素是否正确。&lt;/p>
+&lt;p>这样，整体测试流程就可以通过各个页面的方法来串联。&lt;/p>
+&lt;p>现在编写测试用例的步骤：&lt;/p>
+&lt;p>测试登录流程：&lt;/p>
+&lt;p>参数化不同的用户数据，判断登录是否成功，或者是否出现正确的错误提示。&lt;/p>
+&lt;p>例如：&lt;/p>
+&lt;p>在test_login.py中：&lt;/p>
+&lt;p>import pytest from playwright.sync_api import Page&lt;/p>
+&lt;p>@pytest.mark.parametrize(&amp;ldquo;user_key, expected_success, expected_error&amp;rdquo;, [ (&amp;ldquo;valid_user&amp;rdquo;, True, None), (&amp;ldquo;invalid_password_user&amp;rdquo;, False, &amp;ldquo;Epic sadface: Username and password do not match&amp;rdquo;), (&amp;ldquo;locked_user&amp;rdquo;, False, &amp;ldquo;Epic sadface: Sorry, this user has been locked out.&amp;rdquo;), (&amp;ldquo;missing_username&amp;rdquo;, False, &amp;ldquo;Epic sadface: Username is required&amp;rdquo;), (&amp;ldquo;missing_password&amp;rdquo;, False, &amp;ldquo;Epic sadface: Password is required&amp;rdquo;), ]) def test_login(login_page, user_key, expected_success, expected_error): # 从YAML加载用户数据，这里假设有一个fixture可以加载全部的测试用户数据 users = load_users() user = users[user_key] login_page.navigate() login_page.login(user[&amp;lsquo;username&amp;rsquo;], user[&amp;lsquo;password&amp;rsquo;])&lt;/p>
+&lt;p>if expected_success:
+assert login_page.page.url == &amp;ldquo;&lt;a class="link" href="https://www.saucedemo.com/inventory.html%22" target="_blank" rel="noopener"
+>https://www.saucedemo.com/inventory.html"&lt;/a>
+else:
+assert login_page.get_error_message() == expected_error&lt;/p>
+&lt;p>需要写出load_users函数，或者使用fixture来传递给测试用例。&lt;/p>
+&lt;p>这里的load_users可能是在conftest.py中的一个fixture：&lt;/p>
+&lt;p>import pytest import yaml&lt;/p>
+&lt;p>@pytest.fixture def users(): with open(&amp;lsquo;user.yml&amp;rsquo;) as f: data = yaml.safe_load(f) return data[&amp;lsquo;users&amp;rsquo;]&lt;/p>
+&lt;p>然后测试用例可以接收users作为一个fixture：&lt;/p>
+&lt;p>def test_login(login_page, users, user_key, expected_success, &amp;hellip;): user = users[user_key] &amp;hellip;&lt;/p>
+&lt;p>但这种参数化可能需要结合indirect参数的使用，或者在参数化时动态获取用户数据。&lt;/p>
+&lt;p>或者，将参数化的数据和用户密钥对应起来，通过字典获取正确的用户数据。&lt;/p>
+&lt;p>这可能需要对pytest的参数化更深入的处理，例如使用间接参数化，将用户键作为参数，然后在测试函数内部获取相应用户的数据。&lt;/p>
+&lt;p>或者，这种参数传递方式可能不太直接，可能需要重新设计参数化的结构。&lt;/p>
+&lt;p>可能最好的方式在参数化的列表中直接指定用户数据的键，然后在测试用例中使用该键来索引users fixture中的对应数据。&lt;/p>
+&lt;p>例如：&lt;/p>
+&lt;p>@pytest.mark.parametrize(&amp;ldquo;user_key, expected_success, expected_error&amp;rdquo;, [ (&amp;ldquo;valid_user&amp;rdquo;, True, None), (&amp;ldquo;invalid_password_user&amp;rdquo;, False, &amp;ldquo;Epic sadface: Username and password do not match&amp;rdquo;), (&amp;ldquo;locked_user&amp;rdquo;, False, &amp;ldquo;Epic sadface: Sorry, this user has been locked out.&amp;rdquo;), (&amp;ldquo;missing_username&amp;rdquo;, False, &amp;ldquo;Epic sadface: Username is required&amp;rdquo;), (&amp;ldquo;missing_password&amp;rdquo;, False, &amp;ldquo;Epic sadface: Password is required&amp;rdquo;), ]) def test_login(login_page, users, user_key, expected_success, expected_error): user = users[user_key] login_page.navigate() login_page.login(user[&amp;lsquo;username&amp;rsquo;], user[&amp;lsquo;password&amp;rsquo;]) if expected_success: assert login_page.page.url == &amp;ldquo;&lt;a class="link" href="https://www.saucedemo.com/inventory.html%22" target="_blank" rel="noopener"
+>https://www.saucedemo.com/inventory.html"&lt;/a> else: assert login_page.get_error_message() == expected_error&lt;/p>
+&lt;p>需要确保user.yml中存在相应的键，且各用户的数据正确。&lt;/p>
+&lt;p>对于checkout流程的正常测试：&lt;/p>
+&lt;p>在test_checkout.py中：&lt;/p>
+&lt;p>def test_successful_checkout(login_page, inventory_page, users): valid_user = users[&amp;lsquo;valid_user&amp;rsquo;] login_page.login(valid_user[&amp;lsquo;username&amp;rsquo;], valid_user[&amp;lsquo;password&amp;rsquo;]) inventory_page.add_product_to_cart(&amp;ldquo;Sauce Labs Backpack&amp;rdquo;) cart_page = inventory_page.go_to_cart() checkout_page = cart_page.checkout() checkout_page.fill_shipping_info(&amp;ldquo;John&amp;rdquo;, &amp;ldquo;Doe&amp;rdquo;, &amp;ldquo;12345&amp;rdquo;) checkout_page.continue_to_overview() overview_page = CheckoutOverviewPage(checkout_page.page) overview_page.finish_checkout() assert overview_page.get_confirmation_message() == &amp;ldquo;Thank you for your order!&amp;rdquo;&lt;/p>
+&lt;p>这需要定义CheckoutOverviewPage类的相应元素和方法。&lt;/p>
+&lt;p>对于异常测试：&lt;/p>
+&lt;p>比如，填写信息时省略必填字段：&lt;/p>
+&lt;p>@pytest.mark.parametrize(&amp;ldquo;first_name, last_name, zip_code, expected_error&amp;rdquo;, [ (&amp;rdquo;&amp;rdquo;, &amp;ldquo;Doe&amp;rdquo;, &amp;ldquo;12345&amp;rdquo;, &amp;ldquo;Error: First Name is required&amp;rdquo;), (&amp;ldquo;John&amp;rdquo;, &amp;ldquo;&amp;rdquo;, &amp;ldquo;12345&amp;rdquo;, &amp;ldquo;Error: Last Name is required&amp;rdquo;), (&amp;ldquo;John&amp;rdquo;, &amp;ldquo;Doe&amp;rdquo;, &amp;ldquo;&amp;rdquo;, &amp;ldquo;Error: Postal Code is required&amp;rdquo;), ]) def test_checkout_error_messages(login_page, inventory_page, users, first_name, last_name, zip_code, expected_error): valid_user = users[&amp;lsquo;valid_user&amp;rsquo;] login_page.login(valid_user[&amp;lsquo;username&amp;rsquo;], valid_user[&amp;lsquo;password&amp;rsquo;]) inventory_page.add_product_to_cart(&amp;ldquo;Sauce Labs Backpack&amp;rdquo;) cart_page = inventory_page.go_to_cart() checkout_page = cart_page.checkout() checkout_page.fill_shipping_info(first_name, last_name, zip_code) checkout_page.continue_to_overview() assert checkout_page.get_error_message() == expected_error&lt;/p>
+&lt;p>这里，需要确定实际的错误提示是否是类似这样的文本。比如，在reqreal的网站上，不填first name并继续时，错误提示是否真的是“Error: First Name is required”。需要查看实际页面的情况，可能错误信息是否包含在data-test=&amp;ldquo;error&amp;quot;元素中，或者是否是其他结构。&lt;/p>
+&lt;p>综上所述，整个项目需要：&lt;/p>
+&lt;ul>
+&lt;li>正确配置POM的各个页面类。&lt;/li>
+&lt;li>正确读取用户数据并参数化测试用例。&lt;/li>
+&lt;li>处理不同测试场景的流程，尤其是Test checkout的流程可能需要连续的页面导航和状态维护。&lt;/li>
+&lt;li>对异常情况进行断言，如错误消息的正确性。&lt;/li>
+&lt;/ul>
+&lt;p>可能还需要对页面元素的同步进行确认，尽管Playwright自动等待，但例如，点击按钮后的跳转是否完成可能会需要确认页面的某些元素，这样更稳定。&lt;/p>
+&lt;p>对于一些异步动作，比如点击按钮后元素变化，可以不用等待，因为Playwright内部已经处理了。&lt;/p>
+&lt;p>总的来说，这样的设计应该能够覆盖所需的自动化测试需求。接下来，我需要根据这些思路编写具体的代码文件，并验证是否正确工作。&lt;/p>
+&lt;h3 id="具体实现">具体实现
+&lt;/h3>&lt;p>为了基于pytest和Playwright完成针对saucedemo.com的自动化测试登录和checkout流程，并遵循POM模式，以下是详细的实现方案：&lt;/p>
+&lt;h3 id="项目结构">项目结构
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-plaintext" data-lang="plaintext">&lt;span class="line">&lt;span class="cl">project-root/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├── tests/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│ ├── pages/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│ │ ├── login_page.py
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│ │ ├── inventory_page.py
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│ │ ├── cart_page.py
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│ │ ├── checkout_page.py
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│ │ └── checkout_overview_page.py
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│ ├── test_login.py
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│ └── test_checkout.py
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├── conftest.py
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├── user.yml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">└── pytest.ini
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="依赖安装">依赖安装
+&lt;/h3>&lt;ol>
+&lt;li>安装所需库：&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">pip install pytest playwright pyyaml pytest-playwright
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">playwright install
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="文件实现">文件实现
+&lt;/h3>&lt;h4 id="useryml">user.yml
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">users&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">valid_user&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">username&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">standard_user&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">password&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">secret_sauce&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">invalid_password_user&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">username&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">standard_user&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">password&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">wrong_pass&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">locked_user&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">username&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">locked_out_user&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">password&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">secret_sauce&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">missing_username&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">username&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">password&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">secret_sauce&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">missing_password&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">username&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">standard_user&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">password&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="pageslogin_pagepy">pages/login_page.py
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">LoginPage&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="fm">__init__&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">page&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">page&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">page&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">username_input&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">locator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[data-test=&amp;#34;username&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">password_input&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">locator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[data-test=&amp;#34;password&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">login_button&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">locator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[data-test=&amp;#34;login-button&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">error_message&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">locator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[data-test=&amp;#34;error&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">navigate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;导航到登录页&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">goto&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;https://www.saucedemo.com&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">login&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">username&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;填充并提交登录表单&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">username_input&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fill&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">password_input&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fill&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">login_button&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">click&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">get_error_message&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;获取错误提示文本&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">error_message&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">inner_text&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="pagesinventory_pagepy">pages/inventory_page.py
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">InventoryPage&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="fm">__init__&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">page&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">page&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">page&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">add_product_to_cart&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">product_name&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;将指定商品添加到购物车&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">product_id&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">product_name&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">lower&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">replace&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39; &amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;-&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">locator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s1">&amp;#39;[data-test=&amp;#34;add-to-cart-&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">product_id&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s1">&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">click&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">go_to_cart&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;进入购物车页面&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">locator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;.shopping_cart_link&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">click&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">CartPage&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">page&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="pagescart_pagepy">pages/cart_page.py
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">CartPage&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="fm">__init__&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">page&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">page&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">page&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">checkout&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;进入结算页面&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">locator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[data-test=&amp;#34;checkout&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">click&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">CheckoutPage&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">page&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="pagescheckout_pagepy">pages/checkout_page.py
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">CheckoutPage&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="fm">__init__&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">page&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">page&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">page&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">first_name_input&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">locator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[data-test=&amp;#34;firstName&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">last_name_input&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">locator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[data-test=&amp;#34;lastName&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">postal_code_input&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">locator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[data-test=&amp;#34;postalCode&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">continue_button&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">locator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[data-test=&amp;#34;continue&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">error_message&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">locator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[data-test=&amp;#34;error&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">fill_shipping_info&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">first_name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">last_name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">postal_code&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;填写配送信息&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">first_name_input&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fill&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">first_name&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">last_name_input&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fill&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">last_name&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">postal_code_input&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fill&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">postal_code&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">continue_to_overview&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;提交并进入订单概览&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">continue_button&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">click&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">get_error_message&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;获取错误提示文本&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">error_message&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">inner_text&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="pagescheckout_overview_pagepy">pages/checkout_overview_page.py
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">CheckoutOverviewPage&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="fm">__init__&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">page&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">page&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">page&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">finish_button&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">locator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[data-test=&amp;#34;finish&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">confirmation_message&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">locator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;.complete-header&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">finish_checkout&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;完成订单&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">finish_button&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">click&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">get_confirmation_message&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;获取订单完成确认信息&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">confirmation_message&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">inner_text&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="conftestpy">conftest.py
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pytest&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">yaml&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">playwright.sync_api&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">Page&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">tests.pages.login_page&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">LoginPage&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">tests.pages.inventory_page&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">InventoryPage&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">tests.pages.cart_page&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">CartPage&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">tests.pages.checkout_page&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">CheckoutPage&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.fixture&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">scope&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;session&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">users&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">with&lt;/span> &lt;span class="nb">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;user.yml&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;r&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">f&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">yaml&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">safe_load&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">f&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">data&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;users&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.fixture&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">login_page&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">page&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Page&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">login_page&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">LoginPage&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">page&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">login_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">navigate&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">login_page&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.fixture&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">inventory_page&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">login_page&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">LoginPage&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">users&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">login_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">login&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;valid_user&amp;#39;&lt;/span>&lt;span class="p">][&lt;/span>&lt;span class="s1">&amp;#39;username&amp;#39;&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">users&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;valid_user&amp;#39;&lt;/span>&lt;span class="p">][&lt;/span>&lt;span class="s1">&amp;#39;password&amp;#39;&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">InventoryPage&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">login_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">page&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.fixture&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">cart_page&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">inventory_page&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">InventoryPage&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">inventory_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">go_to_cart&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.fixture&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">checkout_page&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">cart_page&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">CartPage&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">cart_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">checkout&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="test_loginpy">test_login.py
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pytest&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.mark.parametrize&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;user_key, expected_success, expected_error&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;valid_user&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">True&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">None&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;invalid_password_user&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">False&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Epic sadface: Username and password do not match&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;locked_user&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">False&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Epic sadface: Sorry, this user has been locked out.&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;missing_username&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">False&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Epic sadface: Username is required&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;missing_password&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">False&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Epic sadface: Password is required&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_login&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">login_page&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">users&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">user_key&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">expected_success&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">expected_error&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">user&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">users&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">user_key&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">login_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">login&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;username&amp;#39;&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">user&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;password&amp;#39;&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">expected_success&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">login_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">url&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;https://www.saucedemo.com/inventory.html&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">login_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get_error_message&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">expected_error&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="test_checkoutpy">test_checkout.py
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pytest&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_successful_checkout&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">inventory_page&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">checkout_page&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">inventory_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_product_to_cart&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;sauce-labs-backpack&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">checkout_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fill_shipping_info&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;John&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Doe&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;12345&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">checkout_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">continue_to_overview&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">overview_page&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">CheckoutOverviewPage&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">checkout_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">page&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">overview_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">finish_checkout&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">overview_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get_confirmation_message&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;Thank you for your order!&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.mark.parametrize&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;first_name, last_name, postal_code, expected_error&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Doe&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;12345&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Error: First Name is required&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;John&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;12345&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Error: Last Name is required&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;John&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Doe&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Error: Postal Code is required&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_checkout_errors&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">checkout_page&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">first_name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">last_name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">postal_code&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">expected_error&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">checkout_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fill_shipping_info&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">first_name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">last_name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">postal_code&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">checkout_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">continue_to_overview&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">checkout_page&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get_error_message&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">expected_error&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="知识点和解释">知识点和解释
+&lt;/h3>&lt;ol>
+&lt;li>
+&lt;p>&lt;strong>POM设计模式&lt;/strong>:&lt;/p>
+&lt;ul>
+&lt;li>每个页面（如登录页、商品页）被封装为一个类，页面元素和操作抽象为方法，从而提高代码复用性和可维护性。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>数据驱动测试&lt;/strong>:&lt;/p>
+&lt;ul>
+&lt;li>用户数据与测试代码分离，存储在YAML文件中，提升了可维护性，方便添加新的测试场景。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>异常场景覆盖&lt;/strong>:&lt;/p>
+&lt;ul>
+&lt;li>通过参数化测试验证不同错误输入（如锁定用户、错误密码、缺失必填字段）是否会触发正确的错误提示。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Fixture管理&lt;/strong>:&lt;/p>
+&lt;ul>
+&lt;li>利用pytest的fixture管理浏览器和页面对象，确保每个测试用例的独立性，减少重复代码。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Playwright自动等待机制&lt;/strong>:&lt;/p>
+&lt;ul>
+&lt;li>Playwright内置的自动等待确保在操作元素前其已处于可交互状态，增强了测试的稳定性。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;p>此方案覆盖了正常和异常的业务流程，确保核心功能点（登录、购物车、结算）的自动化验证，提高了软件质量。&lt;/p>
+&lt;h3 id="结论">结论
+&lt;/h3>&lt;p>参照给出的结果，基本不用做什么微调就可以执行成功，确实极大提升了我们进行自动化实现的效率。最难能可贵的是，deepseek给出的思考过程，对于我们代码实现和用例设计的要点也有极大的参考价值！&lt;/p></description></item></channel></rss>

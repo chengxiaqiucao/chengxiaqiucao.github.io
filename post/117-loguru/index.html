@@ -1,0 +1,721 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="介绍一个Python日志库"><title>python日志的新姿势，Loguru库的应用</title><link rel=canonical href=https://chengxiaqiucao.github.io/post/117-loguru/><link rel=stylesheet href=/scss/style.min.d6334826c849a420a2748e4872b915ae516105f86c3993d9bad2032725f784b8.css><meta property='og:title' content="python日志的新姿势，Loguru库的应用"><meta property='og:description' content="介绍一个Python日志库"><meta property='og:url' content='https://chengxiaqiucao.github.io/post/117-loguru/'><meta property='og:site_name' content='秋 草 观 “测” 台'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='测试工具'><meta property='article:tag' content='开源项目'><meta property='article:published_time' content='2025-07-31T17:09:06+08:00'><meta property='article:modified_time' content='2025-07-31T17:09:06+08:00'><meta property='og:image' content='https://chengxiaqiucao.github.io/post/117-loguru/Pasted-20250801-2.png'><meta name=twitter:title content="python日志的新姿势，Loguru库的应用"><meta name=twitter:description content="介绍一个Python日志库"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://chengxiaqiucao.github.io/post/117-loguru/Pasted-20250801-2.png'></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/automnGrass_hu_5e44a092fd905642.png width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>秋 草 观 “测” 台</a></h1><h2 class=site-description>Testing is not just checking...</h2></div></header><ol class=menu-social><li><a href=https://github.com/chengxiaqiucao target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://space.bilibili.com/472272606 target=_blank title=Bilibili rel=me><!doctype html><svg t="1750732982440" class="icon" viewBox="0 0 1024 1024" p-id="4593" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632 444.330667 256h135.296l138.368-138.325333A42.666667 42.666667.0 01778.368 178.048L700.330667 256H789.333333A149.333333 149.333333.0 01938.666667 405.333333v341.333334A149.333333 149.333333.0 01789.333333 896H234.666667A149.333333 149.333333.0 0185.333333 746.666667V405.333333A149.333333 149.333333.0 01234.666667 256h88.96L245.632 177.962667a42.666667 42.666667.0 0160.373333-60.373334zm483.328 223.701333H234.666667a64 64 0 00-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0057.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0063.701334-57.856L853.333333 746.666667V405.333333a64 64 0 00-64-64zm-448 128A42.666667 42.666667.0 01384 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666666-42.666667zm341.333334.0A42.666667 42.666667.0 01725.333333 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666667-42.666667z" p-id="4594" fill="#8a8a8a"/></svg></a></li><li><a href=https://www.zhihu.com/people/qiucao target=_blank title=zhihu rel=me><!doctype html><svg t="1750733049138" class="icon" viewBox="0 0 1024 1024" p-id="5820" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M570.581333 806.272h61.952L652.928 876.117333 764.074667 806.272h130.986666V230.186667h-324.48V806.272zM636.501333 292.693333h192.64V743.68h-73.898666l-73.813334 46.378667L668.032 743.808l-31.530667-.128V292.736zM515.754667 493.738667H377.429333a2999.466667 2999.466667.0 005.802667-194.56h135.338667S523.776 239.445334 495.872 240.128H261.76c9.216-34.730667 20.821333-70.613333 34.688-107.690667.0.0-63.701333.0-85.333333 57.130667C202.112 213.12 176.128 303.786667 129.877333 396.416c15.573333-1.706667 67.114667-3.114667 97.450667-58.794667 5.589333-15.616 6.656-17.621333 13.568-38.485333h76.373333c0 27.776-3.157333 177.109333-4.437333 194.474667h-138.24c-31.104.0-41.173333 62.549333-41.173333 62.549333h173.482666C295.253333 688.256 232.789333 799.573333 119.466667 887.466667c54.186667 15.488 108.202667-2.432 134.912-26.197334.0.0 60.8-55.338667 94.122666-183.381333L491.264 849.834667s20.906667-71.168-3.285333-105.856c-20.053333-23.637333-74.24-87.552-97.322667-110.72l-38.698667 30.72c11.52-36.992 18.474667-72.96 20.821334-107.690667h163.072s-.213333-62.549333-20.053334-62.549333z" p-id="5821" fill="#8a8a8a"/></svg></a></li><li><a href=mailto:%20danmyw@qq.com target=_blank title=e-mail rel=me><!doctype html><svg t="1750733089669" class="icon" viewBox="0 0 1451 1024" p-id="6983" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759.0 97.881301C0 3.997201 71.046997.0 71.046997.0H474.477909 961.649408h399.992405s71.046998 3.997201 71.046998 97.881301L771.345323 681.472759S764.482731 685.154773 753.594283 688.65053V688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858V688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759zm53.281707 130.131124C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633.0 212.052267.0 212.052267V942.809523S0 1024 83.726336 1024H682.532949 753.579947h595.368192C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523V212.052267S893.138176 701.759633 817.019477 767.734955c-39.771477 34.470494-74.671786 43.295855-98.955861 43.868928z" fill="#8a8a8a" p-id="6984"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>主页</span></a></li><li><a href=/page/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>检索</span></a></li><li><a href=/page/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>链接</span></a></li><li><a href=/page/about/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>关于</span></a></li><li><a href=/page/releases/><svg class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M9.828 9.172a4 4 0 100 5.656A10 10 0 0012 12a10 10 0 012.172-2.828 4 4 0 110 5.656A10 10 0 0112 12 10 10 0 009.828 9.172"/></svg>
+<span>热门开源</span></a></li><li class=menu-bottom-section><ol class=menu><li id=i18n-switch><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg>
+<select name=language title=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://chengxiaqiucao.github.io/en/>English</option><option value=https://chengxiaqiucao.github.io/ selected>中文</option></select></li><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#引言>引言</a></li><li><a href=#loguru的使用>Loguru的使用</a><ol><li><a href=#1-安装和快速开始>1. 安装和快速开始</a></li><li><a href=#2-日志级别>2. 日志级别</a></li><li><a href=#3-自定义日志级别>3. 自定义日志级别</a></li></ol></li><li><a href=#进阶用法>进阶用法</a><ol><li><a href=#1-日志处理器配置>1. 日志处理器配置</a></li><li><a href=#2-文件日志>2. 文件日志</a></li><li><a href=#3-日志格式化>3. 日志格式化</a></li><li><a href=#4-日志过滤>4. 日志过滤</a></li><li><a href=#5-结构化日志json格式>5. 结构化日志（JSON格式）</a></li><li><a href=#6-异常处理和调试>6. 异常处理和调试</a></li></ol></li><li><a href=#总结>总结</a></li></ol><ol><li><a href=#引语>引语</a></li><li><a href=#pytest-中的caplog>Pytest 中的<code>caplog</code></a></li><li><a href=#解决兼容问题>解决兼容问题</a><ol><li><a href=#方案1pytest-loguru>方案1：pytest-loguru</a></li><li><a href=#方案二loguru日志输出重定向到logging标准输出>方案二：loguru日志输出重定向到logging标准输出</a></li></ol></li></ol><ol><li><a href=#2-loguru-vs-python标准logging库对比>2. Loguru vs Python标准logging库对比</a><ol><li><a href=#21-配置复杂度对比>2.1 配置复杂度对比</a></li><li><a href=#22-api简洁性对比>2.2 API简洁性对比</a></li><li><a href=#23-功能特性对比>2.3 功能特性对比</a></li><li><a href=#24-使用体验对比>2.4 使用体验对比</a></li><li><a href=#25-性能和内存使用对比>2.5 性能和内存使用对比</a></li><li><a href=#26-迁移成本对比>2.6 迁移成本对比</a></li><li><a href=#27-总结对比>2.7 总结对比</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/post/117-loguru/><img src=/post/117-loguru/Pasted-20250801-2_hu_669e39ceb413ea5d.png srcset="/post/117-loguru/Pasted-20250801-2_hu_669e39ceb413ea5d.png 800w, /post/117-loguru/Pasted-20250801-2_hu_120695e7e4621f56.png 1600w" width=800 height=250 loading=lazy alt="Featured image of post python日志的新姿势，Loguru库的应用"></a></div><div class=article-details><header class=article-category><a href=/categories/%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7/ style=background-color:#c6fad2;color:#000>测试工具</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/post/117-loguru/>python日志的新姿势，Loguru库的应用</a></h2><h3 class=article-subtitle>介绍一个Python日志库</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Jul 31, 2025</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 11 分钟</time></div></footer></div></header><section class=article-content><p><img src=/post/117-loguru/Pasted-20250801-2.png width=939 height=294 srcset="/post/117-loguru/Pasted-20250801-2_hu_ee7e6c0be328c8ba.png 480w, /post/117-loguru/Pasted-20250801-2_hu_4e4762a755196627.png 1024w" loading=lazy class=gallery-image data-flex-grow=319 data-flex-basis=766px></p><h2 id=引言>引言</h2><p>开发过Python程序或通过Python编写自动化脚本，都知道日志对于一个程序的重要性。 Python语言也内建了一个日志处理的标准库 <code>logging</code>, 但这个库的使用相对比较复杂。</p><p>本文我们介绍一个目前很受欢迎的第三方日志框架 <code>Loguru</code>, 在Github上已有超过22K星标。是一个比 <code>logging</code>更加直观易用的替代方案。开发者可以专注于业务逻辑而不是日志配置的繁琐细节</p><h2 id=loguru的使用>Loguru的使用</h2><h3 id=1-安装和快速开始>1. 安装和快速开始</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>pip install loguru
+</span></span></code></pre></td></tr></table></div></div><p>最简单的使用方式：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>debug</span><span class=p>(</span><span class=s2>&#34;Happy logging with Loguru!&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>输出：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>2025-08-01 14:00:51.069 | DEBUG    | __main__:&lt;module&gt;:3 - Happy logging with Loguru!
+</span></span></code></pre></td></tr></table></div></div><h3 id=2-日志级别>2. 日志级别</h3><p>Loguru提供了7个内置日志级别， 并对不同级别设定了不同的默认颜色显示：</p><div class=table-wrapper><table><thead><tr><th>级别</th><th>方法</th><th>数值</th><th>用途</th></tr></thead><tbody><tr><td>TRACE</td><td>logger.trace()</td><td>5</td><td>极其详细的调试信息</td></tr><tr><td>DEBUG</td><td>logger.debug()</td><td>10</td><td>开发调试信息</td></tr><tr><td>INFO</td><td>logger.info()</td><td>20</td><td>一般信息</td></tr><tr><td>SUCCESS</td><td>logger.success()</td><td>25</td><td>成功操作通知</td></tr><tr><td>WARNING</td><td>logger.warning()</td><td>30</td><td>警告信息</td></tr><tr><td>ERROR</td><td>logger.error()</td><td>40</td><td>错误信息</td></tr><tr><td>CRITICAL</td><td>logger.critical()</td><td>50</td><td>严重错误</td></tr></tbody></table></div><p>示例代码：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>trace</span><span class=p>(</span><span class=s2>&#34;A trace message.&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>debug</span><span class=p>(</span><span class=s2>&#34;A debug message.&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;An info message.&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>success</span><span class=p>(</span><span class=s2>&#34;A success message.&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>warning</span><span class=p>(</span><span class=s2>&#34;A warning message.&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>error</span><span class=p>(</span><span class=s2>&#34;An error message.&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>critical</span><span class=p>(</span><span class=s2>&#34;A critical message.&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>输出：
+<img src=/post/117-loguru/Pasted-20250801.png width=1097 height=281 srcset="/post/117-loguru/Pasted-20250801_hu_938d5fbcdd1e644.png 480w, /post/117-loguru/Pasted-20250801_hu_b9caea5d30f66cfe.png 1024w" loading=lazy class=gallery-image data-flex-grow=390 data-flex-basis=936px></p><h3 id=3-自定义日志级别>3. 自定义日志级别</h3><p><code>loguru</code> 创建自定义的级别也极为方便，比如创建一个 <code>FATAL</code> 级别的日志</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 创建自定义级别</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>level</span><span class=p>(</span><span class=s2>&#34;FATAL&#34;</span><span class=p>,</span> <span class=n>no</span><span class=o>=</span><span class=mi>60</span><span class=p>,</span> <span class=n>color</span><span class=o>=</span><span class=s2>&#34;&#34;</span><span class=p>,</span> <span class=n>icon</span><span class=o>=</span><span class=s2>&#34;!!!&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>log</span><span class=p>(</span><span class=s2>&#34;FATAL&#34;</span><span class=p>,</span> <span class=s2>&#34;A fatal error occurred.&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=进阶用法>进阶用法</h2><h3 id=1-日志处理器配置>1. 日志处理器配置</h3><p>Loguru使用<code>add()</code>方法添加处理器：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>sys</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 移除默认处理器</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>remove</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 添加自定义处理器</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>sys</span><span class=o>.</span><span class=n>stderr</span><span class=p>,</span> <span class=n>level</span><span class=o>=</span><span class=s2>&#34;INFO&#34;</span><span class=p>,</span> <span class=nb>format</span><span class=o>=</span><span class=s2>&#34;{time:YYYY-MM-DD HH:mm:ss} | </span><span class=si>{level}</span><span class=s2> | </span><span class=si>{message}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>log</span><span class=p>(</span><span class=s2>&#34;INFO&#34;</span><span class=p>,</span><span class=s2>&#34;配置完成，开始记录日志&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=2-文件日志>2. 文件日志</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 基本文件日志</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=s2>&#34;app.log&#34;</span><span class=p>,</span> <span class=n>rotation</span><span class=o>=</span><span class=s2>&#34;500 MB&#34;</span><span class=p>,</span> <span class=n>retention</span><span class=o>=</span><span class=s2>&#34;10 days&#34;</span><span class=p>,</span> <span class=n>compression</span><span class=o>=</span><span class=s2>&#34;zip&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 高级文件日志配置</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;app_{time:YYYY-MM-DD}.log&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>rotation</span><span class=o>=</span><span class=s2>&#34;00:00&#34;</span><span class=p>,</span>  <span class=c1># 每天午夜轮转</span>
+</span></span><span class=line><span class=cl>    <span class=n>retention</span><span class=o>=</span><span class=s2>&#34;30 days&#34;</span><span class=p>,</span>  <span class=c1># 保留30天</span>
+</span></span><span class=line><span class=cl>    <span class=n>compression</span><span class=o>=</span><span class=s2>&#34;gz&#34;</span><span class=p>,</span>  <span class=c1># 压缩格式</span>
+</span></span><span class=line><span class=cl>    <span class=n>level</span><span class=o>=</span><span class=s2>&#34;INFO&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;测试一下日志&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>执行后，根据代码会得到两个日志文件，<code>app.log</code>, <code>app_2025-08-01.log</code></p><h3 id=3-日志格式化>3. 日志格式化</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>sys</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>remove</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 自定义格式</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>sys</span><span class=o>.</span><span class=n>stderr</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nb>format</span><span class=o>=</span><span class=s2>&#34;&lt;green&gt;{time:YYYY-MM-DD HH:mm:ss}&lt;/green&gt; | &#34;</span>
+</span></span><span class=line><span class=cl>           <span class=s2>&#34;&lt;level&gt;</span><span class=si>{level: &lt;8}</span><span class=s2>&lt;/level&gt; | &#34;</span>
+</span></span><span class=line><span class=cl>           <span class=s2>&#34;&lt;cyan&gt;</span><span class=si>{name}</span><span class=s2>&lt;/cyan&gt;:&lt;cyan&gt;</span><span class=si>{function}</span><span class=s2>&lt;/cyan&gt;:&lt;cyan&gt;</span><span class=si>{line}</span><span class=s2>&lt;/cyan&gt; | &#34;</span>
+</span></span><span class=line><span class=cl>           <span class=s2>&#34;&lt;level&gt;</span><span class=si>{message}</span><span class=s2>&lt;/level&gt;&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 也可使用函数进行动态格式化</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>custom_formatter</span><span class=p>(</span><span class=n>record</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>record</span><span class=p>[</span><span class=s2>&#34;level&#34;</span><span class=p>]</span><span class=o>.</span><span class=n>no</span> <span class=o>&gt;=</span> <span class=mi>40</span><span class=p>:</span>  <span class=c1># ERROR及以上</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s2>&#34;</span><span class=si>{time}</span><span class=s2> | </span><span class=si>{level}</span><span class=s2> | </span><span class=si>{thread}</span><span class=s2> | </span><span class=si>{message}</span><span class=se>\n</span><span class=si>{exception}</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s2>&#34;</span><span class=si>{time}</span><span class=s2> | </span><span class=si>{level}</span><span class=s2> | </span><span class=si>{message}</span><span class=se>\n</span><span class=si>{exception}</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>sys</span><span class=o>.</span><span class=n>stderr</span><span class=p>,</span> <span class=nb>format</span><span class=o>=</span><span class=n>custom_formatter</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;测试一下日志&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>会得到如下定义的输出结果：
+<img src=/post/117-loguru/Pasted-20250801-1.png width=1041 height=117 srcset="/post/117-loguru/Pasted-20250801-1_hu_c4d19c2fbcb23980.png 480w, /post/117-loguru/Pasted-20250801-1_hu_a76dd90f9fa27c6a.png 1024w" loading=lazy class=gallery-image data-flex-grow=889 data-flex-basis=2135px></p><h3 id=4-日志过滤>4. 日志过滤</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 基于级别的过滤</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>level_filter</span><span class=p>(</span><span class=n>level</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>is_level</span><span class=p>(</span><span class=n>record</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>record</span><span class=p>[</span><span class=s2>&#34;level&#34;</span><span class=p>]</span><span class=o>.</span><span class=n>name</span> <span class=o>==</span> <span class=n>level</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>is_level</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>sys</span><span class=o>.</span><span class=n>stderr</span><span class=p>,</span> <span class=nb>filter</span><span class=o>=</span><span class=n>level_filter</span><span class=p>(</span><span class=n>level</span><span class=o>=</span><span class=s2>&#34;WARNING&#34;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 基于模块的过滤</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=s2>&#34;app.log&#34;</span><span class=p>,</span> <span class=nb>filter</span><span class=o>=</span><span class=s2>&#34;my_module&#34;</span><span class=p>)</span>  <span class=c1># 只记录my_module的日志</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=s2>&#34;error.log&#34;</span><span class=p>,</span> <span class=nb>filter</span><span class=o>=</span><span class=k>lambda</span> <span class=n>record</span><span class=p>:</span> <span class=n>record</span><span class=p>[</span><span class=s2>&#34;level&#34;</span><span class=p>]</span><span class=o>.</span><span class=n>no</span> <span class=o>&gt;=</span> <span class=mi>40</span><span class=p>)</span>  <span class=c1># 只记录错误及以上日志</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=5-结构化日志json格式>5. 结构化日志（JSON格式）</h3><p>loguru默认提供支持json格式的序列化输出</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># JSON格式日志</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>sys</span><span class=o>.</span><span class=n>stderr</span><span class=p>,</span> <span class=n>serialize</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;测试一下日志&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>得到如下输出：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span><span class=nt>&#34;text&#34;</span><span class=p>:</span> <span class=s2>&#34;2025-08-01 14:25:44.560 | INFO     | __main__:&lt;module&gt;:8 - 测试一下日志\n&#34;</span><span class=p>,</span> <span class=nt>&#34;record&#34;</span><span class=p>:</span> <span class=p>{</span><span class=nt>&#34;elapsed&#34;</span><span class=p>:</span> <span class=p>{</span><span class=nt>&#34;repr&#34;</span><span class=p>:</span> <span class=s2>&#34;0:00:00.00 &#34;</span><span class=err>seconds</span><span class=s2>&#34;: 0.003698}, &#34;</span><span class=err>exception</span><span class=s2>&#34;: null, &#34;</span><span class=err>extra</span><span class=s2>&#34;: {}, &#34;</span><span class=err>file</span><span class=s2>&#34;: {&#34;</span><span class=err>name</span><span class=s2>&#34;: &#34;</span><span class=err>demo.py</span><span class=s2>&#34;, &#34;</span><span class=err>path</span><span class=s2>&#34;: &#34;</span><span class=err>E</span><span class=p>:</span><span class=err>\\qiucao\\dev\\loguruDemo\\demo.py</span><span class=s2>&#34;}, &#34;</span><span class=err>function</span><span class=s2>&#34;: &#34;</span><span class=err>&lt;module&gt;</span><span class=s2>&#34;, &#34;</span><span class=err>level</span><span class=s2>&#34;: {&#34;</span><span class=err>icon</span><span class=s2>&#34;: &#34;</span><span class=err>ℹ️</span><span class=s2>&#34;, &#34;</span><span class=err>name</span><span class=s2>&#34;: &#34;</span><span class=err>INFO</span><span class=s2>&#34;, &#34;</span><span class=err>no</span><span class=s2>&#34;: 20}, &#34;</span><span class=err>line</span><span class=s2>&#34;: 8, &#34;</span><span class=err>message</span><span class=s2>&#34;: &#34;</span><span class=err>测试一下日志</span><span class=s2>&#34;, &#34;</span><span class=err>module</span><span class=s2>&#34;: &#34;</span> <span class=s2>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;__main__&#34;</span><span class=p>,</span> <span class=nt>&#34;process&#34;</span><span class=p>:</span> <span class=p>{</span><span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=mi>4580</span><span class=p>,</span> <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;MainProcess&#34;</span><span class=p>},</span> <span class=nt>&#34;thread&#34;</span><span class=p>:</span> <span class=p>{</span><span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=mi>5680</span><span class=p>,</span> <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;MainThread&#34;</span><span class=p>},</span> <span class=nt>&#34;time&#34;</span><span class=p>:</span> <span class=p>{</span><span class=nt>&#34;repr&#34;</span><span class=p>:</span> <span class=s2>&#34;2025-08-01 14:25:44.560271+08:00&#34;</span><span class=p>,</span> <span class=nt>&#34;timestamp&#34;</span><span class=p>:</span> <span class=mf>1754029544.560271</span><span class=p>}}}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=6-异常处理和调试>6. 异常处理和调试</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 控制诊断信息（生产环境应设为False）</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=s2>&#34;app.log&#34;</span><span class=p>,</span> <span class=n>diagnose</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 自动捕获异常</span>
+</span></span><span class=line><span class=cl><span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>result</span> <span class=o>=</span> <span class=mi>1</span> <span class=o>/</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl><span class=k>except</span> <span class=ne>ZeroDivisionError</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>logger</span><span class=o>.</span><span class=n>exception</span><span class=p>(</span><span class=s2>&#34;Division by zero occurred&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>loguru</code> 可以直接捕获异常，这里的<code>diagnose</code> 参数，还会在捕获异常时，自动记录局部变量的信息，便于我们进行调试（生产环境一般需要设置为False）</p><h2 id=总结>总结</h2><p>以上就 <code>loguru</code> 这个库的用法总结，无论从配置的简便性，功能丰富程度，还是对自定义扩展、调试支持等多方面，都非常出色。</p><p>那么，写Python处理日志，就快快用起来吧~~</p><hr><h1 id=pytest中使用loguru的问题及解决>pytest中使用loguru的问题及解决</h1><h2 id=引语>引语</h2><p>上一篇文章，我们向大家推荐了python语言的一个第三方日志库<code>loguru</code>，使用非常简单且功能完备。文章参见【】</p><p>但对于我们做自动化测试，经常使用 <code>pytest</code> 框架的小伙伴来说，却有点小问题。就是 <code>Pytest</code> 内建的日志捕获机制是在标准库 <code>logging</code> 的基础上进行优化过的。 这样我们在使用 pytest 框架时，如果牵涉到 pytest 自身的日志机制，也就是pytest的内建fixture <code>caplog</code>实际使用的还是logging标准模块, 这里<code>loguru</code> 库定义的日志就难以发生作用。</p><p>当然，问题也不大，本文我们简单探讨下这个问题，并介绍下兼容方案。</p><h2 id=pytest-中的caplog>Pytest 中的<code>caplog</code></h2><p>首先我们还是先来介绍下 Pytest 的日志</p><p><code>caplog</code>是pytest提供的一个内置fixture，用于捕获和测试日志输出。</p><p>因为这个内置插件的作用，我们在执行pytest测试时，默认只会在用例存在失败时才会显示标准输出和<code>logging</code>模块及记录的日志信息。</p><p>比如下面这段代码：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_cap.py</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_fail</span><span class=p>():</span>  
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=s2>&#34;这条信息将在失败时显示&#34;</span><span class=p>)</span>  
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=kc>False</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_pass</span><span class=p>():</span>  
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=s2>&#34;这条信息成功时不显示&#34;</span><span class=p>)</span>  
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=kc>True</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_exception</span><span class=p>():</span>  
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>  
+</span></span><span class=line><span class=cl>        <span class=n>result</span> <span class=o>=</span> <span class=mi>1</span> <span class=o>/</span> <span class=mi>0</span>  
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=ne>ZeroDivisionError</span><span class=p>:</span>  
+</span></span><span class=line><span class=cl>        <span class=n>logging</span><span class=o>.</span><span class=n>error</span><span class=p>(</span><span class=s2>&#34;除零错误发生&#34;</span><span class=p>,</span> <span class=n>exc_info</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>  
+</span></span><span class=line><span class=cl>        <span class=n>result</span> <span class=o>=</span> <span class=kc>None</span>  
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=kc>False</span>
+</span></span></code></pre></td></tr></table></div></div><p>我们正常通过 <code>pytest</code> 执行的话，会看到下面这样的输出</p><p><img src=/post/117-loguru/Pasted-20250805.png width=1521 height=925 srcset="/post/117-loguru/Pasted-20250805_hu_bab90810a5b29af9.png 480w, /post/117-loguru/Pasted-20250805_hu_907bbaa3710da2d2.png 1024w" loading=lazy class=gallery-image data-flex-grow=164 data-flex-basis=394px></p><p>而如果我们将上面记录日志的部分修改为<code>loguru</code>库的日志写法的话</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_exception</span><span class=p>():</span>  
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>  
+</span></span><span class=line><span class=cl>        <span class=n>result</span> <span class=o>=</span> <span class=mi>1</span> <span class=o>/</span> <span class=mi>0</span>  
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=ne>ZeroDivisionError</span><span class=p>:</span>  
+</span></span><span class=line><span class=cl>        <span class=c1># logging.error(&#34;除零错误发生&#34;, exc_info=True)  </span>
+</span></span><span class=line><span class=cl>        <span class=n>logger</span><span class=o>.</span><span class=n>error</span><span class=p>(</span><span class=s2>&#34;除零错误发生&#34;</span><span class=p>)</span>  
+</span></span><span class=line><span class=cl>        <span class=n>result</span> <span class=o>=</span> <span class=kc>None</span>  
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=kc>False</span>
+</span></span></code></pre></td></tr></table></div></div><p>运行时能看到区别：</p><p><img src=/post/117-loguru/Pasted-20250805-1.png width=1324 height=538 srcset="/post/117-loguru/Pasted-20250805-1_hu_62e7c4cf3377adb5.png 480w, /post/117-loguru/Pasted-20250805-1_hu_d2d77062f33c73cc.png 1024w" loading=lazy class=gallery-image data-flex-grow=246 data-flex-basis=590px></p><p>也就是 <code>loguru</code> 记录的日志，不能被 Pytest 的 <code>caplog</code> 获取。</p><p>这样自然也就<strong>不能使用 <code>caplog</code> 提供的一些api如 <code>caplog.text</code>, <code>caplog.records</code></strong>， 为我们灵活利用 <code>pytest</code> 造成了一些阻碍</p><h2 id=解决兼容问题>解决兼容问题</h2><p>那要解决这个兼容问题，有多个方案，这里分享下我的验证</p><h3 id=方案1pytest-loguru>方案1：pytest-loguru</h3><p>存在问题，当然可以先查一下社区有没有现成的解决方案， 然后发现有人已经提供了解决方案。就是 <code>pytest-loguru</code> 这个插件</p><p>通过下面命令安装即可：</p><p><code>pip install pytest-loguru</code></p><p>但我进行实测，发现windows系统上会报句柄错误</p><p><img src=/post/117-loguru/Pasted-20250805-2.png width=1311 height=823 srcset="/post/117-loguru/Pasted-20250805-2_hu_5ad58dbe1f9cf347.png 480w, /post/117-loguru/Pasted-20250805-2_hu_9c64e830a4ad1822.png 1024w" loading=lazy class=gallery-image data-flex-grow=159 data-flex-basis=382px></p><p>所以这里建议使用方案二解决。</p><h3 id=方案二loguru日志输出重定向到logging标准输出>方案二：loguru日志输出重定向到logging标准输出</h3><p>可以利用 pytest 的 <code>conftest.py</code> 配置脚本，用下面的代码将 loguru 日志重定向到 logging</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># conftest.py</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>pytest</span>  
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>  
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>SafePropagateHandler</span><span class=p>(</span><span class=n>logging</span><span class=o>.</span><span class=n>Handler</span><span class=p>):</span>  
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>  
+</span></span><span class=line><span class=cl>        <span class=nb>super</span><span class=p>()</span><span class=o>.</span><span class=fm>__init__</span><span class=p>()</span>  
+</span></span><span class=line><span class=cl>        <span class=c1># 确保有一个基本的格式化器  </span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>setFormatter</span><span class=p>(</span><span class=n>logging</span><span class=o>.</span><span class=n>Formatter</span><span class=p>(</span><span class=s1>&#39;</span><span class=si>%(levelname)s</span><span class=s1> - </span><span class=si>%(message)s</span><span class=s1>&#39;</span><span class=p>))</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>emit</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>record</span><span class=p>):</span>  
+</span></span><span class=line><span class=cl>        <span class=k>try</span><span class=p>:</span>  
+</span></span><span class=line><span class=cl>            <span class=c1># 获取标准logging的logger  </span>
+</span></span><span class=line><span class=cl>            <span class=n>std_logger</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>getLogger</span><span class=p>(</span><span class=n>record</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>            <span class=c1># 确保logger有处理器  </span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=ow>not</span> <span class=n>std_logger</span><span class=o>.</span><span class=n>handlers</span><span class=p>:</span>  
+</span></span><span class=line><span class=cl>                <span class=c1># 添加一个空处理器，避免&#34;No handlers&#34;警告  </span>
+</span></span><span class=line><span class=cl>                <span class=n>std_logger</span><span class=o>.</span><span class=n>addHandler</span><span class=p>(</span><span class=n>logging</span><span class=o>.</span><span class=n>NullHandler</span><span class=p>())</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>            <span class=c1># 安全地处理记录  </span>
+</span></span><span class=line><span class=cl>            <span class=n>std_logger</span><span class=o>.</span><span class=n>handle</span><span class=p>(</span><span class=n>record</span><span class=p>)</span>  
+</span></span><span class=line><span class=cl>        <span class=k>except</span> <span class=ne>Exception</span><span class=p>:</span>  
+</span></span><span class=line><span class=cl>            <span class=c1># 如果传播失败，静默忽略，避免影响测试  </span>
+</span></span><span class=line><span class=cl>            <span class=k>pass</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span><span class=p>(</span><span class=n>scope</span><span class=o>=</span><span class=s2>&#34;session&#34;</span><span class=p>,</span> <span class=n>autouse</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>  
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>setup_safe_loguru_integration</span><span class=p>():</span>  
+</span></span><span class=line><span class=cl>    <span class=c1># 移除Loguru的默认处理器  </span>
+</span></span><span class=line><span class=cl>    <span class=n>logger</span><span class=o>.</span><span class=n>remove</span><span class=p>()</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>    <span class=n>safe_handler</span> <span class=o>=</span> <span class=n>SafePropagateHandler</span><span class=p>()</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>    <span class=c1># 添加传播处理器到Loguru  </span>
+</span></span><span class=line><span class=cl>    <span class=n>handler_id</span> <span class=o>=</span> <span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span>  
+</span></span><span class=line><span class=cl>        <span class=n>safe_handler</span><span class=p>,</span>  
+</span></span><span class=line><span class=cl>        <span class=nb>format</span><span class=o>=</span><span class=s2>&#34;</span><span class=si>{message}</span><span class=s2>&#34;</span><span class=p>,</span>  <span class=c1># 简化格式，避免重复  </span>
+</span></span><span class=line><span class=cl>        <span class=n>level</span><span class=o>=</span><span class=s2>&#34;DEBUG&#34;</span><span class=p>,</span>  
+</span></span><span class=line><span class=cl>        <span class=n>backtrace</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span>  
+</span></span><span class=line><span class=cl>        <span class=n>diagnose</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span>  
+</span></span><span class=line><span class=cl>        <span class=n>catch</span><span class=o>=</span><span class=kc>True</span>  <span class=c1># 捕获处理器中的异常  </span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>    <span class=c1># 配置标准logging以避免冲突  </span>
+</span></span><span class=line><span class=cl>    <span class=n>logging</span><span class=o>.</span><span class=n>basicConfig</span><span class=p>(</span>  
+</span></span><span class=line><span class=cl>        <span class=n>level</span><span class=o>=</span><span class=n>logging</span><span class=o>.</span><span class=n>INFO</span><span class=p>,</span>  
+</span></span><span class=line><span class=cl>        <span class=nb>format</span><span class=o>=</span><span class=s1>&#39;</span><span class=si>%(levelname)s</span><span class=s1> - </span><span class=si>%(message)s</span><span class=s1>&#39;</span><span class=p>,</span>  
+</span></span><span class=line><span class=cl>        <span class=n>handlers</span><span class=o>=</span><span class=p>[</span><span class=n>logging</span><span class=o>.</span><span class=n>NullHandler</span><span class=p>()]</span>  
+</span></span><span class=line><span class=cl>    <span class=p>)</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>    <span class=k>yield</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>    <span class=c1># 清理  </span>
+</span></span><span class=line><span class=cl>    <span class=n>logger</span><span class=o>.</span><span class=n>remove</span><span class=p>(</span><span class=n>handler_id</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>再次执行，可以看到<code>caplog</code>已经可以正常捕捉loguru记录的日志了</p><p><img src=/post/117-loguru/Pasted-20250805-3.png width=1215 height=830 srcset="/post/117-loguru/Pasted-20250805-3_hu_1fed80aa3a20c158.png 480w, /post/117-loguru/Pasted-20250805-3_hu_9abb272facc4c78.png 1024w" loading=lazy class=gallery-image data-flex-grow=146 data-flex-basis=351px></p><hr><h1 id=loguru和logging模块对比>loguru和logging模块对比</h1><h2 id=2-loguru-vs-python标准logging库对比>2. Loguru vs Python标准logging库对比</h2><p>在深入了解Loguru之前，让我们先将其与Python标准库中的logging模块进行对比，这将帮助您更好地理解为什么越来越多的开发者选择Loguru作为他们的日志解决方案。</p><h3 id=21-配置复杂度对比>2.1 配置复杂度对比</h3><p><strong>Python标准logging的配置：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 标准logging需要多个步骤的配置</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>getLogger</span><span class=p>(</span><span class=vm>__name__</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>setLevel</span><span class=p>(</span><span class=n>logging</span><span class=o>.</span><span class=n>DEBUG</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 创建控制台处理器</span>
+</span></span><span class=line><span class=cl><span class=n>console_handler</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>StreamHandler</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>console_handler</span><span class=o>.</span><span class=n>setLevel</span><span class=p>(</span><span class=n>logging</span><span class=o>.</span><span class=n>INFO</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 创建文件处理器</span>
+</span></span><span class=line><span class=cl><span class=n>file_handler</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>FileHandler</span><span class=p>(</span><span class=s1>&#39;app.log&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>file_handler</span><span class=o>.</span><span class=n>setLevel</span><span class=p>(</span><span class=n>logging</span><span class=o>.</span><span class=n>DEBUG</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 创建格式化器</span>
+</span></span><span class=line><span class=cl><span class=n>console_formatter</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>Formatter</span><span class=p>(</span><span class=s1>&#39;</span><span class=si>%(asctime)s</span><span class=s1> - </span><span class=si>%(name)s</span><span class=s1> - </span><span class=si>%(levelname)s</span><span class=s1> - </span><span class=si>%(message)s</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>file_formatter</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>Formatter</span><span class=p>(</span><span class=s1>&#39;</span><span class=si>%(asctime)s</span><span class=s1> - </span><span class=si>%(name)s</span><span class=s1> - </span><span class=si>%(levelname)s</span><span class=s1> - </span><span class=si>%(filename)s</span><span class=s1>:</span><span class=si>%(lineno)d</span><span class=s1> - </span><span class=si>%(message)s</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 设置格式化器</span>
+</span></span><span class=line><span class=cl><span class=n>console_handler</span><span class=o>.</span><span class=n>setFormatter</span><span class=p>(</span><span class=n>console_formatter</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>file_handler</span><span class=o>.</span><span class=n>setFormatter</span><span class=p>(</span><span class=n>file_formatter</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 添加处理器</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>addHandler</span><span class=p>(</span><span class=n>console_handler</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>addHandler</span><span class=p>(</span><span class=n>file_handler</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 现在才能开始使用</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;配置完成，开始记录日志&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>Loguru的配置：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Loguru一行代码即可完成相同功能</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>sys</span><span class=o>.</span><span class=n>stdout</span><span class=p>,</span> <span class=n>level</span><span class=o>=</span><span class=s2>&#34;INFO&#34;</span><span class=p>,</span> <span class=nb>format</span><span class=o>=</span><span class=s2>&#34;</span><span class=si>{time}</span><span class=s2> - </span><span class=si>{name}</span><span class=s2> - </span><span class=si>{level}</span><span class=s2> - </span><span class=si>{message}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=s2>&#34;app.log&#34;</span><span class=p>,</span> <span class=n>level</span><span class=o>=</span><span class=s2>&#34;DEBUG&#34;</span><span class=p>,</span> <span class=nb>format</span><span class=o>=</span><span class=s2>&#34;</span><span class=si>{time}</span><span class=s2> - </span><span class=si>{name}</span><span class=s2> - </span><span class=si>{level}</span><span class=s2> - </span><span class=si>{file}</span><span class=s2>:</span><span class=si>{line}</span><span class=s2> - </span><span class=si>{message}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;配置完成，开始记录日志&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>优势对比：</strong></p><ul><li><strong>标准logging</strong>：需要创建logger、handler、formatter等多个对象，并进行多层配置</li><li><strong>Loguru</strong>：通过简单的<code>add()</code>方法即可完成所有配置，代码量减少70%以上</li></ul><h3 id=22-api简洁性对比>2.2 API简洁性对比</h3><p><strong>Python标准logging的API：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 需要导入多个模块和类</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging.handlers</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging.config</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 不同级别需要不同的方法调用</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>debug</span><span class=p>(</span><span class=s2>&#34;Debug message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;Info message&#34;</span><span class=p>)</span> 
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>warning</span><span class=p>(</span><span class=s2>&#34;Warning message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>error</span><span class=p>(</span><span class=s2>&#34;Error message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>critical</span><span class=p>(</span><span class=s2>&#34;Critical message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 异常记录需要单独处理</span>
+</span></span><span class=line><span class=cl><span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=mi>1</span> <span class=o>/</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl><span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>logger</span><span class=o>.</span><span class=n>error</span><span class=p>(</span><span class=s2>&#34;An error occurred&#34;</span><span class=p>,</span> <span class=n>exc_info</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>Loguru的API：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 统一的API，更直观的方法名</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>trace</span><span class=p>(</span><span class=s2>&#34;Trace message&#34;</span><span class=p>)</span>      <span class=c1># 比debug更详细</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>debug</span><span class=p>(</span><span class=s2>&#34;Debug message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;Info message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>success</span><span class=p>(</span><span class=s2>&#34;Success message&#34;</span><span class=p>)</span>  <span class=c1># 独有的成功级别</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>warning</span><span class=p>(</span><span class=s2>&#34;Warning message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>error</span><span class=p>(</span><span class=s2>&#34;Error message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>critical</span><span class=p>(</span><span class=s2>&#34;Critical message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 异常记录极其简单</span>
+</span></span><span class=line><span class=cl><span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=mi>1</span> <span class=o>/</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl><span class=k>except</span> <span class=ne>Exception</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>logger</span><span class=o>.</span><span class=n>exception</span><span class=p>(</span><span class=s2>&#34;An error occurred&#34;</span><span class=p>)</span>  <span class=c1># 自动包含异常信息</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>优势对比：</strong></p><ul><li><strong>标准logging</strong>：API相对繁琐，异常处理需要额外参数</li><li><strong>Loguru</strong>：API设计更加人性化，提供SUCCESS级别，异常处理更简洁</li></ul><h3 id=23-功能特性对比>2.3 功能特性对比</h3><div class=table-wrapper><table><thead><tr><th>功能特性</th><th>Python标准logging</th><th>Loguru</th><th>优势说明</th></tr></thead><tbody><tr><td><strong>日志轮转</strong></td><td>需要<code>TimedRotatingFileHandler</code>或<code>RotatingFileHandler</code></td><td>内置支持，一行代码配置</td><td>Loguru配置简单，支持更多轮转策略</td></tr><tr><td><strong>日志压缩</strong></td><td>不支持，需要手动实现</td><td>内置支持多种压缩格式</td><td>Loguru自动处理，节省存储空间</td></tr><tr><td><strong>日志过滤</strong></td><td>需要创建Filter类</td><td>支持函数、字符串、字典等多种过滤方式</td><td>Loguru更灵活，代码更少</td></tr><tr><td><strong>结构化日志</strong></td><td>不支持原生JSON格式</td><td>内置JSON序列化支持</td><td>Loguru更适合现代日志分析系统</td></tr><tr><td><strong>颜色支持</strong></td><td>需要第三方库如<code>colorama</code></td><td>内置终端颜色支持</td><td>Loguru开箱即用，视觉效果更好</td></tr><tr><td><strong>上下文信息</strong></td><td>需要手动使用<code>LoggerAdapter</code></td><td>通过<code>bind()</code>方法轻松实现</td><td>Loguru更直观，功能更强大</td></tr><tr><td><strong>异常诊断</strong></td><td>基本的异常信息</td><td>详细的变量值显示和调用栈</td><td>Loguru调试效率更高</td></tr></tbody></table></div><p><strong>代码示例对比：</strong></p><p><strong>标准logging实现日志轮转：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging.handlers</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>os</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 创建轮转文件处理器</span>
+</span></span><span class=line><span class=cl><span class=n>rotating_handler</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>handlers</span><span class=o>.</span><span class=n>RotatingFileHandler</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;app.log&#39;</span><span class=p>,</span> 
+</span></span><span class=line><span class=cl>    <span class=n>maxBytes</span><span class=o>=</span><span class=mi>10</span><span class=o>*</span><span class=mi>1024</span><span class=o>*</span><span class=mi>1024</span><span class=p>,</span>  <span class=c1># 10MB</span>
+</span></span><span class=line><span class=cl>    <span class=n>backupCount</span><span class=o>=</span><span class=mi>5</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 需要手动处理压缩</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>compress_old_logs</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 复杂的压缩逻辑...</span>
+</span></span><span class=line><span class=cl>    <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>addHandler</span><span class=p>(</span><span class=n>rotating_handler</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>Loguru实现日志轮转：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 一行代码搞定轮转和压缩</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;app.log&#34;</span><span class=p>,</span> 
+</span></span><span class=line><span class=cl>    <span class=n>rotation</span><span class=o>=</span><span class=s2>&#34;10 MB&#34;</span><span class=p>,</span>        <span class=c1># 文件大小轮转</span>
+</span></span><span class=line><span class=cl>    <span class=n>retention</span><span class=o>=</span><span class=s2>&#34;10 days&#34;</span><span class=p>,</span>     <span class=c1># 保留10天</span>
+</span></span><span class=line><span class=cl>    <span class=n>compression</span><span class=o>=</span><span class=s2>&#34;zip&#34;</span>        <span class=c1># 自动压缩</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=24-使用体验对比>2.4 使用体验对比</h3><p><strong>Python标准logging的痛点：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 痛点1：全局配置影响所有模块</span>
+</span></span><span class=line><span class=cl><span class=n>logging</span><span class=o>.</span><span class=n>basicConfig</span><span class=p>(</span><span class=n>level</span><span class=o>=</span><span class=n>logging</span><span class=o>.</span><span class=n>DEBUG</span><span class=p>)</span>  <span class=c1># 会影响整个程序</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 痛点2：重复日志问题</span>
+</span></span><span class=line><span class=cl><span class=n>logger1</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>getLogger</span><span class=p>(</span><span class=s1>&#39;app&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger2</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>getLogger</span><span class=p>(</span><span class=s1>&#39;app.module&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1># 如果配置不当，容易出现重复日志</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 痛点3：格式化字符串需要使用%</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;User </span><span class=si>%s</span><span class=s2> logged in from </span><span class=si>%s</span><span class=s2>&#34;</span><span class=p>,</span> <span class=n>username</span><span class=p>,</span> <span class=n>ip_address</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1># 不如f-string直观</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 痛点4：难以获取调用者信息</span>
+</span></span><span class=line><span class=cl><span class=c1># 需要复杂的格式化字符串才能显示文件名和行号</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>Loguru的解决方案：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 优势1：单例模式，避免配置混乱</span>
+</span></span><span class=line><span class=cl><span class=c1># 无需担心多个logger实例的配置问题</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 优势2：自动避免重复日志</span>
+</span></span><span class=line><span class=cl><span class=c1># 智能的处理器管理，不会出现重复输出</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 优势3：支持现代字符串格式化</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;User </span><span class=si>{</span><span class=n>username</span><span class=si>}</span><span class=s2> logged in from </span><span class=si>{</span><span class=n>ip_address</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1># 也支持{}格式化</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;User </span><span class=si>{}</span><span class=s2> logged in from </span><span class=si>{}</span><span class=s2>&#34;</span><span class=p>,</span> <span class=n>username</span><span class=p>,</span> <span class=n>ip_address</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 优势4：自动包含丰富的上下文信息</span>
+</span></span><span class=line><span class=cl><span class=c1># 默认显示时间、级别、模块、函数、行号等</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=25-性能和内存使用对比>2.5 性能和内存使用对比</h3><p><strong>性能测试代码：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>time</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 测试标准logging性能</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_standard_logging</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=n>std_logger</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>getLogger</span><span class=p>(</span><span class=s1>&#39;test&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>std_logger</span><span class=o>.</span><span class=n>setLevel</span><span class=p>(</span><span class=n>logging</span><span class=o>.</span><span class=n>DEBUG</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>handler</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>StreamHandler</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>handler</span><span class=o>.</span><span class=n>setLevel</span><span class=p>(</span><span class=n>logging</span><span class=o>.</span><span class=n>DEBUG</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>std_logger</span><span class=o>.</span><span class=n>addHandler</span><span class=p>(</span><span class=n>handler</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>start</span> <span class=o>=</span> <span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>10000</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>std_logger</span><span class=o>.</span><span class=n>debug</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;Test message </span><span class=si>{</span><span class=n>i</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>end</span> <span class=o>=</span> <span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>end</span> <span class=o>-</span> <span class=n>start</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 测试Loguru性能</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_loguru</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=n>logger</span><span class=o>.</span><span class=n>remove</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>handler_id</span> <span class=o>=</span> <span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>sys</span><span class=o>.</span><span class=n>stderr</span><span class=p>,</span> <span class=n>level</span><span class=o>=</span><span class=s2>&#34;DEBUG&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>start</span> <span class=o>=</span> <span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>10000</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>logger</span><span class=o>.</span><span class=n>debug</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;Test message </span><span class=si>{</span><span class=n>i</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>end</span> <span class=o>=</span> <span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>logger</span><span class=o>.</span><span class=n>remove</span><span class=p>(</span><span class=n>handler_id</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>end</span> <span class=o>-</span> <span class=n>start</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>性能对比结果：</strong></p><ul><li><strong>标准logging</strong>：在简单场景下性能略好，但功能有限</li><li><strong>Loguru</strong>：在启用高级功能（如异步、格式化）时性能接近标准logging，但功能更强大</li></ul><p><strong>内存使用对比：</strong></p><ul><li><strong>标准logging</strong>：每个logger实例占用较多内存</li><li><strong>Loguru</strong>：单例模式，内存使用更高效</li></ul><h3 id=26-迁移成本对比>2.6 迁移成本对比</h3><p><strong>从标准logging迁移到Loguru：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># 原有代码</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>getLogger</span><span class=p>(</span><span class=vm>__name__</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;This is a log message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 迁移后代码</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;This is a log message&#34;</span><span class=p>)</span>  <span class=c1># API几乎完全兼容</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>迁移优势：</strong></p><ol><li><strong>API兼容性</strong>：Loguru的API设计与标准logging相似，学习成本低</li><li><strong>渐进式迁移</strong>：可以在项目中同时使用两者，逐步迁移</li><li><strong>向后兼容</strong>：Loguru提供了与标准logging的集成方案</li></ol><h3 id=27-总结对比>2.7 总结对比</h3><div class=table-wrapper><table><thead><tr><th>对比维度</th><th>Python标准logging</th><th>Loguru</th><th>推荐选择</th></tr></thead><tbody><tr><td><strong>学习曲线</strong></td><td>陡峭，需要理解多个概念</td><td>平缓，直观易用</td><td><strong>Loguru</strong></td></tr><tr><td><strong>配置复杂度</strong></td><td>高，需要多个步骤</td><td>低，一行代码搞定</td><td><strong>Loguru</strong></td></tr><tr><td><strong>功能完整性</strong></td><td>基础功能，需要扩展</td><td>开箱即用的高级功能</td><td><strong>Loguru</strong></td></tr><tr><td><strong>代码简洁性</strong></td><td>冗长，模板代码多</td><td>简洁，表达力强</td><td><strong>Loguru</strong></td></tr><tr><td><strong>调试友好性</strong></td><td>一般</td><td>优秀，详细信息丰富</td><td><strong>Loguru</strong></td></tr><tr><td><strong>性能</strong></td><td>略好（简单场景）</td><td>接近，功能更强大</td><td><strong>Loguru</strong></td></tr><tr><td><strong>社区支持</strong></td><td>官方支持，历史悠久</td><td>活跃社区，快速迭代</td><td><strong>Loguru</strong></td></tr></tbody></table></div><p><strong>结论：</strong>
+Loguru在几乎所有的对比维度上都优于Python标准logging库。它不仅大大简化了日志配置的复杂性，还提供了更丰富的功能和更好的用户体验。对于新项目，强烈推荐直接使用Loguru；对于现有项目，也可以考虑逐步迁移到Loguru以提升开发效率和日志管理能力。</p></section><footer class=article-footer><section class=article-tags><a href=/tags/%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7/>测试工具</a>
+<a href=/tags/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE/>开源项目</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/post/011-%E5%A6%82%E4%BD%95%E5%8F%8A%E6%97%B6%E6%8E%8C%E6%8F%A1%E5%90%84%E7%A7%8D%E5%B8%B8%E7%94%A8%E6%A1%86%E6%9E%B6%E7%9A%84%E6%9C%80%E6%96%B0%E5%8F%98%E5%8C%96/><div class=article-image><img src=/post/011-%E5%A6%82%E4%BD%95%E5%8F%8A%E6%97%B6%E6%8E%8C%E6%8F%A1%E5%90%84%E7%A7%8D%E5%B8%B8%E7%94%A8%E6%A1%86%E6%9E%B6%E7%9A%84%E6%9C%80%E6%96%B0%E5%8F%98%E5%8C%96/Pasted-20240831-1.66e361294b21b9df4ab039d81b87fcce_hu_6eccbca4948bb8b4.png width=250 height=150 loading=lazy alt="Featured image of post 如何及时掌握各种常用框架的最新变化？" data-hash="md5-ZuNhKUshud9KsDnYG4f8zg=="></div><div class=article-details><h2 class=article-title>如何及时掌握各种常用框架的最新变化？</h2></div></a></article><article class=has-image><a href=/post/120-autotestdata/><div class=article-image><img src=/post/120-autotestdata/title.665ed01cdeaf3ce986fb754c231a1e3e_hu_7de74c14e491bf75.png width=250 height=150 loading=lazy alt="Featured image of post 推荐一个用于页面探索测试的数据辅助工具" data-hash="md5-Zl7QHN6vPOmG+3VMIxoePg=="></div><div class=article-details><h2 class=article-title>推荐一个用于页面探索测试的数据辅助工具</h2></div></a></article><article class=has-image><a href=/post/118-pom_replacement/><div class=article-image><img src=/post/118-pom_replacement/Pasted-20250806.f76c8d5a1901a96f974bf59653a68a57_hu_14ccbf1f5b41b9c6.png width=250 height=150 loading=lazy alt="Featured image of post UI自动化，POM之外的另一模式" data-hash="md5-92yNWhkBqW+XS/WWU6aKVw=="></div><div class=article-details><h2 class=article-title>UI自动化，POM之外的另一模式</h2></div></a></article><article class=has-image><a href=/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/><div class=article-image><img src=/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250721-2.0d9ba897ea0011af29e3e9f32a6d5e83_hu_9e7f8a132ec29530.png width=250 height=150 loading=lazy alt="Featured image of post 本地定制Pytest插件及发布指南" data-hash="md5-DZuol+oAEa8p4+nzKm1egw=="></div><div class=article-details><h2 class=article-title>本地定制Pytest插件及发布指南</h2></div></a></article><article class=has-image><a href=/post/102-%E5%B8%B8%E7%94%A8%E6%88%AA%E5%9B%BE%E5%B7%A5%E5%85%B7/><div class=article-image><img src=/post/102-%E5%B8%B8%E7%94%A8%E6%88%AA%E5%9B%BE%E5%B7%A5%E5%85%B7/title.cf97208ffd802c434978703e1237880e_hu_43e17b197ea96d71.png width=250 height=150 loading=lazy alt="Featured image of post 提升工作效率的秘密！自用截图工具分享，长图&动态图轻松搞定" data-hash="md5-z5cgj/2ALENJeHA+EjeIDg=="></div><div class=article-details><h2 class=article-title>提升工作效率的秘密！自用截图工具分享，长图&动态图轻松搞定</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2023 -
+2025 |by 城下秋草（公众号： 秋草说测试）</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

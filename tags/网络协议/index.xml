@@ -1,0 +1,784 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>网络协议 on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/</link><description>Recent content in 网络协议 on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Tue, 01 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/index.xml" rel="self" type="application/rss+xml"/><item><title>大话网络协议之HTTP不同版本的演进和区别</title><link>https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/</link><pubDate>Tue, 01 Jul 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/Pasted-20250702.png" alt="Featured image of post 大话网络协议之HTTP不同版本的演进和区别" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>大话网络协议这个系列，之前我们介绍过OSI七层模型和TCP/IP四层模型【】，也详细介绍过HTTPS协议及其实现加密通信的基本原理 【】。而现今互联网的运行，离不开HTTP协议这个基石，但HTTP协议我们目前能看到多个不同版本，如http/1.1， http/2，http/3等，那这些不同版本有何区别，具体应用场景如何？本篇我们就重点来聊聊HTTP协议中这些不同版本的异同。&lt;/p>
+&lt;h2 id="http协议简介">HTTP协议简介
+&lt;/h2>&lt;h3 id="概述">概述
+&lt;/h3>&lt;p>&lt;strong>HTTP&lt;/strong>（超文本传输协议 Hypertext Transfer Protocol）位于 &lt;strong>OSI七层网络模型&lt;/strong>中的&lt;strong>应用层&lt;/strong>，它的核心使命是实现分布式系统间的资源传输。它和 TCP/UDP这样的传输层协议间更多是一种协作关系。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/OSI-7.png"
+width="1150"
+height="858"
+srcset="https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/OSI-7_hu_ac7e6a0c3873a958.png 480w, https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/OSI-7_hu_b7f8c621bc348aa5.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="134"
+data-flex-basis="321px"
+>&lt;/p>
+&lt;p>HTTP协议，从设计之初， 就包含如下一些核心特性：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>无状态设计&lt;/strong>：服务器不保存客户端上下文信息&lt;/li>
+&lt;li>&lt;strong>请求/响应模型&lt;/strong>：基于标准的请求方法和状态码&lt;/li>
+&lt;li>&lt;strong>可扩展头部&lt;/strong>：通过Header字段实现元数据传输&lt;/li>
+&lt;li>&lt;strong>跨平台兼容&lt;/strong>：文本协议设计确保多系统互操作性&lt;/li>
+&lt;/ul>
+&lt;p>HTTP协议负责在客户端与服务器之间传输超文本资源。作为&lt;strong>无状态协议&lt;/strong>，HTTP不保留客户端交互记录，每个请求独立处理。通过这个协议规范，统一了Web资源访问方式，可以兼容各类操作系统和设备，并可通过头部字段实现功能扩展。 是当今互联网世界的基础协议。&lt;/p>
+&lt;h3 id="协议构成">协议构成
+&lt;/h3>&lt;p>HTTP通信基于请求/响应模型，通过TCP/IP协议栈传输：&lt;/p>
+&lt;p>&lt;strong>请求报文结构&lt;/strong>：
+&lt;img src="https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/Pasted-20250701.png"
+width="976"
+height="239"
+srcset="https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/Pasted-20250701_hu_4eb860eb3291ff90.png 480w, https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/Pasted-20250701_hu_e6fe4db646b9721b.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="408"
+data-flex-basis="980px"
+>
+如：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-http" data-lang="http">&lt;span class="line">&lt;span class="cl">&lt;span class="nf">POST&lt;/span> &lt;span class="nn">/api/v1/users&lt;/span> &lt;span class="kr">HTTP&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="m">1.1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Host&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="l">api.example.com&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Content-Type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="l">application/json&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Authorization&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="l">Bearer xyz123&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Content-Length&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="l">48&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>&lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="s2">&amp;#34;John&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="nt">&amp;#34;email&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="s2">&amp;#34;john@example.com&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>响应报文结构&lt;/strong>：&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/Pasted-20250701-1.png"
+width="977"
+height="419"
+srcset="https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/Pasted-20250701-1_hu_405ca6b9ea57e5e1.png 480w, https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/Pasted-20250701-1_hu_4bba38441c40b6cb.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="233"
+data-flex-basis="559px"
+>
+如：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-http" data-lang="http">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">HTTP&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="m">1.1&lt;/span> &lt;span class="m">201&lt;/span> &lt;span class="ne">Created&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Location&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="l">/api/v1/users/789&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Content-Type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="l">application/json&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Date&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="l">Mon, 15 Jul 2024 09:28:53 GMT&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Content-Length&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="l">35&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>&lt;span class="nt">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">789&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="nt">&amp;#34;status&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="s2">&amp;#34;created&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="http方法">HTTP方法
+&lt;/h3>&lt;p>HTTP方法定义了对网络资源的操作语义，可以用下表总结不同http方法的应用场景&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;strong>方法&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>幂等性&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>安全性&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>应用场景&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>RESTful实践案例&lt;/strong>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>GET&lt;/td>
+&lt;td>是&lt;/td>
+&lt;td>是&lt;/td>
+&lt;td>获取资源&lt;/td>
+&lt;td>查询用户信息&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>POST&lt;/td>
+&lt;td>否&lt;/td>
+&lt;td>否&lt;/td>
+&lt;td>创建资源/执行操作&lt;/td>
+&lt;td>新建订单&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>PUT&lt;/td>
+&lt;td>是&lt;/td>
+&lt;td>否&lt;/td>
+&lt;td>全量更新资源&lt;/td>
+&lt;td>更新用户资料&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DELETE&lt;/td>
+&lt;td>是&lt;/td>
+&lt;td>否&lt;/td>
+&lt;td>删除资源&lt;/td>
+&lt;td>取消订单&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>PATCH&lt;/td>
+&lt;td>否&lt;/td>
+&lt;td>否&lt;/td>
+&lt;td>部分更新资源&lt;/td>
+&lt;td>修改订单地址&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>HEAD&lt;/td>
+&lt;td>是&lt;/td>
+&lt;td>是&lt;/td>
+&lt;td>获取头部元数据&lt;/td>
+&lt;td>检查资源是否存在&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>OPTIONS&lt;/td>
+&lt;td>是&lt;/td>
+&lt;td>是&lt;/td>
+&lt;td>获取服务器支持的方法&lt;/td>
+&lt;td>CORS预检请求&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="http状态码">HTTP状态码
+&lt;/h3>&lt;p>状态码是响应消息中，以三位数字表示的请求处理结果。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;strong>类别&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>常用状态码&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>技术含义&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>应用场景&lt;/strong>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>1xx&lt;/td>
+&lt;td>101&lt;/td>
+&lt;td>协议切换&lt;/td>
+&lt;td>WebSocket升级&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2xx&lt;/td>
+&lt;td>200/201/204&lt;/td>
+&lt;td>成功处理&lt;/td>
+&lt;td>资源创建成功&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3xx&lt;/td>
+&lt;td>301/302/304&lt;/td>
+&lt;td>重定向/缓存有效&lt;/td>
+&lt;td>永久迁移/临时跳转&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>4xx&lt;/td>
+&lt;td>400/401/404&lt;/td>
+&lt;td>客户端错误&lt;/td>
+&lt;td>参数错误/未授权/资源不存在&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>5xx&lt;/td>
+&lt;td>500/502/503&lt;/td>
+&lt;td>服务器错误&lt;/td>
+&lt;td>服务崩溃/网关错误/过载&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="http的不同版本和演进">HTTP的不同版本和演进
+&lt;/h2>&lt;p>&lt;strong>演进路线&lt;/strong>：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">timeline
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> title HTTP协议演进
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 1991 ： HTTP 0.9
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 1996 ： HTTP 1.0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 1997 ： HTTP 1.1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 2015 ： HTTP 2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 2020 ： HTTP 3
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="http09-1991">HTTP/0.9 (1991)
+&lt;/h3>&lt;p>最初版本的 HTTP 协议并没有版本号，只是后来为了和后续版本区分，定义为了0.9版本。它基于&lt;strong>Tim Berners-Lee博士&lt;/strong>为 CERN 内部文档传输设计的初始协议，也被称为&lt;strong>单行协议&lt;/strong>（one-line）&lt;/p>
+&lt;p>这个协议极为简单：&lt;/p>
+&lt;p>请求：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-http" data-lang="http">&lt;span class="line">&lt;span class="cl">&lt;span class="err">GET /mypage.html
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>响应只包含页面文档本身， 也不存在消息头：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 这是一个非常简单的 HTML 页面
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>局限性也显而易见：&lt;/p>
+&lt;p>这个协议无法支持复杂Web应用，仅可以传输纯HTML文档，也没有状态码反映通信状态。&lt;/p>
+&lt;h3 id="http10-1996">HTTP/1.0 (1996)
+&lt;/h3>&lt;p>随着网络的发展，浏览器和服务器的应用快速增长，http协议也得到更多的应用。基于原协议增加了很多的特性，并在1996 整合到了标准文档 &lt;strong>RFC 1945&lt;/strong> 中进行了标准化，并定义为了HTTP/1.0，但这个协议并非官方标准，是个狭义的标准化版本。&lt;/p>
+&lt;p>&lt;strong>HTTP/1.0 的核心改进&lt;/strong>：&lt;/p>
+&lt;ol>
+&lt;li>引入版本标识（HTTP/1.0）&lt;/li>
+&lt;li>新增状态码（200/404等）&lt;/li>
+&lt;li>支持头部字段（Content-Type/Cache-Control）&lt;/li>
+&lt;li>扩展方法（POST/HEAD）&lt;/li>
+&lt;/ol>
+&lt;p>通信过程如：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">sequenceDiagram
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Client-&amp;gt;&amp;gt;Server: GET /index.html (连接1)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Server-&amp;gt;&amp;gt;Client: 200 OK + 关闭
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Client-&amp;gt;&amp;gt;Server: GET /style.css (连接2)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Server-&amp;gt;&amp;gt;Client: 200 OK + 关闭
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>但这个标准存在极为关键的性能开销问题：&lt;/p>
+&lt;ul>
+&lt;li>短连接机制，且每个资源使用独立连接，TCP握手开销大&lt;/li>
+&lt;li>无压缩/缓存机制&lt;/li>
+&lt;/ul>
+&lt;h3 id="http11-1997">HTTP/1.1 (1997)
+&lt;/h3>&lt;p>为了解决Web页面资源加载效率问题，从 HTTP/1.0发布之前，其实就已经在着手HTTP协议的官方标准化工作，并在1997年发布了&lt;strong>RFC 2068&lt;/strong>（也有将 1999 年的修订版本 &lt;strong>RFC 2616&lt;/strong> 看作HTTP/1,1标准），2014年还发布了修订版本&lt;strong>RFC 7235&lt;/strong>&lt;/p>
+&lt;p>HTTP/1.1版本非常成功，直到今天依然广为应用。它实现如下一些主要的特性：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;strong>特性&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>实现机制&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>性能提升&lt;/strong>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>持久连接&lt;/td>
+&lt;td>Connection: keep-alive&lt;/td>
+&lt;td>减少60% TCP握手&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>管道化&lt;/td>
+&lt;td>请求批量发送&lt;/td>
+&lt;td>理论吞吐量增加30%&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>分块传输&lt;/td>
+&lt;td>Transfer-Encoding&lt;/td>
+&lt;td>支持大文件流式传输&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>内容协商&lt;/td>
+&lt;td>Accept头系列&lt;/td>
+&lt;td>多格式资源支持&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>HTTP/1.1 协议为提升效率，提供了&lt;strong>管道化机制&lt;/strong>，也就是可以让客户端向服务端同时发出多个请求来提升效率。但是这里存在的问题，就是虽然客户端效率得到提升，但是服务端依然只能一次一条来返回响应。也就是 &lt;strong>队头阻塞(Head-of-Line Blocking)&lt;/strong> 问题&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">sequenceDiagram
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Client-&amp;gt;&amp;gt;Server: 请求A (大文件下载)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Client-&amp;gt;&amp;gt;Server: 请求B (小文件)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Server-&amp;gt;&amp;gt;Client: 响应A处理中...（阻塞）
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Note over Server: 请求B已完成但必须等待
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Server-&amp;gt;&amp;gt;Client: 响应A
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Server-&amp;gt;&amp;gt;Client: 响应B
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>其他局限&lt;/strong>：&lt;/p>
+&lt;p>除此之外，虽然这个版本引入了压缩机制，但是对于消息头并没有提供压缩支持，依然存在较大的性能浪费。&lt;/p>
+&lt;p>而且 HTTP/1.1 无状态的特性，服务端依然只能被动等待客户端提交状态信息。&lt;/p>
+&lt;h3 id="http2-2015">HTTP/2 (2015)
+&lt;/h3>&lt;p>随着互联网上Web应用的丰富化和网络带宽的提升，传输内容要求也越来越高。为了进一步提升 HTTP协议的传输效率及其遗留问题，2015年基于谷歌的 &lt;strong>SPDY&lt;/strong> 协议基础上改进发布了 &lt;strong>RFC 7540&lt;/strong> 。&lt;/p>
+&lt;p>在HTTP/2中，主要进行了以下改进：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>二进制帧&lt;/strong>：采用二进制而不是文本协议，不再可读，也不可无障碍地手动创建。&lt;/li>
+&lt;li>&lt;strong>多路复用&lt;/strong>：单连接并发传输&lt;/li>
+&lt;li>&lt;strong>头部压缩&lt;/strong>：通过HPACK算法对消息头进行压缩，可减少70-85%开销&lt;/li>
+&lt;li>&lt;strong>服务器推送&lt;/strong>：主动发送关联资源，允许服务器在客户端缓存中填充数据&lt;/li>
+&lt;/ol>
+&lt;p>&lt;strong>局限性&lt;/strong>：&lt;/p>
+&lt;p>虽然 HTTP/2.0 提出了通过多路复用的方法来解决 &lt;strong>队头堵塞&lt;/strong>，但实际效果并不理想，根本原因是HTTP协议是基于TCP协议之上的应用层协议，也就是&lt;strong>即便在应用层可以通过多路复用，但在传输层，因为TCP的重传机制，依然要等待传输层的消息逐一返回，也就是在TCP层，依然存在队头堵塞&lt;/strong>。&lt;/p>
+&lt;h3 id="http3-2020">HTTP/3 (2020)
+&lt;/h3>&lt;p>为了彻底解决&lt;strong>队头堵塞&lt;/strong>问题，2020推出了HTTP/3协议，该协议最大的变化就是对协议栈进行了彻底重构，传输层不再基于TCP协议，而是基于UDP的&lt;strong>QUIC协议&lt;/strong>&lt;/p>
+&lt;p>UDP协议因为设计上没有TCP的丢包重传机制，且通信效率较TCP协议有很大提升，而QUIC重新设计的通信方式，在几乎等同于TCP连接可靠性的同时，延迟大大减少。&lt;/p>
+&lt;p>目前超过95%以上的浏览器均已支持了HTTP/3协议，且30%以上的网站也已开始支持HTTP/3。&lt;/p>
+&lt;h2 id="总结">总结
+&lt;/h2>&lt;p>通过上述HTTP不同版本的主要区别介绍，可以概括如下：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;strong>版本&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>核心贡献&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>主要局限&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>采用率&lt;/strong>(2024 )&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>0.9&lt;/td>
+&lt;td>建立请求/响应模型&lt;/td>
+&lt;td>仅支持GET&lt;/td>
+&lt;td>0%&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>1.0&lt;/td>
+&lt;td>引入头部/状态码&lt;/td>
+&lt;td>短连接效率低&lt;/td>
+&lt;td>&amp;lt;1%&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>1.1&lt;/td>
+&lt;td>持久连接/管道化&lt;/td>
+&lt;td>队头阻塞&lt;/td>
+&lt;td>52%&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2&lt;/td>
+&lt;td>二进制分帧/头部压缩&lt;/td>
+&lt;td>TCP层阻塞&lt;/td>
+&lt;td>96%&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3&lt;/td>
+&lt;td>QUIC协议/连接迁移&lt;/td>
+&lt;td>基础设施支持待完善&lt;/td>
+&lt;td>39%&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>据Cloudflare 2024报告：全球HTTP流量中HTTP/3占比已达35%，预计2026年将成为主导协议。HTTP协议的持续演进体现了互联网基础设施对性能、安全、移动性需求的技术响应，开发者需深入理解各版本特性，构建适应未来网络环境的高性能应用。&lt;/p></description></item><item><title>大话网络协议-OSI七层模型和TCP/IP四层模型</title><link>https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/</link><pubDate>Mon, 21 Oct 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-2.png" alt="Featured image of post 大话网络协议-OSI七层模型和TCP/IP四层模型" />&lt;p>时至今日，互联网已经是大家日常生活中不可或缺的一部分，购物、点餐、刷剧、网课，已经融入了我们生活的方方面面。但网络具体是怎么工作的呢？ 特别是我们具体从事软件研发、ICT行业的同学，理解和掌握这个我们产品运行的基础设施尤为必要。&lt;/p>
+&lt;p>本文，我们会力争用最简单易懂的方式，弄清网络协议的地基：&lt;code>OSI七层模型&lt;/code> 和 &lt;code>TCP/IP四层模型&lt;/code>&lt;/p>
+&lt;h2 id="网络的起源">网络的起源
+&lt;/h2>&lt;p>要说 OSI 七层模型，我们首先还是要回顾下网络技术本身的发展和渊源。&lt;/p>
+&lt;p>现今的网络技术，其实最初是军事目的，萌芽于美苏争霸的冷战背景下。1957 年苏联成功发射第一颗人造卫星，引起美国恐慌，并成立了&lt;strong>APRA&lt;/strong>（Advanced Research Project Agency，美国国防部高级研究计划局）。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021.png"
+width="935"
+height="896"
+srcset="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021_hu_a0313a5f02a50148.png 480w, https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021_hu_9dc6bbed5f709c47.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="104"
+data-flex-basis="250px"
+>&lt;/p>
+&lt;p>1961 年，苏联又成功试射了 R-16 洲际导弹，使核打击美国本土成为可能。为了应对可能来临的攻击，美国国防部授权 APRA 研发一种 &lt;strong>“分布式”的军事指挥系统&lt;/strong>。&lt;/p>
+&lt;p>1966年，这个系统的雏形，被命名为 &lt;strong>ARPANET&lt;/strong> （阿帕网），它也就是现代互联网的前身。&lt;/p>
+&lt;p>1969年，美国国防部正式对 ARPANET 开始商业招标，BBN公司中标，并在同年组建了研发中心。&lt;/p>
+&lt;p>1969年底，第一个 ARPANET 诞生，将加利福尼亚州大学洛杉矶分校、加州大学圣巴巴拉分校、斯坦福大学、犹他州大学四所大学的 4 台大型计算机进行了互联。人类社会开始进入 “网络时代”。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-1.png"
+width="932"
+height="615"
+srcset="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-1_hu_a6164cb5e3c33af1.png 480w, https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-1_hu_c796cb41083ac572.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="151"
+data-flex-basis="363px"
+>&lt;/p>
+&lt;p>在 ARPANET 的继续演进过程中，网络协议的需求被提出，以解决不同节点间的信号识别问题。最开始建立的网络协议叫 NCP （net control protocol）&lt;/p>
+&lt;p>1977年，为了解决 NCP 本身要求同构系统的缺点，以及支持的主机数量有限，提出了传输控制协议 TCP V1和V2版本。&lt;/p>
+&lt;p>1978年，TCP V3版本基于分层思想，将原先的协议分为了TCP协议和IP协议。前者负责可靠传输，后者负责寻址互联。并进一步演进到稳定的V4版本。&lt;/p>
+&lt;p>到1984年，美国国防部将 ARPANET 划分为军用和民用两部分。Internet 至此诞生&lt;/p>
+&lt;p>同样在1984年，为了解决不同系统间的互操作问题，国际标准化组织 &lt;strong>ISO&lt;/strong>， 提出了 &lt;strong>OSI （Open System Interconnect）开放系统互联模型&lt;/strong>，并大力推广。&lt;/p>
+&lt;p>与此同时，Unix操作系统中捆绑了TCP/IP协议，并随着Unix系统的推广流行，TCP/IP被后续各种操作系统支持，TCP/IP的四层模型成为在实际中被采用更多的实现。&lt;/p>
+&lt;p>但 OSI 七层模型和 TCP/IP 四层模型虽然定义不同，但基本上是可以匹配对应的。OSI 模型更偏理论，TCP/IP则实际采用更多。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-2.png"
+width="823"
+height="617"
+srcset="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-2_hu_1b199481b10d97b5.png 480w, https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-2_hu_f2c5d7bb1c8cf78a.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>&lt;/p>
+&lt;h2 id="osi七层网络模型">OSI七层网络模型
+&lt;/h2>&lt;p>下面我们来具体说明 OSI 七层模型是如何划分，每一层具体的作用和它所处的角色。&lt;/p>
+&lt;h3 id="物理层">物理层
+&lt;/h3>&lt;p>现代计算机网络技术的基础，其实最底层还是数字电路技术。也就是将电磁波形信号中的电压位对应的高电平信号和低电平信号，处理为二进制中的1和0。也就是二进制中的位 &lt;strong>Bit&lt;/strong>。 我们在电脑、手机上的各种操作，最后通过网络传送出去的，最终实际上就是一连串的二进制信号&lt;strong>bits&lt;/strong>，也就是&lt;strong>比特流&lt;/strong>。&lt;/p>
+&lt;p>所以物理层的作用，处理的就是物理意义上的连通，通过网卡、网线，或者光纤、无线电磁波信号等，把我们当前使用的设备，跟目标主机之间的通信通道建立起来。通过这个通道，把比特流传导到对端。&lt;/p>
+&lt;h3 id="数据链路层">数据链路层
+&lt;/h3>&lt;p>但是&lt;strong>比特流&lt;/strong>只是一串二进制的信号，这串信号要发去哪里，物理层其实是不知道的。这就是数据链路层的作用了：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>在这一层，首先会把二进制的比特流，以8位一组转换为&lt;strong>字节&lt;/strong>（1个字节对应8位），&lt;strong>字节&lt;/strong>也就是我们计算机存储的基本单位。
+按字节分组组织好的数据，定义上把这个叫做&lt;strong>帧（frame）&lt;/strong>。链路层的第一个作用，是对数据进行重组，将&lt;strong>比特&lt;/strong>转换为&lt;strong>帧&lt;/strong>。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>另一个链路层的关键作用，还包括&lt;strong>MAC地址&lt;/strong>的添加。用来标记要发送的数据去到哪里。
+这里的mac地址，也叫&lt;strong>网络物理地址&lt;/strong>，是我们每一个网卡，在网卡出厂的时候就被烧录进去的一个唯一地址，不可变更。通过这个唯一的地址，我们就能知道这个数据具体是要发给谁的。就像写信时我们要有个地址一样，这样信件才能知道发到哪里。
+但是一开始如果并不知道通过物理层连接的这个设备的mac地址， 就还需要寻址。
+&lt;strong>寻址&lt;/strong>是通过寻址协议（ARP），先发送一个广播消息，带上自己的mac地址和从网络层拿到的IP地址，在当前网络中询问要访问的目标IP对应的MAC地址。而对应的目标，在收到广播消息后，就会根据收到消息中的源mac地址，将自己的mac地址发送给他，这样，原来的发送方拿到目标mac地址后，就能够完成数据帧的封装，并根据地址进行正确的传递。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-3.png"
+width="973"
+height="316"
+srcset="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-3_hu_e2bf620bce3e41cd.png 480w, https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-3_hu_6fe8c5b186ea9796.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="307"
+data-flex-basis="738px"
+>&lt;/p>
+&lt;p>这一层中，通常会存在二层交换机在当前网络中，用来进行消息的转发。&lt;/p>
+&lt;p>所以数据链路层的主要作用就是帧的封装，以及mac寻址。（而通过交换机，还能完成一些差错检测和纠正，以及流量控制的目的）&lt;/p>
+&lt;h3 id="网络层">网络层
+&lt;/h3>&lt;p>在链路层我们说的&lt;strong>寻址&lt;/strong>，是要在同一个网络下，通过广播喊上一嗓子，对方能够收到，然后才能把mac地址告诉你。但实际中我们访问互联网，目标服务器和自己相隔十万八千里，这时要怎么找到对方并完成通信呢？&lt;/p>
+&lt;p>这时就有了不同网络的概念，互联网实际上是由大大小小各种各样不同的网络构成的。在不同网络之间完成通信，你的数据可能会经过很多个不同网络的计算机才能到达对端，同时我们还要找出最快速的路径来让传输的效率更高。&lt;/p>
+&lt;p>所以，我们的电脑要联网，其实都有一个&lt;strong>IP地址&lt;/strong>，相对mac地址对应物理地址，IP地址是&lt;strong>逻辑地址&lt;/strong>。ip地址按照IP协议定义，我们目前常用的是IPV4，也就是我们常见的四段十进制点分数字（形如192.168.101.11这样），对应到二进制，它实际是一个32位的二进制数串。 当然，现在因为IPV4地址已经用尽，目前网络IP也在向128位的IPV6转化，但相当长时间内，IPV4还是会继续使用。&lt;/p>
+&lt;p>在这32位的IP中，会同时标明当前电脑所在的&lt;strong>网络号&lt;/strong>和&lt;strong>主机号&lt;/strong>。而区分网络号和主机号，是IP地址中子网掩码的作用（具体IP协议的梳理理解，我们后续文章再总结）&lt;/p>
+&lt;p>而这里就是网络层的主要作用，会把IP地址封装到&lt;strong>数据包&lt;/strong>中，也就是这一层经过封装的数据叫做&lt;strong>包（package）&lt;/strong>。会包括源IP和目标IP，经过下一层链路层的继续封装，补上MAC地址，就会发送到当前网络的默认网关（也就是默认路由），默认网关收到这个包后，如果发现目标地址不是当前网络的，会通过保存的&lt;strong>路由表&lt;/strong>来选择最优的路径来进行数据包的路由转发。经过一系列的转发，终于到达目标网络，再由目标网络的网关将收到的这个数据包，转换成&lt;strong>帧&lt;/strong>，最后转发给目标主机。&lt;/p>
+&lt;p>所以，网络层，主要是完成数据包的封装并进行路由转发。在整个网络通信过程中，极为关键的一层。&lt;/p>
+&lt;h3 id="传输层">传输层
+&lt;/h3>&lt;p>之前几层我们讨论的数据传输是从主机到主机，但我们在计算机上运行着很多不同的程序，听着歌，开着QQ，打着游戏&amp;hellip; 这些不同的程序都会产生网络通信，那这些传输的数据都怎么正确区分，让不同程序处理各自所需要的数据呢？&lt;/p>
+&lt;p>这就是传输层要做的。操作系统会通过端口来对应不同的应用程序，不同应用对应的数据，加上它对应的端口封装起来，这样封装的数据叫做&lt;strong>段（segment）&lt;/strong>。 在段中主要就是添加上了&lt;strong>源端口&lt;/strong>，和&lt;strong>目的端口&lt;/strong>。
+此外，段的作用，还有一点，就是应用要处理的数据可能会比较多，要保证数据处理的连贯性和完整性，不可能等所有数据都拿到以后再一次性处理，所以传输层还有个作用就是将数据进行分割，一段一段来传输。在传输层有有两个最重要的协议，一个是TCP（Transmission Control Protocol）、一个是UDP（User Datagram Protocol）。主要是完成对数据进行分段、排序、重组。&lt;/p>
+&lt;h3 id="会话层">会话层
+&lt;/h3>&lt;p>从这一层向上，是OSI模型中的上三层，主要是程序层面的处理。在TCP/IP模型中，这三层统一看作一层。&lt;/p>
+&lt;p>会话层的作用是建立两端通信实体之间的连接，负责通信过程中认证、鉴权以及检查点记录，以便在会话意外中断时还能够继续传输数据。如会话保持、登录信息的记录，断点记录等。&lt;/p>
+&lt;h3 id="表示层">表示层
+&lt;/h3>&lt;p>表示层，主要是为了消除通信两端不同系统之间的一些差异，负责数据的表示和编解码，实现不同系统之间的数据格式转换和表示方式的统一。通俗地说就是完成两个系统翻译部分的工作。另外还包括像数据的加密和压缩、瘦身，也是定义在这一层来完成。&lt;/p>
+&lt;h3 id="应用层">应用层
+&lt;/h3>&lt;p>应用层是我们平时使用各种应用时直接接触的一层。主要负责对用户的操作进行处理，完成用户的应用需求。
+比如最常用的互联网协议http协议就在这一层。此外还有像邮件协议SMTP、POP3、文件传输协议FTP、远程登录协议telnet等，都是属于应用层。&lt;/p>
+&lt;p>用一张图来体现数据在各层的传递如下图&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-4.png"
+width="1209"
+height="740"
+srcset="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-4_hu_7ca836fc8caaabd7.png 480w, https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-4_hu_463a0c239104a395.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="163"
+data-flex-basis="392px"
+>&lt;/p>
+&lt;h2 id="对osi模型的通俗理解">对OSI模型的通俗理解
+&lt;/h2>&lt;p>以上是从技术原理层面对这个模型进行的分析。 如果用一个我们生活中的例子来类比，会更方便理解：&lt;/p>
+&lt;p>双十一到了，要买一个心心念念的笔记本&lt;/p>
+&lt;ol>
+&lt;li>首先各种比价，找到一个平台，性价比满意，决定在这个平台购买。 这里这个平台，其实就是应用层，满足购物需求。（应用层：具体的应用服务）&lt;/li>
+&lt;li>下完订单，卖家在发货前，肯定会把电脑以及各种配件、赠品重新打包好，确保到你手上时没有损坏。那这个打包、保护的过程，就相当于表示层的工作。（表示层：数据编解码，格式化）&lt;/li>
+&lt;li>在你下订单前，可能还会联系客服，确认赠品，备注发货时间，挑选颜色这些，这个跟客服沟通的过程，就是会话层 （会话层：维持双方的沟通通道）&lt;/li>
+&lt;li>确认无误，商家给你发货，这时要有一个快递公司负责送货，这个快递公司是顺丰或者四通一达，目的都是负责把笔记本安全按时交到你手上。 这里快递公司的作用就是传输层。（传输层：负责数据的可靠传递）&lt;/li>
+&lt;li>快递公司怎么送货呢？当然要知道商家地址和买家地址，并根据地址选择最优路径的快递员取货、送货，这就是网络层 （网络层：负责逻辑寻址和路由）&lt;/li>
+&lt;li>买的笔记本从卖家那里送到了自己所在的区域站点了，这时还会有个快递小哥送货上门，通常都会打个电话，联系你是不是在家。通过电话确定你的具体位置，相当于物理寻址。这是数据链路层 （链路层：物理寻址并传递数据帧）&lt;/li>
+&lt;li>最后，整个送货的过程中，会用到卡车、送货面包车、小哥的三轮和双腿，这就是物理层，具体的交通工具 （物理层：物理介质传递比特流）&lt;/li>
+&lt;/ol>
+&lt;p>通过这样的类比，我们是不是就比较清楚 OSI 七层模型具体怎么工作了呢？&lt;/p>
+&lt;hr></description></item><item><title>大话Https协议</title><link>https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/</link><pubDate>Sat, 28 Sep 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-1.png" alt="Featured image of post 大话Https协议" />&lt;p>大家现在访问网络，浏览网页，注意一下的话，网址前面基本上都是一个 &lt;code>https://&lt;/code> 的前缀，这里就是说明这个网址所采用的协议是 https 协议。那么具体应该怎么理解 https 呢？ 本文我们就力争能清楚地解释明白这个我们目前应该最广的协议。&lt;/p>
+&lt;h2 id="理解http协议">理解HTTP协议
+&lt;/h2>&lt;p>要解释 https 协议，当然首先应该知道 http 协议。http 协议可以说是现代互联网的基础。在现代网络的 OSI 七层模型中，http 是典型的第 7 层应用层协议。也就是它是基于网络通信的实际应用，比如浏览器呈现网页内容，这就是网络通信的具体应用。&lt;/p>
+&lt;p>如下图分别是 http 协议的消息请求和响应报文的协议定义格式：&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928.png"
+width="466"
+height="165"
+srcset="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928_hu_a08e1f59ab391875.png 480w, https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928_hu_d9059691b287935e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="282"
+data-flex-basis="677px"
+>&lt;/p>
+&lt;p>访问百度的请求解析如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">GET https://www.baidu.com/ HTTP/1.1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#请求方法 URL HTTP协议版本
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Host: www.baidu.com
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#请求服务器地址
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#以下是消息头内容
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Connection: keep-alive
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#连接方式：长连接
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Cache-Control: max-age=0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#请求缓存控制，需确认请求内容是否有修改
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Upgrade-Insecure-Requests: 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#支持https协议
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#请求客户端，浏览器版本
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#支持的响应内容类型
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Accept-Encoding: gzip, deflate, br
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#支持的编码类型
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#支持的语言
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Cookie: BAIDUID=C0A2...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#携带的cookie信息
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#未携带请求消息体，body为空
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928103246.png"
+width="484"
+height="325"
+srcset="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928103246_hu_ae75e69c12be897f.png 480w, https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928103246_hu_c66146f7ab6dea62.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="148"
+data-flex-basis="357px"
+>&lt;/p>
+&lt;p>响应解析：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">HTTP/1.1 200 OK
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#协议版本 消息状态码 状态描述
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Bdpagetype: 2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Bdqid: 0x8707d7d80001f34e
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#自定义消息头
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Cache-Control: private
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#缓存控制策略
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Connection: Keep-Alive
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#长连接
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Content-Type: text/html;charset=utf-8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#响应内容类型
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Date: Sat, 22 Dec 2018 08:54:51 GMT
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#响应时间
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Expires: Sat, 22 Dec 2018 08:54:51 GMT
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#过期失效时间
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Server: BWS/1.1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#服务器系统及版本
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Set-Cookie: BDSVRTM=372; path=/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Set-Cookie: BD_HOME=1; path=/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Set-Cookie: path=/; domain=.baidu.com
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#设置客户端cookie
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Strict-Transport-Security: max-age=172800
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#严格安全传输，有效时间
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">X-Ua-Compatible: IE=Edge,chrome=1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#兼容浏览器版本
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Content-Length: 191722
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#消息体长度
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#以下消息体内容
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;lt;!Doctype html&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;lt;html xmlns=http://www.w3.org/1999/xhtml&amp;gt;&amp;lt;head&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>关于 http 协议的详细说明，可以参照我之前的博文 &lt;a class="link" href="https://chengxiaqiucao.github.io/post/01-postman%E5%9F%BA%E7%A1%80%E7%AF%87/" target="_blank" rel="noopener"
+>接口测试工具Postman-基础篇&lt;/a>中关于 http 协议基础的部分&lt;/p>
+&lt;p>那这里其实请求的地址 Url 是 &lt;code>https://www.baidu.com&lt;/code>， 是https协议，为什么这里又说它是 http 协议呢？ 这两者到底是什么关系？&lt;/p>
+&lt;h2 id="https协议和tlsssl">HTTPS协议和TLS、SSL
+&lt;/h2>&lt;p>其实 https 协议是指 &lt;strong>HyperText Transfer Protocol over Secure Socket Layer&lt;/strong>，也就是基于SSL之上的HTTP协议。&lt;/p>
+&lt;p>&lt;strong>SSL&lt;/strong>(Secure Socket Layer) 指安全套接字层，是互联网鼻祖公司网景（Netscape）提出的为网络通信提供安全性和隐私保护的标准协议。 发展到 SSL3.0版本后，标准组织 IETF 对 SSL 协议进行了标准化，并重新命名为 &lt;strong>TLS&lt;/strong>(Transport Layer Security，传输层安全)。目前更新到 TLS1.3 版本。&lt;/p>
+&lt;p>所以说SSL和TLS其实是一脉相承的，可以认为二者其实是不同时期的同一个协议。而HTTPS协议其实就是：&lt;/p>
+&lt;blockquote>
+&lt;p>HTTPS = HTTP + SSL/TLS&lt;/p>&lt;/blockquote>
+&lt;p>为什么需要 https 协议呢？ 因为http协议本身在传输过程中，传递的信息基本都是透明的，传输过程中的任何节点，其实都可以看到传输的消息体内容。&lt;/p>
+&lt;p>因此为了安全起见，就有了对传输内容加密的需求，SSL/TLS 协议的作用，其实就是为了保护这个内容安全而推出的。&lt;/p>
+&lt;p>从 TLS 协议的命名也可以看出，它其实是在 TCP 协议（传输控制协议）的基础上，增加了安全特性的一个协议。&lt;/p>
+&lt;p>HTTPS 协议基于HTTP协议，所以它还是属于应用层协议，而TLS 是在第四层的TCP协议基础上，一般认为是属于第五层即会话层。&lt;/p>
+&lt;p>通过TLS，可以实现网络通信传输过程中，通信数据的加密&lt;/p>
+&lt;h2 id="关于加密">关于加密
+&lt;/h2>&lt;p>那么理解 https 协议，这里也就是要搞清楚 TLS 是怎么对通信数据完成加密的。&lt;/p>
+&lt;h3 id="对称加密">对称加密
+&lt;/h3>&lt;p>我们正常理解加密，就是通过双方约定的一个规则，也就是通过加密算法，把原始字串变更为一个只有通信双方知道的密文，这样其他人即便知道通信内容，就并不能知道原始的信息。&lt;/p>
+&lt;p>比如我们看谍战片，传递情报一般都有个重要的东西叫做 &lt;strong>密码本&lt;/strong>, 这里密码本其实就是加密算法，也就是&lt;strong>密钥&lt;/strong>。&lt;/p>
+&lt;p>这种加密方式，双方是对等的，对通信内容加密和解密使用的是同一个密钥，因此叫 &lt;strong>对称加密&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-1.png"
+width="1054"
+height="436"
+srcset="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-1_hu_8e5135f3cf1994a9.png 480w, https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-1_hu_42498ea2d03dccc0.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="241"
+data-flex-basis="580px"
+>&lt;/p>
+&lt;p>但这种加密方式，有一个最大的问题，就是这里的密码本。谍战片中，情报人员舍生忘死也要保护密码本，否则一旦泄露，情报就存在泄露风险。&lt;/p>
+&lt;p>网络通信也是一样，这里最大的问题，就是这里的密钥如何避免泄露。但只要密钥本身也需要通过网络通信来传输，那么依然不安全。&lt;/p>
+&lt;p>这个过程好比：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">A: 跟你说个秘密，我下面的话你不要直接听，我全部说第几页第几行第几列，你去《红楼梦》找到对应的字连起来读。你回话也告诉我对应字的位置就行
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">B: 好嘞，《红楼梦》已摆好，你说吧
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">。。。。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">C：我偷听到啦，赶快买本《红楼梦》去...
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="非对称加密">非对称加密
+&lt;/h3>&lt;p>而除了对称加密之外，还有一种加密方式是 &lt;strong>非对称加密&lt;/strong>， 这种方式会采用一些特殊的加密算法，生成两份密钥，分为 &lt;strong>公钥&lt;/strong> 和 &lt;strong>私钥&lt;/strong>, 通过其中一把钥匙加密的内容，只能通过另一把要是才能解密。并且这个算法是很难通过暴力破解逆向还原推导仿冒出另一把钥匙。&lt;/p>
+&lt;p>类似古代调遣军队的虎符，只有双方严丝合缝对得上才能验证为真。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-2.png"
+width="991"
+height="560"
+srcset="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-2_hu_e74263285cddfe8c.png 480w, https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-2_hu_7adcb1b2fbe49700.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="176"
+data-flex-basis="424px"
+>&lt;/p>
+&lt;p>有了这个机制，就可以把私钥保存在自己这里，并且绝不外传，而公钥可以公告天下，通过网络正常传递，谁都有可能拿到。这样，对方要给我发送加密信息，只要使用公钥加密，而解密只能在我自己这里才能完成。&lt;/p>
+&lt;p>所以，非对称加密大致的过程就是：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl"> A: 我有点秘密想跟你说, 不能被其他人听到....
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> B：稍等，我给你个公钥，你上个锁以后再说给我听。拿到公钥先念下公钥上的字给我看看对不对
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> A: 收到公钥，上面写着“我是王大锤”
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> B: 对，你收到的就是我给你的公钥，用它上锁吧
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> A：公钥加密上锁，打包发给B
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> B：取出私钥，打开包裹，阅读内容...
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>相比 &lt;strong>对称加密&lt;/strong>，&lt;strong>非对称加密&lt;/strong>明显更加安全，但这种方式的缺点是计算量比较大，加解密过程效率不高，速度较慢，所以实际应用中，通常是两种方式结合使用。&lt;/p>
+&lt;p>也就是 TLS 加密过程：&lt;/p>
+&lt;blockquote>
+&lt;p>双方会首先通过非对称加密过程，协商出一个用于通信的对称密钥；这个对称密钥的生成都在各自的本地完成，而完成密钥协商后，后方各自都有了一个相同的对称密钥，就可以基于这个相同的密钥进行后续对称加密通信。&lt;/p>&lt;/blockquote>
+&lt;p>因为这个对称密钥是通过非对称加密的方式得到的，所以并不会在双方的通信过程中传递。这样就兼顾了安全和效率。&lt;/p>
+&lt;h2 id="签名和证书">签名和证书
+&lt;/h2>&lt;p>不过用非对称加密，还是存在一个漏洞。&lt;/p>
+&lt;p>就是在服务器和客户端通信的过程中，通信过程其实会通过大量中间环节，如果存在一个恶意的劫持者，它在收到服务端信息后，想自己假冒服务端，篡改信息后再发给客户端。&lt;/p>
+&lt;p>这时它其实可以伪装成服务端，自己给客户端发放公钥，拿到客户端的信息后，用自己的私钥解密，再用真正的服务端公钥重新加密，发给服务端。&lt;/p>
+&lt;p>这个风险其实就是安全领域中的 &lt;strong>中间人攻击&lt;/strong> 漏洞。&lt;/p>
+&lt;p>而为了规避这个问题，需要服务端应该证明自己的身份，然后客户端还可以验证这个身份。因此就有了签名和证书。&lt;/p>
+&lt;p>签名就是服务端表明自己的身份，拿到公钥的客户端就可以通过签名判断这个发送端是正确的服务器。这里的签名和公钥其实都保存在一个文件中，也就是服务端的签名证书。&lt;/p>
+&lt;p>而为了防止中间人伪造证书，这时就引入了&lt;strong>CA（Certificate Authority)&lt;/strong>，也就是权威的第三方证书颁发机构。这些权威的第三方颁发机构会用私钥对服务端的签名进行加密，这样客户端就可以通过机构的公钥来验证这个签名是否是对应的服务端。验证无误，就可以用证书中携带的公钥来完成和服务端后续的通信协商。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-4.png"
+width="698"
+height="864"
+srcset="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-4_hu_2950ee2ea2f04dc6.png 480w, https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-4_hu_5b6d08632ce2d28c.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="80"
+data-flex-basis="193px"
+>&lt;/p>
+&lt;h2 id="https协议交互过程">HTTPS协议交互过程
+&lt;/h2>&lt;p>有了上面的基础，我们来具体看一下访问一个 https 网站的具体通信过程。&lt;/p>
+&lt;p>TLS因为有不同的版本，并且支持多种不同密钥交换和加密算法，所以在通信前，首先要完成使用何种加密算法、用什么密钥生成方式等过程。而 TLS 是基于TCP协议之上的，所以在 TCP 典型的 3次握手完成建链之后，会进行 TLS 的握手建链过程：&lt;/p>
+&lt;ul>
+&lt;li>比如客户端从浏览器访问网站， 这时浏览器会首先发送&lt;code>Client Hello&lt;/code> 消息到服务器，这个消息中主要包含了客户端支持的&lt;code>加密套件ciphersuites&lt;/code>， TLS 版本信息和&lt;strong>客户端随机数&lt;/strong>。（明文传输）&lt;/li>
+&lt;li>服务器接收到消息后，返回自己支持的&lt;code>ciphersuites&lt;/code>， TLS 版本，自己的数字证书和服务器端生成的随机数等几项内容。（明文传输）&lt;/li>
+&lt;li>客户端对收到的数字证书进行验证。验证无误之后生成一个新的密钥，也就是&lt;code>预主密钥pre-master key&lt;/code>，并使用证书中携带的公钥来对&lt;code>pre-master key&lt;/code>进行加密，发送给服务器。（此时是非对称加密传输）&lt;/li>
+&lt;li>服务器接收到客户端的密文，使用私钥进行解密，获得了&lt;code>pre-master key&lt;/code>。（非对称加密传输）&lt;/li>
+&lt;li>到这里为止，服务器和客户端都有了三组数字，分别是&lt;strong>客户端的随机数、服务端的随机数和pre-master key&lt;/strong>。前两个随机数虽然是明文传输，有泄露风险，但 &lt;code>pre-master key&lt;/code>并没有在通信中传递，是计算而得到的安全密钥。 所以再将这三者结合，使用之前协商好的特定的加密算法再生成一个密钥，这个密钥称为&lt;code>shared secert&lt;/code>。也就是之后的会话密钥，这个密钥是后续对称加密的密钥。&lt;/li>
+&lt;li>客户端在计算出对称加密的密钥之后，使用该密钥对通信内容进行对称加密，告知服务器之后都使用该密钥进行对称加密。（对称加密传输）&lt;/li>
+&lt;li>服务器接收到密文后，使用之前计算出的密钥来进行对称解密，解密成功之后，同样再使用该密钥进行对称加密通信。并告知客户端密钥确认无误，可以使用该密钥进行通信。（对称加密传输）&lt;/li>
+&lt;/ul>
+&lt;p>至此，整个TLS的握手过程完整，之后就可以开始对称加密的通信了。&lt;/p>
+&lt;p>通过 WireShark 抓包的话，通常是这样的一个过程：&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-5.png"
+width="1317"
+height="315"
+srcset="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-5_hu_49d182a58ea91b45.png 480w, https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-5_hu_8e5d0d431298012.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="418"
+data-flex-basis="1003px"
+>&lt;/p>
+&lt;p>具体的交互过程，参考下图 (图片来自网络&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-6.png"
+width="1308"
+height="946"
+srcset="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-6_hu_f82923a9e2715688.png 480w, https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-6_hu_6089939db8ce688d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="138"
+data-flex-basis="331px"
+>&lt;/p>
+&lt;hr>
+&lt;p>以上就是关于 Https 协议通信过程的整体梳理，更多测试和技术相关文章，欢迎关注 &lt;a class="link" href="https://chengxiaqiucao.github.io/" target="_blank" rel="noopener"
+>城下秋草的博客&lt;/a> 或公众号（秋草说测试）&lt;/p></description></item></channel></rss>

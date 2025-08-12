@@ -1,0 +1,494 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="google出品的Puppeteer是自动化测试的新生势力，被广泛看好"><title>自动化测试工具Puppeteer简介</title><link rel=canonical href=https://chengxiaqiucao.github.io/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/><link rel=stylesheet href=/scss/style.min.d6334826c849a420a2748e4872b915ae516105f86c3993d9bad2032725f784b8.css><meta property='og:title' content="自动化测试工具Puppeteer简介"><meta property='og:description' content="google出品的Puppeteer是自动化测试的新生势力，被广泛看好"><meta property='og:url' content='https://chengxiaqiucao.github.io/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/'><meta property='og:site_name' content='秋 草 观 “测” 台'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='自动化测试'><meta property='article:tag' content='puppeteer'><meta property='article:published_time' content='2024-09-30T00:00:00+00:00'><meta property='article:modified_time' content='2024-09-30T00:00:00+00:00'><meta property='og:image' content='https://chengxiaqiucao.github.io/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/puppeteer.png'><meta name=twitter:title content="自动化测试工具Puppeteer简介"><meta name=twitter:description content="google出品的Puppeteer是自动化测试的新生势力，被广泛看好"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://chengxiaqiucao.github.io/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/puppeteer.png'></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/automnGrass_hu_5e44a092fd905642.png width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>秋 草 观 “测” 台</a></h1><h2 class=site-description>Testing is not just checking...</h2></div></header><ol class=menu-social><li><a href=https://github.com/chengxiaqiucao target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://space.bilibili.com/472272606 target=_blank title=Bilibili rel=me><!doctype html><svg t="1750732982440" class="icon" viewBox="0 0 1024 1024" p-id="4593" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632 444.330667 256h135.296l138.368-138.325333A42.666667 42.666667.0 01778.368 178.048L700.330667 256H789.333333A149.333333 149.333333.0 01938.666667 405.333333v341.333334A149.333333 149.333333.0 01789.333333 896H234.666667A149.333333 149.333333.0 0185.333333 746.666667V405.333333A149.333333 149.333333.0 01234.666667 256h88.96L245.632 177.962667a42.666667 42.666667.0 0160.373333-60.373334zm483.328 223.701333H234.666667a64 64 0 00-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0057.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0063.701334-57.856L853.333333 746.666667V405.333333a64 64 0 00-64-64zm-448 128A42.666667 42.666667.0 01384 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666666-42.666667zm341.333334.0A42.666667 42.666667.0 01725.333333 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666667-42.666667z" p-id="4594" fill="#8a8a8a"/></svg></a></li><li><a href=https://www.zhihu.com/people/qiucao target=_blank title=zhihu rel=me><!doctype html><svg t="1750733049138" class="icon" viewBox="0 0 1024 1024" p-id="5820" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M570.581333 806.272h61.952L652.928 876.117333 764.074667 806.272h130.986666V230.186667h-324.48V806.272zM636.501333 292.693333h192.64V743.68h-73.898666l-73.813334 46.378667L668.032 743.808l-31.530667-.128V292.736zM515.754667 493.738667H377.429333a2999.466667 2999.466667.0 005.802667-194.56h135.338667S523.776 239.445334 495.872 240.128H261.76c9.216-34.730667 20.821333-70.613333 34.688-107.690667.0.0-63.701333.0-85.333333 57.130667C202.112 213.12 176.128 303.786667 129.877333 396.416c15.573333-1.706667 67.114667-3.114667 97.450667-58.794667 5.589333-15.616 6.656-17.621333 13.568-38.485333h76.373333c0 27.776-3.157333 177.109333-4.437333 194.474667h-138.24c-31.104.0-41.173333 62.549333-41.173333 62.549333h173.482666C295.253333 688.256 232.789333 799.573333 119.466667 887.466667c54.186667 15.488 108.202667-2.432 134.912-26.197334.0.0 60.8-55.338667 94.122666-183.381333L491.264 849.834667s20.906667-71.168-3.285333-105.856c-20.053333-23.637333-74.24-87.552-97.322667-110.72l-38.698667 30.72c11.52-36.992 18.474667-72.96 20.821334-107.690667h163.072s-.213333-62.549333-20.053334-62.549333z" p-id="5821" fill="#8a8a8a"/></svg></a></li><li><a href=mailto:%20danmyw@qq.com target=_blank title=e-mail rel=me><!doctype html><svg t="1750733089669" class="icon" viewBox="0 0 1451 1024" p-id="6983" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759.0 97.881301C0 3.997201 71.046997.0 71.046997.0H474.477909 961.649408h399.992405s71.046998 3.997201 71.046998 97.881301L771.345323 681.472759S764.482731 685.154773 753.594283 688.65053V688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858V688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759zm53.281707 130.131124C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633.0 212.052267.0 212.052267V942.809523S0 1024 83.726336 1024H682.532949 753.579947h595.368192C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523V212.052267S893.138176 701.759633 817.019477 767.734955c-39.771477 34.470494-74.671786 43.295855-98.955861 43.868928z" fill="#8a8a8a" p-id="6984"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>主页</span></a></li><li><a href=/page/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>检索</span></a></li><li><a href=/page/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>链接</span></a></li><li><a href=/page/about/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>关于</span></a></li><li><a href=/page/releases/><svg class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M9.828 9.172a4 4 0 100 5.656A10 10 0 0012 12a10 10 0 012.172-2.828 4 4 0 110 5.656A10 10 0 0112 12 10 10 0 009.828 9.172"/></svg>
+<span>热门开源</span></a></li><li class=menu-bottom-section><ol class=menu><li id=i18n-switch><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg>
+<select name=language title=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://chengxiaqiucao.github.io/en/>English</option><option value=https://chengxiaqiucao.github.io/ selected>中文</option></select></li><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#前言>前言</a></li><li><a href=#puppeteer-简介>Puppeteer 简介</a></li><li><a href=#puppeteer-架构>Puppeteer 架构</a></li><li><a href=#puppeteer-的安装>Puppeteer 的安装</a></li><li><a href=#hello-world>Hello World</a></li><li><a href=#puppeteer-的主要特性>Puppeteer 的主要特性</a><ol><li><a href=#设置浏览器启动参数>设置浏览器启动参数</a></li><li><a href=#模拟设备显示>模拟设备显示</a></li><li><a href=#元素定位>元素定位</a></li><li><a href=#页面操作及键盘输入>页面操作及键盘输入</a></li><li><a href=#获取元素属性>获取元素属性</a></li><li><a href=#截图>截图</a></li><li><a href=#保存-pdf>保存 PDF</a></li><li><a href=#网络请求拦截>网络请求拦截</a></li><li><a href=#性能指标录制>性能指标录制</a></li></ol></li><li><a href=#puppeteer-结合-jest-自动化测试实例>Puppeteer 结合 Jest 自动化测试实例</a></li><li><a href=#结语>结语</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/><img src=/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/puppeteer_hu_be19165e5ba8974d.png srcset="/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/puppeteer_hu_be19165e5ba8974d.png 800w, /post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/puppeteer_hu_956a298f7a5795c5.png 1600w" width=800 height=372 loading=lazy alt="Featured image of post 自动化测试工具Puppeteer简介"></a></div><div class=article-details><header class=article-category><a href=/categories/%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7/ style=background-color:#c6fad2;color:#000>测试工具</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/>自动化测试工具Puppeteer简介</a></h2><h3 class=article-subtitle>google出品的Puppeteer是自动化测试的新生势力，被广泛看好</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Sep 30, 2024</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 9 分钟</time></div></footer></div></header><section class=article-content><h2 id=前言>前言</h2><p>自动化测试发展到如今，各种自动化测试工具层出不穷。Selenium 无疑是其中的佼佼者，从 2016 年至今，全球流行自动化测试工具排行榜中，Selenium 一直占据着最流行工具的头把交椅。selenium 基于 webdriver 协议，以其免费、开源和强大的功能和扩展性，同时因其创立者著名咨询公司 ThoughtWorks 公司的力推，在行业得到了广泛的应用。</p><p>但在 ThoughtWorks 公司数年前发布的技术雷达（全球技术趋势的分析指南），在 E2E （端到端测试）领域中，指出了 后 Selenium 时代的一些后起之秀，其中就重点提及了Puppeteer。</p><blockquote><p>We keep receiving positive feedback on &ldquo;post-Selenium&rdquo; web UI testing tools such as Cypress, TestCafe and Puppeteer.</p><p>&mldr;</p><p>We have good experience using &ldquo;post-Selenium&rdquo; web UI testing tools such as Cypress, TestCafe and Puppeteer.</p><p>&mldr;</p></blockquote><p>虽然 Selenium 是 TW 公司自家产品，但是随着前端技术的发展， Selenium 也呈现出对浏览器依赖度高、对单页面类应用掌控能力不足、基于 WebDriver 协议的通信效率不高等缺点，新一代的测试工具也逐渐进入行业视野。本文我们就一起来了解一下三驾马车中的第一个： <strong>Puppeteer</strong></p><h2 id=puppeteer-简介>Puppeteer 简介</h2><p>在介绍 Puppeteer 之前，我们先了解一个背景：headless，也就是无头浏览器。很早之前，在前端测试和爬虫领域就存在无头浏览器的需求，也就是不需要浏览器的界面，纯代码环境下实现浏览器内核操作。特别是 UI 自动化测试以及希望静默完成浏览操作的场景下非常有用。当时最流行的开源 headless 是 PhantomJS，但在 google 开源的 Puppeteer 出现之后，目前 PhantomJS 已经处于终止状态，可以说 Puppeteer 是现在应用最为广泛的 headless。</p><p>那么 Puppeteer 就是 headless 吗？官方对 Puppeteer 有一个简单的定义：</p><blockquote><p>Puppeteer is a Node library which provides a high-level API to control Chrome or Chromium over the DevTools Protocol. Puppeteer runs headless by default, but can be configured to run full (non-headless) Chrome or Chromium.</p></blockquote><p>可以看出，Puppeteer 实际上是一个基于CDP协议来控制 Chrome 或 Chromium 的 Node.js 的库，一般用作无头模式，但也能工作在标准模式下。</p><ul><li>Puppeteer 是 Node.js 库，需在 Node 环境下运行代码</li><li>基于 Chrome Devtools protocol</li><li>仅可控制 Chrome 或 Chromium</li><li>可配置运行模式</li></ul><h2 id=puppeteer-架构>Puppeteer 架构</h2><p>如图是 Puppeteer 的官方架构：</p><p><img src=/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240929.png width=881 height=789 srcset="/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240929_hu_c7d8359359ec7a19.png 480w, /post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240929_hu_78b5a8f7dab5be47.png 1024w" loading=lazy class=gallery-image data-flex-grow=111 data-flex-basis=267px></p><p>说明：</p><ul><li>Puppeteer 使用 DevTools Protocol 与浏览器 Browser 进行通信。</li><li>Browser 浏览器实例可以包含多个浏览器上下文 BrowserContext。</li><li>BrowserContext 用于保持浏览器 session，一个浏览器上下文可以包含多个页面。</li><li>Page 一个 Page 最起码包含一个 frame，即 main frame，允许存在其他的 frame，这些frame 可以用 [iframe] 创建。</li><li>Frame 一个 Frame 最起码有一个 Javascript 执行上下文环境，即默认的执行上下文环境。Frame 允许存在额外附加的上下文环境</li><li>Worker 存在唯一的上下文环境，并可与 WebWorkers相互协作。</li></ul><h2 id=puppeteer-的安装>Puppeteer 的安装</h2><p>因为 Puppeteer 实际是一个 Node 库，所以安装非常简单：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>&gt; npm install puppeteer
+</span></span></code></pre></td></tr></table></div></div><p>在安装时会同时安装 chromium，但因为众所周知的原因，国内会下载失败。所以建议使用国内源安装即可</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>&gt; npm install -g cnpm --registry<span class=o>=</span>https://registry.npm.taobao.org
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>&gt; cnpm install puppeteer
+</span></span></code></pre></td></tr></table></div></div><p>安装后可以使用以下命令检查下安装的版本，确认安装正确</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>&gt; npm ls puppeteer
+</span></span></code></pre></td></tr></table></div></div><h2 id=hello-world>Hello World</h2><p>通过一个简单的例子看下 Puppeteer 的基本用法。</p><p>因为 Puppeteer 是通过 CDP 协议直接控制浏览器，所以可以实现很多浏览器层面的直接操作，比如下面这段代码，我们控制浏览器 (正常模式) 在访问我的博客网站时弹出一个对话框：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>puppeteer</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;puppeteer&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>HelloWorld</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>async</span> <span class=kd>function</span> <span class=nx>HelloWorld</span><span class=p>(){</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>browser</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>puppeteer</span><span class=p>.</span><span class=nx>launch</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=nx>headless</span><span class=o>:</span><span class=kc>false</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>page</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>newPage</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s1>&#39;https://chengxiaqiucao.github.io/&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>evaluate</span><span class=p>(()=&gt;</span><span class=nx>alert</span><span class=p>(</span><span class=s1>&#39;hello world!&#39;</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>close</span><span class=p>();</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>具体的 js 语法如 async，await 以及箭头函数等的用法，这里不多介绍了，大家可以先查阅下 js 相关文档。</p><p>通过 node.js 执行这个 js 文件，即可运行。</p><p><code>node pupp_sample.js</code></p><p>执行效果：</p><p><img src=/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930.png width=1184 height=1019 srcset="/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930_hu_830318373418e6bf.png 480w, /post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930_hu_27af755f461ce365.png 1024w" loading=lazy class=gallery-image data-flex-grow=116 data-flex-basis=278px></p><h2 id=puppeteer-的主要特性>Puppeteer 的主要特性</h2><p>前文是一个 Puppeteer 的简单示例。我们可以看到 puppeteer 的基本用法。其实 Puppeteer 作为一个强大的 headless，有很多功能，择要总结如下：</p><h3 id=设置浏览器启动参数>设置浏览器启动参数</h3><p>在启动浏览器的方法中，我们通过设置一些参数来配置浏览器，常用的参数有：</p><ul><li><p>headless: true/false 设置是否启动无头模式</p></li><li><p>devtools: true/false 是否同时启动 devtool</p></li><li><p>slowMo：毫秒数。运行在 slow 模式下，每步骤操作间隔</p></li><li><p>timeout: 毫秒数，设置启动超时时间，默认值 30000，即 30 秒</p></li><li><p>executablePath: 可以使用已安装的 chrome 浏览器替换默认的 chromium 浏览器，此处设置浏览器执行文件路径</p></li><li><p>args：设置 chrome 浏览器支持的配置参数。
+支持的详细参数参见：<a class=link href=https://peter.sh/experiments/chromium-command-line-switches/ target=_blank rel=noopener>chrome浏览器参数</a>。
+比如 <code>args: ["--start-maximized"]</code> 可以设置启动浏览器默认最大化。</p></li></ul><p>还用上文的代码，修改一下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>browser</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>puppeteer</span><span class=p>.</span><span class=nx>launch</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=nx>headless</span><span class=o>:</span><span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>devtools</span><span class=o>:</span><span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>slowMo</span><span class=o>:</span><span class=mi>1000</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>args</span><span class=o>:</span><span class=p>[</span><span class=s2>&#34;--start-maximized&#34;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>page</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>newPage</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s1>&#39;https://chengxiaqiucao.github.io/&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>close</span><span class=p>();</span>
+</span></span></code></pre></td></tr></table></div></div><p>执行后会运行在 slow 模式下，默认开启了 devtool 并且自动进行了最大化。</p><h3 id=模拟设备显示>模拟设备显示</h3><p>Puppeteer 还支持设置模拟移动设备界面。通过 <code>page.emulate()</code> 方法可以模拟一些主流的移动设备界面。具体支持的设备清单可以参见 <a class=link href=https://pptr.dev/api/puppeteer.knowndevices/ target=_blank rel=noopener>官方提供的清单</a></p><p>用法如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>import</span> <span class=nx>puppeteer</span> <span class=nx>from</span> <span class=s1>&#39;puppeteer&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kr>import</span> <span class=p>{</span><span class=nx>KnownDevices</span><span class=p>}</span> <span class=nx>from</span> <span class=s1>&#39;puppeteer&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> 
+</span></span><span class=line><span class=cl><span class=nx>iphone15</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>async</span> <span class=kd>function</span> <span class=nx>iphone15</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=kr>const</span> <span class=nx>iPhone</span> <span class=o>=</span> <span class=nx>KnownDevices</span><span class=p>[</span><span class=s1>&#39;iPhone 15 Pro&#39;</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>browser</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>puppeteer</span><span class=p>.</span><span class=nx>launch</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=nx>headless</span><span class=o>:</span><span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>devtools</span><span class=o>:</span><span class=kc>true</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>pages</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>pages</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>page</span> <span class=o>=</span> <span class=nx>pages</span><span class=p>[</span><span class=mi>0</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>emulate</span><span class=p>(</span><span class=nx>iPhone</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s1>&#39;https://chengxiaqiucao.github.io/&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>执行效果：</p><p><img src=/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-1.png width=1548 height=1124 srcset="/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-1_hu_90b4a6ce3db6e82b.png 480w, /post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-1_hu_f9cd17fdbf24b6c6.png 1024w" loading=lazy class=gallery-image data-flex-grow=137 data-flex-basis=330px></p><p>除了模拟终端设备的方法。还可以通过 Page.setViewport 来设置分辨率，比如如下语句设置页面采用 1920 * 1080 分辨率</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>setViewport</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>  <span class=nx>width</span><span class=o>:</span> <span class=mi>1920</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>height</span><span class=o>:</span> <span class=mi>1080</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=元素定位>元素定位</h3><p>作为一款可进行自动化测试的工具，Puppeteer 自然也需要能够识别页面中的相关元素。 Puppeteer 中可通过 <code>page.$(selector)</code> 和 <code>page.$$(selector)</code> 来获取元素。selector 参数使用Css Selector语法来进行元素定位。css selector 的语法可以参见：<a class=link href=https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors target=_blank rel=noopener>css selector</a>。如定位博客页面种中的归档栏目：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>$</span><span class=p>(</span><span class=s1>&#39;#main-menu &gt; li:nth-child(2) &gt; a&#39;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>一般在 chrome 中获取元素的对应 selector 描述，可以打开 chrome dev tools，定位到元素后，右键拷贝即可。</p><p>除了使用 selector ，也可以通过 xpath 路径进行识别: <code>page.$x(expression)</code>, 如</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>$x</span><span class=p>(</span><span class=s1>&#39;//*[@id=&#34;main-menu&#34;]/li[2]/a&#39;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=页面操作及键盘输入>页面操作及键盘输入</h3><p>自动化测试中最常用的操作自然是驱动页面执行相关的操作。在 Puppeteer 中可以使用相关已封装的方法完成对应操作。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// 获取焦点
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>focus</span><span class=p>(</span><span class=nx>selector</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>//点击元素
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>click</span><span class=p>(</span><span class=nx>selector</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>tap</span><span class=p>(</span><span class=nx>selector</span><span class=p>)</span> <span class=c1>//手机端
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=c1>//输入内容
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>type</span><span class=p>(</span><span class=nx>selector</span><span class=p>,</span> <span class=s1>&#39;输入内容&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>//直接通过键盘输入
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>keyboard</span><span class=p>.</span><span class=nx>type</span><span class=p>(</span><span class=s1>&#39;输入内容&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>keyboard</span><span class=p>.</span><span class=nx>press</span><span class=p>(</span><span class=s1>&#39;KeyA&#39;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=获取元素属性>获取元素属性</h3><p>有时候我们会需要获取页面上元素的属性以进行后续操作，可以使用 <code>page.$eval(selector,pagefunction)</code> 实现，如：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>//获取链接地址
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=nx>preloadHref</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>$eval</span><span class=p>(</span><span class=s1>&#39;link[rel=preload]&#39;</span><span class=p>,</span> <span class=nx>el</span> <span class=p>=&gt;</span> <span class=nx>el</span><span class=p>.</span><span class=nx>href</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=截图>截图</h3><p>Puppeteer 可以通过 <code>page.screenshot()</code> 方法实现页面截图, 有如下一些非常有用的参数：</p><ul><li><p>path：指定截图后的文件保存路径</p></li><li><p>type：指定保存的文件类型，jpg或png</p></li><li><p>quality：图片质量，0-100</p></li><li><p>fullpage：是否保存完整的页面</p></li><li><p>clip：指定截图区域 {x,y,width,height}</p></li><li><p>omitBackground：去除白色背景</p></li><li><p>encoding：图片编码，base64 或 binary</p></li></ul><p>代码示例：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>browser</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>puppeteer</span><span class=p>.</span><span class=nx>launch</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=nx>headless</span><span class=o>:</span><span class=kc>false</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>pages</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>pages</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>page</span> <span class=o>=</span> <span class=nx>pages</span><span class=p>[</span><span class=mi>0</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s1>&#39;https://chengxiaqiucao.github.io/&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>screenshot</span><span class=p>({</span><span class=nx>path</span><span class=o>:</span> <span class=s1>&#39;screenshot.png&#39;</span><span class=p>,</span><span class=nx>fullpage</span><span class=o>:</span><span class=kc>true</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>close</span><span class=p>();</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=保存-pdf>保存 PDF</h3><p>Puppeteer 还有一个功能是可以直接将页面保存为 PDF 文件：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>browser</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>puppeteer</span><span class=p>.</span><span class=nx>launch</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=nx>headless</span><span class=o>:</span><span class=kc>false</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>pages</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>pages</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>page</span> <span class=o>=</span> <span class=nx>pages</span><span class=p>[</span><span class=mi>0</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s1>&#39;https://chengxiaqiucao.github.io/&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>pdf</span><span class=p>({</span><span class=nx>path</span><span class=o>:</span> <span class=s1>&#39;blogList.pdf&#39;</span><span class=p>,</span> <span class=nx>format</span><span class=o>:</span> <span class=s1>&#39;A4&#39;</span><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>close</span><span class=p>();</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=网络请求拦截>网络请求拦截</h3><p>Puppeteer 可以对页面的网络请求进行拦截处理。如下例会拦截 博客网站的头像图片加载：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>browser</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>puppeteer</span><span class=p>.</span><span class=nx>launch</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=nx>headless</span><span class=o>:</span><span class=kc>false</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>pages</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>pages</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>page</span> <span class=o>=</span> <span class=nx>pages</span><span class=p>[</span><span class=mi>0</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>setRequestInterception</span><span class=p>(</span><span class=kc>true</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nx>page</span><span class=p>.</span><span class=nx>on</span><span class=p>(</span><span class=s1>&#39;request&#39;</span><span class=p>,</span> <span class=nx>request</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span><span class=p>(</span><span class=nx>request</span><span class=p>.</span><span class=nx>url</span><span class=p>().</span><span class=nx>includes</span><span class=p>(</span><span class=s1>&#39;automnGrass&#39;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>            <span class=nx>request</span><span class=p>.</span><span class=nx>abort</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span>
+</span></span><span class=line><span class=cl>            <span class=nx>request</span><span class=p>.</span><span class=k>continue</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s1>&#39;https://chengxiaqiucao.github.io/&#39;</span><span class=p>,{</span><span class=nx>timeout</span><span class=o>:</span><span class=mi>100000</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>close</span><span class=p>();</span>
+</span></span></code></pre></td></tr></table></div></div><p>效果如图：
+<img src=/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-2.png width=666 height=579 srcset="/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-2_hu_98274b399ff6c4e9.png 480w, /post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-2_hu_90ce7675a044281e.png 1024w" loading=lazy class=gallery-image data-flex-grow=115 data-flex-basis=276px></p><h3 id=性能指标录制>性能指标录制</h3><p>Puppeteer 另一个非常有用的特性是可以录制下性能跟踪指标，供共享进行性能分析。</p><p>使用非常简单，在需要记录性能指标的操作前后，用 <code>page.tracing.start()</code> 和 <code>page.tracing.stop()</code>标记</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>browser</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>puppeteer</span><span class=p>.</span><span class=nx>launch</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=nx>headless</span><span class=o>:</span><span class=kc>false</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>pages</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>pages</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>page</span> <span class=o>=</span> <span class=nx>pages</span><span class=p>[</span><span class=mi>0</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>tracing</span><span class=p>.</span><span class=nx>start</span><span class=p>({</span><span class=nx>path</span><span class=o>:</span> <span class=s1>&#39;trace.json&#39;</span><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s1>&#39;https://chengxiaqiucao.github.io/&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>tracing</span><span class=p>.</span><span class=nx>stop</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>close</span><span class=p>();</span>
+</span></span></code></pre></td></tr></table></div></div><p>将保存的 trace.json 文件上传到 chrome dev tools 的 performance 栏下，即可进行对应的性能分析。如图：
+<img src=/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-3.png width=1328 height=697 srcset="/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-3_hu_e1d43be1dda79660.png 480w, /post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-3_hu_2b1d6e7cb979c9df.png 1024w" loading=lazy class=gallery-image data-flex-grow=190 data-flex-basis=457px></p><h2 id=puppeteer-结合-jest-自动化测试实例>Puppeteer 结合 Jest 自动化测试实例</h2><p>现在我们来结合一个具体的 UI 自动化测试案例来看看 Puppeteer 的使用。</p><p>测试需求如下：</p><blockquote><p>Case 1:</p><ul><li>打开 秋草观"测"台</li><li>确认站点加载正确</li></ul><p>Case2:</p><ul><li>定位归档页面</li><li>进入归档栏目</li></ul><p>Case3:</p><ul><li>获取当前页面的文章清单并输出到控制台</li></ul></blockquote><p>Puppeteer 是一个 node 的无头浏览器控制库，本身并没有包含测试框架功能，所以一般我们会借助其他测试框架来配合进行测试调度、执行、断言。这里以前端测试中常用的框架 Jest 为例，来看看如何用 Puppeteer 完成上述自动化需求。</p><p>Jest 的安装和基本使用不是本文重点，这里不再进行详细说明，大家可以自行搜索学习一下，这里简单说明；</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>&gt; npm install jest
+</span></span></code></pre></td></tr></table></div></div><p>要使用 Jest，需要在 项目目录下配置 package.json，包含：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=s2>&#34;scripts&#34;</span><span class=err>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;test&#34;</span><span class=p>:</span> <span class=s2>&#34;jest&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>默认会自动识别以 <code>.test.js</code> 结尾的脚本作为测试脚本。通过 <code>npm run test</code> 驱动执行即可。</p><p>以下为具体实现代码，关键处已添加注释，不再另行赘述。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>puppeteer</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;puppeteer&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nx>browser</span><span class=p>,</span> <span class=nx>pages</span><span class=p>,</span> <span class=nx>page</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>//Jest 默认超时时间为 5s, 太短。修改为 60s，
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>jest</span><span class=p>.</span><span class=nx>setTimeout</span><span class=p>(</span><span class=mi>60000</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 测试 Setup，总体准备动作
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>beforeAll</span><span class=p>(</span><span class=kr>async</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 关闭浏览器无头模式，并运行在 slow 模式下
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// 每个页面的默认 viewport 设置 1024 * 768
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>browser</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>puppeteer</span><span class=p>.</span><span class=nx>launch</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=nx>headless</span><span class=o>:</span><span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>slowMo</span><span class=o>:</span><span class=mi>100</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>defaultViewport</span><span class=o>:</span><span class=p>{</span><span class=nx>width</span><span class=o>:</span> <span class=mi>1024</span><span class=p>,</span> <span class=nx>height</span><span class=o>:</span> <span class=mi>768</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>//打开新页面
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>page</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>newPage</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>//设置页面默认超时 60S
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>setDefaultTimeout</span><span class=p>(</span><span class=mi>60000</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 测试 Teardown，总体清理动作
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>afterAll</span><span class=p>(</span><span class=kr>async</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>close</span><span class=p>();</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=c1>//每个用例的 setup 准备操作
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>beforeEach</span><span class=p>(</span><span class=kr>async</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>//todo
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>//每个用例的 Teardown 清理操作
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>afterEach</span><span class=p>(()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>//todo
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>});</span>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=nx>test</span><span class=p>(</span><span class=s1>&#39;Case1：进入博客主页&#39;</span><span class=p>,</span><span class=kr>async</span> <span class=p>()=&gt;{</span>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s1>&#39;https://chengxiaqiucao.github.io/&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=c1>//验证页面正确加载
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kd>let</span> <span class=nx>title</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>title</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=nx>expect</span><span class=p>(</span><span class=nx>title</span><span class=p>).</span><span class=nx>toBe</span><span class=p>(</span><span class=s1>&#39;秋 草 观 “测” 台&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>test</span><span class=p>(</span><span class=s1>&#39;Case2：访问归档栏目&#39;</span><span class=p>,</span> <span class=kr>async</span> <span class=p>()=&gt;{</span>
+</span></span><span class=line><span class=cl>	<span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>waitForSelector</span><span class=p>(</span><span class=s1>&#39;#main-menu &gt; li:nth-child(2) &gt; a&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>click</span><span class=p>(</span><span class=s1>&#39;#main-menu &gt; li:nth-child(2) &gt; a&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>	<span class=c1>//等待加载完成
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>waitForFunction</span><span class=p>(()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=nb>document</span><span class=p>.</span><span class=nx>readyState</span> <span class=o>===</span> <span class=s1>&#39;complete&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=p>});</span>
+</span></span><span class=line><span class=cl><span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>test</span><span class=p>(</span><span class=s1>&#39;Case3：获取文章清单&#39;</span><span class=p>,</span> <span class=kr>async</span> <span class=p>()=&gt;{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>//css selector 定位到 测试 栏目并打开
+</span></span></span><span class=line><span class=cl><span class=c1></span>   <span class=kr>const</span> <span class=nx>ArticleTitles</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>$$eval</span><span class=p>(</span><span class=s1>&#39;h2.article-title&#39;</span><span class=p>,</span> <span class=nx>els</span> <span class=p>=&gt;</span> <span class=nb>Array</span><span class=p>.</span><span class=nx>from</span><span class=p>(</span><span class=nx>els</span><span class=p>).</span><span class=nx>map</span><span class=p>(</span><span class=nx>el</span> <span class=p>=&gt;</span> <span class=nx>el</span><span class=p>.</span><span class=nx>textContent</span><span class=p>));</span> 
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>ArticleTitles</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>})</span>
+</span></span></code></pre></td></tr></table></div></div><p>执行输出：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>PS C:<span class=se>\&gt;</span> npm run <span class=nb>test</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>&gt; <span class=nb>test</span>
+</span></span><span class=line><span class=cl>&gt; jest
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  console.log
+</span></span><span class=line><span class=cl>    <span class=o>[</span>
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;大话Https协议&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;软件分支策略和集成模式梳理&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Git工作原理和常用指令&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Pytest中自动指定可引用fixture&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;用SeleniumBase制作产品Demo&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;适合用来自动化测试练手的项目&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;用Typer快速开发python命令行应用&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;PostmanV11更新便览&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Selenium Manager用法详解&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;理解敏捷宣言背后的文化逻辑&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;如何及时掌握各种常用框架的最新变化？&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;软件测试的目的到底是什么？&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Pytest中fixture的范围&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Pytest使用Fixture进行参数化及中文乱码问题&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Win11操作小技巧二则&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Hugo+Github搭建博客小记&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;AI测试之TestGPT&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;提 Bug 的艺术&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Postman高级篇&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Postman自动化篇&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Postman进阶篇&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Postman基础篇&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=o>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>      at Object.log <span class=o>(</span>pupp.test.js:60:13<span class=o>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> PASS  ./pupp.test.js <span class=o>(</span>14.525 s<span class=o>)</span>
+</span></span><span class=line><span class=cl>  √ Case1：进入博客主页 <span class=o>(</span><span class=m>5420</span> ms<span class=o>)</span>
+</span></span><span class=line><span class=cl>  √ Case2：访问归档栏目 <span class=o>(</span><span class=m>4011</span> ms<span class=o>)</span>
+</span></span><span class=line><span class=cl>  √ Case3：获取文章清单 <span class=o>(</span><span class=m>2464</span> ms<span class=o>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Test Suites: <span class=m>1</span> passed, <span class=m>1</span> total
+</span></span><span class=line><span class=cl>Tests:       <span class=m>3</span> passed, <span class=m>3</span> total
+</span></span><span class=line><span class=cl>Snapshots:   <span class=m>0</span> total
+</span></span><span class=line><span class=cl>Time:        14.578 s, estimated <span class=m>15</span> s
+</span></span><span class=line><span class=cl>Ran all <span class=nb>test</span> suites.
+</span></span></code></pre></td></tr></table></div></div><h2 id=结语>结语</h2><p>以上就是 关于Puppeteer 的基本用法介绍。可以看到 Puppeteer 作为 chrome 官方出品的浏览器控制库，功能强大，可以从浏览器底层完成很多控制操作。无论是 UI 自动化还是作为爬虫，都大有用武之地。直接基于 Node.js 环境运行，安装运行简便。对于针对浏览器前端的 E2E 测试来说，Puppeteer 是一个上佳的选择。</p><p>不过 Puppeteer 作为一个控制库，在自动化测试本身的框架构成上比较单一，一般需要和其他框架配合使用。</p><hr><p>关注 城下秋草， 测试技术不迷路~~</p></section><footer class=article-footer><section class=article-tags><a href=/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95/>自动化测试</a>
+<a href=/tags/puppeteer/>Puppeteer</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/post/118-pom_replacement/><div class=article-image><img src=/post/118-pom_replacement/Pasted-20250806.f76c8d5a1901a96f974bf59653a68a57_hu_14ccbf1f5b41b9c6.png width=250 height=150 loading=lazy alt="Featured image of post UI自动化，POM之外的另一模式" data-hash="md5-92yNWhkBqW+XS/WWU6aKVw=="></div><div class=article-details><h2 class=article-title>UI自动化，POM之外的另一模式</h2></div></a></article><article class=has-image><a href=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/><div class=article-image><img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-5.62e64a7cc6316cdf058647603a537783_hu_5f4e5d6c5a1c2f4d.png width=250 height=150 loading=lazy alt="Featured image of post AI自动化工具Midscene.js源码解析" data-hash="md5-YuZKfMYxbN8FhkdgOlN3gw=="></div><div class=article-details><h2 class=article-title>AI自动化工具Midscene.js源码解析</h2></div></a></article><article class=has-image><a href=/post/066-playwright%E6%96%B0%E7%89%88%E6%9C%AC%E7%AD%9B%E9%80%89%E5%8A%9F%E8%83%BD/><div class=article-image><img src=/post/066-playwright%E6%96%B0%E7%89%88%E6%9C%AC%E7%AD%9B%E9%80%89%E5%8A%9F%E8%83%BD/playwright_logo.82386a35c48e32d43f12199ac6a46a38_hu_d1321ae71a371e02.png width=250 height=150 loading=lazy alt="Featured image of post Playwright新版本筛选功能" data-hash="md5-gjhqNcSOMtQ/EhmaxqRqOA=="></div><div class=article-details><h2 class=article-title>Playwright新版本筛选功能</h2></div></a></article><article class=has-image><a href=/post/050-%E8%87%AA%E5%8A%A8%E5%8C%96%E5%A5%BD%E5%B8%AE%E6%89%8B_chrome%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E5%BD%95%E5%88%B6%E5%99%A8/><div class=article-image><img src=/post/050-%E8%87%AA%E5%8A%A8%E5%8C%96%E5%A5%BD%E5%B8%AE%E6%89%8B_chrome%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E5%BD%95%E5%88%B6%E5%99%A8/Pasted-20250218.0dd60658485e8eafdb0468e39a43eacd_hu_88f92bd342ae392e.png width=250 height=150 loading=lazy alt="Featured image of post 自动化好帮手_chrome浏览器的录制器" data-hash="md5-DdYGWEhejq/bBGjjmkPqzQ=="></div><div class=article-details><h2 class=article-title>自动化好帮手_chrome浏览器的录制器</h2></div></a></article><article class=has-image><a href=/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/><div class=article-image><img src=/post/017-pytest%E4%B8%AD%E8%87%AA%E5%8A%A8%E6%8C%87%E5%AE%9A%E5%8F%AF%E5%BC%95%E7%94%A8fixture/pytest.739cb187fe6d5cc5a43c7d2c8387c849_hu_f020361f601fb56a.png width=250 height=150 loading=lazy alt="Featured image of post Pytest中自动指定可引用fixture" data-hash="md5-c5yxh/5tXMWkPH0sg4fISQ=="></div><div class=article-details><h2 class=article-title>Pytest中自动指定可引用fixture</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2023 -
+2025 |by 城下秋草（公众号： 秋草说测试）</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

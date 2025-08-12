@@ -1,0 +1,801 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="前言 在之前的文章 【】我们了解了字节跳动推出的AI测试工具 Midscene.js， 不管是智能解析项目，测试执行还是最后的报告生成都颇为亮眼，而且除了基于浏览器的web应用，还支持了Android应用的自动化。\n"><title>AI自动化工具Midscene.js源码解析</title><link rel=canonical href=https://chengxiaqiucao.github.io/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/><link rel=stylesheet href=/scss/style.min.d6334826c849a420a2748e4872b915ae516105f86c3993d9bad2032725f784b8.css><meta property='og:title' content="AI自动化工具Midscene.js源码解析"><meta property='og:description' content="前言 在之前的文章 【】我们了解了字节跳动推出的AI测试工具 Midscene.js， 不管是智能解析项目，测试执行还是最后的报告生成都颇为亮眼，而且除了基于浏览器的web应用，还支持了Android应用的自动化。\n"><meta property='og:url' content='https://chengxiaqiucao.github.io/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/'><meta property='og:site_name' content='秋 草 观 “测” 台'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='自动化测试'><meta property='article:tag' content='AI'><meta property='article:published_time' content='2025-06-22T00:00:00+00:00'><meta property='article:modified_time' content='2025-06-22T00:00:00+00:00'><meta property='og:image' content='https://chengxiaqiucao.github.io/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-5.png'><meta name=twitter:title content="AI自动化工具Midscene.js源码解析"><meta name=twitter:description content="前言 在之前的文章 【】我们了解了字节跳动推出的AI测试工具 Midscene.js， 不管是智能解析项目，测试执行还是最后的报告生成都颇为亮眼，而且除了基于浏览器的web应用，还支持了Android应用的自动化。\n"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://chengxiaqiucao.github.io/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-5.png'></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/automnGrass_hu_5e44a092fd905642.png width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>秋 草 观 “测” 台</a></h1><h2 class=site-description>Testing is not just checking...</h2></div></header><ol class=menu-social><li><a href=https://github.com/chengxiaqiucao target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://space.bilibili.com/472272606 target=_blank title=Bilibili rel=me><!doctype html><svg t="1750732982440" class="icon" viewBox="0 0 1024 1024" p-id="4593" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632 444.330667 256h135.296l138.368-138.325333A42.666667 42.666667.0 01778.368 178.048L700.330667 256H789.333333A149.333333 149.333333.0 01938.666667 405.333333v341.333334A149.333333 149.333333.0 01789.333333 896H234.666667A149.333333 149.333333.0 0185.333333 746.666667V405.333333A149.333333 149.333333.0 01234.666667 256h88.96L245.632 177.962667a42.666667 42.666667.0 0160.373333-60.373334zm483.328 223.701333H234.666667a64 64 0 00-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0057.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0063.701334-57.856L853.333333 746.666667V405.333333a64 64 0 00-64-64zm-448 128A42.666667 42.666667.0 01384 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666666-42.666667zm341.333334.0A42.666667 42.666667.0 01725.333333 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666667-42.666667z" p-id="4594" fill="#8a8a8a"/></svg></a></li><li><a href=https://www.zhihu.com/people/qiucao target=_blank title=zhihu rel=me><!doctype html><svg t="1750733049138" class="icon" viewBox="0 0 1024 1024" p-id="5820" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M570.581333 806.272h61.952L652.928 876.117333 764.074667 806.272h130.986666V230.186667h-324.48V806.272zM636.501333 292.693333h192.64V743.68h-73.898666l-73.813334 46.378667L668.032 743.808l-31.530667-.128V292.736zM515.754667 493.738667H377.429333a2999.466667 2999.466667.0 005.802667-194.56h135.338667S523.776 239.445334 495.872 240.128H261.76c9.216-34.730667 20.821333-70.613333 34.688-107.690667.0.0-63.701333.0-85.333333 57.130667C202.112 213.12 176.128 303.786667 129.877333 396.416c15.573333-1.706667 67.114667-3.114667 97.450667-58.794667 5.589333-15.616 6.656-17.621333 13.568-38.485333h76.373333c0 27.776-3.157333 177.109333-4.437333 194.474667h-138.24c-31.104.0-41.173333 62.549333-41.173333 62.549333h173.482666C295.253333 688.256 232.789333 799.573333 119.466667 887.466667c54.186667 15.488 108.202667-2.432 134.912-26.197334.0.0 60.8-55.338667 94.122666-183.381333L491.264 849.834667s20.906667-71.168-3.285333-105.856c-20.053333-23.637333-74.24-87.552-97.322667-110.72l-38.698667 30.72c11.52-36.992 18.474667-72.96 20.821334-107.690667h163.072s-.213333-62.549333-20.053334-62.549333z" p-id="5821" fill="#8a8a8a"/></svg></a></li><li><a href=mailto:%20danmyw@qq.com target=_blank title=e-mail rel=me><!doctype html><svg t="1750733089669" class="icon" viewBox="0 0 1451 1024" p-id="6983" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759.0 97.881301C0 3.997201 71.046997.0 71.046997.0H474.477909 961.649408h399.992405s71.046998 3.997201 71.046998 97.881301L771.345323 681.472759S764.482731 685.154773 753.594283 688.65053V688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858V688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759zm53.281707 130.131124C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633.0 212.052267.0 212.052267V942.809523S0 1024 83.726336 1024H682.532949 753.579947h595.368192C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523V212.052267S893.138176 701.759633 817.019477 767.734955c-39.771477 34.470494-74.671786 43.295855-98.955861 43.868928z" fill="#8a8a8a" p-id="6984"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>主页</span></a></li><li><a href=/page/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>检索</span></a></li><li><a href=/page/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>链接</span></a></li><li><a href=/page/about/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>关于</span></a></li><li><a href=/page/releases/><svg class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M9.828 9.172a4 4 0 100 5.656A10 10 0 0012 12a10 10 0 012.172-2.828 4 4 0 110 5.656A10 10 0 0112 12 10 10 0 009.828 9.172"/></svg>
+<span>热门开源</span></a></li><li class=menu-bottom-section><ol class=menu><li id=i18n-switch><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg>
+<select name=language title=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://chengxiaqiucao.github.io/en/>English</option><option value=https://chengxiaqiucao.github.io/ selected>中文</option></select></li><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#前言>前言</a></li><li><a href=#项目整体架构>项目整体架构</a></li><li><a href=#主要的内置系统提示词>主要的内置系统提示词</a><ol><li><a href=#1-任务规划类-system-prompts>1. 任务规划类 System Prompts</a></li><li><a href=#2-元素定位类-system-prompts>2. 元素定位类 System Prompts</a></li><li><a href=#3-数据提取类-system-prompts>3. 数据提取类 System Prompts</a></li><li><a href=#4-断言验证类-system-prompts>4. 断言验证类 System Prompts</a></li><li><a href=#5-元素描述类-system-prompts>5. 元素描述类 System Prompts</a></li><li><a href=#6-代码生成类-system-prompts>6. 代码生成类 System Prompts</a></li></ol></li><li><a href=#对用户提示词的补充和约束>对用户提示词的补充和约束</a><ol><li><a href=#1-背景上下文的智能生成><strong>1. 背景上下文的智能生成</strong></a></li><li><a href=#2-多模态适配的用户提示><strong>2. 多模态适配的用户提示</strong></a></li><li><a href=#3-结构化json-schema验证><strong>3. 结构化JSON Schema验证</strong></a></li></ol></li><li><a href=#大模型上下文窗口限制>大模型上下文窗口限制</a><ol><li><a href=#1-token数量限制控制>1. Token数量限制控制</a></li><li><a href=#2-图像尺寸限制和自动调整>2. 图像尺寸限制和自动调整</a></li><li><a href=#3-图像压缩和优化>3. 图像压缩和优化</a></li><li><a href=#4-选择合适的模型架构>4. 选择合适的模型架构</a></li><li><a href=#5-token使用情况监控>5. Token使用情况监控</a></li></ol></li><li><a href=#长链路任务的记忆管理>长链路任务的记忆管理</a><ol><li><a href=#任务缓存机制>任务缓存机制</a></li><li><a href=#对话历史管理>对话历史管理</a></li><li><a href=#重规划限制机制>重规划限制机制</a></li><li><a href=#资源清理机制>资源清理机制</a></li><li><a href=#上下文优化>上下文优化</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/><img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-5_hu_135e2bb47ba4a41d.png srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-5_hu_135e2bb47ba4a41d.png 800w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-5_hu_8cd337e2cca62e49.png 1600w" width=800 height=356 loading=lazy alt="Featured image of post AI自动化工具Midscene.js源码解析"></a></div><div class=article-details><header class=article-category><a href=/categories/ai/ style=background-color:#245678;color:#888>AI
+</a><a href=/categories/%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7/ style=background-color:#c6fad2;color:#000>测试工具</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/>AI自动化工具Midscene.js源码解析</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Jun 22, 2025</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 12 分钟</time></div></footer></div></header><section class=article-content><h2 id=前言>前言</h2><p>在之前的文章 【】我们了解了字节跳动推出的AI测试工具 <code>Midscene.js</code>， 不管是智能解析项目，测试执行还是最后的报告生成都颇为亮眼，而且除了基于浏览器的web应用，还支持了Android应用的自动化。</p><p>那么这个项目具体是如何利用 AI 智能完成测试执行任务的呢？ 本文我们就结合 Midscene.js 的开源项目源码，对该项目的实现，以及对大模型的应用进行深入分析。</p><h2 id=项目整体架构>项目整体架构</h2><p>通过项目源码的分析，该项目的总体架构可以用下图概括：
+<img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/midscene_arch.png width=1742 height=794 srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/midscene_arch_hu_9172cfb8f9e87682.png 480w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/midscene_arch_hu_414f7b1d2f727692.png 1024w" loading=lazy class=gallery-image data-flex-grow=219 data-flex-basis=526px></p><ul><li><p><strong>用户</strong>: 用户是Midscene的起点，通过自然语言描述、JavaScript SDK 或 YAML 脚本来定义自动化任务和目标。</p></li><li><p><strong>MCP 客户端 (MCP Clients)</strong>: Midscene还支持其他MCP客户端直接使用其能力，这表明它可能有一个API或集成点供其他系统调用。</p></li><li><p><strong>Midscene Core</strong>: 这是Midscene的核心逻辑层。它负责解析用户的指令，与AI模型交互，并协调自动化代理来执行操作。它也管理报告生成和缓存。</p></li><li><p><strong>AI 模型</strong>: Midscene支持多种AI模型，包括：</p><ul><li><p><strong>多模态 LLM (Multimodal LLM)</strong>：如 GPT-4o, Gemini-2.5-Pro，用于理解更复杂的指令和上下文。</p></li><li><p><strong>视觉语言模型 (Visual-Language Models)</strong>：如 Qwen2.5-VL, Doubao-1.5-thinking-vision-pro, UI-TARS，特别推荐用于UI自动化，因为它们能更好地理解视觉信息。 AI模型接收来自Midscene Core的请求，并返回执行动作或获取信息的指令。</p></li></ul></li><li><p><strong>自动化代理</strong>: 这是一个关键的执行层，负责根据Midscene Core的指令，实际操作目标应用程序或UI。它能获取UI状态和截图，并将其反馈给Midscene Core。</p></li><li><p><strong>目标应用程序/UI</strong>: 这是自动化操作的实际对象，可以是：</p><ul><li><strong>浏览器 (Browser)</strong>：通过Playwright或Puppeteer等工具进行Web自动化。</li><li><strong>Android 应用 (Android App)</strong>：进行Android自动化。</li></ul></li><li><p><strong>可视化报告 (Visual Reports)</strong>: Midscene提供可视化报告，方便用户理解、回放和调试整个自动化过程。</p></li><li><p><strong>Playground</strong>: 内置的Playground环境，允许用户通过自然语言指令进行调试。</p></li><li><p><strong>缓存机制 (Caching Mechanism)</strong>: Midscene利用缓存机制来提高效率，允许脚本更快地重放以获得结果。</p></li></ul><h2 id=主要的内置系统提示词>主要的内置系统提示词</h2><p><code>MidScene</code> 的智能解析能力主要依托 LLM 大模型来实现，因此在调用 LLM 的时候，其设定的系统提示词就尤为关键。通过分析源码，可以看到 MidScene 针对不同类型的任务，设定了不同的系统提示词。总结如下：</p><h3 id=1-任务规划类-system-prompts>1. 任务规划类 System Prompts</h3><p>该项目包含三种不同的任务规划提示词：</p><p><strong>传统LLM模型的任务规划提示词</strong> - 用于指导传统语言模型将用户指令分解为一系列可执行的UI操作动作。</p><p><code>packages/core/src/ai-model/prompt/llm-planning.ts</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span><span class=lnt>78
+</span><span class=lnt>79
+</span><span class=lnt>80
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=kr>const</span> <span class=nx>llmLocateParam</span> <span class=o>=</span> <span class=sb>`locate: {{&#34;id&#34;: string, &#34;prompt&#34;: string}} | null`</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>systemTemplateOfLLM</span> <span class=o>=</span> <span class=p>({</span> <span class=nx>pageType</span> <span class=p>}</span><span class=o>:</span> <span class=p>{</span> <span class=nx>pageType</span>: <span class=kt>PageType</span> <span class=p>})</span> <span class=o>=&gt;</span> <span class=sb>`
+</span></span></span><span class=line><span class=cl><span class=sb>## Role
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>You are a versatile professional in software UI automation. Your outstanding contributions will impact the user experience of billions of users.
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>## Objective
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>- Decompose the instruction user asked into a series of actions
+</span></span></span><span class=line><span class=cl><span class=sb>- Locate the target element if possible
+</span></span></span><span class=line><span class=cl><span class=sb>- If the instruction cannot be accomplished, give a further plan.
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>## Workflow
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>1. Receive the screenshot, element description of screenshot(if any), user&#39;s instruction and previous logs.
+</span></span></span><span class=line><span class=cl><span class=sb>2. Decompose the user&#39;s task into a sequence of actions, and place it in the \`actions\` field. There are different types of actions (Tap / Hover / Input / KeyboardPress / Scroll / FalsyConditionStatement / Sleep </span><span class=si>${</span><span class=nx>pageType</span> <span class=o>===</span> <span class=s1>&#39;android&#39;</span> <span class=o>?</span> <span class=s1>&#39;/ AndroidBackButton / AndroidHomeButton / AndroidRecentAppsButton&#39;</span> <span class=o>:</span> <span class=s1>&#39;&#39;</span><span class=si>}</span><span class=sb>). The &#34;About the action&#34; section below will give you more details.
+</span></span></span><span class=line><span class=cl><span class=sb>3. Precisely locate the target element if it&#39;s already shown in the screenshot, put the location info in the \`locate\` field of the action.
+</span></span></span><span class=line><span class=cl><span class=sb>4. If some target elements is not shown in the screenshot, consider the user&#39;s instruction is not feasible on this page. Follow the next steps.
+</span></span></span><span class=line><span class=cl><span class=sb>5. Consider whether the user&#39;s instruction will be accomplished after all the actions
+</span></span></span><span class=line><span class=cl><span class=sb> - If yes, set \`taskWillBeAccomplished\` to true
+</span></span></span><span class=line><span class=cl><span class=sb> - If no, don&#39;t plan more actions by closing the array. Get ready to reevaluate the task. Some talent people like you will handle this. Give him a clear description of what have been done and what to do next. Put your new plan in the \`furtherPlan\` field. The &#34;How to compose the \`taskWillBeAccomplished\` and \`furtherPlan\` fields&#34; section will give you more details.
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>## Constraints
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>- All the actions you composed MUST be based on the page context information you get.
+</span></span></span><span class=line><span class=cl><span class=sb>- Trust the &#34;What have been done&#34; field about the task (if any), don&#39;t repeat actions in it.
+</span></span></span><span class=line><span class=cl><span class=sb>- Respond only with valid JSON. Do not write an introduction or summary or markdown prefix like \`\`\`json\`\`\`.
+</span></span></span><span class=line><span class=cl><span class=sb>- If the screenshot and the instruction are totally irrelevant, set reason in the \`error\` field.
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>## About the \`actions\` field
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>The \`locate\` param is commonly used in the \`param\` field of the action, means to locate the target element to perform the action, it conforms to the following scheme:
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>type LocateParam = {{
+</span></span></span><span class=line><span class=cl><span class=sb>  &#34;id&#34;: string, // the id of the element found. It should either be the id marked with a rectangle in the screenshot or the id described in the description.
+</span></span></span><span class=line><span class=cl><span class=sb>  &#34;prompt&#34;?: string // the description of the element to find. It can only be omitted when locate is null.
+</span></span></span><span class=line><span class=cl><span class=sb>}} | null // If it&#39;s not on the page, the LocateParam should be null
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>## Supported actions
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>Each action has a \`type\` and corresponding \`param\`. To be detailed:
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;Tap&#39;
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ </span><span class=si>${</span><span class=nx>llmLocateParam</span><span class=si>}</span><span class=sb> }}
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;RightClick&#39;
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ </span><span class=si>${</span><span class=nx>llmLocateParam</span><span class=si>}</span><span class=sb> }}
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;Hover&#39;
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ </span><span class=si>${</span><span class=nx>llmLocateParam</span><span class=si>}</span><span class=sb> }}
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;Input&#39;, replace the value in the input field
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ </span><span class=si>${</span><span class=nx>llmLocateParam</span><span class=si>}</span><span class=sb>, param: {{ value: string }} }}
+</span></span></span><span class=line><span class=cl><span class=sb>  * \`value\` is the final value that should be filled in the input field. No matter what modifications are required, just provide the final value user should see after the action is done. 
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;KeyboardPress&#39;, press a key
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ param: {{ value: string }} }}
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;Scroll&#39;, scroll up or down.
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ 
+</span></span></span><span class=line><span class=cl><span class=sb>      </span><span class=si>${</span><span class=nx>llmLocateParam</span><span class=si>}</span><span class=sb>, 
+</span></span></span><span class=line><span class=cl><span class=sb>      param: {{ 
+</span></span></span><span class=line><span class=cl><span class=sb>        direction: &#39;down&#39;(default) | &#39;up&#39; | &#39;right&#39; | &#39;left&#39;, 
+</span></span></span><span class=line><span class=cl><span class=sb>        scrollType: &#39;once&#39; (default) | &#39;untilBottom&#39; | &#39;untilTop&#39; | &#39;untilRight&#39; | &#39;untilLeft&#39;, 
+</span></span></span><span class=line><span class=cl><span class=sb>        distance: null | number 
+</span></span></span><span class=line><span class=cl><span class=sb>      }} 
+</span></span></span><span class=line><span class=cl><span class=sb>    }}
+</span></span></span><span class=line><span class=cl><span class=sb>    * To scroll some specific element, put the element at the center of the region in the \`locate\` field. If it&#39;s a page scroll, put \`null\` in the \`locate\` field. 
+</span></span></span><span class=line><span class=cl><span class=sb>    * \`param\` is required in this action. If some fields are not specified, use direction \`down\`, \`once\` scroll type, and \`null\` distance.
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ param: {{ button: &#39;Back&#39; | &#39;Home&#39; | &#39;RecentApp&#39; }} }}
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;ExpectedFalsyCondition&#39;
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ param: {{ reason: string }} }}
+</span></span></span><span class=line><span class=cl><span class=sb>  * use this action when the conditional statement talked about in the instruction is falsy.
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;Sleep&#39;
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ param: {{ timeMs: number }} }}
+</span></span></span><span class=line><span class=cl><span class=sb></span><span class=si>${</span>
+</span></span><span class=line><span class=cl>  <span class=nx>pageType</span> <span class=o>===</span> <span class=s1>&#39;android&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=o>?</span> <span class=sb>`- type: &#39;AndroidBackButton&#39;, trigger the system &#34;back&#34; operation on Android devices
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ param: {{}} }}
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;AndroidHomeButton&#39;, trigger the system &#34;home&#34; operation on Android devices
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ param: {{}} }}
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;AndroidRecentAppsButton&#39;, trigger the system &#34;recent apps&#34; operation on Android devices
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ param: {{}} }}`</span>
+</span></span><span class=line><span class=cl>    <span class=o>:</span> <span class=s1>&#39;&#39;</span>
+</span></span><span class=line><span class=cl><span class=si>}</span><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>`</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>视觉-语言模型的任务规划提示词</strong> - 专门针对具有视觉能力的AI模型（如Qwen-VL、Gemini）设计，能够直接处理截图并规划下一步动作。</p><p><img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621.png width=1862 height=840 srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621_hu_1f245f4a7381fc92.png 480w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621_hu_cbe0546441c0937e.png 1024w" loading=lazy class=gallery-image data-flex-grow=221 data-flex-basis=532px></p><p><strong>UI-Tars模型的任务规划提示词</strong> - 为UI-Tars专门设计的GUI智能体提示词，采用思考-行动的格式。</p><p><img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-1.png width=1920 height=869 srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-1_hu_193a279710b18da0.png 480w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-1_hu_6ecc8617144abc71.png 1024w" loading=lazy class=gallery-image data-flex-grow=220 data-flex-basis=530px></p><h3 id=2-元素定位类-system-prompts>2. 元素定位类 System Prompts</h3><p><strong>元素定位提示词</strong> - 用于在页面截图和元素描述中精确定位目标元素，支持传统LLM和视觉-语言模型两种模式。
+<img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-2.png width=1920 height=925 srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-2_hu_e01f34217f929004.png 480w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-2_hu_7241f9c8a4fe6b33.png 1024w" loading=lazy class=gallery-image data-flex-grow=207 data-flex-basis=498px></p><p><strong>区域定位提示词</strong> - 用于定位包含目标元素的页面区域，通常不超过300x300像素的区域。</p><p><img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-3.png width=1920 height=869 srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-3_hu_2d4e24d478a96e80.png 480w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-3_hu_48ab05ecdf3dc135.png 1024w" loading=lazy class=gallery-image data-flex-grow=220 data-flex-basis=530px></p><h3 id=3-数据提取类-system-prompts>3. 数据提取类 System Prompts</h3><p><strong>数据提取提示词</strong> - 指导AI从UI界面中提取结构化数据，支持多种数据类型和格式要求。</p><p><img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-4.png width=1920 height=869 srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-4_hu_daa210e733e616c6.png 480w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-4_hu_944203a030fafb3f.png 1024w" loading=lazy class=gallery-image data-flex-grow=220 data-flex-basis=530px></p><h3 id=4-断言验证类-system-prompts>4. 断言验证类 System Prompts</h3><p><strong>断言验证提示词</strong> - 用于验证页面状态是否符合预期的断言条件，支持UI-Tars和普通模型两种格式。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=kr>const</span> <span class=nx>defaultAssertionPrompt</span> <span class=o>=</span>
+</span></span><span class=line><span class=cl>  <span class=s1>&#39;You are a senior testing engineer. User will give an assertion and a screenshot of a page. By carefully viewing the screenshot, please tell whether the assertion is truthy.&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>defaultAssertionResponseJsonFormat</span> <span class=o>=</span> <span class=sb>`Return in the following JSON format:
+</span></span></span><span class=line><span class=cl><span class=sb>{
+</span></span></span><span class=line><span class=cl><span class=sb>  pass: boolean, // whether the assertion is truthy
+</span></span></span><span class=line><span class=cl><span class=sb>  thought: string | null, // string, if the result is falsy, give the reason why it is falsy. Otherwise, put null.
+</span></span></span><span class=line><span class=cl><span class=sb>}`</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=5-元素描述类-system-prompts>5. 元素描述类 System Prompts</h3><p><strong>元素描述提示词</strong> - 用于生成精确的元素描述，帮助识别页面中的特定UI元素（给定元素）。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl> <span class=kr>export</span> <span class=kr>const</span> <span class=nx>elementDescriberInstruction</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=sb>`Describe the element in the red rectangle for precise identification. Use </span><span class=si>${</span><span class=nx>getPreferredLanguage</span><span class=p>()</span><span class=si>}</span><span class=sb>.
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>Rules:
+</span></span></span><span class=line><span class=cl><span class=sb>1. Start with element type (button, input, link, etc.)    
+</span></span></span><span class=line><span class=cl><span class=sb>2. Include key identifiers:
+</span></span></span><span class=line><span class=cl><span class=sb>   - Text content: &#34;with text &#39;Submit&#39;&#34;
+</span></span></span><span class=line><span class=cl><span class=sb>   - Visual features: &#34;blue background&#34;, &#34;icon only&#34;
+</span></span></span><span class=line><span class=cl><span class=sb>   - Position: &#34;top-right&#34;, &#34;below search bar&#34;
+</span></span></span><span class=line><span class=cl><span class=sb>3. Keep description under 20 words
+</span></span></span><span class=line><span class=cl><span class=sb>4. Don&#39;t mention the red rectangle
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>Return JSON:
+</span></span></span><span class=line><span class=cl><span class=sb>{
+</span></span></span><span class=line><span class=cl><span class=sb>  &#34;description&#34;: &#34;brief element type with key identifiers&#34;,
+</span></span></span><span class=line><span class=cl><span class=sb>  &#34;error&#34;?: &#34;error message if any&#34;
+</span></span></span><span class=line><span class=cl><span class=sb>}`</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=6-代码生成类-system-prompts>6. 代码生成类 System Prompts</h3><p><strong>Playwright测试代码生成提示词</strong> - 基于录制的浏览器会话事件生成可执行的Playwright测试代码。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl> <span class=c1>// Create system prompt
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kr>const</span> <span class=nx>systemPrompt</span> <span class=o>=</span> <span class=sb>`You are an expert test automation engineer specializing in Playwright and Midscene. 
+</span></span></span><span class=line><span class=cl><span class=sb>Your task is to generate a complete, executable Playwright test using @midscene/web/playwright that reproduces a recorded browser session.
+</span></span></span></code></pre></td></tr></table></div></div><blockquote><p>通过对这些 system prompts 采用模块化设计，根据不同的AI模型类型（传统LLM vs 视觉-语言模型）和页面类型（web vs Android）来动态调整。项目还包含了完整的JSON schema定义来确保AI输出的结构化和一致性，并且支持多语言环境 <code>${getPreferredLanguage()}</code></p></blockquote><h2 id=对用户提示词的补充和约束>对用户提示词的补充和约束</h2><p>除了通过这些系统提示词的设定，让LLM可以更好理解当前任务。对于用户的输入指令，即<code>用户提示词</code>，在实际处理时，必然还需要进行一定的扩展和约束补充。</p><p>这里我们再分析关于用户提示词的处理：</p><h3 id=1-背景上下文的智能生成><strong>1. 背景上下文的智能生成</strong></h3><p>项目通过<code>generateTaskBackgroundContext</code>函数为用户指令添加结构化的背景上下文，包括高优先级知识和历史执行日志，防止重复执行相同的操作。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=kr>export</span> <span class=kr>const</span> <span class=nx>generateTaskBackgroundContext</span> <span class=o>=</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>  <span class=nx>userInstruction</span>: <span class=kt>string</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>log?</span>: <span class=kt>string</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>userActionContext?</span>: <span class=kt>string</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>log</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=sb>`
+</span></span></span><span class=line><span class=cl><span class=sb>Here is the user&#39;s instruction:
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>&lt;instruction&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>  &lt;high_priority_knowledge&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>    </span><span class=si>${</span><span class=nx>userActionContext</span><span class=si>}</span><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>  &lt;/high_priority_knowledge&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>  </span><span class=si>${</span><span class=nx>userInstruction</span><span class=si>}</span><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>&lt;/instruction&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>These are the logs from previous executions, which indicate what was done in the previous actions.
+</span></span></span><span class=line><span class=cl><span class=sb>Do NOT repeat these actions.
+</span></span></span><span class=line><span class=cl><span class=sb>&lt;previous_logs&gt;
+</span></span></span><span class=line><span class=cl><span class=sb></span><span class=si>${</span><span class=nx>log</span><span class=si>}</span><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>&lt;/previous_logs&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>`</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=sb>`
+</span></span></span><span class=line><span class=cl><span class=sb>Here is the user&#39;s instruction:
+</span></span></span><span class=line><span class=cl><span class=sb>&lt;instruction&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>  &lt;high_priority_knowledge&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>    </span><span class=si>${</span><span class=nx>userActionContext</span><span class=si>}</span><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>  &lt;/high_priority_knowledge&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>  </span><span class=si>${</span><span class=nx>userInstruction</span><span class=si>}</span><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>&lt;/instruction&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>`</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=2-多模态适配的用户提示><strong>2. 多模态适配的用户提示</strong></h3><p>根据AI模型的能力，用户提示会采用不同的格式。对于视觉语言模型，直接传递任务背景；对于传统LLM，则结合页面描述信息。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=kr>export</span> <span class=kr>const</span> <span class=nx>automationUserPrompt</span> <span class=o>=</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>  <span class=nx>vlMode</span>: <span class=kt>ReturnType</span><span class=p>&lt;</span><span class=nt>typeof</span> <span class=na>vlLocateMode</span><span class=p>&gt;,</span>
+</span></span><span class=line><span class=cl><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>vlMode</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=k>new</span> <span class=nx>PromptTemplate</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>      <span class=nx>template</span><span class=o>:</span> <span class=s1>&#39;{taskBackgroundContext}&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nx>inputVariables</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;taskBackgroundContext&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=k>new</span> <span class=nx>PromptTemplate</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>    <span class=nx>template</span><span class=o>:</span> <span class=sb>`
+</span></span></span><span class=line><span class=cl><span class=sb>pageDescription:
+</span></span></span><span class=line><span class=cl><span class=sb>=====================================
+</span></span></span><span class=line><span class=cl><span class=sb>{pageDescription}
+</span></span></span><span class=line><span class=cl><span class=sb>=====================================
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>{taskBackgroundContext}`</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>inputVariables</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;pageDescription&#39;</span><span class=p>,</span> <span class=s1>&#39;taskBackgroundContext&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>  <span class=p>});</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=3-结构化json-schema验证><strong>3. 结构化JSON Schema验证</strong></h3><p>项目使用OpenAI的结构化输出schema来严格约束AI的响应格式，确保返回的数据符合预定义的结构，包括actions、log、error等必要字段。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=kr>export</span> <span class=kr>const</span> <span class=nx>planSchema</span>: <span class=kt>ResponseFormatJSONSchema</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;json_schema&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>json_schema</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>name</span><span class=o>:</span> <span class=s1>&#39;action_items&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>strict</span>: <span class=kt>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>schema</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;object&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nx>strict</span>: <span class=kt>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nx>properties</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>actions</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>          <span class=c1>//  TODO
+</span></span></span><span class=line><span class=cl><span class=c1></span>          <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;array&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=nx>items</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;object&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nx>strict</span>: <span class=kt>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nx>properties</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>              <span class=nx>thought</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=nx>description</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>                  <span class=s1>&#39;Reasons for generating this task, and why this task is feasible on this page&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>              <span class=p>},</span>
+</span></span><span class=line><span class=cl>              <span class=kr>type</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=nx>description</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>                  <span class=s1>&#39;Type of action, one of &#34;Tap&#34;, &#34;RightClick&#34;, &#34;Hover&#34; , &#34;Input&#34;, &#34;KeyboardPress&#34;, &#34;Scroll&#34;, &#34;ExpectedFalsyCondition&#34;, &#34;Sleep&#34;, &#34;AndroidBackButton&#34;, &#34;AndroidHomeButton&#34;, &#34;AndroidRecentAppsButton&#34;&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>              <span class=p>},</span>
+</span></span><span class=line><span class=cl>              <span class=nx>param</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=nx>anyOf</span><span class=o>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>                  <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;null&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                  <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;object&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>properties</span><span class=o>:</span> <span class=p>{</span> <span class=nx>value</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;string&#39;</span><span class=p>,</span> <span class=s1>&#39;number&#39;</span><span class=p>]</span> <span class=p>}</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>required</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;value&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>additionalProperties</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                  <span class=p>},</span>
+</span></span><span class=line><span class=cl>                  <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;object&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>properties</span><span class=o>:</span> <span class=p>{</span> <span class=nx>timeMs</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;number&#39;</span><span class=p>,</span> <span class=s1>&#39;string&#39;</span><span class=p>]</span> <span class=p>}</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>required</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;timeMs&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>additionalProperties</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                  <span class=p>},</span>
+</span></span><span class=line><span class=cl>                  <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;object&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>properties</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                      <span class=nx>direction</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                      <span class=nx>scrollType</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                      <span class=nx>distance</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;number&#39;</span><span class=p>,</span> <span class=s1>&#39;string&#39;</span><span class=p>,</span> <span class=s1>&#39;null&#39;</span><span class=p>]</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                    <span class=p>},</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>required</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;direction&#39;</span><span class=p>,</span> <span class=s1>&#39;scrollType&#39;</span><span class=p>,</span> <span class=s1>&#39;distance&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>additionalProperties</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                  <span class=p>},</span>
+</span></span><span class=line><span class=cl>                  <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;object&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>properties</span><span class=o>:</span> <span class=p>{</span> <span class=nx>reason</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span> <span class=p>}</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>required</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;reason&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>additionalProperties</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                  <span class=p>},</span>
+</span></span><span class=line><span class=cl>                  <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;object&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>properties</span><span class=o>:</span> <span class=p>{</span> <span class=nx>button</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span> <span class=p>}</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>required</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;button&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>additionalProperties</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                  <span class=p>},</span>
+</span></span><span class=line><span class=cl>                <span class=p>],</span>
+</span></span><span class=line><span class=cl>                <span class=nx>description</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>                  <span class=s1>&#39;Parameter of the action, can be null ONLY when the type field is Tap or Hover&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>              <span class=p>},</span>
+</span></span><span class=line><span class=cl>              <span class=nx>locate</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=kr>type</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;object&#39;</span><span class=p>,</span> <span class=s1>&#39;null&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>                <span class=nx>properties</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                  <span class=nx>id</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                  <span class=nx>prompt</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                <span class=p>},</span>
+</span></span><span class=line><span class=cl>                <span class=nx>required</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;id&#39;</span><span class=p>,</span> <span class=s1>&#39;prompt&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>                <span class=nx>additionalProperties</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=nx>description</span><span class=o>:</span> <span class=s1>&#39;Location information for the target element&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>              <span class=p>},</span>
+</span></span><span class=line><span class=cl>            <span class=p>},</span>
+</span></span><span class=line><span class=cl>            <span class=nx>required</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;thought&#39;</span><span class=p>,</span> <span class=s1>&#39;type&#39;</span><span class=p>,</span> <span class=s1>&#39;param&#39;</span><span class=p>,</span> <span class=s1>&#39;locate&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>            <span class=nx>additionalProperties</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=p>},</span>
+</span></span><span class=line><span class=cl>          <span class=nx>description</span><span class=o>:</span> <span class=s1>&#39;List of actions to be performed&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nx>more_actions_needed_by_instruction</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>          <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;boolean&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=nx>description</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>            <span class=s1>&#39;If all the actions described in the instruction have been covered by this action and logs, set this field to false.&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nx>log</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>          <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=nx>description</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>            <span class=s1>&#39;Log what these planned actions do. Do not include further actions that have not been planned.&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nx>error</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>          <span class=kr>type</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;string&#39;</span><span class=p>,</span> <span class=s1>&#39;null&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>          <span class=nx>description</span><span class=o>:</span> <span class=s1>&#39;Error messages about unexpected situations&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>      <span class=p>},</span>
+</span></span><span class=line><span class=cl>      <span class=nx>required</span><span class=o>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=s1>&#39;actions&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s1>&#39;more_actions_needed_by_instruction&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s1>&#39;log&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s1>&#39;error&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=p>],</span>
+</span></span><span class=line><span class=cl>      <span class=nx>additionalProperties</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>  <span class=p>},</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><blockquote><p>通过这些多层次的增强和约束机制，确保了AI模型能够准确理解用户意图，同时严格控制AI的行为边界。从提示词的定义来看，项目很注重防止AI产生幻觉或执行超出用户指令范围的操作，这对于UI自动化这种需要高精度操作的场景至关重要。</p></blockquote><h2 id=大模型上下文窗口限制>大模型上下文窗口限制</h2><p>在利用各种AI大模型完成智能任务时，一个非常重要的约束，就是大模型通常是有着<code>上下文窗口大小限制</code>的，超过这个限制的历史信息会被丢弃，以节约大模型的资源，提升性能。</p><p>而对于一个自动化测试任务来说，分解拆分后的运行链路往往较长，通常都会超出LLM的上下文限制。</p><p>所以这里我们再分析一下这个项目对于上下文窗口限制的处理是如何实现的</p><h3 id=1-token数量限制控制>1. Token数量限制控制</h3><p>项目通过<code>OPENAI_MAX_TOKENS</code>环境变量来设置响应的最大token数量</p><p><img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-6.png width=1126 height=454 srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-6_hu_39857d17a17763b5.png 480w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-6_hu_d4381f5b29a9ca89.png 1024w" loading=lazy class=gallery-image data-flex-grow=248 data-flex-basis=595px></p><h3 id=2-图像尺寸限制和自动调整>2. 图像尺寸限制和自动调整</h3><p>项目针对不同模型实施图像尺寸限制，特别是对GPT-4o模型实施严格的尺寸控制。当检测到图像尺寸超过GPT-4o的最大输入限制（2000x768或768x2000像素）时，系统会发出警告 。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=kd>let</span> <span class=nx>warned</span> <span class=o>=</span> <span class=kc>false</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kr>export</span> <span class=kd>function</span> <span class=nx>warnGPT4oSizeLimit</span><span class=p>(</span><span class=nx>size</span>: <span class=kt>Size</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>warned</span><span class=p>)</span> <span class=k>return</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>getModelName</span><span class=p>()</span><span class=o>?</span><span class=p>.</span><span class=nx>toLowerCase</span><span class=p>().</span><span class=nx>includes</span><span class=p>(</span><span class=s1>&#39;gpt-4o&#39;</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>warningMsg</span> <span class=o>=</span> <span class=sb>`GPT-4o has a maximum image input size of 2000x768 or 768x2000, but got </span><span class=si>${</span><span class=nx>size</span><span class=p>.</span><span class=nx>width</span><span class=si>}</span><span class=sb>x</span><span class=si>${</span><span class=nx>size</span><span class=p>.</span><span class=nx>height</span><span class=si>}</span><span class=sb>. Please set your page to a smaller resolution. Otherwise, the result may be inaccurate.`</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>      <span class=nb>Math</span><span class=p>.</span><span class=nx>max</span><span class=p>(</span><span class=nx>size</span><span class=p>.</span><span class=nx>width</span><span class=p>,</span> <span class=nx>size</span><span class=p>.</span><span class=nx>height</span><span class=p>)</span> <span class=o>&gt;</span> <span class=mi>2000</span> <span class=o>||</span>
+</span></span><span class=line><span class=cl>      <span class=nb>Math</span><span class=p>.</span><span class=nx>min</span><span class=p>(</span><span class=nx>size</span><span class=p>.</span><span class=nx>width</span><span class=p>,</span> <span class=nx>size</span><span class=p>.</span><span class=nx>height</span><span class=p>)</span> <span class=o>&gt;</span> <span class=mi>768</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>console</span><span class=p>.</span><span class=nx>warn</span><span class=p>(</span><span class=nx>warningMsg</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=nx>warned</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=nx>size</span><span class=p>.</span><span class=nx>width</span> <span class=o>&gt;</span> <span class=mi>1800</span> <span class=o>||</span> <span class=nx>size</span><span class=p>.</span><span class=nx>height</span> <span class=o>&gt;</span> <span class=mi>1800</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>warn</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>      <span class=sb>`The image size seems too large (</span><span class=si>${</span><span class=nx>size</span><span class=p>.</span><span class=nx>width</span><span class=si>}</span><span class=sb>x</span><span class=si>${</span><span class=nx>size</span><span class=p>.</span><span class=nx>height</span><span class=si>}</span><span class=sb>). It may lead to more token usage, slower response, and inaccurate result.`</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nx>warned</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=3-图像压缩和优化>3. 图像压缩和优化</h3><p>系统通过图像压缩来减少数据传输量(<code>packages/shared/src/img/transform.ts</code>) ，包括：</p><ul><li>设置图像质量为90%来平衡质量和文件大小</li><li>提供图像调整大小功能</li><li>支持base64格式的图像处理和转换</li></ul><h3 id=4-选择合适的模型架构>4. 选择合适的模型架构</h3><p>项目支持两种不同类型的AI模型来优化token使用：</p><p><strong>通用多模态LLM（如GPT-4o）</strong>：需要同时发送截图和DOM树，导致token消耗较高 。</p><p><strong>视觉定位VL模型（如Qwen-2.5-VL）</strong>：支持视觉定位功能，不需要发送DOM树，可以节省30%到50%的token数量。</p><p>参见 <code>apps/site/docs/zh/choose-a-model.mdx</code> 文档中的说明</p><p><img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-7.png width=1817 height=548 srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-7_hu_e6f13b553c1f4e4d.png 480w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-7_hu_319f3ac552d20a26.png 1024w" loading=lazy class=gallery-image data-flex-grow=331 data-flex-basis=795px></p><h3 id=5-token使用情况监控>5. Token使用情况监控</h3><p>项目还提供了详细的token使用情况跟踪和调试功能，记录prompt tokens、completion tokens和总token数量 。</p><p>总结来说，该项目的上下文窗口限制处理策略主要集中在三个方面：</p><ul><li><strong>控制输入数据量</strong>（通过图像压缩和尺寸限制）</li><li><strong>选择合适的模型架构</strong>（VL模型vs通用LLM）</li><li><strong>监控和优化token使用</strong></li></ul><p>这种多层次的处理方式有效地减少了对大型上下文窗口的需求，同时也保持了功能的完整性。</p><h2 id=长链路任务的记忆管理>长链路任务的记忆管理</h2><p>对于大模型来说，已完成步骤和历史任务的记忆对于保证结果的准确，避免无谓重复和节约成本意义重大，像我们之前文章介绍的如 <code>Browser-Use</code>这样的工具，会引入 <code>mem0</code> 这样的记忆框架来实现 AI 的记忆能力，那么Midscene在这方面是如何处理的呢？</p><p>基于对 Midscene 代码的分析，长链路任务的记忆管理主要通过以下几个核心机制实现：</p><h3 id=任务缓存机制>任务缓存机制</h3><p>Midscene 实现了一个智能的任务缓存系统来管理 AI 操作的记忆。该系统缓存规划结果和元素定位信息，避免重复的 AI 调用，从而减少内存消耗和提高执行效率。</p><p><code>packages/web-integration/src/common/task-cache.ts</code></p><p>缓存系统支持两种类型的缓存：</p><ul><li><strong>规划缓存 (PlanningCache)</strong> 用于存储 AI 规划的 YAML 工作流</li><li><strong>定位缓存 (LocateCache)</strong> 用于存储元素的 XPath 信息。</li></ul><h3 id=对话历史管理>对话历史管理</h3><p>为了防止长链路任务中对话历史无限增长导致内存溢出，Midscene 实现了智能的对话历史管理策略。系统限制用户图像消息最多保留 4 条，采用先进先出 (FIFO) 策略自动清理旧的对话记录。</p><p><code>packages/web-integration/src/common/tasks.ts</code></p><h3 id=重规划限制机制>重规划限制机制</h3><p>为了防止 AI 在长链路任务中陷入无限重规划的死循环，系统设置了重规划次数限制。当重规划次数超过限制时，任务会主动终止并返回错误信息。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=k>while</span> <span class=p>(</span><span class=nx>planningTask</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=p>(</span><span class=nx>replanCount</span> <span class=o>&gt;</span> <span class=nx>replanningCountLimit</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kr>const</span> <span class=nx>errorMsg</span> <span class=o>=</span>
+</span></span><span class=line><span class=cl>          <span class=s1>&#39;Replanning too many times, please split the task into multiple steps&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=k>this</span><span class=p>.</span><span class=nx>appendErrorPlan</span><span class=p>(</span><span class=nx>taskExecutor</span><span class=p>,</span> <span class=nx>errorMsg</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=资源清理机制>资源清理机制</h3><p>Midscene 使用 FreeFn 模式确保长链路任务完成后能够正确清理所有资源，包括网络连接、临时文件、定时器等。即使在异常情况下，资源清理机制也能保证系统资源得到释放。</p><p><code>packages/web-integration/src/yaml/player.ts</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=nx>freeFn</span> <span class=o>=</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=p>...(</span><span class=nx>newFreeFn</span> <span class=o>||</span> <span class=p>[]),</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>          <span class=nx>name</span><span class=o>:</span> <span class=s1>&#39;restore-agent-onTaskStartTip&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=nx>fn</span><span class=o>:</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=p>(</span><span class=nx>agent</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>              <span class=nx>agent</span><span class=p>.</span><span class=nx>onTaskStartTip</span> <span class=o>=</span> <span class=nx>originalOnTaskStartTip</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>          <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>      <span class=p>];</span>
+</span></span><span class=line><span class=cl>  <span class=p>....</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// free the resources
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>for</span> <span class=p>(</span><span class=kr>const</span> <span class=nx>fn</span> <span class=k>of</span> <span class=nx>freeFn</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>try</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// console.log(&#39;freeing&#39;, fn.name);
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>await</span> <span class=nx>fn</span><span class=p>.</span><span class=nx>fn</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// console.log(&#39;freed&#39;, fn.name);
+</span></span></span><span class=line><span class=cl><span class=c1></span>      <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>e</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// console.error(&#39;error freeing&#39;, fn.name, e);
+</span></span></span><span class=line><span class=cl><span class=c1></span>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=上下文优化>上下文优化</h3><p>为了减少内存占用，Midscene 还实现了多项上下文优化策略：</p><ul><li><strong>可见元素过滤</strong>：只提取页面中可见的元素，减少 DOM 树的大小</li><li><strong>图像压缩</strong>：对截图进行智能压缩，减少内存和传输开销</li><li><strong>视口裁剪</strong>：根据视口范围裁剪上下文数据</li></ul><blockquote><p>可以看到，虽然Mdscene没有引入专门的记忆框架来处理历史记忆，但还是建立了记忆管理机制来协同处理，使 Midscene 能够在处理复杂的长链路任务时保持高效的内存使用，通过对话历史管理控制记忆增长，重规划限制防止无限循环，通过资源清理确保系统稳定性，最终实现了一个可靠的长链路任务执行系统。</p></blockquote><hr><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>graph TD
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    A[用户] --&gt;|提供自然语言描述/JS SDK/YAML脚本| B(Midscene Core)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    B --&gt;|调用| C{AI 模型}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    C --&gt;|返回动作/信息| B
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    B --&gt;|控制| D[自动化代理]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    D --&gt;|操作| E[目标应用程序/UI]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    E --&gt;|返回UI状态/截图| D
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    D --&gt;|发送| B
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    B --&gt;|生成| F[可视化报告]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    B --&gt;|提供| G[Playground&lt;调试&gt; ]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    B --&gt;|利用| H[缓存机制]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    subgraph 目标平台
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        E -- Web --&gt; E1[浏览器&lt;Playwright/Puppeteer&gt;]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        E -- Android --&gt; E2[Android 应用]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    end
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    subgraph AI 模型类型
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        C -- 多模态 LLM --&gt; C1[GPT-4o, Gemini-2.5-Pro]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        C -- 视觉语言模型 --&gt; C2[Qwen2.5-VL, Doubao-1.5-thinking-vision-pro, UI-TARS]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    end
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    subgraph 辅助工具
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        F --&gt; F1[报告文件]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        G --&gt; G1[内置调试环境]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        H --&gt; H1[提高效率/重放]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    end
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    I[MCP 客户端] --&gt;|直接使用能力| B
+</span></span></code></pre></td></tr></table></div></div></section><footer class=article-footer><section class=article-tags><a href=/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95/>自动化测试</a>
+<a href=/tags/ai/>AI</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/post/072-%E5%BE%AE%E8%BD%AF%E5%B7%B2%E5%8F%91%E5%B8%83playwright-mcp/><div class=article-image><img src=/post/072-%E5%BE%AE%E8%BD%AF%E5%B7%B2%E5%8F%91%E5%B8%83playwright-mcp/Pasted-20250402.edb9525a16cda48c1d70d1a55f9e35ca_hu_e06fb7fef1ae29f3.png width=250 height=150 loading=lazy alt="Featured image of post 微软已发布Playwright Mcp" data-hash="md5-7blSWhbNpIwdcNGlX541yg=="></div><div class=article-details><h2 class=article-title>微软已发布Playwright Mcp</h2></div></a></article><article class=has-image><a href=/post/118-pom_replacement/><div class=article-image><img src=/post/118-pom_replacement/Pasted-20250806.f76c8d5a1901a96f974bf59653a68a57_hu_14ccbf1f5b41b9c6.png width=250 height=150 loading=lazy alt="Featured image of post UI自动化，POM之外的另一模式" data-hash="md5-92yNWhkBqW+XS/WWU6aKVw=="></div><div class=article-details><h2 class=article-title>UI自动化，POM之外的另一模式</h2></div></a></article><article class=has-image><a href=/post/115-zread_ai/><div class=article-image><img src=/post/115-zread_ai/title.74442ea6ca67a0e29249b91d8665d84d_hu_ab07491885917994.png width=250 height=150 loading=lazy alt="Featured image of post  快速理清开源项目源码的神器，这款AI工具不可不知！" data-hash="md5-dEQupspnoOKSSbkdhmXYTQ=="></div><div class=article-details><h2 class=article-title>快速理清开源项目源码的神器，这款AI工具不可不知！</h2></div></a></article><article><a href=/post/112-context_engineering/><div class=article-details><h2 class=article-title>用好AI的新风向，从提示词工程到上下文工程</h2></div></a></article><article class=has-image><a href=/post/107-%E5%92%8Cai%E6%B2%9F%E9%80%9A/><div class=article-image><img src=/post/107-%E5%92%8Cai%E6%B2%9F%E9%80%9A/logo.61c81761a49f45562fa6b272f1aedb48_hu_f594e2b35d9f9f70.png width=250 height=150 loading=lazy alt="Featured image of post 和AI的协作，重点依然是沟通，细说如何与AI更有效沟通" data-hash="md5-YcgXYaSfRVYvprJy8a7bSA=="></div><div class=article-details><h2 class=article-title>和AI的协作，重点依然是沟通，细说如何与AI更有效沟通</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2023 -
+2025 |by 城下秋草（公众号： 秋草说测试）</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

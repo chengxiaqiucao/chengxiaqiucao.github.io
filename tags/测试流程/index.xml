@@ -1,0 +1,1353 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>测试流程 on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B/</link><description>Recent content in 测试流程 on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Sat, 05 Jul 2025 23:57:54 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B/index.xml" rel="self" type="application/rss+xml"/><item><title>测试是否应该给开发自测提供用例？</title><link>https://chengxiaqiucao.github.io/post/109-dev_test_cases/</link><pubDate>Sat, 05 Jul 2025 23:57:54 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/109-dev_test_cases/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/109-dev_test_cases/dev-tester.png" alt="Featured image of post 测试是否应该给开发自测提供用例？" />&lt;h2 id="背景">背景
+&lt;/h2>&lt;blockquote>
+&lt;p>收到不少小伙伴的咨询，作为一个测试，是否应该在开发人员自测时提供测试用例或者测试数据？&lt;/p>&lt;/blockquote>
+&lt;p>这是实际工作中大家经常遇到的实际困扰，特别是现在很多团队强调&lt;strong>测试左移&lt;/strong>，要求测试提供用例、准备测试数据很常见。但同时一些团队依然在将缺陷作为KPI考核指标，而因此还引发诸多后遗症：&lt;/p>
+&lt;ol>
+&lt;li>开发阶段利用测试提供的用例发现了问题，势必影响测试阶段发现问题的产出&lt;/li>
+&lt;li>测试提供用例，后续出现问题，算开发遗漏还是测试遗漏？&lt;/li>
+&lt;li>测试将用例提供给了开发，在测试阶段还有没有必要再跑一遍相同的用例？&lt;/li>
+&lt;li>测试人员的价值何在？就是尽可能充分地去编写用例吗？&lt;/li>
+&lt;/ol>
+&lt;h2 id="测试的职责和用例的作用">测试的职责和用例的作用
+&lt;/h2>&lt;p>之前的文章【】我们详细讨论过测试的真正目的。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/109-dev_test_cases/Pasted-20250707.png"
+width="1425"
+height="672"
+srcset="https://chengxiaqiucao.github.io/post/109-dev_test_cases/Pasted-20250707_hu_e1475a5965955721.png 480w, https://chengxiaqiucao.github.io/post/109-dev_test_cases/Pasted-20250707_hu_ed1c7ade15b29217.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="212"
+data-flex-basis="508px"
+>&lt;/p>
+&lt;p>所以我们应该明确：测试的职责其实不是为了去发现bug，是为了去反映出产品&lt;strong>质量状态&lt;/strong>。&lt;/p>
+&lt;p>而在测试工作中，测试用例的主要作用，其实是帮助我们在进行测试前梳理、归纳好各种测试路径，预先根据产品需求整理好需要进行测试的要点，避免实际执行时产生遗漏。&lt;/p>
+&lt;p>以上是我们谈到测试左移时，探讨用例移交的基础。&lt;/p>
+&lt;h2 id="是否应该移交用例给开发">是否应该移交用例给开发？
+&lt;/h2>&lt;p>从团队角度，最终必然是面向产品质量。而根据著名的缺陷和成本的关系曲线，越早发现缺陷，成本越低，交付质量信心就越强。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/109-dev_test_cases/testing_cost.png"
+width="1081"
+height="562"
+srcset="https://chengxiaqiucao.github.io/post/109-dev_test_cases/testing_cost_hu_8e20015363ba90d5.png 480w, https://chengxiaqiucao.github.io/post/109-dev_test_cases/testing_cost_hu_fc865517651ecb86.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="192"
+data-flex-basis="461px"
+>
+所以从这个角度，测试左移，包括向开发提供测试用例，都是符合质量目标的。&lt;/p>
+&lt;p>但实际操作中，团队的KPI考核导向，会影响实际执行效果。&lt;/p>
+&lt;p>也就是如果像很多团队以Bug数量作为KPI，那么必然导致移交用例的效果大打折扣。&lt;/p>
+&lt;p>这个KPI，其实人为割裂了开发团队和测试团队的产出：开发需要尽可能少地产生Bug，测试却要尽可能多地发现Bug。&lt;/p>
+&lt;p>而测试用例、测试数据其实反映的是测试发现Bug的测试思维。将用例移交开发，会帮助开发减少Bug，但却会影响自己发现Bug的产出。&lt;/p>
+&lt;p>所以在这种导向下，测试即便提供用例，也很难保证用例的覆盖。只会流于形式。&lt;/p>
+&lt;p>所以从产品质量来看，作为测试角色，&lt;strong>开发阶段提供测试用例，协助开发团队完成充分自测是岗位的义务，但要想真的落实产生效果，前提是必须取消这种按Bug数量进行考核的度量模式&lt;/strong>。&lt;/p>
+&lt;h2 id="用例未覆盖的遗漏如何界定">用例未覆盖的遗漏如何界定？
+&lt;/h2>&lt;p>首先，必须认清一个事实：测试是不可能做到100%全覆盖的。在项目早期阶段，仅依靠需求和尚未完全完成的开发版本编写的测试用例，能覆盖到的测试场景就更为有限。&lt;/p>
+&lt;p>实际工作中，即便在系统测试中，按测试用例执行发现的Bug和实际测试中探索发现的Bug相比，占比也极为有限。这也是 &lt;code>探索式测试&lt;/code> 推行的出发点。&lt;/p>
+&lt;p>也就是说，开发阶段，按照用例测试后，后续系统测试阶段继续发现未覆盖的问题，是一个100%的确定事件。&lt;/p>
+&lt;p>那么如何保证这个阶段用例的覆盖充分呢?&lt;/p>
+&lt;p>首先，还是要强调，质量是团队目标。不用纠结与界定是开发遗漏还是测试遗漏，共同目标都是减少遗漏。&lt;/p>
+&lt;p>其次，测试用例应该看作是思维工具的产出，是测试思路的体现。测试提供的用例本身并不一定是全部，开发也一样应该考虑覆盖场景。&lt;/p>
+&lt;p>用例的需求覆盖率和代码覆盖率是比较适合的量化指标，用来衡量这个阶段的用例覆盖情况。&lt;/p>
+&lt;p>开发阶段完成自测的原则，是保证产品的需求被完整实现，不出现严重的阻塞问题，产品的主要逻辑和架构得到验证。&lt;/p>
+&lt;p>达到以上目标就可以认为开发自测阶段顺利完成。而不应纠结于具体的某一个Bug在自测阶段是否覆盖。&lt;/p>
+&lt;h2 id="测试阶段是否还应使用同一套用例测试">测试阶段是否还应使用同一套用例测试？
+&lt;/h2>&lt;p>经过充分自测的产品，已经执行过的测试用例，提交测试后&lt;strong>原则上其实无需再次重新测试&lt;/strong>。也就是默认已验证过的场景，不会产生问题。&lt;/p>
+&lt;p>但实际工作中，开发的自测是否充分？用例执行是否严格？包括用例本身的覆盖是否有模糊地带？ 这些其实都是未知数。&lt;/p>
+&lt;p>而测试的工作职责，是需要在产品发布前，准备评估产品的质量状态。很难说经过开发自测的部分，就无需再次进行评估。&lt;/p>
+&lt;p>所以，即便是用例本身没有发生变化，同一套用例也依然是需要进行复验的。当然，这里非常适合通过自动化测试来覆盖已有用例，而让测试人员的精力更多放到探索式测试上。&lt;/p>
+&lt;h2 id="测试人员的价值是否主要是输出用例">测试人员的价值是否主要是输出用例？
+&lt;/h2>&lt;p>其实从上面的描述，我们也知道，测试在测试阶段，更重要的职责是还要完成探索式测试。测试用例本身更多是测试思维的体现，是测试思路的一种表现形式，它只是一个辅助产出。并不是测试的核心。&lt;/p>
+&lt;p>对于测试来说，我之前文章中也多次提及，James Bach有个著名的论文，讨论了测试和检查的区别。按用例执行只是&lt;strong>检查&lt;/strong>，&lt;strong>不能算测试&lt;/strong>。真正的测试，除检查外还包含&lt;strong>试验、研究、探索、设问、观察、推理&lt;/strong>等多方面能力，这些才是帮助我们发现更深层次产品缺陷，暴露产品质量问题的真正能力。&lt;/p>
+&lt;p>所以，测试人员的价值，当然不仅仅是产生用例。而更多是揭示未知，去评估除对团队来说，还是黑盒的产品质量状态。&lt;/p>
+&lt;hr></description></item><item><title>谈谈Bug的生命周期和Bug状态变更原则</title><link>https://chengxiaqiucao.github.io/post/091-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/</link><pubDate>Wed, 07 May 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/091-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/091-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-1.png" alt="Featured image of post 谈谈Bug的生命周期和Bug状态变更原则" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>在软件产品研发中，Bug既是测试工作最为重要的产出，也是开发人员修复问题的直接输入，更是产品质量改进的主要抓手。&lt;/p>
+&lt;p>在前文【】中，我们从测试人员的角度，分析了在提交Bug时应如何帮助团队更高效地去进行质量改进。&lt;/p>
+&lt;p>但除了Bug提交环节，在我们工作中，Bug从发现到被修复，会经历一个完整的生命周期，对应到我们提交的问题单，会呈现不同的状态。而Bug在这些不同状态间的迁移，其实反映了团队围绕Bug的协作沟通过程。实际工作中，因为Bug认定或状态设定上产生的分歧屡见不鲜，特别是在很多将Bug作为重要KPI数据的团队，测试和开发之间因为Bug产生激烈争论，时有发生。比如：&lt;/p>
+&lt;ul>
+&lt;li>开发和测试对Bug认定有分歧，测试觉得是Bug，开发觉得不是问题，怎么处理？&lt;/li>
+&lt;li>Bug归属产生分歧，是前端问题还是后端问题？&lt;/li>
+&lt;li>Bug无法复现，应不应该关闭？&lt;/li>
+&lt;li>&amp;hellip;..等等&lt;/li>
+&lt;/ul>
+&lt;p>本文，我们就来详细梳理一下，Bug的完整生命周期，以及它在不同阶段的状态处理原则。&lt;/p>
+&lt;h2 id="bug的生命周期及不同状态">Bug的生命周期及不同状态
+&lt;/h2>&lt;p>Bug并不是凭空产生，是在测试过程中暴露出来的质量问题，从被发现到完成修复并确认无误，会经历一个过程，这个过程就是Bug的生命周期。在软件研发过程中，针对这个生命周期的管理，通常会由Bug管理系统（常用的比如Jira、禅道、Bugfree、HP QC等）来跟踪和同步每个Bug的状态，并在开发和测试人员之间起到协作桥梁的作用。&lt;/p>
+&lt;p>Bug生命周期的主要过程大致如下：&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/091-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513.png"
+width="4188"
+height="292"
+srcset="https://chengxiaqiucao.github.io/post/091-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513_hu_38512c472d0f2fb4.png 480w, https://chengxiaqiucao.github.io/post/091-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513_hu_d326b60d707e1ab3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="1434"
+data-flex-basis="3442px"
+>&lt;/p>
+&lt;h3 id="已提交open">已提交（Open）
+&lt;/h3>&lt;p>&lt;strong>Open&lt;/strong> 状态，是Bug被发现以后的初始状态。通常由发现Bug的测试人员录入Bug管理系统，形成问题单，此时Bug的状态处于 &lt;strong>Open&lt;/strong> 状态，也表示该Bug待处理。&lt;/p>
+&lt;p>另外，如果有已关闭的历史Bug，后来发现其实并未解决，也可以重新将Bug激活，此时Bug也会处于 &lt;strong>Open&lt;/strong> 状态。&lt;/p>
+&lt;p>在该状态下，提交Bug的测试人员应该指定处理Bug的开发人员进行下一步处理，通常会根据Bug的现象，直接指定到能修复Bug的开发这里。不过一般Bug管理系统，也会设置默认处理人，对于&lt;strong>Open&lt;/strong> 状态的Bug，默认处理人通常会设置为开发负责人，会做进一步更准确的判断以便重新指派。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">状态&lt;/th>
+&lt;th style="text-align: center">说明&lt;/th>
+&lt;th style="text-align: center">当前负责人&lt;/th>
+&lt;th style="text-align: center">移交处理人&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Open&lt;/td>
+&lt;td style="text-align: center">初始状态，待处理&lt;/td>
+&lt;td style="text-align: center">测试人员&lt;/td>
+&lt;td style="text-align: center">开发负责人或Bug归属人&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="处理中in-progress">处理中（In Progress）
+&lt;/h3>&lt;p>开发人员被指派Bug后，会进入Bug的分析阶段，此时Bug不能确定是否能被修复，所以会进入&lt;strong>处理中&lt;/strong>状态，经过分析后，可以对Bug进行修复操作，或发现并不是自己可以完成修复的问题，再将bug重新指派给实际应该修复bug的开发人员。&lt;/p>
+&lt;p>这里如果存在Bug在开发人员间的移交，Bug状态会保持在 &lt;strong>In Progress&lt;/strong>, 仅仅当前处理人会发生变化。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">状态&lt;/th>
+&lt;th style="text-align: center">说明&lt;/th>
+&lt;th style="text-align: center">当前负责人&lt;/th>
+&lt;th style="text-align: center">移交处理人&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">In Progress&lt;/td>
+&lt;td style="text-align: center">Bug进入分析，通常针对较复杂Bug&lt;/td>
+&lt;td style="text-align: center">被指派开发人员&lt;/td>
+&lt;td style="text-align: center">实际Bug修复人&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="已解决resolved">已解决（Resolved）
+&lt;/h3>&lt;p>Bug在经过开发人员的修复后，会标记为&lt;strong>已解决&lt;/strong>。该状态其实代表测试人员可以对Bug进行验证。&lt;/p>
+&lt;p>这里需要注意，很多开发人员会有的一个误区，就是我把代码进行修改或者做过自测，就是&lt;strong>Resolved&lt;/strong>。其实并不是，&lt;strong>Resolved&lt;/strong> 状态的重点是被移交的处理人，也就是&lt;strong>测试人员是可以进行验证&lt;/strong>的。&lt;/p>
+&lt;p>因为实际工作中，测试人员对产品进行测试，会有测试轮次的概念，并不是随时都可以测试。
+所以只有当&lt;strong>修复的代码已经进入下一轮的提交测试&lt;/strong>，才应该将状态置为 &lt;strong>Resolved&lt;/strong>。否则当前测试环境中，被修复的代码尚未部署，当然实际并无法完成验证。&lt;/p>
+&lt;p>（&lt;em>当然更完善的Bug管理系统，会再增加一个&lt;strong>待验证&lt;/strong>的状态，这时已解决就只代表开发完成了代码的修复，而待验证才是重新提测。本文重在说明常用必要状态，不再过多扩展&lt;/em>）&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">状态&lt;/th>
+&lt;th style="text-align: center">说明&lt;/th>
+&lt;th style="text-align: center">当前负责人&lt;/th>
+&lt;th style="text-align: center">移交处理人&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Resolved&lt;/td>
+&lt;td style="text-align: center">Bug已经完成修复，标记为已解决，即待验证&lt;/td>
+&lt;td style="text-align: center">Bug修复人&lt;/td>
+&lt;td style="text-align: center">测试人员&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="已关闭closed">已关闭（Closed）
+&lt;/h3>&lt;p>经过验证，确认Bug已被修复后，Bug可以置为 &lt;strong>已关闭&lt;/strong> 状态。该状态代表Bug所反映的质量问题在当前产品版本中已不复存在。&lt;/p>
+&lt;p>关闭Bug应该是一个很严肃的事情，通常应该由Bug的提交人进行确认后才可关闭。当然特殊情况下，产品的决策团队（CCB）也可决定Bug是否可以进行关闭。&lt;/p>
+&lt;p>另外，关闭的Bug需要重新激活的情况也时有发生，比如验证时场景考虑不够完整，环境问题导致误关或者是提测版本切换后，已修复的Bug又被重新改错，或是错误代码又被重新合入等等，这时就会牵涉Bug重开（ReOpen）操作&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">状态&lt;/th>
+&lt;th style="text-align: center">说明&lt;/th>
+&lt;th style="text-align: center">当前负责人&lt;/th>
+&lt;th style="text-align: center">移交处理人&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Closed&lt;/td>
+&lt;td style="text-align: center">Bug已确认修复，版本中已不存在Bug对应的质量问题&lt;/td>
+&lt;td style="text-align: center">Bug提交人&lt;/td>
+&lt;td style="text-align: center">无&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;hr>
+&lt;p>除了上面几个最主要的Bug生命周期状态外，实际工作中，还会存在一些特殊情况，也会对应到不同的Bug状态&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/091-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-1.png"
+width="4188"
+height="1420"
+srcset="https://chengxiaqiucao.github.io/post/091-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-1_hu_d98df15e1989db10.png 480w, https://chengxiaqiucao.github.io/post/091-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-1_hu_ce46dd07ac9eed71.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="294"
+data-flex-basis="707px"
+>&lt;/p>
+&lt;h3 id="已拒绝rejected">已拒绝（Rejected）
+&lt;/h3>&lt;p>测试过程中，测试人员出现误判，或者环境配置有误时，还是比较容易出现测试提交的Bug实际并不是质量问题的情况，开发人员在经过分析后，认为不是bug，此时就可以将Bug置为 &lt;strong>已拒绝&lt;/strong> 状态。这时Bug会回到测试人员手中，进行确认，若认可误报，可由提交人进行关闭操作。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">状态&lt;/th>
+&lt;th style="text-align: center">说明&lt;/th>
+&lt;th style="text-align: center">当前负责人&lt;/th>
+&lt;th style="text-align: center">移交处理人&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Rejected&lt;/td>
+&lt;td style="text-align: center">经分析Bug属于误报，不反映质量问题&lt;/td>
+&lt;td style="text-align: center">Bug分析人&lt;/td>
+&lt;td style="text-align: center">Bug提交者&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>但实际中，针对被拒绝Bug，很多时候是测试和开发人员对需求或是否质量问题的分歧导致，在分歧无法自行弥合的情况下，正常的操作应该是：
+测试人员重新提交Bug，但Bug不在指派到开发人员，而是指派到产品决策团队CCB（其实主要是BA或PO），由CCB进行仲裁，根据仲裁结果来判断是否需要进行修复或关闭。&lt;/p>
+&lt;h3 id="已验证verified">已验证（Verified）
+&lt;/h3>&lt;p>测试人员验证Bug无误后，通常可以进行关闭操作将状态置为&lt;strong>Closed&lt;/strong>，但更完整的生命周期，其实还又一个&lt;strong>已验证&lt;/strong>的状态。这个状态的使用，通常出现在验证Bug的测试人员和提交Bug的提交人并不一致，验证人对Bug实施验证后，不能代表提交人，确认Bug可关闭。&lt;/p>
+&lt;p>另外一种情况，就是更严谨的大型软件研发流程，测试环节可能也包括多个。子系统级别的测试团队测试完成后，还会有大系统级别的系统测试或全面验收，在子系统级别的测试进入后续测试后才会将状态置为&lt;strong>Closed&lt;/strong>&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">状态&lt;/th>
+&lt;th style="text-align: center">说明&lt;/th>
+&lt;th style="text-align: center">当前负责人&lt;/th>
+&lt;th style="text-align: center">移交处理人&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Verified&lt;/td>
+&lt;td style="text-align: center">Bug经过验证已被修复&lt;/td>
+&lt;td style="text-align: center">Bug验证人&lt;/td>
+&lt;td style="text-align: center">Bug提交者&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="待补充信息need-more-info">待补充信息（Need More Info）
+&lt;/h3>&lt;p>这个状态是针对测试人员提交的Bug信息不完整或不足以对Bug完成分析，开发人员难以理解具体的Bug现象等情况。这时处理人将问题单置为 &lt;strong>Need More Info&lt;/strong> 状态，返回给Bug提交人补充相关信息。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">状态&lt;/th>
+&lt;th style="text-align: center">说明&lt;/th>
+&lt;th style="text-align: center">当前负责人&lt;/th>
+&lt;th style="text-align: center">移交处理人&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Need More Info&lt;/td>
+&lt;td style="text-align: center">Bug单信息不充分，需要补充更详细的信息&lt;/td>
+&lt;td style="text-align: center">Bug分析人&lt;/td>
+&lt;td style="text-align: center">Bug提交者&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="已延期deferred">已延期（Deferred）
+&lt;/h3>&lt;p>延期一般针对下面几种情况：&lt;/p>
+&lt;ol>
+&lt;li>Bug难以复现，较难分析出产生原因&lt;/li>
+&lt;li>Bug修改难度大，需要对产品进行较大改动，且存在规避方案&lt;/li>
+&lt;li>Bug优先级较低，不影响主要功能，在版本发布前还有其他更重要问题需要解决&lt;/li>
+&lt;/ol>
+&lt;p>针对以上情况，经过产品CCB团队决策，可以将Bug延期处理。同时Bug的负责分析人，还是需要继续针对Bug做分析或后续进行修复。&lt;/p>
+&lt;p>但这里需要注意，&lt;strong>Deferred&lt;/strong> 状态不代表Bug不是问题，在测试团队的质量分析时，还是应该将该状态的Bug视作有效Bug看待。也就是这类Bug还是会影响到版本最终的质量评估结论。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">状态&lt;/th>
+&lt;th style="text-align: center">说明&lt;/th>
+&lt;th style="text-align: center">当前负责人&lt;/th>
+&lt;th style="text-align: center">移交处理人&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Deferred&lt;/td>
+&lt;td style="text-align: center">Bug因特定原因无法在当前版本解决，经项目CCB团队决策认可后，可将Bug保留在版本中，留待后续解决&lt;/td>
+&lt;td style="text-align: center">CCB决策团队&lt;/td>
+&lt;td style="text-align: center">Bug分析人&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;hr>
+&lt;p>以上就是我们针对Bug生命周期中会出现的主要的一些状态定义及相关处理原则的介绍。除了上面列出的这些Bug状态外，更完整的Bug生命周期还包括有：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>待验证：&lt;/strong> 已修复，等待版本提测&lt;/li>
+&lt;li>&lt;strong>调研中：&lt;/strong> 针对比较复杂的Bug，牵涉技术选型、方案对照等较多研究工作时，可在处理Bug前定义该状态&lt;/li>
+&lt;li>&lt;strong>已调研：&lt;/strong> 针对上面进行了方案研究的Bug，但尚未确定修复方案时，Bug处于该状态&lt;/li>
+&lt;li>&lt;strong>验证中：&lt;/strong> 对于测试场景比较复杂的Bug，需要进行较长时间的验证，比如性能类的问题，在完成验证前，可将Bug置于该状态&lt;/li>
+&lt;/ul>
+&lt;p>当然，流程是死的，良好、高效的团队协作最重要的还是团队中不同角色的互信互助。&lt;/p>
+&lt;p>不过我们理解正确流程中的不同环节和正确处理的原则，也有助于我们在出现问题或分歧时，减少互相争论、扯皮的内耗。&lt;/p>
+&lt;h2 id="bug状态迁移">Bug状态迁移
+&lt;/h2>&lt;p>基于上述不同状态的分析，一个比较完整Bug状态迁移图如下，供参考。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/091-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-2.png"
+width="4484"
+height="2292"
+srcset="https://chengxiaqiucao.github.io/post/091-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-2_hu_466b814562f95d6a.png 480w, https://chengxiaqiucao.github.io/post/091-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-2_hu_38648a12e36d7200.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="195"
+data-flex-basis="469px"
+>&lt;/p>
+&lt;p>如需以上完整大图，可回复 &lt;code>Bug状态&lt;/code> 获取。&lt;/p>
+&lt;p>另回复&lt;code>大纲&lt;/code> 可查看秋草测试技能全栈提升课详细目录。回复 &lt;code>进群&lt;/code>可进入测试交流群和小伙伴们分享测试技术、交换资讯。&lt;/p></description></item><item><title>如何快速完成测试</title><link>https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/</link><pubDate>Wed, 12 Feb 2025 15:31:20 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212.png" alt="Featured image of post 如何快速完成测试" />&lt;blockquote>
+&lt;p>有同学提问，团队中没有专职的测试人员，要怎么才能快速完成测试？&lt;/p>&lt;/blockquote>
+&lt;p>先说结论，这里并没有标准答案！&lt;/p>
+&lt;p>没有测试岗位只是没有专门负责这个职能的人员，但测试这个事并没有消失&lt;/p>
+&lt;p>快速完成测试，其实应该换种说法，就是快速建立质量信心。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212.png"
+width="512"
+height="512"
+srcset="https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212_hu_abba87d4733d6d62.png 480w, https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212_hu_f4e60964569403a6.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="100"
+data-flex-basis="240px"
+>&lt;/p>
+&lt;p>因为测试无穷尽，所以没有绝对的完成测试，按历史经验或大家达成基本共识，产品应该没啥问题了，就算完成测试。&lt;/p>
+&lt;p>那既然我们现在希望做的就是快速建立这个质量信心，或者说能快速跟相关干系人达成质量OK的共识，基于这个思路，要考虑哪些因素呢？&lt;/p>
+&lt;h3 id="待测范围">待测范围
+&lt;/h3>&lt;p>要快速做完测试，一个途径就是测试范围少，比如改动很小，而且没啥关联影响模块，快速检验一下就可以了。道理跟开发代码及时提交、高频集成是一样的，不要积累变更，节省出问题后倒查一堆变更的时间。&lt;/p>
+&lt;p>开发阶段充分自测，并及时集成测试，不要积累变更。&lt;/p>
+&lt;h3 id="已有质量">已有质量
+&lt;/h3>&lt;p>另一个方面是是否对产品现有质量有信心，开发是增量的，之前的存量是否质量是过关的？新增部分和存量部分的关联、影响是否都是已知的？产品质量是全量的，历史功能或影响同样对影响当前的质量信心，所以是否清晰新增和存量的关系，存量本身的质量是否过关也是关键。&lt;/p>
+&lt;h3 id="潜在问题">潜在问题
+&lt;/h3>&lt;p>再有就是，测试是黑盒的，并不能清晰知道冰山之下有多大的危险。但质量信心这个东西其实跟潜在问题并没有直接关系，它主要跟已知问题和已测范围相关，也就是已知问题越少、已测范围越大则信心越足。背后的逻辑就是，已知问题越多，往往意味着潜在问题越多，发现一只蟑螂，可能代表有一窝蟑螂。所以还是强调提测质量！自测没充分，就先别集成测试了，每个开发先把自己的一亩三分地扫干净先。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212-1.png"
+width="512"
+height="512"
+srcset="https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212-1_hu_83c4de157a81ff7b.png 480w, https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212-1_hu_e9aae0c38c7e98e3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="100"
+data-flex-basis="240px"
+>&lt;/p>
+&lt;h3 id="问题暴露风险">问题暴露风险
+&lt;/h3>&lt;p>最后，还有一道防火墙，就是出问题的风险。问题暴露，炸了！ 但炸的影响其实不同，是冒个火星就灭了，还是炸个洞，甚至整栋楼塌了！除了问题本身的大小，不同产品对问题的接受程度其实也不一样，在一个等着拆迁的大楼里放个炮仗，大不了也就是提前拆迁了，容忍度高，信心就足！&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212-2.png"
+width="640"
+height="360"
+srcset="https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212-2_hu_74fa70fcd5d9b2b1.png 480w, https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212-2_hu_99a93e33a749c607.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>&lt;/p>
+&lt;h2 id="总结">总结
+&lt;/h2>&lt;p>综合以上几个方面，快速完成测试，归根到底就是能不能尽快建立交付的信心，跟个人能力、产品属性、研发流程都有关。其实是个认知问题&lt;/p>
+&lt;p>最后，还是要说，任何事物都无法背离内在规律，一个运行稳定，健壮，耐造的系统，必然是会要经过各种磨合、内外部各种问题锤炼才可能达成的。&lt;/p>
+&lt;p>你以为的快速交付、一战功成，哪有什么岁月静好，不过是有人替你负重前行罢了。只是这个负重的可能是前期的开发人员、也可能是测试人员、或者运维人员，抑或最后，靠用户抗下所有！&lt;/p></description></item><item><title>常用流程图类型及其作用</title><link>https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/</link><pubDate>Tue, 01 Oct 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-2.png" alt="Featured image of post 常用流程图类型及其作用" />&lt;p>在企业管理、软件研发过程中，经常会需要进行各种业务流程梳理，而流程图就是梳理业务时必要的手段，同时也是梳理的产出。但在不同的情况下适用的流程图又不尽相同。
+本文我们就一起来总结一下8 种最常见的流程图类型&lt;/p>
+&lt;h2 id="数据流程图">数据流程图
+&lt;/h2>&lt;p>&lt;strong>数据流程图（Data Flow Diagram）&lt;/strong>
+是一种用于描述系统中数据流动和处理过程的图形。一般主要用于分析和设计信息系统，帮助理解系统的功能以及数据的输入、输出和存储&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-1.png"
+width="990"
+height="569"
+srcset="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-1_hu_5cb904fd685bb885.png 480w, https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-1_hu_c3d8cda25a69f0b9.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="173"
+data-flex-basis="417px"
+>&lt;/p>
+&lt;h2 id="状态迁移图">状态迁移图
+&lt;/h2>&lt;p>&lt;strong>状态迁移图（State Transition Diagram）&lt;/strong>
+通常用在业务对象有较多不同的状态，为了梳理不同状态之间的迁移关系和触发条件。
+比如订单的状态迁移：&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001.png"
+width="1142"
+height="831"
+srcset="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001_hu_c361534838e8b98d.png 480w, https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001_hu_b0c143082ed2f491.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="137"
+data-flex-basis="329px"
+>&lt;/p>
+&lt;h2 id="过程流程图">过程流程图
+&lt;/h2>&lt;p>&lt;strong>过程流程图（Process Flow Diagram）&lt;/strong>
+也就是我们通常所说的一般流程图。是用于描述和分析业务流程、工作流程或系统操作的图形。它通过图形符号和连接线展示流程的各个步骤及其顺序，帮助理解和优化过程&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-2.png"
+width="1290"
+height="578"
+srcset="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-2_hu_65d72f228388809d.png 480w, https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-2_hu_6fc1bf15363ad852.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="223"
+data-flex-basis="535px"
+>&lt;/p>
+&lt;h2 id="泳道流程图">泳道流程图
+&lt;/h2>&lt;p>&lt;strong>泳道图（Swimlane Diagram）&lt;/strong>
+是一种用于描述和分析跨部门或跨职能流程的图形。通过将不同的&amp;quot;泳道&amp;quot;分配给参与者或部门，通过泳道流程图清晰地展示了各方在整个流程中的角色与责任&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-3.png"
+width="1375"
+height="1037"
+srcset="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-3_hu_4face3a99273af72.png 480w, https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-3_hu_b8768850aa430bab.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="132"
+data-flex-basis="318px"
+>&lt;/p>
+&lt;h2 id="工作流图">工作流图
+&lt;/h2>&lt;p>&lt;strong>工作流图（Workflow Diagram）&lt;/strong>
+是一种用于描述工作流程和业务过程的图形，通常用于显示任务的顺序、参与者的角色以及任务之间的逻辑关系。它帮助团队理解和优化工作流程，确保任务的高效执行&lt;/p>
+&lt;p>比如代码版本控制管理中的 &lt;strong>gitflow&lt;/strong> 就是一种典型的工作流图&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-4.png"
+width="1150"
+height="1524"
+srcset="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-4_hu_dbad816bf21d59d0.png 480w, https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-4_hu_83481c12c78339b8.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="181px"
+>&lt;/p>
+&lt;h2 id="时序流程图">时序流程图
+&lt;/h2>&lt;p>&lt;strong>时序图（Sequence Diagram）&lt;/strong>
+是一种用于描述对象之间交互的图形，特别强调时间顺序。它通常用于建模系统中对象或组件之间的动态行为，特别是在软件工程和系统设计中。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-5.png"
+width="1192"
+height="978"
+srcset="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-5_hu_adc75acac48662e7.png 480w, https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-5_hu_f530512328b7ef20.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="121"
+data-flex-basis="292px"
+>&lt;/p>
+&lt;h2 id="系统架构图">系统架构图
+&lt;/h2>&lt;p>&lt;strong>系统架构图（System Architecture Diagram）&lt;/strong>
+是一种用于描述系统各个组件之间关系和交互的图形。它提供了系统的整体视图，帮助开发团队、项目经理和利益相关者理解系统的结构和设计&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-6.png"
+width="1135"
+height="877"
+srcset="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-6_hu_6d0922df4b6a1d24.png 480w, https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-6_hu_e0ddf14368785c6f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="129"
+data-flex-basis="310px"
+>&lt;/p>
+&lt;h2 id="组织结构图">组织结构图
+&lt;/h2>&lt;p>&lt;strong>组织结构图（Organizational Chart）&lt;/strong>
+是一种用于展示组织内部各个部门、职位及其相互关系的图形。它帮助员工、管理层和利益相关者理解组织的层级结构和工作关系&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-7.png"
+width="1584"
+height="860"
+srcset="https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-7_hu_4cf85ce3f0292ce2.png 480w, https://chengxiaqiucao.github.io/post/030-%E5%B8%B8%E8%A7%81%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%B1%BB%E5%9E%8B%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8/Pasted-20241001-7_hu_70a2228dde93a6f1.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="184"
+data-flex-basis="442px"
+>&lt;/p></description></item><item><title>软件分支策略和集成模式梳理</title><link>https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/</link><pubDate>Fri, 27 Sep 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/branch.png" alt="Featured image of post 软件分支策略和集成模式梳理" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>软件代码是任何一个软件研发团队的核心资产。而软件的分支管理就是团队中多人合作时，如何协调处理不同人员的代码同步、集成并解决冲突的主要方式。&lt;/p>
+&lt;p>本文根据软件大牛Martin Flower的分支模型阅读笔记整理&lt;/p>
+&lt;h2 id="基础模式">基础模式
+&lt;/h2>&lt;h3 id="源分支">源分支
+&lt;/h3>&lt;p>所有修改都记录到同一分支&lt;/p>
+&lt;p>分支的定义：
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927.png"
+width="701"
+height="259"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927_hu_d4d3068e3f2598bc.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927_hu_a8449443230e7ad4.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="270"
+data-flex-basis="649px"
+>
+创建分支：
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-1.png"
+width="916"
+height="590"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-1_hu_6098059e69a69708.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-1_hu_76295e80e62f86e2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="155"
+data-flex-basis="372px"
+>&lt;/p>
+&lt;p>不同的两个开发者基于主分支拉去各自的开发分支：
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-2.png"
+width="872"
+height="439"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-2_hu_f52032f3cbeccd64.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-2_hu_a4a8cfd6c8cb1d23.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="198"
+data-flex-basis="476px"
+>&lt;/p>
+&lt;p>Jonny LeRoy 指出我们绘制分支线时，其实忽略了随着时间，导致的复杂度提升
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-3.png"
+width="883"
+height="521"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-3_hu_3f48b100679b4356.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-3_hu_b114d269317d2d1.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="169"
+data-flex-basis="406px"
+>&lt;/p>
+&lt;h4 id="主干的定义">主干的定义：
+&lt;/h4>&lt;p>&lt;strong>Master、Trunk&lt;/strong>&lt;/p>
+&lt;p>是反映产品当前实际状态的唯一公用分支&lt;/p>
+&lt;p>可以随时获得当前产品版本状态，并基于此进行开发&lt;/p>
+&lt;h4 id="健康分支">健康分支：
+&lt;/h4>&lt;p>为每一次提交进行自动化构建、测试，确保没有在当前分支引入故障（可工作的无故障分支）&lt;/p>
+&lt;p>优点：&lt;/p>
+&lt;ol>
+&lt;li>健康的公用分支，可以避免从这个分支上拉取的新分支工作在错误的基础上&lt;/li>
+&lt;li>健康分支更易入直接发布到产品&lt;/li>
+&lt;li>随时保持一个健康分支能极大降低集成的工作量并减少潜在风险。&lt;/li>
+&lt;li>便于进行差异调试。（可以将调试失败的commit去除，仅保留健康的commit）&lt;/li>
+&lt;li>在集成到主干时如果出现问题，就可以非常明确地确认是冲突导致而非代码错误&lt;/li>
+&lt;/ol>
+&lt;p>可能是公用分支、也可以是自己的分支。
+自测代码是健康分支的核心，自测应可以快速得到结果（分钟级）&lt;/p>
+&lt;h2 id="集成模式">集成模式
+&lt;/h2>&lt;h3 id="主线集成">主线集成
+&lt;/h3>&lt;p>开发从主干拉取代码进行开发，集成，并将健康的更改推送回主干
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-4.png"
+width="1086"
+height="253"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-4_hu_13469664a5d85941.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-4_hu_e78cbd5209ceaec2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="429"
+data-flex-basis="1030px"
+>
+从主干拉取分支到本地，并在本地分支上进行开发&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-5.png"
+width="1058"
+height="302"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-5_hu_2e852c5d48edaa74.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-5_hu_95b356c339ee0ff5.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="350"
+data-flex-basis="840px"
+>
+开发过程中，其他开发已经提交了变更到主干分支
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-6.png"
+width="1021"
+height="313"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-6_hu_1c0b4402c038b960.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-6_hu_9c1d222d40356939.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="326"
+data-flex-basis="782px"
+>
+此时如需向主干提交，则首先需要合入其他的变更
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-7.png"
+width="1067"
+height="334"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-7_hu_71458497204245e0.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-7_hu_73d9f4f1fb973746.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="319"
+data-flex-basis="766px"
+>
+有时，本地的修改和已经提交的变更会有冲突，此时需要先解决冲突
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-8.png"
+width="1055"
+height="322"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-8_hu_4e9aad39450c55f7.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-8_hu_aafa4ba988541945.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="327"
+data-flex-basis="786px"
+>
+再重新将修改并自测后的健康代码提交到主干分支&lt;/p>
+&lt;p>使用主干时，意味着我们会实行&lt;strong>主干集成模式&lt;/strong>&lt;/p>
+&lt;h3 id="特性分支">特性分支
+&lt;/h3>&lt;p>为每一个功能特性拉取它独立的分支，并在feture完成后集成回主干&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-9.png"
+width="933"
+height="366"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-9_hu_74b95c7ee6bcc59d.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-9_hu_32c0ddbd05ee967a.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="254"
+data-flex-basis="611px"
+>
+从主干拉取不同的特性分支并分别进行开发
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927175324.png"
+width="952"
+height="350"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927175324_hu_12d1719d35d77f7d.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927175324_hu_afcf5cdf5e2a68df.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="272"
+data-flex-basis="652px"
+>
+开发过程中会持续从主干拉取最新代码，如果有其他功能变更，要及时进行集成解决冲突（本地）。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-10.png"
+width="885"
+height="360"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-10_hu_20dd7f755d09ae7a.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-10_hu_f29cffe845a9b55e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="245"
+data-flex-basis="590px"
+>
+特性完成开发后，集成回主干。（受影响的冲突已在本地解决，所有其他特性分支上直接拉取变更，不会存在冲突需要解决）&lt;/p>
+&lt;h3 id="低频集成">低频集成
+&lt;/h3>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-11.png"
+width="1063"
+height="335"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-11_hu_a05c68bed305ab44.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-11_hu_9daf312ea04c227f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="317"
+data-flex-basis="761px"
+>&lt;/p>
+&lt;p>两条独立的开发分支上分别进行了几次本地提交，但没有向主干推送
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-12.png"
+width="1015"
+height="333"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-12_hu_26b3824f0bf7a0e8.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-12_hu_13f0a04d517dcf1.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="304"
+data-flex-basis="731px"
+>
+主干上合入了变更&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-13.png"
+width="1064"
+height="338"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-13_hu_78ae884a57bcb222.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-13_hu_ed2fa66bb5a8fc68.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="314"
+data-flex-basis="755px"
+>
+开发分支需要拉取变更并合入到本地分支（解决冲突）&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-14.png"
+width="1067"
+height="342"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-14_hu_d54a092c550a112e.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-14_hu_819f06a28caca5af.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="311"
+data-flex-basis="748px"
+>
+分支A上继续完成了4，5两个提交，然后推送大主干
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-15.png"
+width="1052"
+height="321"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-15_hu_450e64d3035717ed.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-15_hu_11fe33b1a4c666ee.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="327"
+data-flex-basis="786px"
+>
+分支B上完成了4，5，6几个提交后，需要在本地合入主干上A的提交，集成后推送到主干。（本地合入的大小代表工作量）&lt;/p>
+&lt;h3 id="高频集成">高频集成
+&lt;/h3>&lt;p>每次提交都向主干进行集成和推送呢？
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-16.png"
+width="1057"
+height="312"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-16_hu_af2461a8a4eeb452.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-16_hu_c2915e7288889683.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="338"
+data-flex-basis="813px"
+>
+V完成第1次提交后就推送回主干&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-17.png"
+width="1025"
+height="324"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-17_hu_3bd84e894d966406.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-17_hu_5e73f50ccccec7f2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="316"
+data-flex-basis="759px"
+>
+S在完成第1次提交后就进行本地合入，并推送回主干
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-18.png"
+width="1036"
+height="327"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-18_hu_81fb63d9bcbd438c.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-18_hu_a427bc1c01c61ba7.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="316"
+data-flex-basis="760px"
+>
+S的第2次推送，主干没有变更，没有本地合入工作
+V完成第2次提交和本地合入，推送
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-19.png"
+width="1074"
+height="323"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-19_hu_3b84f8f85861beda.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-19_hu_711e4f940a79bb3e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="332"
+data-flex-basis="798px"
+>
+S的第3次提交，需要本地合入，推送
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-20.png"
+width="1078"
+height="345"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-20_hu_92be6eb77101a99a.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-20_hu_3e1c6ae613104a6.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="312"
+data-flex-basis="749px"
+>
+如此，每次本地的提交，都会向主干进行推送&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-21.png"
+width="1021"
+height="401"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-21_hu_d27d5d59cebb2a27.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-21_hu_e4a65e5ebd0a4c1.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="254"
+data-flex-basis="611px"
+>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-22.png"
+width="1053"
+height="429"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-22_hu_f963bcda7ec114e5.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-22_hu_9b20a62829346550.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="245"
+data-flex-basis="589px"
+>&lt;/p>
+&lt;p>比较二者，高频集成会有更多的本地集成工作，但这些集成的工作量比低频集成低得多。
+同时，比工作量减少更重要的是，这样做减少了风险。（虽然大多情况下，进行大的合入也能顺利完成，但有时却会有严重的冲突问题难以解决。这种情况，偶发的巨大问题比常规的小问题更糟糕）
+如果每次常规集成10分钟，但50次集成合在一起要6小时，看起来6小时比500分钟还是要少，但是这会导致&lt;em>集成恐惧&lt;/em>（if it hurt，do it more often）&lt;/p>
+&lt;p>而且高频集成模式下，可以更早发现代码间的冲突情况，并避免在冲突代码在后期才发现而导致中间持续产生了很多本不应该存在的更多冲突代码。&lt;/p>
+&lt;p>源码控制系统其实更多是一个沟通平台，可以意识到其他团队成员的工作&lt;/p>
+&lt;h3 id="持续集成">持续集成
+&lt;/h3>&lt;p>开发者一旦完成一个健康的提交，就会尽快完成主干集成，一般不超过1天。&lt;/p>
+&lt;p>（如果高频集成更有效率且可实施，但使用特性分支，意味着限制了变更不能比一个特性更小，那么集成频次就成了问题？）&lt;/p>
+&lt;p>持续集成-只要特性上的开发是有进展并且是健康的，就可以向主干集成。唯一的原则就是每天都要进行集成（甚至更短）&lt;/p>
+&lt;p>开发团队需要习惯在主干上存在未完成特性的情况并考虑如何在产品中不暴露这些特性。（通过隐藏入口、配置控制），有时我们还可以实现灰度发布。&lt;/p>
+&lt;p>在持续集成模式下，开发着往往不需要创建自己的特性分支，只要在本地的主干分支上工作即可。&lt;/p>
+&lt;p>特性分支和持续集成的区别不在于是否有特性分支存在，而在于何时向主干集成。&lt;/p>
+&lt;p>两者的比较：&lt;/p>
+&lt;p>两种模式的差异更多取决于特性的大小，如果特性足够小（一天以内可以完成），就可以同时实行特性分支和持续集成。&lt;/p>
+&lt;p>特性分支最明显的问题在于合并的工作量和不确定性，然而更大的问题是它可能阻止重构。重构是软件优化最有效的途径，但是重构会产生冲突，当解决冲突工作量太大时，重构往往需要极大的勇气。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>功能分支&lt;/th>
+&lt;th>持续集成&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>- 可以将某个功能中的所有代码作为一个单元进行质量评估&lt;br>- 功能完成后才将功能代码添加到产品中&lt;br>- 合并频率较低&lt;/td>
+&lt;td>- 支持比特征长度更高的频率集成&lt;br>- 减少发现冲突的时间&lt;br>- 规模较小的合并&lt;br>- 鼓励重构&lt;br>- 需要致力于健康的分支（从而实现自我测试代码）&lt;br>- 科学证据表明它有助于提高软件交付性能&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="特性分支和开源软件">特性分支和开源软件
+&lt;/h4>&lt;p>github的特性分支？pull request模式
+上下文不同：分散、不定时、团队成员不了解 vs 全职、熟悉的团队成员、可靠&lt;/p>
+&lt;p>提交的审核review&lt;/p>
+&lt;ul>
+&lt;li>代码审核·&lt;/li>
+&lt;li>集成受阻&lt;/li>
+&lt;li>模块化的重要性&lt;/li>
+&lt;li>&lt;/li>
+&lt;/ul>
+&lt;h2 id="发布模式">发布模式
+&lt;/h2>&lt;p>主干分支是活动分支，代码持续在其上开发。如果能保持主干的健康状态，任何人都可以从一个稳定的基础开始自己的工作。
+而且足够健康的话，也可以直接从主干分支进行产品的发布&lt;/p>
+&lt;p>&lt;img src="https://i-blog.csdnimg.cn/blog_migrate/b1dee5579befaf2a2e007af2dbb2c29f.png#pic_center"
+loading="lazy"
+alt="在这里插入图片描述"
+>
+对于实施CI/CD的团队，一个常用的实践是通过打Tag标记来跟踪每一个发布的版本。但不实践CD的团队，则需要其他的发布模式&lt;/p>
+&lt;h3 id="release-branch-发布分支">Release Branch 发布分支
+&lt;/h3>&lt;p>预备发布的分支，只接受以版本稳定和交付为目标的提交 （一般系统测试阶段）
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-23.png"
+width="716"
+height="287"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-23_hu_81382339d9d451f8.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-23_hu_7bf94c3181911e26.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="249"
+data-flex-basis="598px"
+>&lt;/p>
+&lt;p>Release分支从主干分支中拉取，不再接受任何新feature的合入。工作在release分支上的开发工作主要是修复发现的bug或影响交付的功能。所有的修改最终还需要合并回主干。
+&lt;img src="https://i-blog.csdnimg.cn/blog_migrate/4e7655a86c338d8ce135fc704ded3f97.png#pic_center"
+loading="lazy"
+alt="cherry-pick 到release分支"
+>
+尽管release分支上的工作往往比新feature的开发工作量更小，但是如果在其上的开发时间过长依然会导致合并回主干非常困难（主干上的提交越多，合入就越困难）&lt;/p>
+&lt;p>实际工作中，因为release分支的存在，合并回主干的操作往往容易被忽视，特别是有困难的冲突需要解决并且存在发布压力的情况下。&lt;/p>
+&lt;p>所以有的开发会采用另一种方式，继续在主干上开发，然后通过cherry-pick将只和发布相关的提交合入到release分支。这种方式的缺点是很多时候chrry-pick有时也很困难（对之前的commit有依赖的情况），在实际发布之前对release分支往往有一些重做工作。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-24.png"
+width="1000"
+height="430"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-24_hu_2d6097156d59f34e.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-24_hu_4afd22e582bedc82.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="232"
+data-flex-basis="558px"
+>
+对于只有一个产品版本的团队来说，使用单一的release分支就好。但很多情况下，会存在需要支持多个产品版本的情况，比如客户本地部署的软件，可能会长时间运行在一个历史版本上，但是又需要继续做一些bug fix或者一些特别的需求，此时就需要维护多个不同的release 分支，并定期保持和主干同步&lt;/p>
+&lt;p>对开发团队这明显是大大增加了维护难度和工作量，但这更多是产品策略带来的成本。唯一可以做的就是鼓励客户更及时地升级到最近版本（保持产品稳定非常关键，一旦产品不稳定导致问题，会使客户更倾向不再升级）&lt;/p>
+&lt;p>Release分支对于难以保持主干分支持续在健康状态的团队非常有必要，团队可以关注在产品发布的功能验证上。但对于单一产品的团队，release分支并不必要，使用主干分支并保持健康状态即可（发布的版本进行Tag标记）
+另外，对于发布流程存在很多阻塞的团队，relase分支也是必要的（比如有比较缓慢的审核流程，在应用商店上线的时间窗、安全、法务、合规等的审核等）&lt;/p>
+&lt;h3 id="成熟分支">成熟分支
+&lt;/h3>&lt;p>分支的head总是标记为最近版本的成熟代码基线&lt;/p>
+&lt;p>根据团队对产品成熟度的不同定义，拉取出的对应的成熟分支。比如QA分支（提测）、Staging分支（预发）、production分支（上线）&lt;/p>
+&lt;p>但很多情况下，使用清晰定义的Tag机制就可以代替成熟分支的作用。比如“成熟级别-内部版本号”，“qa-233”，“prod-445”
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-25.png"
+width="808"
+height="418"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-25_hu_384ca6b5a8e6e3fb.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-25_hu_5bc1629d3f4c0e2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="193"
+data-flex-basis="463px"
+>&lt;/p>
+&lt;h3 id="长期发布分支">长期发布分支
+&lt;/h3>&lt;p>release分支一般在产品发布后就可以删除，但我们也可以维持一个长期的发布分支。它的作用可以看作是发布分支和成熟分支的集合。这个分支上进行release前的fix工作并合并回主线，并在实际发布时打上发布Tag，然后进入下一个版本的发布准备。
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-26.png"
+width="940"
+height="304"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-26_hu_9c8e0e55cb8f7a79.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-26_hu_53dfcd4c2a28453e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="309"
+data-flex-basis="742px"
+>&lt;/p>
+&lt;h3 id="环境分支">环境分支
+&lt;/h3>&lt;p>通过不同的提交来配置代码的运行环境
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-27.png"
+width="825"
+height="467"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-27_hu_fecd763b06fd168d.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-27_hu_ddb2fac8f5b9c999.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="176"
+data-flex-basis="423px"
+>&lt;/p>
+&lt;p>不同的产品运行环境往往会有不同的配置代码（测试环境、开发环境、性能验证、安全验证环境、预发环境、产品环境等），环境分支会包含这些配置的变更提交并触发对应的构建、部署。&lt;/p>
+&lt;p>环境分支一般也用作成熟分支，比如QA的成熟分支，会包含QA环境的配置变更。&lt;/p>
+&lt;p>但是环境分支并不是好的实践，不同的环境需要不同的编译代码会引入风险。如果产品程序在不同的环境上有不同的行为表现会使问题的修复、定位变得极其困难。所以最好保证不同环境下运行的可执行代码都是相同的，环境的配置都通过显式的配置文件或变量来控制。环境变更导致的任何更改都不应包含在源码控制系统中&lt;/p>
+&lt;p>环境分支只应是缺乏这种环境切换控制机制团队的应急机制存在。&lt;/p>
+&lt;h3 id="hotfix">Hotfix
+&lt;/h3>&lt;p>用于进行紧急产品故障修复的分支&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-28.png"
+width="908"
+height="310"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-28_hu_acc30d14bafe8983.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-28_hu_d0d781cb2c1c3797.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="292"
+data-flex-basis="702px"
+>
+从主线分支对应的release版本拉取hotfix分支，并在完成后合入回主线（如果release时间比较久，合并工作可能会比较大）
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-29.png"
+width="819"
+height="289"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-29_hu_de9c76df8a7edc9a.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-29_hu_5c98c8fddd3a9342.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="283"
+data-flex-basis="680px"
+>
+对使用release 分支的团队，也可以直接在release分支上进行hotfix，此时相当于将原release分支转变为hotfix分支
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-30.png"
+width="785"
+height="293"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-30_hu_855c768ad01d0c1f.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-30_hu_f596bdaa59685590.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="267"
+data-flex-basis="643px"
+>
+对于实践CD的团队，甚至可以直接在主干上完成hotfix（还是会拉取hotfix分支，但会从最新的提交拉取），因为一般团队已经具备了不公开未发布特性的能力。而且在hotfix过程中，不允许向主线进行任何新的提交。（hotfix优先）&lt;/p>
+&lt;p>如何定义hotfix？对于可以发布频率较高的团队，一般可以将问题纳入日常发布节奏而不需要进行hotfix。取决于团队发布频率和对业务的实际影响&lt;/p>
+&lt;h3 id="release-train">release train
+&lt;/h3>&lt;p>象火车发车一样有定期的发布间隔，特性完成后选择放入哪一次发布（和SAFe的Agile release train不是一个概念，那更多是组织层面的实践）
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-31.png"
+width="789"
+height="361"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-31_hu_1167bd31713427f4.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-31_hu_8fd7313e73bea9d4.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="218"
+data-flex-basis="524px"
+>
+团队定义定期的发布计划，并确定每列发布列车上的功能，据此承诺、安排各自的工作任务。一旦火车发车，当前分支就转化为release分支，只会接受bug fix。发布列车一般会和feature分支一起使用。对于发布流程中存在较多阻塞的团队来说，release train是非常有用的，不会因为这些阻塞而影响后续功能的研发。
+但比较明显的缺点是，如果一个功能很早就完成，也需要等到发车时间才能上线。&lt;/p>
+&lt;p>release train可以看作是团队release流程的一个提升手段，对与很难进行稳定发布的团队，实施CD往往不够现实 ，此时release train会是一个好选择。&lt;/p>
+&lt;h4 id="loading-future-trains">loading future trains
+&lt;/h4>&lt;p>和旧列车发车后再向新的列车上装载需求不同，可以使用这种模式的变种。如果一些功能不能确定是否能在预定发车前完成，可以同时开启两列train（预期发车时间不同），在三月列车上完成的开发工作同时向4月列车上提交并在三月列车发车后继续在4月列车上完成剩余工作。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-32.png"
+width="895"
+height="304"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-32_hu_d04c6c121bd084fa.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-32_hu_aeb573cbb9964815.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="294"
+data-flex-basis="706px"
+>
+这种模式可以让4月列车上的工作不影响三月列车，但缺点是如果4月列车上的变更影响到3月的功能，会是后续的合并工作更加复杂。&lt;/p>
+&lt;h4 id="和主线发布比较">和主线发布比较
+&lt;/h4>&lt;p>release train的主要好处是可以有一个定期的产品发布日历，但是多个分支依然会引入复杂性。
+其实使用主线模式也可以如此工作，在主线上开发，到发布日期后增加一个对应的发布分支即可。
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-33.png"
+width="820"
+height="445"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-33_hu_e9c39230173121cc.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-33_hu_8505908c388c8ec1.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="184"
+data-flex-basis="442px"
+>&lt;/p>
+&lt;h3 id="预发布主线">预发布主线
+&lt;/h3>&lt;p>确保主线是绝对健康状态，并且主线的head永远能被直接发布到产品环境。（每个提交都具备直接发布的健康状态，但是只有实际发布的提交才需要加上tag）
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-34.png"
+width="796"
+height="265"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-34_hu_58a256d1b3e13f3a.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-34_hu_51c51264bf398328.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="300"
+data-flex-basis="720px"
+>&lt;/p>
+&lt;h2 id="其他发布模式">其他发布模式
+&lt;/h2>&lt;h3 id="实验分支">实验分支
+&lt;/h3>&lt;p>在代码基线上收集用于实验的工作，这些功能不会被直接合入产品环境&lt;/p>
+&lt;p>实验性的点子
+功能的不同实现方式&lt;/p>
+&lt;h3 id="未来分支">未来分支
+&lt;/h3>&lt;p>一个用于对其他分支侵入性太大的变更分支&lt;/p>
+&lt;p>较少使用的模式，只会从主线pull而不会merge回其他分支。一旦使用，意味着团队中存在一个独立的代码特区。应尽可能缩短这个分支存在的时间。&lt;/p>
+&lt;h3 id="合作分支">合作分支
+&lt;/h3>&lt;p>用于开发者之间协同工作，但不需要进行正式的集成的情况。&lt;/p>
+&lt;h3 id="团队集成分支">团队集成分支
+&lt;/h3>&lt;p>在向主线集成前，允许子团队间先进行互相集成。（大型项目）&lt;/p>
+&lt;hr>
+&lt;p>原文参考Martin的博客 &lt;a class="link" href="https://martinfowler.com/articles/branching-patterns.html" target="_blank" rel="noopener"
+>Branch Patterns&lt;/a>&lt;/p></description></item><item><title>软件测试的目的到底是什么？</title><link>https://chengxiaqiucao.github.io/post/007-what-is-testing-goal/</link><pubDate>Fri, 30 Aug 2024 20:35:21 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/007-what-is-testing-goal/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/007-what-is-testing-goal/testing.png" alt="Featured image of post 软件测试的目的到底是什么？" />&lt;h2 id="对测试工作目的的认识误区">对测试工作目的的认识误区
+&lt;/h2>&lt;p>在IT行业，其实一直对软件测试，测试这个工作的目的，一直有着不太准确的认识。&lt;/p>
+&lt;p>各种说法都有，比较流行，被很多IT工作甚至测试从业者认可的有下面两种：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>测试是为了发现Bug&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>大家一般概念中通常都会把做测试和找Bug等同起来，也就是说软件测试的目的是为了发现产品中的问题。&lt;/p>&lt;/blockquote>
+&lt;ul>
+&lt;li>&lt;strong>测试是为了验证产品满足需求&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>也有从测试执行的角度来说，测试工作是为了证明软件产品是符合产品需求定义，是为了验证需求是否实现的。&lt;/p>&lt;/blockquote>
+&lt;p>那这些说法对不对呢？ 可以说对，也可以说不对&lt;/p>
+&lt;p>确实，测试工作的主要产出就是我们发现的各种产品bug，而要验证需求则是我们测试工作的主要输入和评估标准。&lt;/p>
+&lt;p>但这些就是我们要进行测试工作的目的吗？&lt;/p>
+&lt;p>单纯把测试工作的目的从上面几点来看就狭隘了。&lt;/p>
+&lt;h3 id="测试是为了找bug吗">测试是为了找Bug吗？
+&lt;/h3>&lt;p>我们做测试工作是为了发现bug吗？&lt;/p>
+&lt;p>bug对于产品来说，意味着成本，bug本身对产品来说是不会产生价值的。被解决掉的Bug才会带来产品质量的提升，进而体现到产品的价值中去。bug的减少，对产品才有价值。&lt;/p>
+&lt;p>所以，单纯地把发现更多bug作为测试工作目的是一个误区，这也是很多团队错误地把发现bug的数量作为测试工作成效依据的主要原因。如果bug发现得越多代表测试工作越好，测试人员是不是就不应该再早期阶段去参与？因为在前期就规避掉的问题其实会导致到测试阶段bug变少，如果测试工作是希望发现更多bug，是不是就应该希望产品提测的时候包含更多bug呢？ 这个导向显然是不符合产品利益的。&lt;/p>
+&lt;p>因此把发现bug作为测试工作的目的是一个常见的，明显的对测试工作的认识误区&lt;/p>
+&lt;h3 id="测试就是为了验证需求吗">测试就是为了验证需求吗？
+&lt;/h3>&lt;p>第二个对测试工作目的的认识误区，就是认为测试工作就是为了验证产品的需求。这其实是另一个被广泛接受的错误认识。甚至我们当今流传广泛的很多软件工程实践，都是建立在这个错误认识之上的。&lt;/p>
+&lt;p>测试大牛James Bach有篇著名的论文，探讨了Testing跟Checking的区别。&lt;/p>
+&lt;p>也就是测试工作远远不止是checking。而验证需求，这样的checking只是测试工作的一部分。测试要深入产品、发现潜在的深层问题，还需要除了checking之外的更多其他能力支撑，包括探索、试验、设问、推理等等&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/007-what-is-testing-goal/Pasted-20240830.png"
+width="833"
+height="582"
+srcset="https://chengxiaqiucao.github.io/post/007-what-is-testing-goal/Pasted-20240830_hu_25cc6891f9026da1.png 480w, https://chengxiaqiucao.github.io/post/007-what-is-testing-goal/Pasted-20240830_hu_70c44345306bceff.png 1024w"
+loading="lazy"
+alt="Testing vs Checking"
+class="gallery-image"
+data-flex-grow="143"
+data-flex-basis="343px"
+>&lt;/p>
+&lt;p>所以，把验证需求，当作测试工作的目的，是不够的。像工厂质检那样依据严格的规程来确定产品是否合格，和软件产品这种偏创造性的行业也并不匹配。这也是我们说自动化测试更多是为了提升执行效率和快速得到已覆盖场景的验证结果反馈，但自动化测试本身并不能达到完成产品测试的目的。&lt;/p>
+&lt;p>测试除了验证需求中明确的功能外，还需要针对交付产品进行更深度的探索，才更可能充分发现产品中的质量问题。这也是近年探索式测试被更多提及的主要缘由。&lt;/p>
+&lt;h2 id="软件测试工作的真正目的">软件测试工作的真正目的
+&lt;/h2>&lt;p>好，那既然测试工作的目的既不是为了找Bug，也不是为了验证需求，那目的究竟是什么呢？&lt;/p>
+&lt;blockquote>
+&lt;p>软件测试的真正目的： &lt;strong>准确&lt;/strong>、&lt;strong>及时&lt;/strong>地&lt;strong>评估&lt;/strong>出被测对象的&lt;strong>质量状态&lt;/strong>&lt;/p>&lt;/blockquote>
+&lt;p>这里的核心是&lt;strong>评估质量状态&lt;/strong>。质量是产品属性，只能通过产品本身的变更来调整，所以测试工作无法提高质量，也无法保证质量。但通过测试工作，我们可以通过暴露产品中的问题，反映出产品的质量状态。我们的主要作用是对当前产品的质量进行评估。再由产品或项目针对这个状态来对质量进行改进。&lt;/p>
+&lt;p>所以测试工作对于质量的贡献更多体现在这个评估出的质量状态是否及时和准确两方面。&lt;/p>
+&lt;h3 id="准确评估">准确评估
+&lt;/h3>&lt;p>测试无法穷尽，在有限的时间内发现产品的所有问题也是不可能的。但测试的职责是需要在有限的时间内，尽可能多地将影响产品质量的问题暴露出来。这里除了数量外，我们还要看问题的影响，综合这两点，才是更准确地反映质量。&lt;/p>
+&lt;h3 id="及时评估">及时评估
+&lt;/h3>&lt;p>产品是无法进行无限测试的，而且测试工作其实本身是成本支出。所以通过测试工作得出产品质量状态的时效对于产品的质量改进和成本控制也尤为关键。问题发现得越早，修复成本就越低；得出质量状态评估的时间越短，产品进行针对性改进的空间就越大。所以测试工作的目的，还包括提高测试效率，通过自动化、测试左移等手段来尽可能及时地完成产品质量评估。&lt;/p>
+&lt;p>所以这才是我们进行软件测试工作的真正目的，不是为了发现更多的bug，也不是仅仅是对需求实现的检查，而是通过我们的专业能力，在有限的时间内，及时、充分地反映出当前产品实际的质量状态。&lt;/p>
+&lt;p>以上就是关于软件测试工作目的 的分享，我是城下秋草。 &lt;strong>秋草观测台，观察测试业&lt;/strong>&lt;/p>
+&lt;hr>
+&lt;p>推广下我的测试课程，感兴趣的小伙伴可以通过以下链接了解下哦&lt;/p>
+&lt;p>❤️❤️❤️❤️ &lt;a class="link" href="https://coding.imooc.com/class/chapter/885.html#Anchor" target="_blank" rel="noopener"
+>城下秋草的测试职业进阶提升课&lt;/a> ❤️❤️❤️❤️&lt;/p></description></item><item><title>提 Bug 的艺术</title><link>https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/</link><pubDate>Sat, 19 Aug 2023 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/</guid><description>&lt;h3 id="前言">前言
+&lt;/h3>&lt;p>作为测试工程师最重要的工作产出，Bug Report（或者故障单、问题单）是测试工程师工作成果的直接体现，也是最能呈现测试工程师价值和能力的输出物。但项目干系人甚至测试工程师本身对Bug Report的重要性往往认识不足，Bug 单的内容及其提交方式、处理流程对项目推进、运作效率甚至团队士气都有重要影响。&lt;/p>
+&lt;p>行业针对 Bug Report 的讨论和总结还比较少，本篇我们希望以笔者多年的从业观察出发，对 Bug report 的要素及专业测试工程师的处理方式给出一些总结和建议，意在抛砖引玉，错漏之处还请多多指正。&lt;/p>
+&lt;p>主要包含以下内容：&lt;/p>
+&lt;ul>
+&lt;li>Bug 是什么，Bug 报告单是什么&lt;/li>
+&lt;li>开发或项目团队看到 Bug 实际希望获取的信息是什么&lt;/li>
+&lt;li>测试小白在提 Bug 时的常见错误做法&lt;/li>
+&lt;li>提 Bug 与说故事&lt;/li>
+&lt;li>专业测试工程师如何高质量地提交 Bug&lt;/li>
+&lt;/ul>
+&lt;h3 id="何为bug-bug的历史">何为Bug？ Bug的历史
+&lt;/h3>&lt;p>Bug 一词在英文中本是虫子，臭虫之意，现在 IT 行业用它来代指软件中存在的缺陷，其实这个历史还比较有意思：&lt;/p>
+&lt;p>早在 1878 年，大发明家爱迪生就在给朋友的信中就用 bug 一词代指过电子电路中的故障（或可能导致故障的原因），但是真正在计算机行业载入史册还要到 1947 年 9 月 9 日。&lt;/p>
+&lt;p>这时第一批写程序的程序员们正在哈佛大学研发 markII 计算机，其中 [Grace Murray Hopper][1] 在查找一个问题时，在中继器触点旁发现了一个飞蛾，用日志本拍死了它，并标记它为“第一个找到 bug 的真实案例”。由此 bug 一词便被用来代指计算机中的缺陷或故障。相应地 debug 则被用来指代去除故障的调测行为。&lt;/p>
+&lt;p>下图即保存在美国管家博物馆的史上第一个 bug 实物：
+&lt;img src="https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134227.png"
+width="743"
+height="599"
+srcset="https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134227_hu_e82606b7db3ba596.png 480w, https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134227_hu_b4619dde3aa4f924.png 1024w"
+loading="lazy"
+alt="first bug"
+class="gallery-image"
+data-flex-grow="124"
+data-flex-basis="297px"
+>&lt;/p>
+&lt;p>史上第一批程序员，其中唯一的女性就是“虫”母：
+&lt;img src="https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134247.png"
+width="888"
+height="588"
+srcset="https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134247_hu_92d04c99af73787e.png 480w, https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134247_hu_cb11bc7065bce58e.png 1024w"
+loading="lazy"
+alt="bug mother"
+class="gallery-image"
+data-flex-grow="151"
+data-flex-basis="362px"
+>&lt;/p>
+&lt;p>总之，现在 Bug 一词可以代指软件或程序中存在的缺陷或者故障。但对于项目团队来说，建议不要简单地将 Bug 定义成&lt;code>故障&lt;/code>，因为&lt;code>故障&lt;/code>一词定性上有否定的意味，而将 Bug 视作&lt;code>缺陷&lt;/code>、或者&lt;code>问题&lt;/code>，强调&lt;strong>可改进空间&lt;/strong>对项目团队更加有积极的引导作用。&lt;/p>
+&lt;h3 id="bug-report-问题单是什么">Bug Report （问题单）是什么?
+&lt;/h3>&lt;p>report 这个词在英文中既可作动词也可作名词。所以 &lt;code>Bug report&lt;/code> 既可表示发现问题并报告的这个动作，也可以指问题发现后提交的报告内容。 这里我们一般还是将它看作是问题报告(名词)，即 &lt;code>问题单&lt;/code>，那么&lt;code>问题单&lt;/code>到底是什么呢？&lt;/p>
+&lt;p>测试大神 Cem Kaner 曾指出:&lt;/p>
+&lt;blockquote>
+&lt;p>The purpose of testing is not to find bugs. The purpose is to get bugs fixed.&lt;/p>
+&lt;p>测试的目的不是发现 Bug, 而是使 Bug 被修复。&lt;/p>&lt;/blockquote>
+&lt;p>这个观点其实指出了很多测试人员认识上的一个误区，就是觉得测试工作就是尽可能多地发现 Bug。 其实对团队来说，发现的 Bug 再多，最终还是要解决掉才能体现这些 Bug 被发现的价值。&lt;/p>
+&lt;p>而从发现到被解决， &lt;code>问题单&lt;/code> 是其中的主要媒介，既是测试人员测试工作的输出，又是开发人员解决问题的输入，重要性不言而喻。&lt;/p>
+&lt;p>另外，虽然将发现的问题知会给开发人员有各种形式：口头告知、实际演示、电子邮件、IM聊天等等都可以起到知会的作用。但在现代软件研发过程中，一般还会有专门的系统来进行缺陷追踪，如 JIRA、禅道、bugfree、QC（HP quality center） 等软件都能进行缺陷的提交和跟踪。通过这些专门的系统，不仅能够起到记录和反馈的作用，还能够通过统计和分析更好地反映出项目整体的质量状况和研发进展。&lt;/p>
+&lt;p>因此：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>问题单&lt;/code> 是测试人员测试活动中发现缺陷后的输出&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>问题单&lt;/code> 是开发人员解决缺陷的输入&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>问题单&lt;/code> 是测试人员和开发人员之间针对 Bug 的沟通媒介&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>问题单&lt;/code> 还是项目团队评估当前研发状态和产品成熟度的指示器。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="问题单的作用和重要性">问题单的作用和重要性
+&lt;/h3>&lt;p>相信很多测试工程师在提交问题单后，都有得到如下一些反馈或抱怨的经历：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>你这个问题单到底想说明啥？&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>在我这里运行没有这个问题&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>为什么你提交的这个算是缺陷？&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>一般人不会像问题单那样使用软件，脑子有问题的人才会那样用&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>这个确实是问题，但是修复成本太大，而且也可以换种操作方式来规避&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>你虽然认为这是个问题，但是实际用户不会觉得不好&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>你提交的虽然确实是问题，但是影响用户很小。那些影响用户更大的部分为什么看不到多少问题单？&lt;/p>
+&lt;p>&amp;hellip;&amp;hellip;&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>测试人员当然不希望得到这样的反馈。但这些问题也从侧面反映出在对待 Bug 这件事上，开发人员或项目团队更加注重的其实是 Bug 如何解决（包括是否&lt;strong>需要&lt;/strong>解决的判断），他们更希望从&lt;code>问题单&lt;/code>中获知的是如下的一些信息：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>所发现的什么问题？&lt;/p>
+&lt;ul>
+&lt;li>问题现象是什么？&lt;/li>
+&lt;li>总是会出现吗？&lt;/li>
+&lt;li>发现这个问题时的背景、上下文是什么？&lt;/li>
+&lt;li>除了看到的现象，系统同时还发生了什么？&lt;/li>
+&lt;li>有没有截图、日志、录屏？&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>为什么它是个问题？&lt;/p>
+&lt;ul>
+&lt;li>这个问题有什么影响？&lt;/li>
+&lt;li>不解决它会怎么样？&lt;/li>
+&lt;li>发生概率怎么样？&lt;/li>
+&lt;li>有没有和其他问题重复？&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>是做了什么操作，暴露出的这个问题？&lt;/p>
+&lt;ul>
+&lt;li>输入是什么？&lt;/li>
+&lt;li>用了什么测试路径？测试数据？&lt;/li>
+&lt;li>所在测试环境、软件版本如何？&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>所以，作为测试，不应把&lt;code>问题单&lt;/code>看作是一个简单的问题记录，它是测试和开发之间的重要沟通媒介，好的问题单可以极大减少双方的沟通成本，既极大减轻开发人员解决问题的工作量，同时也减少测试人员澄清、重复验证等的工作量。对项目来说，&lt;code>问题单&lt;/code>的提交质量，影响的就是团队的生产力以及交付速度，不容小觑。&lt;/p>
+&lt;h3 id="问题单的要素">问题单的要素
+&lt;/h3>&lt;p>了解了&lt;code>问题单&lt;/code>的作用，那么&lt;code>问题单&lt;/code>中应该包含的要素也就比较清楚了，一般有以下方面：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>方便初步判断的标题&lt;/strong>&lt;/p>
+&lt;p>标题应该能够比较清楚地概要说明问题，以及这个问题所处的模块。便于开发人员作一个初步的判断&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>上下文及必要的关联信息&lt;/strong>&lt;/p>
+&lt;p>发生问题时的上下文背景，关联的信息如软件版本、测试环境、配置情况、资源状态等&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>准确合理的详细描述信息&lt;/strong>&lt;/p>
+&lt;p>详细描述问题发现的步骤，操作预期，实际发生的状况。问题发生频率，所使用的测试输入、数据、文件等&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>帮助问题解决的补充信息&lt;/strong>&lt;/p>
+&lt;p>能够帮助开发人员加快解决问题进度的补充信息，比如截图、录屏、操作日志、系统日志等&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>帮助项目决策的辅助信息&lt;/strong>&lt;/p>
+&lt;p>测试人员作为 Bug 的第一判断者，应给出问题的严重程度、解决优先级建议。初步指派解决问题的开发人员，以及便于统计、追踪的关联信息标识。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="测试小白的错误做法">测试小白的错误做法
+&lt;/h3>&lt;p>那么结合&lt;code>问题单&lt;/code>的要素，我们可以初步总结一些测试小白或者不专业测试在提交 Bug 时常见的一些错误做法：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>标题不够明确&lt;/p>
+&lt;p>标题非常简单，不便于初步判断问题。比如简单地写 “系统 crash”，太过笼统，而且过于简单的标题很容易产生雷同，对问题的集中回顾、评审都带来很多不便。&lt;/p>
+&lt;p>或者过于复杂。太长的标题，容易导致阅读疲劳，没有重点。比如标题中详细描写操作步骤就没什么必要&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>脱离实际，偏离需求场景。&lt;/p>
+&lt;p>有时候测试小白会从个人偏好角度出发，想当然地提出一些问题。“我觉得”、“感觉上不好” 是这类小白问题中出现的高频词汇。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>不是问题&lt;/p>
+&lt;p>测试小白，往往因为对系统实现原理理解上的错误或技能水平上的不足，提交出不是 bug 的问题单。&lt;/p>
+&lt;p>还有因为测试小白的测试方法或者环境配置本身就是不正确的，由此导致的问题&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>描述信息不足&lt;/p>
+&lt;p>典型的，通过问题单的描述信息，开发人员不足以确认问题现象或自行复现。测试小白往往觉得发现问题就完成工作，没有把充分的信息提供给开发人员，比如截图、日志等。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>无关信息过多、格式杂乱&lt;/p>
+&lt;p>有时小白的问题单中会包含太多冗余的嘈杂信息，很难看到重点。比如不分青红皂白把几万行的 log 贴到问题单中&lt;/p>
+&lt;p>或者完全不进行排版，一大堆信息杂乱地混杂在一起，阅读难度极高&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>问题过多&lt;/p>
+&lt;p>问题单应该聚焦，有时测试小白会在同一个问题单中包含很多个不同的问题。这对于问题追踪和聚焦都非常不利&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>只看现象不考虑本质&lt;/p>
+&lt;p>有时候简单的问题现象，往往是一些严重问题的体现或线索。小白往往会忽视重要的风险，对一些看似蛛丝马迹的问题视而不见，将潜藏在现象之下的 Bug 轻易漏过。比如有些预期外的提示信息，往往是后台计算、统计准确性等 Bug 的体现。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="提-bug-与说故事">提 Bug 与说故事
+&lt;/h3>&lt;p>再回到 &lt;code>提交 Bug&lt;/code> 这件事，本质上，这其实是一个沟通的过程，&lt;code>问题单&lt;/code> 承载了这个沟通媒介的作用，通过&lt;code>问题单&lt;/code>，测试人员将自己在测试过程中看到的、发现到的问题描述出来，开发人员通过阅读&lt;code>问题单&lt;/code>，掌握到对应信息并相应地去解决问题。&lt;/p>
+&lt;p>所以&lt;code>提 Bug&lt;/code> 其实和写一个小短文，说一个小故事一样，测试人员是作者，而开发人员是读者。&lt;/p>
+&lt;p>我们在提&lt;code>问题单&lt;/code>时，其实也是写作的一种。写作的 &lt;strong>5W&lt;/strong> 要求也一样适用：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>What 内容&amp;ndash;具体的问题是什么？&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Why 目的&amp;ndash;为什么要提出这个问题？为什么它是个问题？&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Who 主体-问题主体是谁？关联方有谁？？&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Where 地点&amp;ndash;问题发生在哪？&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>When 时间&amp;ndash;在什么时间和频率下发生？&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>提 Bug 时思考这 &lt;strong>5W&lt;/strong>，再结合上文提到问题单要素，一般就不会犯很多测试新手在提问题单时常犯的错误了。&lt;/p>
+&lt;h3 id="提-bug-的艺术">提 Bug 的艺术
+&lt;/h3>&lt;p>上文阐述问题单的要素以及 提Bug 时应注意的一些细节，但是为什么我们还要说提 Bug 其实是一件艺术性的工作？&lt;/p>
+&lt;p>我们来举几个问题单的例子：&lt;/p>
+&lt;p>假设有一个商品管理系统，用户在某个特定商品分类下（水果）新增商品时会发生crash&lt;/p>
+&lt;p>&lt;strong>问题单 例一：&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">用户新增商品，发生Crash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">如图所示（crash界面截图）
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这个问题单通过提供截图其实基本描述了问题现象。但是对开发人员来说，信息量太少，而且很有可能并不能第一时间复现问题（水果分类）。问题单中包含的信息太过于简单，可以说是非常糟糕的问题单案例。&lt;/p>
+&lt;p>&lt;strong>问题单 例二：&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">用户在新增商品时，会发生Crash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">操作步骤：
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1. 打开App
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2. 用户登录系统，输入正确的用户名、密码并登录
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">3. 进入商品管理页面
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">4. 选择分类：水果
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">5. 点击新建商品按钮
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">6. 输入商品信息：*********
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">7. 点击提交按钮
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">预期结果：商品创建成功App
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">实际结果：发生 crash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">使用的设备机型：xiaomi 8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">操作系统版本：android 8.0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">软件版本 V1.1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">附件：crash截图
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这个问题单，是很多测试小白常见的提单形式，包含了非常详细的操作步骤和相关辅助信息。但是这也是一个非常糟糕的问题单。
+首先，这样的步骤描述毫无必要，开发人员不会连打开app、登录、提交这样的操作也不了解需要在问题单中交代
+其次，辅助信息虽多，但是基本和问题原因无关，并不利于开发人员定位，反而引入了一些干扰信息。
+这样的问题单，无法体现测试人员的专业价值，对问题的快速解决也没有好处&lt;/p>
+&lt;p>&lt;strong>问题单 例三：&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">用户在水果分类下进行新增商品操作时，会发生Crash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">操作步骤：
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1. 选择水果分类，创建商品，发生crash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2. 选择非水果分类，创建商品，商品创建成功
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">已验证机型：xiaomi 8，huawei mate 7 等现象一致，应和机型、操作系统、版本无关
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">附件：错误截图、系统 crash 时的 logcat 日志
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">影响：用户无法新增水果分类商品，直接影戏用户使用。需高优先级解决
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>此问题单已经可以算比较合格的问题单了，比较明确地指明了问题发生的场景，并将一些无关信息进行了初步排除。开发人员可以聚焦在水果这个类别下的商品创建进行问题分析。
+同时指出了问题对软件的影响和解决优先级建议，使项目团队明确知道这个问题的影响所在&lt;/p>
+&lt;p>&lt;strong>问题单 例四：&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">用户在水果分类下进行新增商品操作时，会发生空指针Crash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">操作步骤：
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1. 选择水果分类，创建商品，发生crash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2. 选择非水果分类，创建商品，商品创建成功
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">3. 对已有水果分类下的商品进行编辑操作，可以编辑成功
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">后台数据库对水果分类因字段缺失insert操作出错，update操作正常。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">已验证机型：xiaomi 8，huawei mate 7 等现象一致，应和机型、操作系统、版本无关
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">附件：错误截图、系统 crash 时的 logcat 日志
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">影响：用户无法新增水果分类商品，直接影戏用户使用。需高优先级解决
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这个问题单，则在上一个问题单基础上更进一步，初步分析出了问题原因，新增操作时，有一个关键字段信息未包含，所以导致的crash。开发人员已经可以很明确地对问题进行修复了&lt;/p>
+&lt;p>&lt;strong>问题单 例五：&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">用户在水果分类下进行新增商品操作时，会发生空指针Crash。导入商品操作旧模板也同样存在问题。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">操作步骤：
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1. 选择水果分类，创建商品，发生crash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2. 选择非水果分类，创建商品，商品创建成功
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">3. 对已有水果分类下的商品进行编辑操作，可以编辑成功
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">后台数据库对水果分类因字段缺失insert操作出错，update操作正常。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">在商品管理导入商品功能中，新模板水果商品导入成功，使用旧模板（未包含新增字段）导入水果数据，也会发生失败。需一并修复。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">已验证机型：xiaomi 8，huawei mate 7 等现象一致，应和机型、操作系统、版本无关
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">附件：错误截图、系统 crash 时的 logcat 日志、新旧模板导入日志
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">影响：用户无法新增水果分类商品，直接影戏用户使用。需高优先级解决
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这个问题单，则在上一个例子的基础上，根据测试人员的经验，推理出有类似逻辑的导入功能，可能存在同样问题并进行了验证。很好体现了测试人员专业能力。&lt;/p>
+&lt;p>通过以上这个简单的案例，我们可以看到，不同的问题单提法，对问题解决效果却有很大差距。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>包含的信息太少，开发人员难以确定产生 Bug 的根本原因，Debug 的工作量成倍上升。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>包含的信息过多，开发人员又会耗费额外的精力去分析那些冗余的信息，甚至干扰调试、解决的方向，同样造成很大的工作量浪费&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>越是能清晰、明确地反映问题的根本原因，开发人员解决问题就越是高效。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>测试人员的经验和判断推理能力，通过问题单能够很好地得到体现&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>所以为什么说提 Bug 是个艺术性的工作？问题单既不能太过简单，也不应太过冗杂，还要能够将信息尽可能准确、全面地传递给开发，这真的是一件非常艺术性的事情。&lt;/p>
+&lt;h3 id="结语">结语
+&lt;/h3>&lt;p>总而言之，提 Bug 在软件研发过程中，是一件相当重要的活动，&lt;code>问题单&lt;/code>的质量直接影响团队的效率和产出。作为专业的测试人员，掌握提 Bug 的艺术，&lt;code>问题单&lt;/code>不在是个简单的问题记录，更是测试和开发间的沟通桥梁，是帮助开发高效修复 Bug 的支撑。&lt;/p>
+&lt;p>欢迎大家关注评论，也可关注公众号： &lt;strong>秋草说测试&lt;/strong>&lt;/p></description></item></channel></rss>
