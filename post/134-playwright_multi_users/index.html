@@ -1,0 +1,360 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="介绍如何创建一个自定义的 Fixture 来处理多用户的交互场景"><title>用Playwright Fixture支持多用户和不同上下文场景</title><link rel=canonical href=https://chengxiaqiucao.github.io/post/134-playwright_multi_users/><link rel=stylesheet href=/scss/style.min.602e9aab9278c27da97b17e9269e2dc09982e5ac79404fcec3820af47d681074.css><meta property='og:title' content="用Playwright Fixture支持多用户和不同上下文场景"><meta property='og:description' content="介绍如何创建一个自定义的 Fixture 来处理多用户的交互场景"><meta property='og:url' content='https://chengxiaqiucao.github.io/post/134-playwright_multi_users/'><meta property='og:site_name' content='秋 草 观 “测” 台'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Playwright'><meta property='article:tag' content='自动化测试'><meta property='article:published_time' content='2025-11-02T10:34:15+08:00'><meta property='article:modified_time' content='2025-11-02T10:34:15+08:00'><meta property='og:image' content='https://chengxiaqiucao.github.io/post/134-playwright_multi_users/Pasted-20251105.png'><meta name=twitter:title content="用Playwright Fixture支持多用户和不同上下文场景"><meta name=twitter:description content="介绍如何创建一个自定义的 Fixture 来处理多用户的交互场景"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://chengxiaqiucao.github.io/post/134-playwright_multi_users/Pasted-20251105.png'></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/automnGrass_hu_ba0d09fe872844bf.png width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>秋 草 观 “测” 台</a></h1><h2 class=site-description>Testing is not just checking...</h2></div></header><ol class=menu-social><li><a href=https://github.com/chengxiaqiucao target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://space.bilibili.com/472272606 target=_blank title=Bilibili rel=me><!doctype html><svg t="1750732982440" class="icon" viewBox="0 0 1024 1024" p-id="4593" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632 444.330667 256h135.296l138.368-138.325333A42.666667 42.666667.0 01778.368 178.048L700.330667 256H789.333333A149.333333 149.333333.0 01938.666667 405.333333v341.333334A149.333333 149.333333.0 01789.333333 896H234.666667A149.333333 149.333333.0 0185.333333 746.666667V405.333333A149.333333 149.333333.0 01234.666667 256h88.96L245.632 177.962667a42.666667 42.666667.0 0160.373333-60.373334zm483.328 223.701333H234.666667a64 64 0 00-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0057.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0063.701334-57.856L853.333333 746.666667V405.333333a64 64 0 00-64-64zm-448 128A42.666667 42.666667.0 01384 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666666-42.666667zm341.333334.0A42.666667 42.666667.0 01725.333333 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666667-42.666667z" p-id="4594" fill="#8a8a8a"/></svg></a></li><li><a href=https://www.zhihu.com/people/qiucao target=_blank title=zhihu rel=me><!doctype html><svg t="1750733049138" class="icon" viewBox="0 0 1024 1024" p-id="5820" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M570.581333 806.272h61.952L652.928 876.117333 764.074667 806.272h130.986666V230.186667h-324.48V806.272zM636.501333 292.693333h192.64V743.68h-73.898666l-73.813334 46.378667L668.032 743.808l-31.530667-.128V292.736zM515.754667 493.738667H377.429333a2999.466667 2999.466667.0 005.802667-194.56h135.338667S523.776 239.445334 495.872 240.128H261.76c9.216-34.730667 20.821333-70.613333 34.688-107.690667.0.0-63.701333.0-85.333333 57.130667C202.112 213.12 176.128 303.786667 129.877333 396.416c15.573333-1.706667 67.114667-3.114667 97.450667-58.794667 5.589333-15.616 6.656-17.621333 13.568-38.485333h76.373333c0 27.776-3.157333 177.109333-4.437333 194.474667h-138.24c-31.104.0-41.173333 62.549333-41.173333 62.549333h173.482666C295.253333 688.256 232.789333 799.573333 119.466667 887.466667c54.186667 15.488 108.202667-2.432 134.912-26.197334.0.0 60.8-55.338667 94.122666-183.381333L491.264 849.834667s20.906667-71.168-3.285333-105.856c-20.053333-23.637333-74.24-87.552-97.322667-110.72l-38.698667 30.72c11.52-36.992 18.474667-72.96 20.821334-107.690667h163.072s-.213333-62.549333-20.053334-62.549333z" p-id="5821" fill="#8a8a8a"/></svg></a></li><li><a href=mailto:%20danmyw@qq.com target=_blank title=e-mail rel=me><!doctype html><svg t="1750733089669" class="icon" viewBox="0 0 1451 1024" p-id="6983" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759.0 97.881301C0 3.997201 71.046997.0 71.046997.0H474.477909 961.649408h399.992405s71.046998 3.997201 71.046998 97.881301L771.345323 681.472759S764.482731 685.154773 753.594283 688.65053V688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858V688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759zm53.281707 130.131124C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633.0 212.052267.0 212.052267V942.809523S0 1024 83.726336 1024H682.532949 753.579947h595.368192C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523V212.052267S893.138176 701.759633 817.019477 767.734955c-39.771477 34.470494-74.671786 43.295855-98.955861 43.868928z" fill="#8a8a8a" p-id="6984"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>主页</span></a></li><li><a href=/page/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>检索</span></a></li><li><a href=/page/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>链接</span></a></li><li><a href=/page/about/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>关于</span></a></li><li><a href=/page/releases/><svg class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M9.828 9.172a4 4 0 100 5.656A10 10 0 0012 12a10 10 0 012.172-2.828 4 4 0 110 5.656A10 10 0 0112 12 10 10 0 009.828 9.172"/></svg>
+<span>热门开源</span></a></li><li class=menu-bottom-section><ol class=menu><li id=i18n-switch><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg>
+<select name=language title=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://chengxiaqiucao.github.io/en/>English</option><option value=https://chengxiaqiucao.github.io/ selected>中文</option></select></li><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#单用户测试的局限性>单用户测试的局限性</a></li><li><a href=#定制多用户-fixture>定制多用户 Fixture</a><ol><li><a href=#代码实现><strong>代码实现</strong></a></li><li><a href=#实际使用><strong>实际使用</strong></a></li><li><a href=#登录状态保持><strong>登录状态保持</strong></a></li></ol></li><li><a href=#总结>总结</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/post/134-playwright_multi_users/><img src=/post/134-playwright_multi_users/Pasted-20251105_hu_756ee3c6dec8022.png srcset="/post/134-playwright_multi_users/Pasted-20251105_hu_756ee3c6dec8022.png 800w, /post/134-playwright_multi_users/Pasted-20251105_hu_34cdfecab6c85010.png 1600w" width=800 height=416 loading=lazy alt="Featured image of post 用Playwright Fixture支持多用户和不同上下文场景"></a></div><div class=article-details><header class=article-category><a href=/categories/%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7/ style=background-color:#c6fad2;color:#000>测试工具</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/post/134-playwright_multi_users/>用Playwright Fixture支持多用户和不同上下文场景</a></h2><h3 class=article-subtitle>介绍如何创建一个自定义的 Fixture 来处理多用户的交互场景</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Nov 02, 2025</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 5 分钟</time></div></footer></div></header><section class=article-content><p>在现代 Web 开发中，应用程序通常需要处理多个用户同时交互的场景。无论是实时协作工具、社交媒体平台，还是电子商务网站，测试这些多用户交互对于确保应用的稳定性和正确性至关重要。</p><p>然而，默认情况下，Playwright 测试是为单个用户设计的，每个测试都在一个隔离的浏览器上下文中运行。</p><p>本文我们将介绍如何创建一个自定义的 Fixture 来处理这种多用户的交互场景。</p><p><img src=/post/134-playwright_multi_users/Pasted-20251105.png width=923 height=480 srcset="/post/134-playwright_multi_users/Pasted-20251105_hu_b0609f7a4a2e6d9.png 480w, /post/134-playwright_multi_users/Pasted-20251105_hu_8ebc9eb09d94ba33.png 1024w" loading=lazy class=gallery-image data-flex-grow=192 data-flex-basis=461px></p><h2 id=单用户测试的局限性>单用户测试的局限性</h2><p>当我们编写一个标准的 Playwright 测试时，通常会得到一个 <code>page</code> 对象，它代表一个单一的浏览器标签页，并且这个标签页属于一个独立的 <code>browserContext</code>。这个上下文是完全隔离的，拥有自己的 Cookie、本地存储等。这对于大部分需要测试的场景来说，是非常有用的特性。</p><p>但是，当我们要测试类似以下的场景时，问题就出现了：</p><ul><li>用户 A 发送一个好友请求给用户 B。</li><li>用户 B 接受这个好友请求。</li><li>用户 A 和用户 B 现在可以看到对方在好友列表中。</li></ul><p>在单个测试中，无法同时以用户 A 和用户 B 的身份进行操作，因为此时只有一个 <code>page</code> 对象。我们可能也会手动创建一个新的浏览器上下文来单独处理，但这会让测试代码变得冗长、重复且难以维护。</p><h2 id=定制多用户-fixture>定制多用户 Fixture</h2><p>Playwright 中提供了一个强大的功能叫做 &ldquo;fixtures&rdquo;，它允许自定义测试的执行环境。我们可以利用这个功能来创建一个 fixture，它这样就能为每个测试提供一个或多个完全独立的用户环境。</p><p>利用 Python 的 <code>pytest-playwright</code> 库，我们通过 <code>@pytest.fixture</code> 装饰器来实现。</p><p>下面我们将创建两个 fixture：<code>user_one</code> 和 <code>user_two</code>。每个 fixture 都会负责创建自己的 <code>BrowserContext</code> 和 <code>Page</code>，并在测试结束后自动清理它们。</p><h3 id=代码实现><strong>代码实现</strong></h3><p>这里我们将使用 <code>pytest</code> 和 <code>playwright</code> 的异步 API，因为这更接近实际的异步场景。</p><p>首先，确保安装了必要的库：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>pip install pytest pytest-playwright
+</span></span><span class=line><span class=cl>playwright install
+</span></span></code></pre></td></tr></table></div></div><p>现在，在测试文件<code>conftest.py</code> 中，定义以下 fixture：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># conftest.py</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>pytest</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>playwright.async_api</span> <span class=kn>import</span> <span class=n>Page</span><span class=p>,</span> <span class=n>BrowserContext</span><span class=p>,</span> <span class=n>Browser</span><span class=p>,</span> <span class=n>expect</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>async</span> <span class=k>def</span> <span class=nf>user_one</span><span class=p>(</span><span class=n>browser</span><span class=p>:</span> <span class=n>Browser</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    为用户一提供一个独立的浏览器上下文和页面。
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 创建一个全新的、隔离的浏览器上下文</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span> <span class=o>=</span> <span class=k>await</span> <span class=n>browser</span><span class=o>.</span><span class=n>new_context</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 在该上下文中创建一个新页面</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=k>await</span> <span class=n>context</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># 将上下文和页面作为一个字典提供给测试函数</span>
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=p>{</span><span class=s2>&#34;context&#34;</span><span class=p>:</span> <span class=n>context</span><span class=p>,</span> <span class=s2>&#34;page&#34;</span><span class=p>:</span> <span class=n>page</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># 测试结束后，关闭上下文以清理资源</span>
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>context</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>async</span> <span class=k>def</span> <span class=nf>user_two</span><span class=p>(</span><span class=n>browser</span><span class=p>:</span> <span class=n>Browser</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    为用户二提供一个独立的浏览器上下文和页面。
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span> <span class=o>=</span> <span class=k>await</span> <span class=n>browser</span><span class=o>.</span><span class=n>new_context</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=k>await</span> <span class=n>context</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=p>{</span><span class=s2>&#34;context&#34;</span><span class=p>:</span> <span class=n>context</span><span class=p>,</span> <span class=s2>&#34;page&#34;</span><span class=p>:</span> <span class=n>page</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>context</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>代码解释</strong>：</p><ul><li>定义了两个异步 fixture：<code>user_one</code> 和 <code>user_two</code>。</li><li>每个 fixture 都依赖于 <code>pytest-playwright</code> 自动提供的 <code>browser</code> fixture。</li><li><code>yield</code> 关键字是 <code>pytest</code> fixture 的核心。<code>yield</code> 之前的代码是设置部分，<code>yield</code> 的值会被传递给测试函数，<code>yield</code> 之后的代码是拆卸部分。</li><li>这样，每个使用这些 fixture 的测试都会获得两个完全独立的用户环境。</li></ul><h3 id=实际使用><strong>实际使用</strong></h3><p>现在，我们可以在测试中轻松地使用 <code>user_one</code> 和 <code>user_two</code> fixture 了。只需将它们作为参数添加到测试函数中即可。</p><p>假设我们有一个简单的聊天应用，我们想测试用户 A 发送消息，用户 B 能否收到。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_multi_user_chat.py</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>pytest</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>playwright.async_api</span> <span class=kn>import</span> <span class=n>expect</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 注意：user_one 和 user_two 的 fixture 定义可以放在 conftest.py 中，</span>
+</span></span><span class=line><span class=cl><span class=c1># pytest 会自动发现它们。这里为了方便展示，我们假设它们已经可用。</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.mark.asyncio</span>
+</span></span><span class=line><span class=cl><span class=k>async</span> <span class=k>def</span> <span class=nf>test_chat_between_two_users</span><span class=p>(</span><span class=n>user_one</span><span class=p>,</span> <span class=n>user_two</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 获取两个用户的页面对象</span>
+</span></span><span class=line><span class=cl>    <span class=n>page_a</span> <span class=o>=</span> <span class=n>user_one</span><span class=p>[</span><span class=s1>&#39;page&#39;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=n>page_b</span> <span class=o>=</span> <span class=n>user_two</span><span class=p>[</span><span class=s1>&#39;page&#39;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1># 用户 A 进入聊天室</span>
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>page_a</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=s2>&#34;https://your-chat-app.com/room/123&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>page_a</span><span class=o>.</span><span class=n>get_by_label</span><span class=p>(</span><span class=s2>&#34;Username&#34;</span><span class=p>)</span><span class=o>.</span><span class=n>fill</span><span class=p>(</span><span class=s2>&#34;UserA&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>page_a</span><span class=o>.</span><span class=n>get_by_role</span><span class=p>(</span><span class=s2>&#34;button&#34;</span><span class=p>,</span> <span class=n>name</span><span class=o>=</span><span class=s2>&#34;Join&#34;</span><span class=p>)</span><span class=o>.</span><span class=n>click</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1># 用户 B 进入同一个聊天室</span>
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>page_b</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=s2>&#34;https://your-chat-app.com/room/123&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>page_b</span><span class=o>.</span><span class=n>get_by_label</span><span class=p>(</span><span class=s2>&#34;Username&#34;</span><span class=p>)</span><span class=o>.</span><span class=n>fill</span><span class=p>(</span><span class=s2>&#34;UserB&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>page_b</span><span class=o>.</span><span class=n>get_by_role</span><span class=p>(</span><span class=s2>&#34;button&#34;</span><span class=p>,</span> <span class=n>name</span><span class=o>=</span><span class=s2>&#34;Join&#34;</span><span class=p>)</span><span class=o>.</span><span class=n>click</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1># 用户 A 发送一条消息</span>
+</span></span><span class=line><span class=cl>    <span class=n>message_text</span> <span class=o>=</span> <span class=s2>&#34;Hello from User A!&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>page_a</span><span class=o>.</span><span class=n>get_by_label</span><span class=p>(</span><span class=s2>&#34;Message&#34;</span><span class=p>)</span><span class=o>.</span><span class=n>fill</span><span class=p>(</span><span class=n>message_text</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>page_a</span><span class=o>.</span><span class=n>get_by_role</span><span class=p>(</span><span class=s2>&#34;button&#34;</span><span class=p>,</span> <span class=n>name</span><span class=o>=</span><span class=s2>&#34;Send&#34;</span><span class=p>)</span><span class=o>.</span><span class=n>click</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1># 用户 B 验证是否收到了消息</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 我们需要等待消息出现在用户 B 的页面上</span>
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>expect</span><span class=p>(</span><span class=n>page_b</span><span class=o>.</span><span class=n>get_by_text</span><span class=p>(</span><span class=n>message_text</span><span class=p>))</span><span class=o>.</span><span class=n>to_be_visible</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1># 用户 B 回复消息</span>
+</span></span><span class=line><span class=cl>    <span class=n>reply_text</span> <span class=o>=</span> <span class=s2>&#34;Hello from User B!&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>page_b</span><span class=o>.</span><span class=n>get_by_label</span><span class=p>(</span><span class=s2>&#34;Message&#34;</span><span class=p>)</span><span class=o>.</span><span class=n>fill</span><span class=p>(</span><span class=n>reply_text</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>page_b</span><span class=o>.</span><span class=n>get_by_role</span><span class=p>(</span><span class=s2>&#34;button&#34;</span><span class=p>,</span> <span class=n>name</span><span class=o>=</span><span class=s2>&#34;Send&#34;</span><span class=p>)</span><span class=o>.</span><span class=n>click</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1># 用户 A 验证是否收到了回复</span>
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>expect</span><span class=p>(</span><span class=n>page_a</span><span class=o>.</span><span class=n>get_by_text</span><span class=p>(</span><span class=n>reply_text</span><span class=p>))</span><span class=o>.</span><span class=n>to_be_visible</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=登录状态保持><strong>登录状态保持</strong></h3><p>在实际测试中，通常会希望用户在开始测试前就已经处于登录状态。这里可以通过 <code>storageState</code> 选项来实现这一点。只需在创建上下文时加载一个包含认证信息的 JSON 文件即可。</p><p>代码类似：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>asyncio</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>playwright.async_api</span> <span class=kn>import</span> <span class=n>async_playwright</span><span class=p>,</span> <span class=n>Browser</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>async</span> <span class=k>def</span> <span class=nf>generate_user_state</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>browser</span><span class=p>:</span> <span class=n>Browser</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>base_url</span><span class=p>:</span> <span class=nb>str</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>user_email</span><span class=p>:</span> <span class=nb>str</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>user_password</span><span class=p>:</span> <span class=nb>str</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>output_path</span><span class=p>:</span> <span class=nb>str</span> <span class=o>=</span> <span class=s2>&#34;user_one_state.json&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    生成用户认证状态文件（如 user_one_state.json）
+</span></span></span><span class=line><span class=cl><span class=s2>    
+</span></span></span><span class=line><span class=cl><span class=s2>    :param browser: Playwright Browser 实例
+</span></span></span><span class=line><span class=cl><span class=s2>    :param base_url: 应用基础 URL
+</span></span></span><span class=line><span class=cl><span class=s2>    :param user_email: 用户邮箱
+</span></span></span><span class=line><span class=cl><span class=s2>    :param user_password: 用户密码
+</span></span></span><span class=line><span class=cl><span class=s2>    :param output_path: 状态文件输出路径
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 1. 创建临时浏览器上下文（无状态）</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span> <span class=o>=</span> <span class=k>await</span> <span class=n>browser</span><span class=o>.</span><span class=n>new_context</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=k>await</span> <span class=n>context</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=c1># 2. 导航到登录页面并登录</span>
+</span></span><span class=line><span class=cl>        <span class=k>await</span> <span class=n>page</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;</span><span class=si>{</span><span class=n>base_url</span><span class=si>}</span><span class=s2>/login&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>await</span> <span class=n>page</span><span class=o>.</span><span class=n>fill</span><span class=p>(</span><span class=s2>&#34;input[name=&#39;email&#39;]&#34;</span><span class=p>,</span> <span class=n>user_email</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>await</span> <span class=n>page</span><span class=o>.</span><span class=n>fill</span><span class=p>(</span><span class=s2>&#34;input[name=&#39;password&#39;]&#34;</span><span class=p>,</span> <span class=n>user_password</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>await</span> <span class=n>page</span><span class=o>.</span><span class=n>click</span><span class=p>(</span><span class=s2>&#34;button[type=&#39;submit&#39;]&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=c1># 等待登录成功（例如跳转到仪表盘）</span>
+</span></span><span class=line><span class=cl>        <span class=k>await</span> <span class=n>page</span><span class=o>.</span><span class=n>wait_for_url</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;</span><span class=si>{</span><span class=n>base_url</span><span class=si>}</span><span class=s2>/dashboard&#34;</span><span class=p>,</span> <span class=n>timeout</span><span class=o>=</span><span class=mi>10000</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=c1># 3. 保存认证状态到文件</span>
+</span></span><span class=line><span class=cl>        <span class=k>await</span> <span class=n>context</span><span class=o>.</span><span class=n>storage_state</span><span class=p>(</span><span class=n>path</span><span class=o>=</span><span class=n>output_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;✅ 用户状态已保存到: </span><span class=si>{</span><span class=n>output_path</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;❌ 登录失败: </span><span class=si>{</span><span class=n>e</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>raise</span>
+</span></span><span class=line><span class=cl>    <span class=k>finally</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=c1># 4. 关闭上下文</span>
+</span></span><span class=line><span class=cl>        <span class=k>await</span> <span class=n>context</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 使用示例</span>
+</span></span><span class=line><span class=cl><span class=k>async</span> <span class=k>def</span> <span class=nf>main</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=k>async</span> <span class=k>with</span> <span class=n>async_playwright</span><span class=p>()</span> <span class=k>as</span> <span class=n>p</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>browser</span> <span class=o>=</span> <span class=k>await</span> <span class=n>p</span><span class=o>.</span><span class=n>chromium</span><span class=o>.</span><span class=n>launch</span><span class=p>(</span><span class=n>headless</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>  <span class=c1># 可设为 False 以调试</span>
+</span></span><span class=line><span class=cl>        <span class=k>await</span> <span class=n>generate_user_state</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>            <span class=n>browser</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=n>base_url</span><span class=o>=</span><span class=s2>&#34;https://your-app.com&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=n>user_email</span><span class=o>=</span><span class=s2>&#34;user_one@example.com&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=n>user_password</span><span class=o>=</span><span class=s2>&#34;your_password&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=n>output_path</span><span class=o>=</span><span class=s2>&#34;user_one_state.json&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>await</span> <span class=n>browser</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=vm>__name__</span> <span class=o>==</span> <span class=s2>&#34;__main__&#34;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>asyncio</span><span class=o>.</span><span class=n>run</span><span class=p>(</span><span class=n>main</span><span class=p>())</span>
+</span></span></code></pre></td></tr></table></div></div><p>上面的代码，首先我们创建了临时浏览器上下文，并执行了登录流程，然后利用<code>storageState</code>存储到json文件后，关闭上下文，释放资源。</p><p>得到Json文件形如：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;cookies&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;session_id&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;value&#34;</span><span class=p>:</span> <span class=s2>&#34;abc123&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;domain&#34;</span><span class=p>:</span> <span class=s2>&#34;your-app.com&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;path&#34;</span><span class=p>:</span> <span class=s2>&#34;/&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;expires&#34;</span><span class=p>:</span> <span class=mi>-1</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;httpOnly&#34;</span><span class=p>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;secure&#34;</span><span class=p>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;sameSite&#34;</span><span class=p>:</span> <span class=s2>&#34;Lax&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>],</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;origins&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;origin&#34;</span><span class=p>:</span> <span class=s2>&#34;https://your-app.com&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;localStorage&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>          <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;token&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=nt>&#34;value&#34;</span><span class=p>:</span> <span class=s2>&#34;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>      <span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>然后我们修改对应的 <code>user_one</code> fixture：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># conftest.py (更新后的 user_one fixture)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>async</span> <span class=k>def</span> <span class=nf>user_one</span><span class=p>(</span><span class=n>browser</span><span class=p>:</span> <span class=n>Browser</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    为用户一提供一个独立的、已登录的浏览器上下文和页面。
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 假设我们已经通过一个单独的脚本或测试生成了 &#39;user_one_state.json&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span> <span class=o>=</span> <span class=k>await</span> <span class=n>browser</span><span class=o>.</span><span class=n>new_context</span><span class=p>(</span><span class=n>storage_state</span><span class=o>=</span><span class=s2>&#34;user_one_state.json&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=k>await</span> <span class=n>context</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=p>{</span><span class=s2>&#34;context&#34;</span><span class=p>:</span> <span class=n>context</span><span class=p>,</span> <span class=s2>&#34;page&#34;</span><span class=p>:</span> <span class=n>page</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>context</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p>这样，每次使用 <code>user_one</code> fixture 的测试都会自动获得一个已经登录的用户环境，极大地简化了测试的设置过程。</p><h2 id=总结>总结</h2><p>通过创建自定义的多用户 fixture，我们可以轻松地扩展 Playwright 测试的能力，以应对复杂的多用户交互场景。</p></section><footer class=article-footer><section class=article-tags><a href=/tags/playwright/>Playwright</a>
+<a href=/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95/>自动化测试</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/post/135-playwright_unstable/><div class=article-details><h2 class=article-title>Playwright中对不稳定测试的重试处理</h2></div></a></article><article class=has-image><a href=/post/066-playwright%E6%96%B0%E7%89%88%E6%9C%AC%E7%AD%9B%E9%80%89%E5%8A%9F%E8%83%BD/><div class=article-image><img src=/post/066-playwright%E6%96%B0%E7%89%88%E6%9C%AC%E7%AD%9B%E9%80%89%E5%8A%9F%E8%83%BD/playwright_logo.82386a35c48e32d43f12199ac6a46a38_hu_4a434fd1b6eb715.png width=250 height=150 loading=lazy alt="Featured image of post Playwright新版本筛选功能" data-hash="md5-gjhqNcSOMtQ/EhmaxqRqOA=="></div><div class=article-details><h2 class=article-title>Playwright新版本筛选功能</h2></div></a></article><article><a href=/post/137-anti_automation/><div class=article-details><h2 class=article-title>关于自动化测试中的反模式</h2></div></a></article><article class=has-image><a href=/post/122-playwright_adv_fixture/><div class=article-image><img src=/post/122-playwright_adv_fixture/playwright_logo.82386a35c48e32d43f12199ac6a46a38_hu_4a434fd1b6eb715.png width=250 height=150 loading=lazy alt="Featured image of post Playwright中Fixture的高级应用技巧" data-hash="md5-gjhqNcSOMtQ/EhmaxqRqOA=="></div><div class=article-details><h2 class=article-title>Playwright中Fixture的高级应用技巧</h2></div></a></article><article class=has-image><a href=/post/118-pom_replacement/><div class=article-image><img src=/post/118-pom_replacement/Pasted-20250806.f76c8d5a1901a96f974bf59653a68a57_hu_a02d5b9b8c63369f.png width=250 height=150 loading=lazy alt="Featured image of post UI自动化，POM之外的另一模式" data-hash="md5-92yNWhkBqW+XS/WWU6aKVw=="></div><div class=article-details><h2 class=article-title>UI自动化，POM之外的另一模式</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2023 -
+2026 |by 城下秋草（公众号： 秋草说测试）</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

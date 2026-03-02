@@ -1,0 +1,751 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>质量管理 on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86/</link><description>Recent content in 质量管理 on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Wed, 27 Aug 2025 16:31:25 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86/index.xml" rel="self" type="application/rss+xml"/><item><title>测试左移，并不仅仅是测试人员的前期参与</title><link>https://chengxiaqiucao.github.io/post/125-testing_shift_left/</link><pubDate>Wed, 27 Aug 2025 16:31:25 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/125-testing_shift_left/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/125-testing_shift_left/Pasted-20250827-1.png" alt="Featured image of post 测试左移，并不仅仅是测试人员的前期参与" /&gt;&lt;h2 id="前言"&gt;前言
+&lt;/h2&gt;&lt;p&gt;传统的瀑布式软件研发流程，测试环节通常处于SDLC的后期，测试人员承担着“质量守门员”的职责。而随着敏捷研发和DevOps等研发模式的推行，快速迭代、持续交付成为常态，相应地，“测试左移”这个概念也被高频地提及，很多实施敏捷的团队都将“测试左移”作为重要实践。&lt;/p&gt;
+&lt;p&gt;很多团队都会鼓励测试人员尽早参与项目，在需求、设计、开发环节都会让测试人员参与，包括需求评审、设计讨论、开发阶段的结对、单元/集成测试、持续集成管道、自动化测试等等，都有测试人员参与的身影。&lt;/p&gt;
+&lt;p&gt;本文，我们不讨论测试左移中这些具体的实践，而是想澄清一点：&lt;strong&gt;“测试左移”，并不仅仅是测试人员向前端的平移&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/125-testing_shift_left/Pasted-20250827-1.png"
+width="1198"
+height="646"
+srcset="https://chengxiaqiucao.github.io/post/125-testing_shift_left/Pasted-20250827-1_hu_aae4e1edd5e5ae95.png 480w, https://chengxiaqiucao.github.io/post/125-testing_shift_left/Pasted-20250827-1_hu_b445e9ed87d39106.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="185"
+data-flex-basis="445px"
+&gt;&lt;/p&gt;
+&lt;h2 id="软件质量"&gt;软件质量
+&lt;/h2&gt;&lt;p&gt;何谓软件质量? &lt;strong&gt;IEEE.1061&lt;/strong&gt;的定义如下：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;软件质量是软件产品满足规定的需求，以及基于用户需求和期望的隐含需求的程度。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;这个定义很抽象，也从侧面说明，质量其实是一个较难明确界定的产品要素。&lt;/p&gt;
+&lt;p&gt;不同视角的角色看待质量其实是不同的。&lt;/p&gt;
+&lt;h3 id="用户视角"&gt;用户视角
+&lt;/h3&gt;&lt;p&gt;质量是满足用户需求和期望的程度。也就是产品是否能帮用户解决具体问题？是否方便快捷？稳定可靠？性价比高？&lt;/p&gt;
+&lt;p&gt;“这个软件很好用！”
+“这个系统稳定性好，从不崩溃！”
+“这个App用得很丝滑~”&lt;/p&gt;
+&lt;h3 id="开发视角"&gt;开发视角
+&lt;/h3&gt;&lt;p&gt;站在开发者视角，质量则体现在代码和架构上。&lt;/p&gt;
+&lt;p&gt;“代码是否规范，可读性，可维护性良好”
+“架构清晰，方便扩展”
+“技术债务可控”&lt;/p&gt;
+&lt;h3 id="测试视角"&gt;测试视角
+&lt;/h3&gt;&lt;p&gt;从测试者的视角来看，除了带入用户视角的体验外，质量更多是多种场景的适应性。&lt;/p&gt;
+&lt;p&gt;happy path、angry path、scary path、greedy path等等各种场景下，软件适用程度。&lt;/p&gt;
+&lt;h3 id="管理视角"&gt;管理视角
+&lt;/h3&gt;&lt;p&gt;而从管理视角来看，质量又体现在是否能按时交付？预算是否可控？产品指标是否满足？&lt;/p&gt;
+&lt;p&gt;“产品按时高质量交付”
+“研发成本大幅缩减”
+“系统稳定运行，可用性达到99.999%”&lt;/p&gt;
+&lt;h3 id="业务视角"&gt;业务视角
+&lt;/h3&gt;&lt;p&gt;而站在业务运营角度，质量衡量的是产品创造价值和竞争优势的程度。&lt;/p&gt;
+&lt;p&gt;“用户下载量”，“用户注册数”，“订单转化率”，“用户留存率”等等&amp;hellip;.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/125-testing_shift_left/Pasted-20250827-2.png"
+width="1013"
+height="555"
+srcset="https://chengxiaqiucao.github.io/post/125-testing_shift_left/Pasted-20250827-2_hu_39c4c4c1439ce14e.png 480w, https://chengxiaqiucao.github.io/post/125-testing_shift_left/Pasted-20250827-2_hu_85304c54ab252817.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="182"
+data-flex-basis="438px"
+&gt;
+&lt;code&gt;一千个人眼中有一千个哈姆雷特&lt;/code&gt;, 质量也如是！&lt;/p&gt;
+&lt;p&gt;说到底，其实还是落到我们经常强调的：质量不是由测试保证的，测试也无法保证！质量是和整个团队，软件生命周期链条上所有人都紧密相关的，人人都应该是owner！&lt;/p&gt;
+&lt;h2 id="测试左移的本质"&gt;测试左移的本质
+&lt;/h2&gt;&lt;p&gt;通过上一节的说明，其实本文题眼所说，&lt;code&gt;“测试左移”并不仅仅是测试人员的前移！&lt;/code&gt; 就很容易理解了。&lt;/p&gt;
+&lt;p&gt;因为快速迭代和持续交付的推行，这一应运而生的质量控制举措，将测试人员前移，虽然测试相关活动已经不局限于后期验证，但如果还是把质量依赖于测试人员的相关活动，那么依然是治标不治本。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;测试左移&lt;/strong&gt;，本质上是面向全员质量文化的普及。测试人员的左移，更多是应该将测试人特有的，对质量风险敏感的测试思维带到前端，带动团队整体建立起质量优先的文化氛围。&lt;/p&gt;
+&lt;p&gt;亦即&lt;strong&gt;测试应该向【QA】转型！&lt;/strong&gt; 而且，这里的 &lt;code&gt;QA&lt;/code&gt;, 并不是传统意义上，重在流程管控、做质量保障工作的&lt;code&gt;Quality Assurance&lt;/code&gt;， 应该是适应敏捷模式的新型QA&lt;/p&gt;
+&lt;h2 id="测试向qa的转型"&gt;测试向QA的转型
+&lt;/h2&gt;&lt;h3 id="quality-assurance"&gt;Quality Assurance
+&lt;/h3&gt;&lt;p&gt;传统的QA岗位，即&lt;code&gt;Quality Assurance(质量保证)&lt;/code&gt;，是一个专门面向质量体系的岗位，和测试岗位并不相同。QA的工作更多是质量标准的制定和监督，面向的全生命周期的流程管控；而测试更多是一个基于测试技术的工程岗位。&lt;/p&gt;
+&lt;p&gt;在测试左移的趋势下，测试就不再应该局限于测试技术的应用，而应该将视角转向&lt;code&gt;Quality Assurance&lt;/code&gt;，也需要关注软件研发全链路中，各个环节的质量风险。&lt;/p&gt;
+&lt;h3 id="quality-analyzer"&gt;Quality Analyzer
+&lt;/h3&gt;&lt;p&gt;这其实还不够！测试左移，并不是角色的切换，更重要的还包括测试思维的导入。也就是这时，测试还应该是&lt;code&gt;Quality Analyzer（质量分析师）&lt;/code&gt;。 比如&lt;/p&gt;
+&lt;h4 id="在需求评审时"&gt;在需求评审时：
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;寻找模糊地带&lt;/strong&gt;：主动识别需求中的歧义点。例如，&amp;ldquo;系统响应要快&amp;rdquo;——多快才算快？&amp;ldquo;友好的用户界面&amp;rdquo;——如何定义友好？&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;提出&amp;quot;What if&amp;quot;问题&lt;/strong&gt;：探索各种场景，包括正常流程、异常流程和边界情况：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&amp;ldquo;如果用户在这里输入特殊字符会怎样？&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;如果网络突然中断，数据会如何处理？&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;如果用户没有权限，应该看到什么提示？&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;确保需求的可测试性&lt;/strong&gt;：评估每个需求点是否可以通过具体的操作和预期结果来验证&lt;/p&gt;
+&lt;h4 id="在架构设计阶段"&gt;在架构/设计阶段：
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;从用户视角出发&lt;/strong&gt;：检查设计稿的流程是否顺畅、直观&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;关注边缘案例&lt;/strong&gt;：加载状态、错误提示、空状态页面等是否都已设计&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;评估可访问性&lt;/strong&gt;：考虑设计是否对所有用户群体都友好&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;评估系统可测试性&lt;/strong&gt;：确保系统是可验证的。包括日志的记录、操作流的追溯、第三方的模拟等等&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;评估非功能性需求及测试策略&lt;/strong&gt;：确保系统架构和设计阶段已经充分考虑了性能、安全、可靠性等非功能性需求，构建相应的测试方案&lt;/p&gt;
+&lt;h4 id="在开发过程中"&gt;在开发过程中：
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;推动单元测试覆盖&lt;/strong&gt;：协助开发团队构建单元测试框架、提升测试覆盖&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;深入系统集成&lt;/strong&gt;：和开发团队基于合适的分支管理模式，建立持续集成CI管道，构建自动化测试的&lt;code&gt;质量门禁&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;通过深度参与前端环节，将测试思维和对软件质量的思考和敏锐观察，融入到测试之外的软件研发活动中。&lt;/p&gt;
+&lt;h3 id="quality-advocator"&gt;Quality Advocator
+&lt;/h3&gt;&lt;p&gt;此外，质量文化不是一蹴而就的，在一个高速运转的团队中，一个以质量为第一优先的角色，不断向团队倡导质量意识，在质量失控风险时能及时提出&amp;quot;异议&amp;quot;, 更是“测试左移”后，测试人员的重要职能。&lt;/p&gt;
+&lt;p&gt;但这个新职能要发挥作用，离不开团队和管理层对&lt;strong&gt;质量优先&lt;/strong&gt;的一致认可，包括对测试人员在左移后
+相关工作的制度支持。否则，质量优先多半只会流于形式，不过一句响亮的口号&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/125-testing_shift_left/Pasted-20250827.png"
+width="1166"
+height="536"
+srcset="https://chengxiaqiucao.github.io/post/125-testing_shift_left/Pasted-20250827_hu_d47507218d0bf5d7.png 480w, https://chengxiaqiucao.github.io/post/125-testing_shift_left/Pasted-20250827_hu_f41878c444985eaf.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="217"
+data-flex-basis="522px"
+&gt;&lt;/p&gt;
+&lt;h2 id="总结"&gt;总结
+&lt;/h2&gt;&lt;p&gt;随着敏捷、DevOps技术的不断发展，软件研发的速度、节奏和复杂性都在不断提升。在这样的背景下，测试左移要落到实处，质量文化的建立其实是根本。&lt;/p&gt;
+&lt;p&gt;而在这个过程中，测试也需要完成角色的蜕变，向质量顾问、质量分析师、质量倡导者转型，在更广大的范围发挥价值。&lt;/p&gt;
+&lt;p&gt;总而言之，推行“测试左移”，需要将质量思考融入进研发的每个环节，将质量文化烙入团队的DNA，最终构建出一个全员参与、持续改进的质量生态。&lt;/p&gt;</description></item><item><title>勇于做“异见者”，再谈测试人的职能认知</title><link>https://chengxiaqiucao.github.io/post/124-testing_not_valid/</link><pubDate>Wed, 20 Aug 2025 16:01:41 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/124-testing_not_valid/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/124-testing_not_valid/Pasted-20250825-2.png" alt="Featured image of post 勇于做“异见者”，再谈测试人的职能认知" /&gt;&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/124-testing_not_valid/Pasted-20250825-2.png"
+width="751"
+height="501"
+srcset="https://chengxiaqiucao.github.io/post/124-testing_not_valid/Pasted-20250825-2_hu_8e7d853ddf6985d5.png 480w, https://chengxiaqiucao.github.io/post/124-testing_not_valid/Pasted-20250825-2_hu_b43e344c373fd8f2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="149"
+data-flex-basis="359px"
+&gt;&lt;/p&gt;
+&lt;h2 id="前言"&gt;前言
+&lt;/h2&gt;&lt;p&gt;前几天，看到一篇国外博主 &lt;code&gt;Vitaly Sharovatov&lt;/code&gt; 的&lt;a class="link" href="https://www.ministryoftesting.com/articles/overcoming-the-trap-of-intellectual-conformity-tips-for-software-testers?utm_campaign=Software%2BTesting%2BWeekly&amp;amp;utm_medium=web&amp;amp;utm_source=Software_Testing_Weekly_280" target="_blank" rel="noopener"
+&gt;博文&lt;/a&gt;, 谈到 &lt;code&gt;认知一致性陷阱&lt;/code&gt; 在企业和研发团队中的，因为 &lt;strong&gt;认知一致性陷阱&lt;/strong&gt; 的存在，往往很多本可避免的错误决策被推行。而测试人员可以在其中发挥出更关键的作用。&lt;/p&gt;
+&lt;p&gt;读后很有启发，深入思考后，草就此文，与诸君共飨~&lt;/p&gt;
+&lt;h2 id="认知一致性陷阱"&gt;认知一致性陷阱
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;认知一致性陷阱&lt;/strong&gt;是指个体在持有某种立场或认知后，倾向于选择性地接受与之一致的信息，而忽视或忽略不一致的信息，从而形成自我强化的认知闭环，导致难以客观评估现实。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;上世纪50年代，费斯汀格与卡尔史密斯、所罗门阿希等心理学家，做过很多相关实验，证实了认知一致性偏差的广泛存在&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;试验者在执行枯燥任务时，低报酬者比高报酬者更倾向于改变原先评价，以合理化行为与结果的矛盾。&lt;/li&gt;
+&lt;li&gt;另一个实验中，大部分试验者会因为其他人的错误答案，而改变原先自己的正确选择。&lt;/li&gt;
+&lt;li&gt;试验者在不同标价的同种食材食品中，会倾向认为标价更高的食品更为美味&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/124-testing_not_valid/Pasted-20250825-1.png"
+width="801"
+height="535"
+srcset="https://chengxiaqiucao.github.io/post/124-testing_not_valid/Pasted-20250825-1_hu_3522bd5b82f177fc.png 480w, https://chengxiaqiucao.github.io/post/124-testing_not_valid/Pasted-20250825-1_hu_59482af1a41ddc26.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="149"
+data-flex-basis="359px"
+&gt;&lt;/p&gt;
+&lt;p&gt;以上试验，其实简而言之，就是我们说的 “&lt;strong&gt;从众心态&lt;/strong&gt;”&lt;/p&gt;
+&lt;h2 id="认知一致性导致的质量风险"&gt;认知一致性导致的质量风险
+&lt;/h2&gt;&lt;p&gt;企业中，因为以上“从众心态”，顺从主要意见而导致的质量问题并不鲜见。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;一个冒烟都无法通过的开发版本匆匆提交测试，只是因为开发人员“觉得”没问题了&lt;/li&gt;
+&lt;li&gt;领导拍脑袋想出的一个功能，匆匆上马，因为不符合用户实际需求，成为摆设甚至必须回退&lt;/li&gt;
+&lt;li&gt;缺少对用户群体的调查和真实使用场景的分析，新功能完全无法使用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;上面这些问题，真的没人在发生前觉得可能有问题吗？只是因为大多数人没有意见或者到了流程节点，默认就推行下去了。&lt;/p&gt;
+&lt;p&gt;之前看到一个初创公司CEO的观点：软件测试人员在成本效益方面&amp;quot;弊大于利&amp;quot;。如果招聘的都是具有质量意识的优秀开发人员，就不需要专门的质量角色。&lt;/p&gt;
+&lt;p&gt;但事实确实如此吗？ 我此前的文章中，曾经讨论过“开发思维” 和 “测试思维” 的不同：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;开发人员更倾向追求&lt;strong&gt;确定性&lt;/strong&gt;。基于确定性的需求，步骤，定义产品的表现。&lt;/li&gt;
+&lt;li&gt;测试人员则需要基于&lt;strong&gt;不确定性&lt;/strong&gt;来考虑各种可能路径和分支场景，基于未知来评估产品的可能表现。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;而且，在一个基于绩效驱动的组织中，开发人员被雇佣来是为了交付成果，而不是质疑。评估他们的标准是他们的构建能力，而不是他们发现和应对问题的能力。&lt;/p&gt;
+&lt;p&gt;再基于 &lt;code&gt;认知一致性陷阱&lt;/code&gt;，在一个强调产出的组织中，质疑的声音会被不断弱化，所以&lt;strong&gt;具有优秀质量意识&lt;/strong&gt;的开发人员，在这样的环境下，也很难做到质量优先。&lt;/p&gt;
+&lt;h2 id="测试岗位赋予的异见者"&gt;测试，岗位赋予的“异见者”
+&lt;/h2&gt;&lt;p&gt;很多“从众心态”的人员，其实能意识到问题不对，只是缺少提出“异见”的勇气，但一旦有指出问题的挑战者出现，便也能积极提出意见。&lt;/p&gt;
+&lt;p&gt;而测试这个岗位，则从职能设定上就是被赋予且被期望去提出质疑和挑战。&lt;/p&gt;
+&lt;p&gt;这也正是测试这个岗位存在且重要的必要性所在：降低他人的异议门槛，为团队创造批判性思维空间。&lt;/p&gt;
+&lt;p&gt;而作为测试人员，也不要囿于研发生命周期的限制，积极测试左移，更多参与前期环节，才更能体现角色的价值。&lt;/p&gt;
+&lt;p&gt;当然，认知到这点，也要接受成为“&lt;strong&gt;带来坏消息的人&lt;/strong&gt;”这个定位。坦然面对，团队走向成功，离不开这样的角色。&lt;/p&gt;
+&lt;h2 id="结语"&gt;结语
+&lt;/h2&gt;&lt;p&gt;喜欢看古装历史剧的同学，应该都熟悉，在历朝历代，都有“御史”这样的官职，作为谏议言官，虽然多半不受皇帝大臣待见，但体系的运转，却不能缺少这个监察审议的存在。&lt;/p&gt;
+&lt;p&gt;而测试人，也正颇似软件研发这个体系中的“御史”。&lt;/p&gt;
+&lt;p&gt;不要担心测试报告上的“&lt;strong&gt;不通过&lt;/strong&gt;”，那就是测试这个职能存在的意义。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/124-testing_not_valid/Pasted-20250825.png"
+width="694"
+height="520"
+srcset="https://chengxiaqiucao.github.io/post/124-testing_not_valid/Pasted-20250825_hu_c927715d3da22d0e.png 480w, https://chengxiaqiucao.github.io/post/124-testing_not_valid/Pasted-20250825_hu_69c00dda2b53865c.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+&gt;&lt;/p&gt;</description></item><item><title>"Bug数量"，糟糕的度量指标</title><link>https://chengxiaqiucao.github.io/post/121-bad_metric_bug/</link><pubDate>Fri, 15 Aug 2025 17:21:34 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/121-bad_metric_bug/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/121-bad_metric_bug/Pasted-20250815-2.png" alt="Featured image of post "Bug数量"，糟糕的度量指标" /&gt;&lt;h2 id="前言"&gt;前言
+&lt;/h2&gt;&lt;p&gt;在很多软件企业中，长期以来，&lt;code&gt;Bug数量&lt;/code&gt; 被认为是衡量质量和团队绩效的直观指标。&lt;/p&gt;
+&lt;p&gt;但实际上，将&lt;code&gt;Bug数量&lt;/code&gt;作为绩效指标，这种看似简单直接的度量方式，其实有着根本性的缺陷。不仅不能反映个人和团队的真实价值，反而还会催生“眼镜蛇效应”，阻碍团队向真正的质量目标靠拢。&lt;/p&gt;
+&lt;p&gt;本文，我们将深入分析将&lt;code&gt;Bug数量&lt;/code&gt;作为绩效指标的的弊端，并探讨更合理的度量方式。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/121-bad_metric_bug/Pasted-20250815-2.png"
+width="664"
+height="287"
+srcset="https://chengxiaqiucao.github.io/post/121-bad_metric_bug/Pasted-20250815-2_hu_60d4521a9adcc73.png 480w, https://chengxiaqiucao.github.io/post/121-bad_metric_bug/Pasted-20250815-2_hu_646d6bf0f7a278af.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="231"
+data-flex-basis="555px"
+&gt;&lt;/p&gt;
+&lt;h2 id="bug数量-指标的根本性弊端"&gt;&amp;ldquo;Bug数量&amp;rdquo; 指标的根本性弊端
+&lt;/h2&gt;&lt;p&gt;将&lt;strong&gt;缺陷数量&lt;/strong&gt;作为绩效考核的一个单独指标，其本质是将&lt;strong&gt;质量&lt;/strong&gt;这个复杂、多维度的目标简化为单一、可量化的数字。&lt;/p&gt;
+&lt;p&gt;这种简化在实际度量与预期之间会产生致命的鸿沟，从而根本上违背软件工程的宗旨。&lt;/p&gt;
+&lt;h3 id="眼镜蛇效应"&gt;眼镜蛇效应
+&lt;/h3&gt;&lt;p&gt;任何单一、量化的数据指标，成为绩效后，往往都会引发和设计初衷相悖的负面结果，引发 &lt;strong&gt;眼镜蛇效应&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/121-bad_metric_bug/Pasted-20250815-1.png"
+width="1034"
+height="581"
+srcset="https://chengxiaqiucao.github.io/post/121-bad_metric_bug/Pasted-20250815-1_hu_4e97f6b85b293ae.png 480w, https://chengxiaqiucao.github.io/post/121-bad_metric_bug/Pasted-20250815-1_hu_5eb1211104be081d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="427px"
+&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;眼镜蛇效应&lt;/strong&gt; 源于英国统治时期的印度，为控制眼镜蛇数量，政府悬赏捕杀，但当地居民为了获取赏金开始人工饲养眼镜蛇，当政府停止悬赏后，被放生的眼镜蛇导致了更严重的泛滥。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;在软件研发过程中，如&lt;code&gt;Bug数量&lt;/code&gt;这样偏执性的指标，也同样会产生事与愿违的恶果。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;于测试团队而言&lt;/strong&gt;，这种度量方式会催生出典型的“重数量轻质量”问题。为了达到“缺陷定额”或绩效目标，测试人员会倾向浪费宝贵时间去寻找影响低、优先级低、但容易出现的细微问题来“凑数”。也因此，浪费了大量的开发和业务资源。&lt;/p&gt;
+&lt;p&gt;除此之外，当目标重在追求数量，测试人员会倾向于不再对Bug做深入分析，也即不再追求高价值的&lt;code&gt;Bug报告单&lt;/code&gt;（参见前文【】）。所以这种指标设计，其实是在惩罚那些致力于提供高价值洞察的测试人员。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;于开发团队而言&lt;/strong&gt;，如果开发者的绩效与“修复的bug数量”挂钩，他们则更有动机去修复那些“小而美”、易于解决的bug，而不是去攻克一个高价值的、复杂的深层故障。甚至还可能导致&amp;quot;自产自销&amp;quot;，为了达到修复量/修复率的指标，而去主动制造一些容易修复的缺陷。&lt;/p&gt;
+&lt;p&gt;所以很明显，指标最后驱动的结果是和真正价值背道而驰的。&lt;/p&gt;
+&lt;h3 id="忽视质量目标的本质"&gt;忽视质量目标的本质
+&lt;/h3&gt;&lt;p&gt;我之前的文章 【】中深入分析过从事软件测试的真正目的。其中重要的一条就是：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;软件测试不是为了去发现Bug&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;而这个指标则明确地将发现Bug作为测试工作的目的。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/121-bad_metric_bug/Pasted-20250815.png"
+width="719"
+height="951"
+srcset="https://chengxiaqiucao.github.io/post/121-bad_metric_bug/Pasted-20250815_hu_ef2f7cfb9ac471b8.png 480w, https://chengxiaqiucao.github.io/post/121-bad_metric_bug/Pasted-20250815_hu_38b237810a9980d3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="181px"
+&gt;&lt;/p&gt;
+&lt;p&gt;测试工作是为了准确展示出产品的质量状态。而质量状态整体是未知的，追求Bug数量势必会让测试人员的精力更多投入在表面的、容易触发但对系统影响并不关键的部分；反而对那些需要深入分析、更全面探索的部分造成忽视。&lt;/p&gt;
+&lt;p&gt;也就是说，这个指标其实鼓励的是肤浅测试，但惩罚深度测试。&lt;/p&gt;
+&lt;p&gt;而在这种导向下，“测试左移”其实也会成为空谈，测试左移的贡献越大，会造成后续发现的Bug越少。包括对团队的效率提升，甚至测试团队内部的知识共享都会造成阻碍。&lt;/p&gt;
+&lt;h3 id="制造团队冲突破坏心理安全"&gt;制造团队冲突，破坏心理安全
+&lt;/h3&gt;&lt;p&gt;建立这个指标，也同时在制造 “Tester vs Developer”的对立，从而破坏高效团队的基石&amp;ndash;心理安全。&lt;/p&gt;
+&lt;p&gt;心理安全是团队成员可以自由表达想法、冒险、承认错误而无需担心负面后果。&lt;/p&gt;
+&lt;p&gt;但当测试人员被激励去报告更多的Bug，开发者却要尽可能少地去产生Bug，必然的结果就是开发对Bug的质疑，是否只是测试人员在“刷数字”？ 而测试也会认为开发只是在为了减少Bug数量为自己寻找借口。&lt;/p&gt;
+&lt;p&gt;这种指标，造成了团队的“指责文化”。两个团队之间的信任关系，会天然地瓦解。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/121-bad_metric_bug/Pasted-20250220-2.png"
+width="983"
+height="519"
+srcset="https://chengxiaqiucao.github.io/post/121-bad_metric_bug/Pasted-20250220-2_hu_7b34677ff90aa365.png 480w, https://chengxiaqiucao.github.io/post/121-bad_metric_bug/Pasted-20250220-2_hu_16506636e84b1a06.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="189"
+data-flex-basis="454px"
+&gt;&lt;/p&gt;
+&lt;h2 id="构建价值导向的质量度量"&gt;构建价值导向的质量度量
+&lt;/h2&gt;&lt;p&gt;既然“Bug数量”显然不适合用来进行绩效度量，而且质量作为一个黑盒，也确实难以完全准确度量。这里我们可以从以下几方面，建立基于价值导向的质量度量体系。&lt;/p&gt;
+&lt;h3 id="产品质量维度"&gt;产品质量维度
+&lt;/h3&gt;&lt;p&gt;首先针对产品本身和交付质量，可考虑如下一些指标：&lt;/p&gt;
+&lt;h4 id="1客户与用户体验指标"&gt;（1）客户与用户体验指标
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;客户反馈的功能缺陷&lt;/strong&gt;：相比内部发现的Bug，客户反馈的问题更能反映真实质量影响。但应优先关注高严重性问题（如功能失效、数据丢失），而非简单计数。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;客户满意度（CSAT）与净推荐值（NPS）&lt;/strong&gt;：通过定期调研直接获取用户对软件质量的评价，这是最直接的质量反馈。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2系统稳定性与性能指标"&gt;（2）系统稳定性与性能指标
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;系统可用性（Uptime）&lt;/strong&gt;：以百分比衡量系统正常运行时间，如99.9%可用性意味着每月允许的宕机时间不超过43.2分钟。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;性能指标&lt;/strong&gt;：包括页面加载时间、API响应时间、事务处理吞吐量等，直接反映用户使用体验。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;部署成功率&lt;/strong&gt;：衡量发布流程的可靠性，高成功率意味着发布过程稳定，减少因部署引发的问题。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;线上故障率&lt;/strong&gt;：统计生产环境中发生的故障次数，优先关注影响用户的高严重性故障。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="3问题响应与修复效率"&gt;（3）问题响应与修复效率
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;问题识别到修复发布的平均时间&lt;/strong&gt;：衡量团队对问题的响应速度，时间越短，修复效率越高。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Bug修复成功率&lt;/strong&gt;：统计修复后未引发新问题的比例，反映修复质量。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;支持工单无需升级到开发的比例&lt;/strong&gt;：衡量支持团队独立解决问题的能力，比例越高，说明系统越稳定、文档越完善。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="流程质量维度"&gt;流程质量维度
+&lt;/h3&gt;&lt;p&gt;质量并不是测试或开发团队可以独立负责的，要提升质量，必须从全流程角度考虑。如：&lt;/p&gt;
+&lt;h4 id="1代码与流程质量"&gt;（1）代码与流程质量
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;代码审查周期时间&lt;/strong&gt;：从提交代码到完成审查的平均时间，时间越短，协作效率越高。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;测试覆盖率趋势&lt;/strong&gt;：关注覆盖率的增长趋势，而非绝对百分比，反映测试体系的持续改进。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;技术债务清理比例&lt;/strong&gt;：统计计划内技术债务的解决比例，体现团队对长期质量的重视。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2团队健康度"&gt;（2）团队健康度
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Sprint目标成功率&lt;/strong&gt;：衡量团队计划执行能力，高成功率意味着目标设定合理、团队协作高效。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;团队成员满意度&lt;/strong&gt;：通过定期匿名调研了解团队士气和工作满意度，高满意度是高效团队的基础。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;流程改进建议数量&lt;/strong&gt;：统计团队提出的流程优化建议数量，反映团队的持续改进意识。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="业务价值维度"&gt;业务价值维度
+&lt;/h3&gt;&lt;p&gt;质量最终还是要为业务价值服务，从这个方面考虑：&lt;/p&gt;
+&lt;h4 id="1功能交付质量"&gt;（1）功能交付质量
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;需hotfix的功能比例&lt;/strong&gt;：统计新功能上线后需要紧急修复的比例，比例越低，说明开发质量越高。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;新功能上线后的支持工单量&lt;/strong&gt;：衡量用户对新功能的接受度和问题反馈，工单越少，功能质量越高。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2长期影响"&gt;（2）长期影响
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;速度趋势&lt;/strong&gt;：观察团队开发速度的变化趋势，低质量代码会导致速度逐渐下降，高质量代码则能维持稳定速度。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;系统可维护性与可扩展性评估&lt;/strong&gt;：通过架构评审、代码复杂度分析等方式，定期评估系统的长期健康度。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;通过以上这套指标体系，我们应该可以比较全面地衡量“产品质量到底如何？”这个问题&lt;/p&gt;
+&lt;h2 id="总结"&gt;总结
+&lt;/h2&gt;&lt;p&gt;通过前述分析，我们剖析了为什么不应该将 &lt;code&gt;Bug数量&lt;/code&gt; 作为团队的绩效指标，可说是有百害无一利。&lt;/p&gt;
+&lt;p&gt;同时这里也给出了建立多维度的价值导向的质量指标体系，从产品质量、流程质量和业务价值几个维度，更全面、科学地衡量团队质量。&lt;/p&gt;
+&lt;p&gt;当然，没有完美的指标体系，任何度量都有其局限性。关键还在于保持开放的心态，定期复盘和调整指标，避免“指标依赖”。正如质量大师W. Edwards Deming所言：&lt;code&gt;质量不是由指标决定的，而是由文化和系统决定的&lt;/code&gt;。&lt;/p&gt;</description></item><item><title>测试人员伤害质量的十大误区</title><link>https://chengxiaqiucao.github.io/post/071-%E6%B5%8B%E8%AF%95%E4%BA%BA%E5%91%98%E4%BC%A4%E5%AE%B3%E8%B4%A8%E9%87%8F%E7%9A%84%E5%8D%81%E5%A4%A7%E8%AF%AF%E5%8C%BA/</link><pubDate>Fri, 28 Mar 2025 15:59:08 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/071-%E6%B5%8B%E8%AF%95%E4%BA%BA%E5%91%98%E4%BC%A4%E5%AE%B3%E8%B4%A8%E9%87%8F%E7%9A%84%E5%8D%81%E5%A4%A7%E8%AF%AF%E5%8C%BA/</guid><description>&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/071-%E6%B5%8B%E8%AF%95%E4%BA%BA%E5%91%98%E4%BC%A4%E5%AE%B3%E8%B4%A8%E9%87%8F%E7%9A%84%E5%8D%81%E5%A4%A7%E8%AF%AF%E5%8C%BA/%E4%BC%A4%E5%AE%B3%E8%B4%A8%E9%87%8F10%E5%A4%A7%E8%AF%AF%E5%8C%BA.png"
+width="900"
+height="383"
+srcset="https://chengxiaqiucao.github.io/post/071-%E6%B5%8B%E8%AF%95%E4%BA%BA%E5%91%98%E4%BC%A4%E5%AE%B3%E8%B4%A8%E9%87%8F%E7%9A%84%E5%8D%81%E5%A4%A7%E8%AF%AF%E5%8C%BA/%E4%BC%A4%E5%AE%B3%E8%B4%A8%E9%87%8F10%E5%A4%A7%E8%AF%AF%E5%8C%BA_hu_bb0e562649502f90.png 480w, https://chengxiaqiucao.github.io/post/071-%E6%B5%8B%E8%AF%95%E4%BA%BA%E5%91%98%E4%BC%A4%E5%AE%B3%E8%B4%A8%E9%87%8F%E7%9A%84%E5%8D%81%E5%A4%A7%E8%AF%AF%E5%8C%BA/%E4%BC%A4%E5%AE%B3%E8%B4%A8%E9%87%8F10%E5%A4%A7%E8%AF%AF%E5%8C%BA_hu_583d8674d92f37d2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="234"
+data-flex-basis="563px"
+&gt;&lt;/p&gt;
+&lt;p&gt;很多企业会把承担测试的工程师称为QA（quality assurance），但QA和Tester其实是两个不同的岗位，但不可否认，测试工程师的主要职责也是面向质量的，是通过评估质量状态来帮助团队进行质量改进的。&lt;/p&gt;
+&lt;p&gt;但即便这样，测试工程师的工作就一定是对质量改进有帮助的吗？在实际工作中，有些误区反而会让测试人员的工作对质量产生负面影响。&lt;/p&gt;
+&lt;p&gt;这里秋草梳理总结了测试人员可能伤害质量的十大误区，以及对应的正确做法。&lt;/p&gt;
+&lt;h2 id="1-测试的职责是发现并汇报bug但不是确认"&gt;1. 测试的职责是发现并汇报Bug，但不是确认
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;误区：经常有开发同学和测试同学就某个问题是否应该报Bug进行争论， “需求中没要求”， “这个问题不影响用户使用” 等等是经常出现的理由。很多测试同学也确实会因为这些原因不再报这些问题，甚至在报Bug前会去和开发确认能不能报。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;这是一个对质量伤害极大的误区。测试的价值在于评估质量状态，而评估的关键在于独立性。质量没有对错，只有好坏。需求中没定义的行为，不代表就是不需要的；不影响用户使用也不代表就是好的实现。测试是站在评估质量的视角，指出缺陷或者提出优化建议都是分内工作。开发则负责分析、认定并解决缺陷。如果开发和测试在认定上有分歧，还有PO或业务分析师、CCB成员可以进行仲裁。&lt;/p&gt;
+&lt;p&gt;但对于测试人员来说，汇报&lt;strong&gt;一切&lt;/strong&gt;觉得有问题或者质量不好的产品行为则是工作义务。有意或无意去隐瞒或掩盖缺陷，才是对产品质量真正的伤害。&lt;/p&gt;
+&lt;h2 id="2-发现bug只是开始还应为修复bug提供尽可能多的上下文"&gt;2. 发现Bug只是开始，还应为修复Bug提供尽可能多的上下文
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;误区：有的测试同学会认为我发现了问题，并且也进行了报告，那么工作就已经完成，后续修复过程与我无关，只需修复后进行验证即可&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;测试是整个软件产品研发生命周期中的一个环节，最终是为产品整体质量服务的。而Bug本身其实对产品是无价值的，因为只有解决掉的Bug才会对产品质量有帮助。 从这个角度来说，虽然报告Bug是测试人员的主要工作，但对产品来说，最终解决Bug才是目的。所以测试作为产品研发的一环，即便解决Bug不是测试直接负责，但我们也应该为解决Bug提供必要的支撑。&lt;/p&gt;
+&lt;p&gt;这部分在之前地文章 【】中有详细探讨，大家有兴趣可以参阅&lt;/p&gt;
+&lt;h2 id="3-测试不只是验证需求"&gt;3. 测试不只是验证需求
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;误区：测试只要将需求中明确定义的部分进行验证无误即可，未定义的部分无需测试&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;这里和第一个误区有些关联，是很多开发和测试争论bug的前提。在前文 【】中我们对测试目标的认识误区中，也说过这一点。就是测试除了验证需求之外，还有更多探索性工作应该覆盖。测试并不止是检查。&lt;/p&gt;
+&lt;p&gt;而除此之外，这里我还想更要强调产品的整体性、系统性。特别是在敏捷研发模式下，这个误区很容易被扩大。&lt;/p&gt;
+&lt;p&gt;在敏捷中，敏捷迭代的输出是Increment（产品增量），这个对开发工作是成立的。但测试工作是面向整个产品系统的，并不能只覆盖增量部分。需求也是增量的，所以当然不能仅覆盖增量部分的需求，这就是为什么回归测试是测试中必须包含的范畴，也是自动化测试越来越受重视的根本原因。（关于敏捷相关的分析介绍可以参看之前敏捷系列）&lt;/p&gt;
+&lt;h2 id="4-测试无止境好钢用在刀刃上"&gt;4. 测试无止境，好钢用在刀刃上
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;误区：要想更多发现Bug，尽量探索、发散，并利用Bug的集群效应，尽可能多地发现Bug&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;还是在 【】一文中，我们也澄清过，测试的目标也并不是为了发现更多Bug。而且测试其实无止境的，测试最终的目的是对整个产品或系统提供一个可靠、完整的质量状态评估。而这个质量状态是否客观准确，跟Bug的多少其实并不一定是一个正相关的关系。&lt;/p&gt;
+&lt;p&gt;测试在尽可能发现Bug的同时，还是认识到，我们是要系统地对质量进行评估，但测试又是无法穷尽的，所以必须要把有限的时间进行科学地分配，优先关注高优先的部分，比如新功能、代码出现变更、高风险模块这些都是应该优先进行测试并重点保证的部分。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;精准测试&lt;/code&gt;、&lt;code&gt;基于风险的测试RBT&lt;/code&gt;等都是这种思路下，把我们的测试资源、时间优先放到高价值部分的实践。&lt;/p&gt;
+&lt;h2 id="5-测试工作不是提测才开展从产品需求讨论就已经开始"&gt;5. 测试工作不是提测才开展，从产品需求讨论就已经开始
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;误区：测试应该在产品提测以后才能正式展开，Bug也应该在提测以后才应该报告&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;在当今，以上误区当然是不正确的，因为不管是&lt;code&gt;测试左移&lt;/code&gt;还是各种测试理论都强调了测试早期参与的重要性。&lt;/p&gt;
+&lt;p&gt;但理论归理论，实际实践中，测试通常还是在提测以后才真正开展工作。&lt;/p&gt;
+&lt;p&gt;一方面是产品前期，测试的存在感低，参与度低，容易被忽视；&lt;/p&gt;
+&lt;p&gt;另一方面，很多测试团队的考核重Bug数量，这其实更加消磨了测试早期参与的积极性，导致测试并不太愿意在早期协助团队暴露产品的问题。&lt;/p&gt;
+&lt;p&gt;但从产品交付角度，越是后期，问题修复的成本就越高。所以从产品管理来说，摒弃以Bug考核的导向，引导测试前期的积极参与，测试可以发挥其对问题的敏感度，从需求讨论开始就能识别、考虑到很多异常场景，并帮助团队提前规避。&lt;/p&gt;
+&lt;h2 id="6-设计和架构讨论测试不应是小透明"&gt;6. 设计和架构讨论，测试不应是小透明
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;误区：架构和系统设计、详细设计是开发团队的任务，测试无需了解或参与讨论，等待产品开发完成后根据需求进行测试即可&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;和上一条类似，&lt;code&gt;测试左移&lt;/code&gt;并不只是说测试更多了解需求，同样也要求测试参与到设计、甚至编码环节。&lt;/p&gt;
+&lt;p&gt;还是要谈测试的目标：是要尽可能准确评估出产品的质量状态。而质量必然是和产品的具体实现紧密相关的，对产品的实现细节了解得越清晰，那么在测试时就越能够有的放矢，也包括可以在设计、编码阶段就提前帮助团队规避质量问题。&lt;/p&gt;
+&lt;p&gt;相反，如果对设计、代码完全是黑盒，很可能遗漏掉一些关键的测试场景导致问题泄露。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;不了解云应用的负载均衡机制实现，只在单节点上验证，就无法验证负载均衡失效导致的问题&lt;/li&gt;
+&lt;li&gt;不了解系统的缓存实现机制，就难以针对性地去构建缓存命中场景&lt;/li&gt;
+&lt;li&gt;不了解界面的响应式适配实现，就难以高效地进行完成兼容性测试&lt;/li&gt;
+&lt;li&gt;不了解接口的校验机制，就难以构造有效的接口测试数据&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;以上种种，都是测试不应该游离于设计环节之外，认为产品设计不属于测试范畴而忽略对这个环节的参与&lt;/p&gt;
+&lt;h2 id="7-独立的测试环境是充分测试的前提"&gt;7. 独立的测试环境是充分测试的前提
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;误区：测试执行只需要关注产品本身，可以在集成环境甚至开发环境上进行测试，并不影响测试效果&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;确实，测试的对象是产品本身。但测试环境其实是能否对产品进行全面、高效测试的一个关键制约。&lt;/p&gt;
+&lt;p&gt;软件测试和探索过程中，对产品的使用，通常是很多不同的操作、交互的相互叠加。而在发现产品问题时，对问题的判断，一个重要的前提就是产品本身的相关前置条件、关联因素是清晰、明确的。而要保证这一点，一个独立、无干扰的测试环境就尤为必要。如果使用开发环境来进行测试，在测试同时，开发人员同时也在环境上进行调测、变更，不仅会增加大量无效问题的出现，也是对测试、问题定位等资源的极大浪费。&lt;/p&gt;
+&lt;p&gt;除此之外，测试中，不可避免还有各种异常场景的营造，而一个独立的测试环境，更便于测试人员调整不同的测试场景，比如：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;修改网络配置，营造代理访问、内外部IP、弱网等场景&lt;/li&gt;
+&lt;li&gt;修改系统时间、定时任务触发、模拟不同时段数据等场景&lt;/li&gt;
+&lt;li&gt;模拟资源不足、空间占满、海量或巨大文件等场景&lt;/li&gt;
+&lt;li&gt;产品中的部分限制因素，开启Debug模式、不同的鉴权设定、各种配置变更&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这些测试都是建立在一个独立、可控的测试环境基础上的。&lt;/p&gt;
+&lt;h2 id="8-自动化测试代码也是程序像对待产品一样对待测试代码"&gt;8. 自动化测试代码也是程序，像对待产品一样对待测试代码
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;误区：编写自动化测试，就是为了替代部分手工测试的执行，完成自动化代码部分的编写，让它能执行并覆盖相关用例即可&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;自动化测试的目的确实是为了代替很多人工测试工作，达到效率提升的目的。但自动化测试的实施并非一锤子买卖，它也是一个长期的过程。而且自动化测试，本身也是通过程序代码来实现，是程序就会有bug，因此对自动化测试脚本、工具本身的质量保证和维护也是测试人员的重要工作。&lt;/p&gt;
+&lt;p&gt;并不是我们编写出一个可跑的自动化脚本就是进行了自动化。对自动化脚本同样要像软件产品一样经过需求分析、设计、编码、测试以及后续的维护这样的生命周期。&lt;/p&gt;
+&lt;p&gt;所以自动化测试本身也是一个较大投入，要让相关脚本长期发挥作用并真正起到提升执行效率的目的，那么对自动化测试代码的良好设计和持续维护就必不可少。&lt;/p&gt;
+&lt;h2 id="9--cicd管道同样也是测试的职责"&gt;9. CI/CD管道同样也是测试的职责
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;误区：CI/CD作为现在很多研发团队的基础设施，通常会有专门的DevOps工程师负责搭建、维护，作为测试人员，负责其中自动化测试部分脚本的编写即可&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;诚然，整个CI/CD管道中，和测试直接相关的部分主要就是自动化测试。但还是那句话：测试作为整个研发过程的一分子，是不可能独立于研发过程之外的。特别是敏捷研发中，更加强调团队的整体性，团队整体对研发过程负责。&lt;/p&gt;
+&lt;p&gt;所以CI/CD管道建立、运作和保持畅通的过程，并不存在明显的测试只需要负责自动化测试环节的说法。&lt;/p&gt;
+&lt;p&gt;作为质量视角的专业人员，在CI/CD管道建设中，我们也可以发挥更多的作用：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;定义管道中各个环节流转的质量门禁，将测试左移反映到CI/CD管道中&lt;/li&gt;
+&lt;li&gt;代码变更的管控和识别，这部分对于测试阶段的精准测试，意义重大&lt;/li&gt;
+&lt;li&gt;包括开发环境、集成环境、测试环境以至线上生产环境的监控，特别是很多质量相关指标的收集实现&lt;/li&gt;
+&lt;li&gt;可视化，包括自动化测试报告、各种数据跟踪的状态呈现等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="10-珍惜所有了解终端用户使用场景的机会"&gt;10. 珍惜所有了解终端用户使用场景的机会
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;误区：作为研发团队成员，测试无须主动接触终端用户。和用户对接更多是销售、售后、客服团队的工作&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;测试工作面向质量，而质量的最终判断，其实是终端用户。所以很多团队都强调，测试是终端用户的代言人，是要站在用户视角来使用、体验产品并提前发现问题的角色。&lt;/p&gt;
+&lt;p&gt;因此，从这个意义上，测试其实应该更多地去接触用户，了解用户使用产品的不同场景，诉求以至偏好。&lt;/p&gt;
+&lt;p&gt;所以，在有机会接触用户的场景下，测试应该是主动而非抗拒。作为测试，这方面的机会还是比较多的，充分利用和用户接触的机会，丰富我们对于产品所属行业的理解并应用到我们的测试工作中来。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;用户问题支持。在一些反馈到研发团队的客户问题，需要提供技术支持时，作为测试，是经常会要直接面向客户的，这时也是我们直观了解用户对产品使用场景和面临问题的地方。&lt;/li&gt;
+&lt;li&gt;对外测试。很多用户在选择产品前，都会有针对产品的验收测试。这些测试往往在客户方进行，但产品测试人员往往会作为产品方来提供支持或实施测试，也就是外场测试。这也是一个很好的深入了解用户场景的窗口&lt;/li&gt;
+&lt;li&gt;客户拜访。有的企业在产品研发初期或过程中，会安排和终端客户的拜访、访谈，有时也会邀请研发团队参与，虽然大多情况下是系统分析师、架构等角色参与更多，但测试也会参与到此类拜访中，这是在初期就深入了解产品应用场景的一个绝佳机会。&lt;/li&gt;
+&lt;li&gt;行业报告。除了直接和终端客户的沟通外，关注产品所属行业的行业报告、资讯和趋势分析等资料，同样也是一个深入理解产品所处行业和用户的上佳渠道。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;以上就是对测试人员伤害质量十大误区的梳理总结，欢迎大家讨论补充。
+另外秋草关于测试技能体系化提升的课程，可以回复 &lt;strong&gt;“大纲”&lt;/strong&gt; 或在公众号菜单中查看课程目录。&lt;/p&gt;</description></item><item><title>Deepseek提示词框架助力团队改进现状，效能提升</title><link>https://chengxiaqiucao.github.io/post/069-%E4%BC%98%E5%8C%96ai%E6%8F%90%E7%A4%BA%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%9B%A2%E9%98%9F%E6%8F%90%E5%8D%87/</link><pubDate>Wed, 19 Mar 2025 22:44:42 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/069-%E4%BC%98%E5%8C%96ai%E6%8F%90%E7%A4%BA%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%9B%A2%E9%98%9F%E6%8F%90%E5%8D%87/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/069-%E4%BC%98%E5%8C%96ai%E6%8F%90%E7%A4%BA%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%9B%A2%E9%98%9F%E6%8F%90%E5%8D%87/%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%A1%86%E6%9E%B6.png" alt="Featured image of post Deepseek提示词框架助力团队改进现状，效能提升" /&gt;&lt;p&gt;随着 AI 技术的快速发展，从 ChatGPT 到 Deepseek 的爆发，AI已经可以切实起到辅助我们日常工作的作用。&lt;/p&gt;
+&lt;p&gt;除了在具体的像辅助编程、文案编写等方面，我们也可以充分利用 AI 的强大逻辑能力和海量基础数据，帮助我们针对工作中的一些困境，提出切实可行的改进方案。&lt;/p&gt;
+&lt;p&gt;但要想 AI 帮助我们给出有可操作性的解决方案，提示词的框架设计和提供给AI的上下文信息是极为关键的。一个良好的提示词框架，可以帮助我们快速得到极为有价值的参考。&lt;/p&gt;
+&lt;h2 id="面对的困境案例"&gt;面对的困境案例
+&lt;/h2&gt;&lt;p&gt;这里以一个比较普遍的敏捷团队质量困境的案例来说明：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;作为一个测试工程师，在一个运行Scrum框架的敏捷团队中负责质量保障，团队成员还包括SM、PO、2个Android开发（其中小李负责了App的整体系统设计），1个后端开发，1个非全职的视觉设计。团队产品是一个物联网智能手环产品的配套Android App。但因为存在和硬件团队的配合、需求经常变化、视觉设计不及时、提测不及时、Bug积压等问题，导致产品质量不乐观。目前App已经运行了多个迭代，按计划上线时间越来越近，如何针对当前的质量困境提出改进方案？&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id="设计提示词框架"&gt;设计提示词框架
+&lt;/h3&gt;&lt;p&gt;要 AI 帮助我们给出有可行性的改进方案，首先我们要合理地设计提示词框架，以便最终给出的方案更贴合团队现状以及具备可操作性。&lt;/p&gt;
+&lt;p&gt;那么设计的提示词框架要点：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;给定的角色，让 AI 确定从什么角度去提出改进方案&lt;/li&gt;
+&lt;li&gt;当前的现状，也就是充分的背景信息上下文&lt;/li&gt;
+&lt;li&gt;AI 应该具体分析的内容或它的任务应该是什么&lt;/li&gt;
+&lt;li&gt;希望 AI 提供的具体输出，包括格式要求，应包含的要素等&lt;/li&gt;
+&lt;li&gt;相关的一些制约因素，这对方案是否可行会有重要影响&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;现在针对上述困境，希望AI 能帮助我提供一份针对团队的整体质量提升方案，可以在回顾会上进行讨论。基于以上思路，通过向 Deepseek输入提示词框架，得到如下输出：&lt;/p&gt;
+&lt;h3 id="质量改进方案面向迭代回顾会"&gt;质量改进方案（面向迭代回顾会）
+&lt;/h3&gt;&lt;hr&gt;
+&lt;h4 id="1-总体质量目标"&gt;&lt;strong&gt;1. 总体质量目标&lt;/strong&gt;
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;&amp;ldquo;在2个迭代内将自动化测试覆盖率提升至40%，缺陷修复响应时间缩短50%，回归测试时间压缩30%，建立需求变更与测试联动的质量防线&amp;rdquo;&lt;/strong&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id="2-具体改进举措"&gt;&lt;strong&gt;2. 具体改进举措&lt;/strong&gt;
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;举措&lt;/th&gt;
+&lt;th&gt;执行人&lt;/th&gt;
+&lt;th&gt;执行计划&lt;/th&gt;
+&lt;th&gt;效果评估方法&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;需求冻结机制&lt;/strong&gt;&lt;br&gt;- 每个迭代前3天锁定核心功能需求&lt;br&gt;- 硬件对接需求由PO与硬件团队联合评审后形成接口文档&lt;/td&gt;
+&lt;td&gt;PO、硬件团队负责人&lt;/td&gt;
+&lt;td&gt;迭代计划会签署需求基线文档&lt;br&gt;硬件接口文档通过Confluence共享&lt;/td&gt;
+&lt;td&gt;需求变更次数减少50%&lt;br&gt;接口文档版本变更记录可追溯&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;自动化用例分级策略&lt;/strong&gt;&lt;br&gt;- L0级（核心业务流）：强制全自动化&lt;br&gt;- L1级（高频使用场景）：优先自动化&lt;br&gt;- L2级（边缘场景）：手动验证&lt;/td&gt;
+&lt;td&gt;测试工程师&lt;br&gt;（主导）&lt;br&gt;Android开发工程师&lt;br&gt;（辅助）&lt;/td&gt;
+&lt;td&gt;使用Allure标记用例等级&lt;br&gt;每日构建优先执行L0用例&lt;/td&gt;
+&lt;td&gt;L0用例100%通过率作为提测准出条件&lt;br&gt;自动化执行时间减少40%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;开发自测责任制&lt;/strong&gt;&lt;br&gt;- 开发提交代码需附带单元测试（覆盖率≥60%）&lt;br&gt;- 接口测试由后端工程师在Swagger维护&lt;/td&gt;
+&lt;td&gt;Android开发工程师&lt;br&gt;后端工程师&lt;/td&gt;
+&lt;td&gt;单元测试纳入代码评审检查项&lt;br&gt;Postman接口用例与代码库联动&lt;/td&gt;
+&lt;td&gt;提测版本冒烟测试通过率提升至80%&lt;br&gt;接口缺陷率下降30%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;硬件兼容性Mock服务&lt;/strong&gt;&lt;br&gt;- 基于硬件协议开发模拟器&lt;br&gt;- 自动化测试与真实设备解耦&lt;/td&gt;
+&lt;td&gt;测试工程师&lt;br&gt;（主导）&lt;br&gt;硬件团队提供协议文档&lt;/td&gt;
+&lt;td&gt;使用Python开发蓝牙协议模拟器&lt;br&gt;Jenkins构建时自动启动Mock服务&lt;/td&gt;
+&lt;td&gt;硬件依赖导致测试阻塞次数清零&lt;br&gt;自动化稳定性提升至95%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;缺陷分级管理&lt;/strong&gt;&lt;br&gt;- P0级缺陷：2小时内响应&lt;br&gt;- P1级缺陷：当前迭代必须修复&lt;br&gt;- 遗留缺陷需PO签字确认风险&lt;/td&gt;
+&lt;td&gt;测试工程师&lt;br&gt;（分类）&lt;br&gt;开发工程师&lt;br&gt;（修复）&lt;/td&gt;
+&lt;td&gt;Jira配置自动化缺陷流转规则&lt;br&gt;每日站会同步TOP3缺陷进展&lt;/td&gt;
+&lt;td&gt;缺陷平均修复周期缩短至8小时&lt;br&gt;积压缺陷数量下降60%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h4 id="3-风险及应对"&gt;&lt;strong&gt;3. 风险及应对&lt;/strong&gt;
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;风险&lt;/th&gt;
+&lt;th&gt;应对方案&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;开发人员抵触单元测试&lt;/td&gt;
+&lt;td&gt;- 由小李（系统设计师）示范编写单元测试&lt;br&gt;- 将测试覆盖率纳入DoD完成标准&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;硬件协议频繁变更&lt;/td&gt;
+&lt;td&gt;- 要求硬件团队提前3天通知协议变更&lt;br&gt;- Mock服务设计版本兼容机制&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;UE设计延迟影响UI测试&lt;/td&gt;
+&lt;td&gt;- 与UE设计师约定：视觉稿交付同时提供UI元素ID规范&lt;br&gt;- 使用截图对比工具容差10%像素差异&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h4 id="4-外部支持需求"&gt;&lt;strong&gt;4. 外部支持需求&lt;/strong&gt;
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;类型&lt;/th&gt;
+&lt;th&gt;具体需求&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;工具&lt;/td&gt;
+&lt;td&gt;- 申请BrowserStack移动云测试平台license&lt;br&gt;- 采购Xray测试用例管理插件License&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;人员&lt;/td&gt;
+&lt;td&gt;- 硬件团队指定协议对接接口人&lt;br&gt;- DevOps工程师优化CI/CD流水线&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;培训&lt;/td&gt;
+&lt;td&gt;- 邀请单元测试专家开展TDD工作坊&lt;br&gt;- Appium高级用法内部培训&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h4 id="5-效果评估节点"&gt;&lt;strong&gt;5. 效果评估节点&lt;/strong&gt;
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;节点&lt;/th&gt;
+&lt;th&gt;检验标准&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;迭代5中期&lt;/td&gt;
+&lt;td&gt;- L0级自动化用例覆盖所有核心业务流程&lt;br&gt;- 单元测试覆盖率≥40%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;迭代5结束&lt;/td&gt;
+&lt;td&gt;- 自动化覆盖率≥25%&lt;br&gt;- 回归测试时间≤8小时/次&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;迭代6结束&lt;/td&gt;
+&lt;td&gt;- 自动化覆盖率≥40%&lt;br&gt;- 生产环境致命缺陷数为0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;执行要点说明：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;每日质量看板&lt;/strong&gt;：在团队作战室悬挂自动化执行率/缺陷趋势图&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;质量门禁机制&lt;/strong&gt;：代码合并请求必须通过L0用例+SonarQube检测&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;测试左移实践&lt;/strong&gt;：测试工程师参与需求评审时即输出测试要点矩阵&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;该方案需团队全员签署质量承诺书，建议在迭代回顾会上通过&amp;quot;5Why分析法&amp;quot;就当前质量问题达成改进共识。&lt;/p&gt;
+&lt;p&gt;可以看到，得到了一份极有针对性且有相当可行性的改进方案。我们根据目前的团队现状，进行微调其实就可以纳入实施。&lt;/p&gt;
+&lt;p&gt;所以善用 AI 提示词框架，不仅可以帮助我们在具体事务上获取帮助，对于这种整体改进方面的举措，AI 也能提供巨大助力。&lt;/p&gt;
+&lt;p&gt;回复 “提示词框架” 可获取上文的提示词完整示例。关于 AI 在工作中的更多应用实践，也欢迎大家留言或入群探讨！&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/qrcode_for_gh_e12c318badb4_258%20%281%29.jpg"
+loading="lazy"
+&gt;&lt;/p&gt;</description></item><item><title>软件测试中"可做但不应做"的一些陷阱</title><link>https://chengxiaqiucao.github.io/post/067-%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E4%B8%AD%E5%8F%AF%E5%81%9A%E4%BD%86%E4%B8%8D%E5%BA%94%E5%81%9A%E7%9A%84%E4%B8%80%E4%BA%9B%E9%99%B7%E9%98%B1/</link><pubDate>Tue, 18 Mar 2025 16:49:04 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/067-%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E4%B8%AD%E5%8F%AF%E5%81%9A%E4%BD%86%E4%B8%8D%E5%BA%94%E5%81%9A%E7%9A%84%E4%B8%80%E4%BA%9B%E9%99%B7%E9%98%B1/</guid><description>&lt;h2 id="软件测试中8-种-能做但不应该做-的工作"&gt;软件测试中，8 种 &lt;strong&gt;”能做，但不应该做“&lt;/strong&gt; 的工作
+&lt;/h2&gt;&lt;p&gt;在软件测试中，我们常常会面临一个问题：很多工作确实是我们可以去做到的，似乎做这些事也理所当然，但很多时候，这些事情往往收效甚微。从过度自动化到频繁运行不必要的回归测试，不一而足。&lt;/p&gt;
+&lt;p&gt;随着技术发展，测试人员手中拥有的工具让我们可以完成更多事情，但并不意味每个选择都是明智的。有些工作，盲目地去做，往往会影响真正重要的产出、效率、可维护性等要求。&lt;/p&gt;
+&lt;p&gt;本文列举了在测试工作中八个“能做，但不应做”的工作。有时候，退一步可能是更聪明的选择。&lt;/p&gt;
+&lt;h3 id="1-自动化所有测试"&gt;1. 自动化所有测试
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;可以做到：&lt;/strong&gt; 现代的测试自动化工具让我们几乎可以自动化任何测试用例，从用户界面的每一次点击到API的每一次调用，技术上来说，都可以通过自动化来进行驱动。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;但不应该：&lt;/strong&gt; 仅仅因为可以实现自动化测试，却并不意味它是最佳选择。比如：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;某个产品的用户界面非常动态，设计师每周都会进行调整。如果你选择将所有测试都自动化，每次UI改动后，相关的自动化测试都可能面临失效的风险。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;这种情况下，&lt;strong&gt;手动测试可能更有效&lt;/strong&gt;。&lt;/p&gt;
+&lt;h3 id="2-自动化脚本中使用过于复杂的定位器"&gt;2. 自动化脚本中使用过于复杂的定位器
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;可以做到：&lt;/strong&gt; Selenium, Playwright 等自动化工具中，借助XPath和CSS选择器，我们能够精确定位到页面中最深层的元素。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;但不应该：&lt;/strong&gt; 过于复杂的定位器往往会让测试变得脆弱。比如：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;使用复杂的XPath去定位一个菜单，但当开发团队重构HTML结构后，往往导致多个测试失败，团队不得不花费大量时间修复。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;这时，其他方法可能对自动化用例的稳定性更为有效，比如和开发团队&lt;strong&gt;约定增加元素的 &lt;code&gt;test-id&lt;/code&gt; 属性&lt;/strong&gt;。&lt;/p&gt;
+&lt;h3 id="3-每次提交都运行完整的回归测试"&gt;3. 每次提交都运行完整的回归测试
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;可以做到：&lt;/strong&gt; 在现代CI/CD管道中，每次代码提交都可以轻松触发完整的回归测试。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;但不应该：&lt;/strong&gt; 但实际上，这种做法往往是过度的。想象一下，一个小的代码修复导致整个回归测试运行，而这个过程可能需要几个小时，甚至更长时间。&lt;/p&gt;
+&lt;p&gt;如果在没有将自动化覆盖率提升到一定程度的团队，这种提交后进行完整回归更是噩梦。更好的做法，其实还是及时掌握变更内容，并根据变更和影响实现&lt;strong&gt;精准测试&lt;/strong&gt;。&lt;/p&gt;
+&lt;h3 id="4-在api测试中过度模拟"&gt;4. 在API测试中过度模拟
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;可以做到：&lt;/strong&gt; 模拟API响应可以大幅提高测试速度，消除对外部服务的依赖。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;但不应该：&lt;/strong&gt; 然而，过度模拟会让我们失去与真实环境的连接。大量的Mock API 确实可以提升调试和验证效率，但却背离了真正的测试需要。&lt;strong&gt;真实场景下的测试是不可或缺&lt;/strong&gt;的，就像我们不能预知所有的异常一样&lt;/p&gt;
+&lt;h3 id="5-为琐碎问题撰写极其详细的缺陷报告"&gt;5. 为琐碎问题撰写极其详细的缺陷报告
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;可以做到：&lt;/strong&gt; 借助辅助测试工具，我们可以捕捉到类似很多细小的UI层、提示信息等缺陷，也可以按照用例规范编写极为详尽的缺陷报告。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;但不应该：&lt;/strong&gt; 并不是每个小问题都值得进行事无巨细地全面报告。发现Bug的目的最终是为了解决bug而不是bug本身，况且Bug的价值也有高下主次之分。我在 【】中其实对好的缺陷报告进行过分析，缺陷报告的价值是作为和开发沟通的渠道，报告八股文本身并无价值。&lt;/p&gt;
+&lt;h3 id="6-在没有人工监督的情况下使用ai生成测试用例"&gt;6. 在没有人工监督的情况下使用AI生成测试用例
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;可以做到：&lt;/strong&gt; AI的发展，其实已经可以做到，利用AI工具，基于需求文档快速生成大量测试用例，覆盖大量场景。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;但不应该：&lt;/strong&gt; 然而，现阶段的AI，特别是针对特定的业务，缺乏人类的上下文理解以及各种内部沟通获取的综合信息，因而可能导致用例冗余或遗漏关键测试用例。&lt;/p&gt;
+&lt;h3 id="7-在测试中过多地使用断言"&gt;7. 在测试中过多地使用断言
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;可以做到：&lt;/strong&gt; 结合自动化工具和AI，我们确实可以做到在一个测试中验证大量字段、属性和UI元素。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;但不应该：&lt;/strong&gt; 然而，过多的断言只会让测试变得巨大且复杂，难以调试。当部分断言失败，往往需要耗费大量的精力去排查&lt;/p&gt;
+&lt;h3 id="8-在每个可能的设备和浏览器组合上执行测试"&gt;8. 在每个可能的设备和浏览器组合上执行测试
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;可以做到：&lt;/strong&gt; 针对兼容性测试，现代的跨浏览器和跨设备测试工具让我们能够在许多操作系统和设备上运行测试。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;但不应该：&lt;/strong&gt; 测试所有可能的组合既不必要也不切实际。重点是覆盖用户实际使用的关键场景。而且开发技术的发展如响应式编程等，也大大减少了兼容性问题的风险。&lt;/p&gt;
+&lt;h3 id="结语"&gt;结语
+&lt;/h3&gt;&lt;p&gt;在软件测试中，“有能力做” 却并不总意味着是最佳选择。我们需要在技术能力和实际可行性之间找到平衡。通过避免这些“因为可以做到”的陷阱，去建立一个精简、高效且真正有价值的测试集，对产品的质量保障更有意义。&lt;/p&gt;
+&lt;p&gt;欢迎关注秋草，持续带来更多软件质量相关技术干货！&lt;/p&gt;</description></item><item><title>如何快速完成测试</title><link>https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/</link><pubDate>Wed, 12 Feb 2025 15:31:20 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212.png" alt="Featured image of post 如何快速完成测试" /&gt;&lt;blockquote&gt;
+&lt;p&gt;有同学提问，团队中没有专职的测试人员，要怎么才能快速完成测试？&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;先说结论，这里并没有标准答案！&lt;/p&gt;
+&lt;p&gt;没有测试岗位只是没有专门负责这个职能的人员，但测试这个事并没有消失&lt;/p&gt;
+&lt;p&gt;快速完成测试，其实应该换种说法，就是快速建立质量信心。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212.png"
+width="512"
+height="512"
+srcset="https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212_hu_8034d14734acb271.png 480w, https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212_hu_8768443c2e7fbe43.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="100"
+data-flex-basis="240px"
+&gt;&lt;/p&gt;
+&lt;p&gt;因为测试无穷尽，所以没有绝对的完成测试，按历史经验或大家达成基本共识，产品应该没啥问题了，就算完成测试。&lt;/p&gt;
+&lt;p&gt;那既然我们现在希望做的就是快速建立这个质量信心，或者说能快速跟相关干系人达成质量OK的共识，基于这个思路，要考虑哪些因素呢？&lt;/p&gt;
+&lt;h3 id="待测范围"&gt;待测范围
+&lt;/h3&gt;&lt;p&gt;要快速做完测试，一个途径就是测试范围少，比如改动很小，而且没啥关联影响模块，快速检验一下就可以了。道理跟开发代码及时提交、高频集成是一样的，不要积累变更，节省出问题后倒查一堆变更的时间。&lt;/p&gt;
+&lt;p&gt;开发阶段充分自测，并及时集成测试，不要积累变更。&lt;/p&gt;
+&lt;h3 id="已有质量"&gt;已有质量
+&lt;/h3&gt;&lt;p&gt;另一个方面是是否对产品现有质量有信心，开发是增量的，之前的存量是否质量是过关的？新增部分和存量部分的关联、影响是否都是已知的？产品质量是全量的，历史功能或影响同样对影响当前的质量信心，所以是否清晰新增和存量的关系，存量本身的质量是否过关也是关键。&lt;/p&gt;
+&lt;h3 id="潜在问题"&gt;潜在问题
+&lt;/h3&gt;&lt;p&gt;再有就是，测试是黑盒的，并不能清晰知道冰山之下有多大的危险。但质量信心这个东西其实跟潜在问题并没有直接关系，它主要跟已知问题和已测范围相关，也就是已知问题越少、已测范围越大则信心越足。背后的逻辑就是，已知问题越多，往往意味着潜在问题越多，发现一只蟑螂，可能代表有一窝蟑螂。所以还是强调提测质量！自测没充分，就先别集成测试了，每个开发先把自己的一亩三分地扫干净先。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212-1.png"
+width="512"
+height="512"
+srcset="https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212-1_hu_e701c2e908bc820f.png 480w, https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212-1_hu_c8741331e65ac82f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="100"
+data-flex-basis="240px"
+&gt;&lt;/p&gt;
+&lt;h3 id="问题暴露风险"&gt;问题暴露风险
+&lt;/h3&gt;&lt;p&gt;最后，还有一道防火墙，就是出问题的风险。问题暴露，炸了！ 但炸的影响其实不同，是冒个火星就灭了，还是炸个洞，甚至整栋楼塌了！除了问题本身的大小，不同产品对问题的接受程度其实也不一样，在一个等着拆迁的大楼里放个炮仗，大不了也就是提前拆迁了，容忍度高，信心就足！&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212-2.png"
+width="640"
+height="360"
+srcset="https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212-2_hu_dc3a4c0ad9a61fb.png 480w, https://chengxiaqiucao.github.io/post/054-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%8C%E6%88%90%E6%B5%8B%E8%AF%95/Pasted-20250212-2_hu_1e13261d7776b600.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+&gt;&lt;/p&gt;
+&lt;h2 id="总结"&gt;总结
+&lt;/h2&gt;&lt;p&gt;综合以上几个方面，快速完成测试，归根到底就是能不能尽快建立交付的信心，跟个人能力、产品属性、研发流程都有关。其实是个认知问题&lt;/p&gt;
+&lt;p&gt;最后，还是要说，任何事物都无法背离内在规律，一个运行稳定，健壮，耐造的系统，必然是会要经过各种磨合、内外部各种问题锤炼才可能达成的。&lt;/p&gt;
+&lt;p&gt;你以为的快速交付、一战功成，哪有什么岁月静好，不过是有人替你负重前行罢了。只是这个负重的可能是前期的开发人员、也可能是测试人员、或者运维人员，抑或最后，靠用户抗下所有！&lt;/p&gt;</description></item><item><title>不可不知的5Why根因分析法</title><link>https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/</link><pubDate>Sat, 05 Oct 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/5why.png" alt="Featured image of post 不可不知的5Why根因分析法" /&gt;&lt;p&gt;在质量管理领域，对质量进行改进的一个重要过程就是发现问题并解决问题。这其中，解决问题实践中，一个关键的步骤是根因分析RCA（Root Cause Analysis）。RCA 的方法有很多，常用的有鱼骨图（Fishbone Diagram），亲和图（Affinity Diagram），FMEA（Failure mode and effects analysis）等。&lt;/p&gt;
+&lt;p&gt;不过最易于应用，应用最广泛的可能还是 5Why 根因分析法&lt;/p&gt;
+&lt;h2 id="5why-的提出"&gt;5Why 的提出
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;5Why&lt;/strong&gt; 方法最早起源于丰田汽车，是丰田之父&lt;strong&gt;丰田章男&lt;/strong&gt;提出的。但被引入主流是丰田生产系统负责人&lt;strong&gt;大野耐一&lt;/strong&gt;的功劳。&lt;/p&gt;
+&lt;p&gt;丰田的网站有这样一段说明，描述了大野耐一对这个方法的推崇：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Whenever a problem cropped up, Taiichi Ohno encouraged his staff to explore problems first-hand until the root causes were found. “Observe the production floor without preconceptions,” he would advise. “Ask ‘why’ five times about every matter.”&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;5Why 方法的是基于这样一个基本认识：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;“每个问题背后都有原因，但肤浅的分析只能描述症状。” 为了找到问题背后的根本原因，需要持续的调查，只有得到根本原因，这样才能针对性采取持久的解决方案，使问题不再重现。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;所以 5Why，其实就是我们遇到遇到一个问题，不应该仅仅只从表面上看待导致这个问题的浅层原因，而是要抱着 “打破砂锅问到底” 的精神，探究出它的根本原因。只有解决了导致问题出现的根本原因，才有可能避免问题的不断重复出现。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007.png"
+width="906"
+height="490"
+srcset="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007_hu_b064ea721e01920.png 480w, https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007_hu_f936caed637efe07.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="184"
+data-flex-basis="443px"
+&gt;&lt;/p&gt;
+&lt;p&gt;举一个软件行业的案例来说， 客户验收发现一个比较严重的功能bug，影响产品的最终交付。这时通过 5Why 方法来分析根本原因：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;客户为什么会遇到这个问题？&lt;/strong&gt; 据技术负责人透露，测试团队尚未向开发团队报告任何此类问题&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;为什么测试团队无法发现问题？&lt;/strong&gt; 测试团队只进行了冒烟测试，并没有对功能做完整的回归验证&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;为什么测试团队只进行冒烟测试&lt;/strong&gt;？ 因为他们没有足够的时间对整个应用程序进行彻底的回归验证&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;为什么没有足够的时间进行彻底的回归&lt;/strong&gt;？ 因为开发提测版本只比最后交给客户验收提前了一天，而彻底的功能测试至少需要 3 天。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;为什么开发在交付前一天才提测&lt;/strong&gt;？因为其中一个关键功能的实现比预期的复杂，花了更多的时间。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;分析到这里，其实发现了两个根本原因：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;团队成员对工作量的预估出现严重偏差，开发时间估算不足&lt;/li&gt;
+&lt;li&gt;项目管理上的问题，提测时间比测试预估时间晚太多，牺牲质量，不进行回归就交付给客户。版本准出控制不足。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;所以针对分析出来的原因，需要从两方面改进，才能避免类似的情况持续出现。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;提高开发团队对功能实现的估算准确度，包括培训，需求拆分，尽早理解需求等。&lt;/li&gt;
+&lt;li&gt;项目管理改进，需要加强测试的准入准出控制和风险预防。延期提测需要顺延交付时间；产品未完成回归就进行发布，至少需要完成异常发布的审核流程。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="5why的实施步骤"&gt;5Why的实施步骤
+&lt;/h2&gt;&lt;p&gt;5Why 方法虽然很简单，但它的实施还是需要遵循一定的步骤流程：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-3.png"
+width="904"
+height="161"
+srcset="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-3_hu_1c18c9b96e3efa17.png 480w, https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-3_hu_5a36d5df4520c8ce.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="561"
+data-flex-basis="1347px"
+&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;首先，当然是需要跟问题相关的关键成员要共同来对问题进行分析，这一步应该是需要团队中跟问题相关的关联角色都能够参加。否则可能因为关键人员的缺席导致分析不能继续进行。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;而在确定参与的团队人员之后，还要保证所有人对问题都比较明确，需要分析什么？有哪些背景信息，大家对问题的理解应该达成共识，而不是以不同的理解进入 Why 的讨论环节&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;而在具体的分析会议期间中，主持人应该通过合适的提问，来逐步地帮助团队挖掘出真正的原因&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;当然，分析问题最终是为了解决问题，所以，我们还要针对得到的根因讨论出对应的纠正措施，以避免同类问题再次发生。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;最后，纠正措施的实施成效怎么样，也需要有对应的举措、时间节点来进行跟踪，对根因分析的效果进行检验确认。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;通过这样一个过程，才是一个完整的、基于 5Why 方法的根因分析实施过程。&lt;/p&gt;
+&lt;h2 id="实施-5why-的注意事项"&gt;实施 5Why 的注意事项
+&lt;/h2&gt;&lt;p&gt;5Why 方法虽然简单，但在实践中，其实并不容易做好，这里有一些需要注意的关键点：&lt;/p&gt;
+&lt;h3 id="团队活动"&gt;团队活动
+&lt;/h3&gt;&lt;p&gt;5Why 分析是一个团队活动，需要跟问题相关的人员积极参与，只有跟问题分析路径上的关键角色能给出有效的答案才能保证分析链路的有效&lt;/p&gt;
+&lt;h3 id="并非高效方法"&gt;并非高效方法
+&lt;/h3&gt;&lt;p&gt;这个方法虽然理解上很简单，但因为是团队活动，且跟问题的各种背景信息是否充分紧密相关。所以包括信息收集、人员召集以及会议上的头脑风暴，都是需要时间投入的，并不是一个高效、快速得到结论的活动，有时甚至要进行多次会议讨论。&lt;/p&gt;
+&lt;h3 id="主持人的经验"&gt;主持人的经验
+&lt;/h3&gt;&lt;p&gt;5Why 方法是否能成功，很关键的一个角色是会议的主持者，这个角色应该对 5Why 方法有充分理解并且对问题相关领域比较熟悉，能够引导团队在正确的方向上去挖掘根本原因。避免过度发散&lt;/p&gt;
+&lt;h3 id="对事不对人避免责任推卸"&gt;对事不对人，避免责任推卸
+&lt;/h3&gt;&lt;p&gt;根因分析不是定责，也就是会议的重点是为了发现将来改进的要点，而不是界定当前问题的责任，避免把分析会变成责任推协会和甩锅会&lt;/p&gt;
+&lt;h3 id="关注可控因素"&gt;关注可控因素
+&lt;/h3&gt;&lt;p&gt;根因分析，得到的根因应该是可以采取措施的一些可控的因素。而不是找到一些根本无法完成修正的不可抗因素。比如说人手不足了，根本原因是公司效益不好，而公司效益不好是经济下行.. 结论会变成不了了之&lt;/p&gt;
+&lt;p&gt;总而言之，5Why 分析法是一个简单实用的根因分析方法，但并不是高效方法，并且它的有效性跟团队成员的齐心合力和实施方式关系紧密。只有理解它的内部逻辑，根据团队的实际情况，有选择地实施才能真正起到应有的效用。&lt;/p&gt;
+&lt;h2 id="分析模板"&gt;分析模板
+&lt;/h2&gt;&lt;p&gt;附上两个常见的分析模板，供大家参考&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-1.png"
+width="1535"
+height="942"
+srcset="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-1_hu_cf97c34413296afa.png 480w, https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-1_hu_9f5f977bff14e7a1.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="162"
+data-flex-basis="391px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-2.png"
+width="959"
+height="594"
+srcset="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-2_hu_e56c5835c7bf09a3.png 480w, https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-2_hu_1d2880f4202aa832.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="161"
+data-flex-basis="387px"
+&gt;&lt;/p&gt;
+&lt;hr&gt;</description></item></channel></rss>

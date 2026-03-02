@@ -1,0 +1,164 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="在实施自动化测试时，最令人头疼的可能就是遇到那些“`不稳定的测试`”"><title>Playwright中对不稳定测试的重试处理</title><link rel=canonical href=https://chengxiaqiucao.github.io/post/135-playwright_unstable/><link rel=stylesheet href=/scss/style.min.602e9aab9278c27da97b17e9269e2dc09982e5ac79404fcec3820af47d681074.css><meta property='og:title' content="Playwright中对不稳定测试的重试处理"><meta property='og:description' content="在实施自动化测试时，最令人头疼的可能就是遇到那些“`不稳定的测试`”"><meta property='og:url' content='https://chengxiaqiucao.github.io/post/135-playwright_unstable/'><meta property='og:site_name' content='秋 草 观 “测” 台'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Playwright'><meta property='article:tag' content='自动化测试'><meta property='article:published_time' content='2025-11-12T17:22:26+08:00'><meta property='article:modified_time' content='2025-11-12T17:22:26+08:00'><meta name=twitter:title content="Playwright中对不稳定测试的重试处理"><meta name=twitter:description content="在实施自动化测试时，最令人头疼的可能就是遇到那些“`不稳定的测试`”"></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/automnGrass_hu_ba0d09fe872844bf.png width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>秋 草 观 “测” 台</a></h1><h2 class=site-description>Testing is not just checking...</h2></div></header><ol class=menu-social><li><a href=https://github.com/chengxiaqiucao target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://space.bilibili.com/472272606 target=_blank title=Bilibili rel=me><!doctype html><svg t="1750732982440" class="icon" viewBox="0 0 1024 1024" p-id="4593" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632 444.330667 256h135.296l138.368-138.325333A42.666667 42.666667.0 01778.368 178.048L700.330667 256H789.333333A149.333333 149.333333.0 01938.666667 405.333333v341.333334A149.333333 149.333333.0 01789.333333 896H234.666667A149.333333 149.333333.0 0185.333333 746.666667V405.333333A149.333333 149.333333.0 01234.666667 256h88.96L245.632 177.962667a42.666667 42.666667.0 0160.373333-60.373334zm483.328 223.701333H234.666667a64 64 0 00-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0057.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0063.701334-57.856L853.333333 746.666667V405.333333a64 64 0 00-64-64zm-448 128A42.666667 42.666667.0 01384 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666666-42.666667zm341.333334.0A42.666667 42.666667.0 01725.333333 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666667-42.666667z" p-id="4594" fill="#8a8a8a"/></svg></a></li><li><a href=https://www.zhihu.com/people/qiucao target=_blank title=zhihu rel=me><!doctype html><svg t="1750733049138" class="icon" viewBox="0 0 1024 1024" p-id="5820" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M570.581333 806.272h61.952L652.928 876.117333 764.074667 806.272h130.986666V230.186667h-324.48V806.272zM636.501333 292.693333h192.64V743.68h-73.898666l-73.813334 46.378667L668.032 743.808l-31.530667-.128V292.736zM515.754667 493.738667H377.429333a2999.466667 2999.466667.0 005.802667-194.56h135.338667S523.776 239.445334 495.872 240.128H261.76c9.216-34.730667 20.821333-70.613333 34.688-107.690667.0.0-63.701333.0-85.333333 57.130667C202.112 213.12 176.128 303.786667 129.877333 396.416c15.573333-1.706667 67.114667-3.114667 97.450667-58.794667 5.589333-15.616 6.656-17.621333 13.568-38.485333h76.373333c0 27.776-3.157333 177.109333-4.437333 194.474667h-138.24c-31.104.0-41.173333 62.549333-41.173333 62.549333h173.482666C295.253333 688.256 232.789333 799.573333 119.466667 887.466667c54.186667 15.488 108.202667-2.432 134.912-26.197334.0.0 60.8-55.338667 94.122666-183.381333L491.264 849.834667s20.906667-71.168-3.285333-105.856c-20.053333-23.637333-74.24-87.552-97.322667-110.72l-38.698667 30.72c11.52-36.992 18.474667-72.96 20.821334-107.690667h163.072s-.213333-62.549333-20.053334-62.549333z" p-id="5821" fill="#8a8a8a"/></svg></a></li><li><a href=mailto:%20danmyw@qq.com target=_blank title=e-mail rel=me><!doctype html><svg t="1750733089669" class="icon" viewBox="0 0 1451 1024" p-id="6983" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759.0 97.881301C0 3.997201 71.046997.0 71.046997.0H474.477909 961.649408h399.992405s71.046998 3.997201 71.046998 97.881301L771.345323 681.472759S764.482731 685.154773 753.594283 688.65053V688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858V688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759zm53.281707 130.131124C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633.0 212.052267.0 212.052267V942.809523S0 1024 83.726336 1024H682.532949 753.579947h595.368192C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523V212.052267S893.138176 701.759633 817.019477 767.734955c-39.771477 34.470494-74.671786 43.295855-98.955861 43.868928z" fill="#8a8a8a" p-id="6984"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>主页</span></a></li><li><a href=/page/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>检索</span></a></li><li><a href=/page/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>链接</span></a></li><li><a href=/page/about/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>关于</span></a></li><li><a href=/page/releases/><svg class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M9.828 9.172a4 4 0 100 5.656A10 10 0 0012 12a10 10 0 012.172-2.828 4 4 0 110 5.656A10 10 0 0112 12 10 10 0 009.828 9.172"/></svg>
+<span>热门开源</span></a></li><li class=menu-bottom-section><ol class=menu><li id=i18n-switch><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg>
+<select name=language title=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://chengxiaqiucao.github.io/en/>English</option><option value=https://chengxiaqiucao.github.io/ selected>中文</option></select></li><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#前言>前言</a></li><li><a href=#何为不稳定的测试>何为不稳定的测试？</a></li><li><a href=#为什么会变得不稳定>为什么会变得不稳定？</a></li><li><a href=#一个简单的解决方案>一个简单的解决方案</a><ol><li><a href=#定义重试装饰器><strong>定义重试装饰器</strong></a></li><li><a href=#方案的优缺点><strong>方案的优缺点</strong></a></li></ol></li><li><a href=#结语>结语</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7/ style=background-color:#c6fad2;color:#000>测试工具</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/post/135-playwright_unstable/>Playwright中对不稳定测试的重试处理</a></h2><h3 class=article-subtitle>在实施自动化测试时，最令人头疼的可能就是遇到那些“`不稳定的测试`”</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Nov 12, 2025</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 4 分钟</time></div></footer></div></header><section class=article-content><h2 id=前言>前言</h2><p>在实施自动化测试时，最令人头疼的可能就是遇到那些“<code>不稳定的测试</code>”。这些测试在没有对代码进行任何更改的情况下，时而通过，时而失败。这种不一致性会导致对自动化测试集的不信任，并浪费大量宝贵的时间在不断调试上。</p><p>本文，我们将分享一个简单但有效的方案，用于处理 Playwright 中的不稳定测试：<strong>一个自定义的重试工具函数</strong>。</p><h2 id=何为不稳定的测试>何为不稳定的测试？</h2><p><strong>不稳定测试（或“抖动测试”）</strong> 是指那些并非由于代码缺陷原因而间歇性失败的测试。即便应用程序和测试代码都保持不变，它们的执行结果也可能不同。</p><h2 id=为什么会变得不稳定>为什么会变得不稳定？</h2><p>测试不稳定的原因有很多，最常见的包括以下一些情况：</p><ol><li><strong>网络延迟</strong>：API 或页面资源加载缓慢，导致测试超时。</li><li><strong>服务器响应慢</strong>：后端服务器出现过载，业务处理时间过长，会导致响应时间过长。</li><li><strong>第三方依赖</strong>：依赖的外部服务（如支付网关或社交媒体 API）不够稳定，时好时坏。</li><li><strong>竞态条件</strong>：测试在应用程序完全渲染或状态更新之前就尝试与元素交互。</li><li><strong>浏览器差异</strong>：不同浏览器处理页面加载和 JavaScript 执行的方式略有不同。</li></ol><h2 id=一个简单的解决方案>一个简单的解决方案</h2><p>Playwright 内置了自动重试机制，但它是针对整个测试的。</p><p>有时，如果我们只想重试测试中的某一部分，而不是从头开始执行，这时我们就可以自定义一个重试函数来处理。</p><p>该函数将接收一个操作（<em>一个函数</em>）作为参数，并在失败时尝试多次执行它。</p><h3 id=定义重试装饰器><strong>定义重试装饰器</strong></h3><p><strong>创建 <code>retry_decorator.py</code> 文件</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># retry_decorator.py</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>asyncio</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>functools</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>typing</span> <span class=kn>import</span> <span class=n>Callable</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>retry_async</span><span class=p>(</span><span class=n>max_retries</span><span class=p>:</span> <span class=nb>int</span> <span class=o>=</span> <span class=mi>3</span><span class=p>,</span> <span class=n>delay</span><span class=p>:</span> <span class=nb>float</span> <span class=o>=</span> <span class=mf>1.0</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    一个用于异步函数的重试装饰器。
+</span></span></span><span class=line><span class=cl><span class=s2>
+</span></span></span><span class=line><span class=cl><span class=s2>    :param max_retries: 最大重试次数，默认为 3。
+</span></span></span><span class=line><span class=cl><span class=s2>    :param delay: 每次重试之间的延迟（秒），默认为 1.0。
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>decorator</span><span class=p>(</span><span class=n>func</span><span class=p>:</span> <span class=n>Callable</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nd>@functools.wraps</span><span class=p>(</span><span class=n>func</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>async</span> <span class=k>def</span> <span class=nf>wrapper</span><span class=p>(</span><span class=o>*</span><span class=n>args</span><span class=p>,</span> <span class=o>**</span><span class=n>kwargs</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>last_exception</span> <span class=o>=</span> <span class=kc>None</span>
+</span></span><span class=line><span class=cl>            <span class=k>for</span> <span class=n>attempt</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>max_retries</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>                <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                    <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;--- 尝试执行 </span><span class=si>{</span><span class=n>func</span><span class=o>.</span><span class=vm>__name__</span><span class=si>}</span><span class=s2> (Attempt </span><span class=si>{</span><span class=n>attempt</span> <span class=o>+</span> <span class=mi>1</span><span class=si>}</span><span class=s2>/</span><span class=si>{</span><span class=n>max_retries</span><span class=si>}</span><span class=s2>) ---&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                    <span class=k>return</span> <span class=k>await</span> <span class=n>func</span><span class=p>(</span><span class=o>*</span><span class=n>args</span><span class=p>,</span> <span class=o>**</span><span class=n>kwargs</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                    <span class=n>last_exception</span> <span class=o>=</span> <span class=n>e</span>
+</span></span><span class=line><span class=cl>                    <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;尝试 </span><span class=si>{</span><span class=n>attempt</span> <span class=o>+</span> <span class=mi>1</span><span class=si>}</span><span class=s2> 失败: </span><span class=si>{</span><span class=n>e</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                    <span class=k>if</span> <span class=n>attempt</span> <span class=o>&lt;</span> <span class=n>max_retries</span> <span class=o>-</span> <span class=mi>1</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;等待 </span><span class=si>{</span><span class=n>delay</span><span class=si>}</span><span class=s2> 秒后重试...&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                        <span class=k>await</span> <span class=n>asyncio</span><span class=o>.</span><span class=n>sleep</span><span class=p>(</span><span class=n>delay</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            
+</span></span><span class=line><span class=cl>            <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;所有 </span><span class=si>{</span><span class=n>max_retries</span><span class=si>}</span><span class=s2> 次尝试均失败。&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>raise</span> <span class=n>last_exception</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>wrapper</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>decorator</span>
+</span></span></code></pre></td></tr></table></div></div><p>这个重试装饰器的核心思路：</p><ol><li>循环 <code>max_Retries</code> 次。</li><li>在 <code>try</code> 块中执行传入的<code>Callable</code>函数 。</li><li>如果成功，立即返回结果。</li><li>如果失败，捕获错误，等待一秒，然后进行下一次尝试。</li><li>如果所有尝试都失败了，抛出最后一次的错误。</li></ol><p><strong>在测试脚本文件中使用</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_example_decorator.py</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>pytest</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>playwright.async_api</span> <span class=kn>import</span> <span class=n>Page</span><span class=p>,</span> <span class=n>expect</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>retry_decorator</span> <span class=kn>import</span> <span class=n>retry_async</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 模拟页面, 其内容会动态变化</span>
+</span></span><span class=line><span class=cl><span class=n>FLAKY_PAGE_HTML</span> <span class=o>=</span> <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;!DOCTYPE html&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;html&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;head&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;title&gt;不稳定页面&lt;/title&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;/head&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;body&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;h1&gt;测试页面&lt;/h1&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;p id=&#34;status&#34;&gt;加载中...&lt;/p&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;script&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>        setTimeout(() =&gt; {
+</span></span></span><span class=line><span class=cl><span class=s2>            document.getElementById(&#39;status&#39;).innerText = &#39;完成！&#39;;
+</span></span></span><span class=line><span class=cl><span class=s2>        }, 1500);
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;/script&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;/body&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;/html&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.mark.asyncio</span>
+</span></span><span class=line><span class=cl><span class=k>async</span> <span class=k>def</span> <span class=nf>test_flaky_element_with_decorator</span><span class=p>(</span><span class=n>page</span><span class=p>:</span> <span class=n>Page</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>page</span><span class=o>.</span><span class=n>set_content</span><span class=p>(</span><span class=n>FLAKY_PAGE_HTML</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># 直接调用被装饰的函数，重试逻辑被透明地处理了</span>
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>check_status</span><span class=p>(</span><span class=n>page</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=s2>&#34;测试通过！&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 对业务处理方法进行装饰</span>
+</span></span><span class=line><span class=cl><span class=nd>@retry_async</span><span class=p>(</span><span class=n>max_retries</span><span class=o>=</span><span class=mi>5</span><span class=p>,</span> <span class=n>delay</span><span class=o>=</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>async</span> <span class=k>def</span> <span class=nf>check_status</span><span class=p>(</span><span class=n>page</span><span class=p>:</span> <span class=n>Page</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;这个函数包含了不稳定的断言，现在被装饰器保护&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>status_locator</span> <span class=o>=</span> <span class=n>page</span><span class=o>.</span><span class=n>locator</span><span class=p>(</span><span class=s2>&#34;#status&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>await</span> <span class=n>expect</span><span class=p>(</span><span class=n>status_locator</span><span class=p>)</span><span class=o>.</span><span class=n>to_have_text</span><span class=p>(</span><span class=s2>&#34;完成！&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=s2>&#34;状态检查成功！&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=方案的优缺点><strong>方案的优缺点</strong></h3><p><strong>优点：</strong></p><ul><li><strong>简单性</strong>：易于理解和实现。</li><li><strong>可控性</strong>：可以精确控制哪些操作需要重试，而不是重试整个测试。</li><li><strong>可复用性</strong>：可以在多个测试中重复使用这个装饰器。</li></ul><p><strong>缺点：</strong></p><ul><li><strong>掩盖问题</strong>：过度使用可能会掩盖真正的不稳定性根源（如性能问题或竞态条件）。</li><li><strong>增加测试时间</strong>：如果测试频繁失败，重试会显著增加总执行时间。</li><li><strong>调试困难</strong>：当测试失败时，可能不清楚是第几次尝试失败的，日志可能会变得混乱。</li></ul><h2 id=结语>结语</h2><p>通过这个自定义的重试工具，我们在使用 Playwright 处理歇性测试失败的不稳定测试时，提供了一个细粒度的控制层，可以在特定操作失败时进行恢复，而无需放弃整个测试。</p><p>当然，实际应用时，也需要根据被测业务的实际情况，避免滥用。最好把它当作一个临时的解决方案或针对已知、难以修复的不稳定性的补丁。</p><p>对于不稳定测试，最根本的处理，还是应该找到并解决导致不稳定的根本原因。</p></section><footer class=article-footer><section class=article-tags><a href=/tags/playwright/>Playwright</a>
+<a href=/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95/>自动化测试</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/post/134-playwright_multi_users/><div class=article-image><img src=/post/134-playwright_multi_users/Pasted-20251105.a21226a55a6eaa81be671652f722b1c4_hu_70eaed93d789b9a5.png width=250 height=150 loading=lazy alt="Featured image of post 用Playwright Fixture支持多用户和不同上下文场景" data-hash="md5-ohImpVpuqoG+ZxZS9yKxxA=="></div><div class=article-details><h2 class=article-title>用Playwright Fixture支持多用户和不同上下文场景</h2></div></a></article><article class=has-image><a href=/post/066-playwright%E6%96%B0%E7%89%88%E6%9C%AC%E7%AD%9B%E9%80%89%E5%8A%9F%E8%83%BD/><div class=article-image><img src=/post/066-playwright%E6%96%B0%E7%89%88%E6%9C%AC%E7%AD%9B%E9%80%89%E5%8A%9F%E8%83%BD/playwright_logo.82386a35c48e32d43f12199ac6a46a38_hu_4a434fd1b6eb715.png width=250 height=150 loading=lazy alt="Featured image of post Playwright新版本筛选功能" data-hash="md5-gjhqNcSOMtQ/EhmaxqRqOA=="></div><div class=article-details><h2 class=article-title>Playwright新版本筛选功能</h2></div></a></article><article><a href=/post/137-anti_automation/><div class=article-details><h2 class=article-title>关于自动化测试中的反模式</h2></div></a></article><article class=has-image><a href=/post/122-playwright_adv_fixture/><div class=article-image><img src=/post/122-playwright_adv_fixture/playwright_logo.82386a35c48e32d43f12199ac6a46a38_hu_4a434fd1b6eb715.png width=250 height=150 loading=lazy alt="Featured image of post Playwright中Fixture的高级应用技巧" data-hash="md5-gjhqNcSOMtQ/EhmaxqRqOA=="></div><div class=article-details><h2 class=article-title>Playwright中Fixture的高级应用技巧</h2></div></a></article><article class=has-image><a href=/post/118-pom_replacement/><div class=article-image><img src=/post/118-pom_replacement/Pasted-20250806.f76c8d5a1901a96f974bf59653a68a57_hu_a02d5b9b8c63369f.png width=250 height=150 loading=lazy alt="Featured image of post UI自动化，POM之外的另一模式" data-hash="md5-92yNWhkBqW+XS/WWU6aKVw=="></div><div class=article-details><h2 class=article-title>UI自动化，POM之外的另一模式</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2023 -
+2026 |by 城下秋草（公众号： 秋草说测试）</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

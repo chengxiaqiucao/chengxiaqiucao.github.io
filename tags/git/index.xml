@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Git on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/git/</link><description>Recent content in Git on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Fri, 27 Sep 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/git/index.xml" rel="self" type="application/rss+xml"/><item><title>软件分支策略和集成模式梳理</title><link>https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/</link><pubDate>Fri, 27 Sep 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/branch.png" alt="Featured image of post 软件分支策略和集成模式梳理" /&gt;&lt;h2 id="前言"&gt;前言
+&lt;/h2&gt;&lt;p&gt;软件代码是任何一个软件研发团队的核心资产。而软件的分支管理就是团队中多人合作时，如何协调处理不同人员的代码同步、集成并解决冲突的主要方式。&lt;/p&gt;
+&lt;p&gt;本文根据软件大牛Martin Flower的分支模型阅读笔记整理&lt;/p&gt;
+&lt;h2 id="基础模式"&gt;基础模式
+&lt;/h2&gt;&lt;h3 id="源分支"&gt;源分支
+&lt;/h3&gt;&lt;p&gt;所有修改都记录到同一分支&lt;/p&gt;
+&lt;p&gt;分支的定义：
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927.png"
+width="701"
+height="259"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927_hu_3963af370a803906.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927_hu_d59387bd6897e0b7.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="270"
+data-flex-basis="649px"
+&gt;
+创建分支：
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-1.png"
+width="916"
+height="590"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-1_hu_172bcf8b114733e.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-1_hu_c03beeebecaa7fea.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="155"
+data-flex-basis="372px"
+&gt;&lt;/p&gt;
+&lt;p&gt;不同的两个开发者基于主分支拉去各自的开发分支：
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-2.png"
+width="872"
+height="439"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-2_hu_f60f9f5d4e42500c.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-2_hu_f1f9facc0d863e1c.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="198"
+data-flex-basis="476px"
+&gt;&lt;/p&gt;
+&lt;p&gt;Jonny LeRoy 指出我们绘制分支线时，其实忽略了随着时间，导致的复杂度提升
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-3.png"
+width="883"
+height="521"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-3_hu_8725eeddbaee2ae7.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-3_hu_dd160097bd830a03.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="169"
+data-flex-basis="406px"
+&gt;&lt;/p&gt;
+&lt;h4 id="主干的定义"&gt;主干的定义：
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;Master、Trunk&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;是反映产品当前实际状态的唯一公用分支&lt;/p&gt;
+&lt;p&gt;可以随时获得当前产品版本状态，并基于此进行开发&lt;/p&gt;
+&lt;h4 id="健康分支"&gt;健康分支：
+&lt;/h4&gt;&lt;p&gt;为每一次提交进行自动化构建、测试，确保没有在当前分支引入故障（可工作的无故障分支）&lt;/p&gt;
+&lt;p&gt;优点：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;健康的公用分支，可以避免从这个分支上拉取的新分支工作在错误的基础上&lt;/li&gt;
+&lt;li&gt;健康分支更易入直接发布到产品&lt;/li&gt;
+&lt;li&gt;随时保持一个健康分支能极大降低集成的工作量并减少潜在风险。&lt;/li&gt;
+&lt;li&gt;便于进行差异调试。（可以将调试失败的commit去除，仅保留健康的commit）&lt;/li&gt;
+&lt;li&gt;在集成到主干时如果出现问题，就可以非常明确地确认是冲突导致而非代码错误&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;可能是公用分支、也可以是自己的分支。
+自测代码是健康分支的核心，自测应可以快速得到结果（分钟级）&lt;/p&gt;
+&lt;h2 id="集成模式"&gt;集成模式
+&lt;/h2&gt;&lt;h3 id="主线集成"&gt;主线集成
+&lt;/h3&gt;&lt;p&gt;开发从主干拉取代码进行开发，集成，并将健康的更改推送回主干
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-4.png"
+width="1086"
+height="253"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-4_hu_8f5d817918693d5e.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-4_hu_52f7201d30a8380b.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="429"
+data-flex-basis="1030px"
+&gt;
+从主干拉取分支到本地，并在本地分支上进行开发&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-5.png"
+width="1058"
+height="302"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-5_hu_8fdeb47420755ce8.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-5_hu_fe6481847ee0979d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="350"
+data-flex-basis="840px"
+&gt;
+开发过程中，其他开发已经提交了变更到主干分支
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-6.png"
+width="1021"
+height="313"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-6_hu_594fce73163c11bc.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-6_hu_81f27217687c8ed7.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="326"
+data-flex-basis="782px"
+&gt;
+此时如需向主干提交，则首先需要合入其他的变更
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-7.png"
+width="1067"
+height="334"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-7_hu_ae39e5e373c25b95.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-7_hu_faaa1d74faf8fdae.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="319"
+data-flex-basis="766px"
+&gt;
+有时，本地的修改和已经提交的变更会有冲突，此时需要先解决冲突
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-8.png"
+width="1055"
+height="322"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-8_hu_444a69bd7b3e6256.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-8_hu_53e3cb4c5fe37ad1.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="327"
+data-flex-basis="786px"
+&gt;
+再重新将修改并自测后的健康代码提交到主干分支&lt;/p&gt;
+&lt;p&gt;使用主干时，意味着我们会实行&lt;strong&gt;主干集成模式&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id="特性分支"&gt;特性分支
+&lt;/h3&gt;&lt;p&gt;为每一个功能特性拉取它独立的分支，并在feture完成后集成回主干&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-9.png"
+width="933"
+height="366"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-9_hu_da8c6cc43d6ec101.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-9_hu_88552933e75488e2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="254"
+data-flex-basis="611px"
+&gt;
+从主干拉取不同的特性分支并分别进行开发
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927175324.png"
+width="952"
+height="350"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927175324_hu_c6f9a420488a6cb1.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927175324_hu_61d505a2f5c8a713.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="272"
+data-flex-basis="652px"
+&gt;
+开发过程中会持续从主干拉取最新代码，如果有其他功能变更，要及时进行集成解决冲突（本地）。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-10.png"
+width="885"
+height="360"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-10_hu_29e111f1d9521c2e.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-10_hu_75bd0c481422f710.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="245"
+data-flex-basis="590px"
+&gt;
+特性完成开发后，集成回主干。（受影响的冲突已在本地解决，所有其他特性分支上直接拉取变更，不会存在冲突需要解决）&lt;/p&gt;
+&lt;h3 id="低频集成"&gt;低频集成
+&lt;/h3&gt;&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-11.png"
+width="1063"
+height="335"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-11_hu_780eb25071da3300.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-11_hu_4fe9d8c09c0804b1.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="317"
+data-flex-basis="761px"
+&gt;&lt;/p&gt;
+&lt;p&gt;两条独立的开发分支上分别进行了几次本地提交，但没有向主干推送
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-12.png"
+width="1015"
+height="333"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-12_hu_9890964a040e5fa5.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-12_hu_e859173fda6c4fd6.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="304"
+data-flex-basis="731px"
+&gt;
+主干上合入了变更&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-13.png"
+width="1064"
+height="338"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-13_hu_5251f1e111d0435.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-13_hu_c456aa1bcf37c7ab.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="314"
+data-flex-basis="755px"
+&gt;
+开发分支需要拉取变更并合入到本地分支（解决冲突）&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-14.png"
+width="1067"
+height="342"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-14_hu_dbef3a49a4c1c21b.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-14_hu_9bea4ba112091f99.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="311"
+data-flex-basis="748px"
+&gt;
+分支A上继续完成了4，5两个提交，然后推送大主干
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-15.png"
+width="1052"
+height="321"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-15_hu_4940545bd57b9a6b.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-15_hu_e9d9b0f80404c29.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="327"
+data-flex-basis="786px"
+&gt;
+分支B上完成了4，5，6几个提交后，需要在本地合入主干上A的提交，集成后推送到主干。（本地合入的大小代表工作量）&lt;/p&gt;
+&lt;h3 id="高频集成"&gt;高频集成
+&lt;/h3&gt;&lt;p&gt;每次提交都向主干进行集成和推送呢？
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-16.png"
+width="1057"
+height="312"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-16_hu_1249f5609bdba095.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-16_hu_cbfe8e0fedf5f6b9.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="338"
+data-flex-basis="813px"
+&gt;
+V完成第1次提交后就推送回主干&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-17.png"
+width="1025"
+height="324"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-17_hu_ef101964020d5818.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-17_hu_9828a2ca513b44d6.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="316"
+data-flex-basis="759px"
+&gt;
+S在完成第1次提交后就进行本地合入，并推送回主干
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-18.png"
+width="1036"
+height="327"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-18_hu_edf06e300c265c48.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-18_hu_b5fea3f961837be5.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="316"
+data-flex-basis="760px"
+&gt;
+S的第2次推送，主干没有变更，没有本地合入工作
+V完成第2次提交和本地合入，推送
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-19.png"
+width="1074"
+height="323"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-19_hu_4f0cb263b45b956.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-19_hu_2c60f9267e14ab61.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="332"
+data-flex-basis="798px"
+&gt;
+S的第3次提交，需要本地合入，推送
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-20.png"
+width="1078"
+height="345"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-20_hu_21b41c7884fe19cd.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-20_hu_158da370838bf806.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="312"
+data-flex-basis="749px"
+&gt;
+如此，每次本地的提交，都会向主干进行推送&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-21.png"
+width="1021"
+height="401"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-21_hu_baa8630b8ae1ae66.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-21_hu_f5e43b7c5ef04843.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="254"
+data-flex-basis="611px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-22.png"
+width="1053"
+height="429"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-22_hu_396986373d2a808.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-22_hu_43609e380a07fd06.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="245"
+data-flex-basis="589px"
+&gt;&lt;/p&gt;
+&lt;p&gt;比较二者，高频集成会有更多的本地集成工作，但这些集成的工作量比低频集成低得多。
+同时，比工作量减少更重要的是，这样做减少了风险。（虽然大多情况下，进行大的合入也能顺利完成，但有时却会有严重的冲突问题难以解决。这种情况，偶发的巨大问题比常规的小问题更糟糕）
+如果每次常规集成10分钟，但50次集成合在一起要6小时，看起来6小时比500分钟还是要少，但是这会导致&lt;em&gt;集成恐惧&lt;/em&gt;（if it hurt，do it more often）&lt;/p&gt;
+&lt;p&gt;而且高频集成模式下，可以更早发现代码间的冲突情况，并避免在冲突代码在后期才发现而导致中间持续产生了很多本不应该存在的更多冲突代码。&lt;/p&gt;
+&lt;p&gt;源码控制系统其实更多是一个沟通平台，可以意识到其他团队成员的工作&lt;/p&gt;
+&lt;h3 id="持续集成"&gt;持续集成
+&lt;/h3&gt;&lt;p&gt;开发者一旦完成一个健康的提交，就会尽快完成主干集成，一般不超过1天。&lt;/p&gt;
+&lt;p&gt;（如果高频集成更有效率且可实施，但使用特性分支，意味着限制了变更不能比一个特性更小，那么集成频次就成了问题？）&lt;/p&gt;
+&lt;p&gt;持续集成-只要特性上的开发是有进展并且是健康的，就可以向主干集成。唯一的原则就是每天都要进行集成（甚至更短）&lt;/p&gt;
+&lt;p&gt;开发团队需要习惯在主干上存在未完成特性的情况并考虑如何在产品中不暴露这些特性。（通过隐藏入口、配置控制），有时我们还可以实现灰度发布。&lt;/p&gt;
+&lt;p&gt;在持续集成模式下，开发着往往不需要创建自己的特性分支，只要在本地的主干分支上工作即可。&lt;/p&gt;
+&lt;p&gt;特性分支和持续集成的区别不在于是否有特性分支存在，而在于何时向主干集成。&lt;/p&gt;
+&lt;p&gt;两者的比较：&lt;/p&gt;
+&lt;p&gt;两种模式的差异更多取决于特性的大小，如果特性足够小（一天以内可以完成），就可以同时实行特性分支和持续集成。&lt;/p&gt;
+&lt;p&gt;特性分支最明显的问题在于合并的工作量和不确定性，然而更大的问题是它可能阻止重构。重构是软件优化最有效的途径，但是重构会产生冲突，当解决冲突工作量太大时，重构往往需要极大的勇气。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;功能分支&lt;/th&gt;
+&lt;th&gt;持续集成&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;- 可以将某个功能中的所有代码作为一个单元进行质量评估&lt;br&gt;- 功能完成后才将功能代码添加到产品中&lt;br&gt;- 合并频率较低&lt;/td&gt;
+&lt;td&gt;- 支持比特征长度更高的频率集成&lt;br&gt;- 减少发现冲突的时间&lt;br&gt;- 规模较小的合并&lt;br&gt;- 鼓励重构&lt;br&gt;- 需要致力于健康的分支（从而实现自我测试代码）&lt;br&gt;- 科学证据表明它有助于提高软件交付性能&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id="特性分支和开源软件"&gt;特性分支和开源软件
+&lt;/h4&gt;&lt;p&gt;github的特性分支？pull request模式
+上下文不同：分散、不定时、团队成员不了解 vs 全职、熟悉的团队成员、可靠&lt;/p&gt;
+&lt;p&gt;提交的审核review&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;代码审核·&lt;/li&gt;
+&lt;li&gt;集成受阻&lt;/li&gt;
+&lt;li&gt;模块化的重要性&lt;/li&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="发布模式"&gt;发布模式
+&lt;/h2&gt;&lt;p&gt;主干分支是活动分支，代码持续在其上开发。如果能保持主干的健康状态，任何人都可以从一个稳定的基础开始自己的工作。
+而且足够健康的话，也可以直接从主干分支进行产品的发布&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i-blog.csdnimg.cn/blog_migrate/b1dee5579befaf2a2e007af2dbb2c29f.png#pic_center"
+loading="lazy"
+alt="在这里插入图片描述"
+&gt;
+对于实施CI/CD的团队，一个常用的实践是通过打Tag标记来跟踪每一个发布的版本。但不实践CD的团队，则需要其他的发布模式&lt;/p&gt;
+&lt;h3 id="release-branch-发布分支"&gt;Release Branch 发布分支
+&lt;/h3&gt;&lt;p&gt;预备发布的分支，只接受以版本稳定和交付为目标的提交 （一般系统测试阶段）
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-23.png"
+width="716"
+height="287"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-23_hu_aa6616e53082cdf.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-23_hu_17a37b86021c0a27.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="249"
+data-flex-basis="598px"
+&gt;&lt;/p&gt;
+&lt;p&gt;Release分支从主干分支中拉取，不再接受任何新feature的合入。工作在release分支上的开发工作主要是修复发现的bug或影响交付的功能。所有的修改最终还需要合并回主干。
+&lt;img src="https://i-blog.csdnimg.cn/blog_migrate/4e7655a86c338d8ce135fc704ded3f97.png#pic_center"
+loading="lazy"
+alt="cherry-pick 到release分支"
+&gt;
+尽管release分支上的工作往往比新feature的开发工作量更小，但是如果在其上的开发时间过长依然会导致合并回主干非常困难（主干上的提交越多，合入就越困难）&lt;/p&gt;
+&lt;p&gt;实际工作中，因为release分支的存在，合并回主干的操作往往容易被忽视，特别是有困难的冲突需要解决并且存在发布压力的情况下。&lt;/p&gt;
+&lt;p&gt;所以有的开发会采用另一种方式，继续在主干上开发，然后通过cherry-pick将只和发布相关的提交合入到release分支。这种方式的缺点是很多时候chrry-pick有时也很困难（对之前的commit有依赖的情况），在实际发布之前对release分支往往有一些重做工作。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-24.png"
+width="1000"
+height="430"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-24_hu_be573362d898ef0d.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-24_hu_17df8406b6e65c87.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="232"
+data-flex-basis="558px"
+&gt;
+对于只有一个产品版本的团队来说，使用单一的release分支就好。但很多情况下，会存在需要支持多个产品版本的情况，比如客户本地部署的软件，可能会长时间运行在一个历史版本上，但是又需要继续做一些bug fix或者一些特别的需求，此时就需要维护多个不同的release 分支，并定期保持和主干同步&lt;/p&gt;
+&lt;p&gt;对开发团队这明显是大大增加了维护难度和工作量，但这更多是产品策略带来的成本。唯一可以做的就是鼓励客户更及时地升级到最近版本（保持产品稳定非常关键，一旦产品不稳定导致问题，会使客户更倾向不再升级）&lt;/p&gt;
+&lt;p&gt;Release分支对于难以保持主干分支持续在健康状态的团队非常有必要，团队可以关注在产品发布的功能验证上。但对于单一产品的团队，release分支并不必要，使用主干分支并保持健康状态即可（发布的版本进行Tag标记）
+另外，对于发布流程存在很多阻塞的团队，relase分支也是必要的（比如有比较缓慢的审核流程，在应用商店上线的时间窗、安全、法务、合规等的审核等）&lt;/p&gt;
+&lt;h3 id="成熟分支"&gt;成熟分支
+&lt;/h3&gt;&lt;p&gt;分支的head总是标记为最近版本的成熟代码基线&lt;/p&gt;
+&lt;p&gt;根据团队对产品成熟度的不同定义，拉取出的对应的成熟分支。比如QA分支（提测）、Staging分支（预发）、production分支（上线）&lt;/p&gt;
+&lt;p&gt;但很多情况下，使用清晰定义的Tag机制就可以代替成熟分支的作用。比如“成熟级别-内部版本号”，“qa-233”，“prod-445”
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-25.png"
+width="808"
+height="418"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-25_hu_bbc0ec44af8b3ecc.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-25_hu_65df3340dbf1b667.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="193"
+data-flex-basis="463px"
+&gt;&lt;/p&gt;
+&lt;h3 id="长期发布分支"&gt;长期发布分支
+&lt;/h3&gt;&lt;p&gt;release分支一般在产品发布后就可以删除，但我们也可以维持一个长期的发布分支。它的作用可以看作是发布分支和成熟分支的集合。这个分支上进行release前的fix工作并合并回主线，并在实际发布时打上发布Tag，然后进入下一个版本的发布准备。
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-26.png"
+width="940"
+height="304"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-26_hu_be6651f9540b105.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-26_hu_6b25be730cd40425.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="309"
+data-flex-basis="742px"
+&gt;&lt;/p&gt;
+&lt;h3 id="环境分支"&gt;环境分支
+&lt;/h3&gt;&lt;p&gt;通过不同的提交来配置代码的运行环境
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-27.png"
+width="825"
+height="467"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-27_hu_140f0817430bf590.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-27_hu_d49f390ef5028875.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="176"
+data-flex-basis="423px"
+&gt;&lt;/p&gt;
+&lt;p&gt;不同的产品运行环境往往会有不同的配置代码（测试环境、开发环境、性能验证、安全验证环境、预发环境、产品环境等），环境分支会包含这些配置的变更提交并触发对应的构建、部署。&lt;/p&gt;
+&lt;p&gt;环境分支一般也用作成熟分支，比如QA的成熟分支，会包含QA环境的配置变更。&lt;/p&gt;
+&lt;p&gt;但是环境分支并不是好的实践，不同的环境需要不同的编译代码会引入风险。如果产品程序在不同的环境上有不同的行为表现会使问题的修复、定位变得极其困难。所以最好保证不同环境下运行的可执行代码都是相同的，环境的配置都通过显式的配置文件或变量来控制。环境变更导致的任何更改都不应包含在源码控制系统中&lt;/p&gt;
+&lt;p&gt;环境分支只应是缺乏这种环境切换控制机制团队的应急机制存在。&lt;/p&gt;
+&lt;h3 id="hotfix"&gt;Hotfix
+&lt;/h3&gt;&lt;p&gt;用于进行紧急产品故障修复的分支&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-28.png"
+width="908"
+height="310"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-28_hu_92f88f9b1e178ffa.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-28_hu_13913edbe3bfbdf8.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="292"
+data-flex-basis="702px"
+&gt;
+从主线分支对应的release版本拉取hotfix分支，并在完成后合入回主线（如果release时间比较久，合并工作可能会比较大）
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-29.png"
+width="819"
+height="289"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-29_hu_dd6420c525fd4fa1.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-29_hu_121b424e35b06846.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="283"
+data-flex-basis="680px"
+&gt;
+对使用release 分支的团队，也可以直接在release分支上进行hotfix，此时相当于将原release分支转变为hotfix分支
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-30.png"
+width="785"
+height="293"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-30_hu_9fb7a970f69d5b53.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-30_hu_619d95fc88c3e4f0.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="267"
+data-flex-basis="643px"
+&gt;
+对于实践CD的团队，甚至可以直接在主干上完成hotfix（还是会拉取hotfix分支，但会从最新的提交拉取），因为一般团队已经具备了不公开未发布特性的能力。而且在hotfix过程中，不允许向主线进行任何新的提交。（hotfix优先）&lt;/p&gt;
+&lt;p&gt;如何定义hotfix？对于可以发布频率较高的团队，一般可以将问题纳入日常发布节奏而不需要进行hotfix。取决于团队发布频率和对业务的实际影响&lt;/p&gt;
+&lt;h3 id="release-train"&gt;release train
+&lt;/h3&gt;&lt;p&gt;象火车发车一样有定期的发布间隔，特性完成后选择放入哪一次发布（和SAFe的Agile release train不是一个概念，那更多是组织层面的实践）
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-31.png"
+width="789"
+height="361"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-31_hu_3497a27107054b46.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-31_hu_65bc533b053326d0.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="218"
+data-flex-basis="524px"
+&gt;
+团队定义定期的发布计划，并确定每列发布列车上的功能，据此承诺、安排各自的工作任务。一旦火车发车，当前分支就转化为release分支，只会接受bug fix。发布列车一般会和feature分支一起使用。对于发布流程中存在较多阻塞的团队来说，release train是非常有用的，不会因为这些阻塞而影响后续功能的研发。
+但比较明显的缺点是，如果一个功能很早就完成，也需要等到发车时间才能上线。&lt;/p&gt;
+&lt;p&gt;release train可以看作是团队release流程的一个提升手段，对与很难进行稳定发布的团队，实施CD往往不够现实 ，此时release train会是一个好选择。&lt;/p&gt;
+&lt;h4 id="loading-future-trains"&gt;loading future trains
+&lt;/h4&gt;&lt;p&gt;和旧列车发车后再向新的列车上装载需求不同，可以使用这种模式的变种。如果一些功能不能确定是否能在预定发车前完成，可以同时开启两列train（预期发车时间不同），在三月列车上完成的开发工作同时向4月列车上提交并在三月列车发车后继续在4月列车上完成剩余工作。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-32.png"
+width="895"
+height="304"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-32_hu_234389b130978c06.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-32_hu_22da32b07cd20d4c.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="294"
+data-flex-basis="706px"
+&gt;
+这种模式可以让4月列车上的工作不影响三月列车，但缺点是如果4月列车上的变更影响到3月的功能，会是后续的合并工作更加复杂。&lt;/p&gt;
+&lt;h4 id="和主线发布比较"&gt;和主线发布比较
+&lt;/h4&gt;&lt;p&gt;release train的主要好处是可以有一个定期的产品发布日历，但是多个分支依然会引入复杂性。
+其实使用主线模式也可以如此工作，在主线上开发，到发布日期后增加一个对应的发布分支即可。
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-33.png"
+width="820"
+height="445"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-33_hu_766d78572b82812d.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-33_hu_24f80863056a09d4.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="184"
+data-flex-basis="442px"
+&gt;&lt;/p&gt;
+&lt;h3 id="预发布主线"&gt;预发布主线
+&lt;/h3&gt;&lt;p&gt;确保主线是绝对健康状态，并且主线的head永远能被直接发布到产品环境。（每个提交都具备直接发布的健康状态，但是只有实际发布的提交才需要加上tag）
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-34.png"
+width="796"
+height="265"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-34_hu_f64dab05ca734f8c.png 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-34_hu_10d498c551d273de.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="300"
+data-flex-basis="720px"
+&gt;&lt;/p&gt;
+&lt;h2 id="其他发布模式"&gt;其他发布模式
+&lt;/h2&gt;&lt;h3 id="实验分支"&gt;实验分支
+&lt;/h3&gt;&lt;p&gt;在代码基线上收集用于实验的工作，这些功能不会被直接合入产品环境&lt;/p&gt;
+&lt;p&gt;实验性的点子
+功能的不同实现方式&lt;/p&gt;
+&lt;h3 id="未来分支"&gt;未来分支
+&lt;/h3&gt;&lt;p&gt;一个用于对其他分支侵入性太大的变更分支&lt;/p&gt;
+&lt;p&gt;较少使用的模式，只会从主线pull而不会merge回其他分支。一旦使用，意味着团队中存在一个独立的代码特区。应尽可能缩短这个分支存在的时间。&lt;/p&gt;
+&lt;h3 id="合作分支"&gt;合作分支
+&lt;/h3&gt;&lt;p&gt;用于开发者之间协同工作，但不需要进行正式的集成的情况。&lt;/p&gt;
+&lt;h3 id="团队集成分支"&gt;团队集成分支
+&lt;/h3&gt;&lt;p&gt;在向主线集成前，允许子团队间先进行互相集成。（大型项目）&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;原文参考Martin的博客 &lt;a class="link" href="https://martinfowler.com/articles/branching-patterns.html" target="_blank" rel="noopener"
+&gt;Branch Patterns&lt;/a&gt;&lt;/p&gt;</description></item><item><title>Git工作原理和常用指令</title><link>https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/</link><pubDate>Thu, 26 Sep 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/git.png" alt="Featured image of post Git工作原理和常用指令" /&gt;&lt;h2 id="序言"&gt;序言
+&lt;/h2&gt;&lt;p&gt;作为一个有追求的测试工程师，现如今敏捷起来，需要和开发人员紧密配合，像配合单元测试、集成测试，都是需要直接面对开发代码的。而且自己做的自动化测试，本身也是代码，因此代码管理其实也是现在做测试绕不过的一个技能。&lt;/p&gt;
+&lt;p&gt;而在和开发人员相爱相杀的过程中，直接冲进代码库，看看都写了什么见不得测试的勾当，也是咱们深度测试的高阶招数。&lt;/p&gt;
+&lt;p&gt;不过这里首要一关，就是跟代码库打交道。所以本文我们来了解下现在最主流的 &lt;code&gt;Git&lt;/code&gt; 代码分支管理工具， 如何用正确的姿势操作代码库。&lt;/p&gt;
+&lt;h2 id="git是什么"&gt;Git是什么？
+&lt;/h2&gt;&lt;p&gt;Git的作者是大名鼎鼎的Linus Torvalds, 众所周知，著名的 Linux 之父。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-1.png"
+width="1338"
+height="747"
+srcset="https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-1_hu_b59d78bfd91e5eef.png 480w, https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-1_hu_93c862b67062f4db.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="429px"
+&gt;&lt;/p&gt;
+&lt;p&gt;Linux虽然获得了极大的成功，吸引了众多的开发者参与项目，但在早期，作为Linux项目的管理者，Linus主要还是通过手工方式来合并大家的代码。并没有借助任何代码管理工具。&lt;/p&gt;
+&lt;p&gt;倒不是说 Linus 喜欢这种方式，而是因为他对代码版本管理工具非常挑剔，商用的 clearcase，开源的 CVS、SVN等等都不符合他对代码分支管理的预期。&lt;/p&gt;
+&lt;p&gt;直到 2002 年，Linus 才相中了一款商用的分布式版本控制系统 BitKeeper，而基于Linux极大的号召力，BitKeeper也愿意让 Linux 社区免费使用。但到2005年，一位社区开发者在未经允许的情况下逆向了BitKeeper并利用了它未公开的接口，导致 BitKeeper 收回了社区的免费使用权。&lt;/p&gt;
+&lt;p&gt;回到原点的Linus这时就决定自己开发一个代码的版本控制系统，对这个系统的基本诉求是：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;速度&lt;/li&gt;
+&lt;li&gt;设计简单&lt;/li&gt;
+&lt;li&gt;允许大量并行开发的分支&lt;/li&gt;
+&lt;li&gt;完全分布式&lt;/li&gt;
+&lt;li&gt;有能力高效管理类似 Linux 内核一样的超大规模项目&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;然后，大神的效率，Linus 只用了 10 天时间就推出了 Git 的第一个版本。并且给这个版本起了一个略带嘲讽意味的名字——Git（英语俚语中表示“不愉快的人”）。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The name &amp;ldquo;git&amp;rdquo; was given by Linus Torvalds when he wrote the very first version. He described the tool as &amp;ldquo;the stupid content tracker&amp;rdquo; and the name as (depending on your way)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;当然，在 Linus 推出 Git 的第一个版本后，社区中开始有其他感兴趣的成员(Junio Hamano)开始参与并逐渐接手了 Git 的日常维护，Linus 则继续将主要精力放回到了 Linux 内核的维护上。&lt;/p&gt;
+&lt;h2 id="git-vs-svn"&gt;Git vs SVN
+&lt;/h2&gt;&lt;p&gt;在 Git 之前，最流行的代码版本管理用工具应该是 SVN。&lt;/p&gt;
+&lt;p&gt;不能说 SVN 有很大缺点，但 Git 和 SVN 的应用场景确实有较大区别，这里列表做个比较&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="text-align: center"&gt;特性&lt;/th&gt;
+&lt;th style="text-align: center"&gt;Git&lt;/th&gt;
+&lt;th style="text-align: center"&gt;SVN&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;&lt;strong&gt;分支&lt;/strong&gt;&lt;/td&gt;
+&lt;td style="text-align: center"&gt;轻量级分支，创建快速&lt;/td&gt;
+&lt;td style="text-align: center"&gt;分支是代码库的完整拷贝&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;&lt;strong&gt;分支合并&lt;/strong&gt;&lt;/td&gt;
+&lt;td style="text-align: center"&gt;快进式合并，合并快速&lt;/td&gt;
+&lt;td style="text-align: center"&gt;需要手动合并修改&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;&lt;strong&gt;分布式&lt;/strong&gt;&lt;/td&gt;
+&lt;td style="text-align: center"&gt;是，设计为分布式&lt;/td&gt;
+&lt;td style="text-align: center"&gt;不是，不支持完全分布式&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;&lt;strong&gt;快照&lt;/strong&gt;&lt;/td&gt;
+&lt;td style="text-align: center"&gt;保存更改的快照&lt;/td&gt;
+&lt;td style="text-align: center"&gt;保存文件的差异&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;&lt;strong&gt;速度&lt;/strong&gt;&lt;/td&gt;
+&lt;td style="text-align: center"&gt;快，分布式设计&lt;/td&gt;
+&lt;td style="text-align: center"&gt;慢，中心化设计&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;&lt;strong&gt;权限控制&lt;/strong&gt;&lt;/td&gt;
+&lt;td style="text-align: center"&gt;通过Git Hooks和Gitolite控制&lt;/td&gt;
+&lt;td style="text-align: center"&gt;通过钩子脚本控制&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;&lt;strong&gt;学习曲线&lt;/strong&gt;&lt;/td&gt;
+&lt;td style="text-align: center"&gt;较高，需要理解命令和概念&lt;/td&gt;
+&lt;td style="text-align: center"&gt;较低，容易上手&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;&lt;strong&gt;标签&lt;/strong&gt;&lt;/td&gt;
+&lt;td style="text-align: center"&gt;轻量级标签，可以后续修改&lt;/td&gt;
+&lt;td style="text-align: center"&gt;不可变的静态标签&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;&lt;strong&gt;历史记录&lt;/strong&gt;&lt;/td&gt;
+&lt;td style="text-align: center"&gt;保留所有历史记录&lt;/td&gt;
+&lt;td style="text-align: center"&gt;只保留最近的历史记录&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;&lt;strong&gt;合并冲突&lt;/strong&gt;&lt;/td&gt;
+&lt;td style="text-align: center"&gt;需要手动解决&lt;/td&gt;
+&lt;td style="text-align: center"&gt;自动尝试解决，有冲突时需手动介入&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;&lt;strong&gt;命令行工具&lt;/strong&gt;&lt;/td&gt;
+&lt;td style="text-align: center"&gt;是，Git命令行强大灵活&lt;/td&gt;
+&lt;td style="text-align: center"&gt;较为简单，主要用于管理和操作仓库&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;总体来说，现在 Git 更为流行，围绕 Git 的生态更加健全，因此逐渐成为了目前最主流的版本控制工具&lt;/p&gt;
+&lt;h2 id="git的工作原理"&gt;Git的工作原理
+&lt;/h2&gt;&lt;p&gt;那 Git 到底是如何进行工作的呢？&lt;/p&gt;
+&lt;p&gt;git 在架构上其实是一个三层架构，&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;工作目录（working directory）&lt;/strong&gt;： 这是项目文件所在的实际目录。对工作目录中的文件所做的修改被认为是“未跟踪”状态，直到显式地进行 commit 操作。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;暂存区（staging area）&lt;/strong&gt;：暂存区充当工作目录和 &lt;code&gt;.git&lt;/code&gt; 目录之间的缓冲地带。暂存区域中的文件处于“暂存”状态，以便在下一次 commit 时包含。是允许选择和控制更改的手段。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;本地库（local repository）&lt;/strong&gt;：也就是 &lt;code&gt;.git&lt;/code&gt; 目录， 它是Git版本控制系统的核心容器，包含各种元数据、对象数据库和配置信息。&lt;code&gt;.git&lt;/code&gt; 目录存储 commit 的快照，并管理项目的历史记录，接受git的各种操作指令。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;而除了本地代码管理的这三层，还存在一个&lt;code&gt;远程库&lt;/code&gt;的概念，用于不同成员间对同一个项目代码进行协作。&lt;/p&gt;
+&lt;ol start="4"&gt;
+&lt;li&gt;&lt;strong&gt;远程仓库（remote repository）：&lt;/strong&gt; 远程仓库是一个中心仓库，用于团队成员协作，通过push、pull、merge等方式确保代码的同步和协同。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/git-architechture.gif"
+width="1600"
+height="900"
+srcset="https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/git-architechture_hu_bd0f9252263e448e.gif 480w, https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/git-architechture_hu_f44bd9d23f8daf98.gif 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+&gt;&lt;/p&gt;
+&lt;p&gt;结合上面这个架构和主要的Git操作命令，我们理解一下 git 的运作过程：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;首先我们通过 &lt;code&gt;git init&lt;/code&gt; 或者 &lt;code&gt;git clone&lt;/code&gt; 建立起本地的git仓库，也就是会包含 &lt;code&gt;.git&lt;/code&gt; 这个本地库目录。&lt;/li&gt;
+&lt;li&gt;本地新增或修改的代码，这时其实是处于 &lt;code&gt;未跟踪(untracked)&lt;/code&gt; 状态&lt;/li&gt;
+&lt;li&gt;执行 &lt;code&gt;git add .&lt;/code&gt;指令，这时相关变更会进入 &lt;code&gt;暂存区&lt;/code&gt;， 对应的状态是 &lt;code&gt;已缓存(staged)&lt;/code&gt; 或者 &lt;code&gt;已修改(modified)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;这时再执行 &lt;code&gt;git commit&lt;/code&gt;指令， 作用是从暂存区将变更提交到本地库中，对应状态是&lt;code&gt;已提交(committed)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git diff&lt;/code&gt; 是查看变更的命令，可以看到，它其实比较的是工作目录和暂存区的区别，而 &lt;code&gt;git diff HEAD&lt;/code&gt; 则比较本地库和工作目录&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git push&lt;/code&gt; 会将本地库中的内容，提交到远程库&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git fetch&lt;/code&gt; 用于将远程库同步到本地库&lt;/li&gt;
+&lt;li&gt;我们常用的&lt;code&gt;git pull&lt;/code&gt;则是将远程库直接拉取到本地的工作目录下&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="常用-git-命令"&gt;常用 Git 命令
+&lt;/h2&gt;&lt;p&gt;借用一个中文的Git cheatsheet，便于速查。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-2.png"
+width="990"
+height="699"
+srcset="https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-2_hu_4058c0697810d9bc.png 480w, https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-2_hu_6d2f0e5b7e4a77de.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="141"
+data-flex-basis="339px"
+&gt;&lt;/p&gt;
+&lt;p&gt;详细的命令用法这里就不再罗列了，核心命令主要也就是上面原理图中提及到的几个。&lt;/p&gt;
+&lt;p&gt;进一步学习的话，也可以利用在线的学习工具，这里推荐一个：&lt;/p&gt;
+&lt;p&gt;&lt;a class="link" href="https://learngitbranching.js.org/" target="_blank" rel="noopener"
+&gt;https://learngitbranching.js.org/&lt;/a&gt;&lt;/p&gt;</description></item></channel></rss>
