@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Process on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/process/</link><description>Recent content in Process on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Sun, 10 Aug 2025 21:29:57 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/process/index.xml" rel="self" type="application/rss+xml"/><item><title>On Bugs and Their Nine Close Relatives</title><link>https://chengxiaqiucao.github.io/en/post/118-bug_and_others/</link><pubDate>Sun, 10 Aug 2025 21:29:57 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/118-bug_and_others/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-2.webp" alt="Featured image of post On Bugs and Their Nine Close Relatives" />&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-2_hu_ca59889505746387.webp"
+width="1024"
+height="574"
+srcset="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-2_hu_34b32afcccc63c1f.webp 480w, https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-2_hu_ca59889505746387.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="178"
+data-flex-basis="427px"
+>
+&lt;/p>
+&lt;h2 id="preface">Preface
+&lt;/h2>&lt;p>In testing work, finding Bugs and reporting Bugs are daily routine, and it is inevitable to argue with developers about whether a certain issue is a Bug.&lt;/p>
+&lt;p>Although it is normal for different people to disagree on the identification of a Bug because of different perspectives.&lt;/p>
+&lt;p>But in the process of testing a product, we really cannot treat all the problems and issues found as Bugs. &lt;code>Bug&lt;/code> is actually a fairly general term; some companies also call a &lt;code>Bug report&lt;/code> a &amp;ldquo;fault ticket&amp;rdquo; or &amp;ldquo;issue ticket&amp;rdquo;, which strictly speaking is not accurate either. Because conceptually, Bug has quite a few &lt;strong>close relatives&lt;/strong> that are similar in function and meaning but actually different. In this article we will sort out and clarify the different concepts of Bug and these relatives, and their relationship with our work.&lt;/p>
+&lt;h2 id="fault">Fault
+&lt;/h2>&lt;p>&lt;code>Fault&lt;/code> is often equated with Bug in daily work, but strictly speaking, a &lt;strong>fault&lt;/strong> refers to a &lt;strong>static defect in software code or design&lt;/strong>, such as an incorrect step, process, or data definition.&lt;/p>
+&lt;p>In other words, it is more of an &amp;ldquo;internal&amp;rdquo; problem of the software, usually the manifestation of a human error made by the developer in the software.&lt;/p>
+&lt;p>Because it is more static, faults are usually exposed during &lt;strong>code review or static analysis&lt;/strong>.&lt;/p>
+&lt;h4 id="case">Case
+&lt;/h4>&lt;p>For example, in the following Java code, when handling a boundary value, &lt;code>i&amp;gt;=0&lt;/code> is written as &lt;code>i&amp;gt;0&lt;/code>, which causes the first element to be skipped during traversal. This is a fault.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">arr&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">length&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">0&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">arr&lt;/span>&lt;span class="o">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">==&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Or, for the calculation of a user&amp;rsquo;s age, failing to account for February 29 in a leap year leads to an incorrect result; this is also a fault.&lt;/p>
+&lt;h2 id="error">Error
+&lt;/h2>&lt;p>&lt;code>Error&lt;/code> refers to a &lt;strong>human mistake, error in judgment, or deviation in decision made by a developer or other participant (such as a requirements analyst or designer) during software development&lt;/strong>. Errors are usually the root cause of other problems downstream; their occurrence is mainly caused by human factors, such as a deviation in requirements understanding, a logic slip, or a typo in code.&lt;/p>
+&lt;h4 id="case-1">Case
+&lt;/h4>&lt;p>Although an &lt;strong>error&lt;/strong> is &amp;ldquo;human-made&amp;rdquo;, the types of errors that occur can generally be summarized into a limited number of categories, which can also better help testers identify risks when they participate early. For example:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Logic error:&lt;/strong> When writing code, the developer&amp;rsquo;s implementation of an algorithm or business logic does not match expectations, such as the incorrect application of an algorithm formula.&lt;/li>
+&lt;li>&lt;strong>Syntax error:&lt;/strong> The code does not comply with the syntax rules of the programming language. Although modern IDEs can catch most syntax errors, some syntax or configuration errors that only appear at runtime can still occur.&lt;/li>
+&lt;li>&lt;strong>Requirements misunderstanding error:&lt;/strong> The understanding of a requirement deviates from the real requirement, so the implemented feature is not what the user truly needs. For example, for the requirement &amp;ldquo;sort by order size&amp;rdquo;, the developer implements sorting by order amount, but the user actually wants sorting by the number of items in the order.&lt;/li>
+&lt;li>&lt;strong>Concurrency error:&lt;/strong> For example, in a multithreaded or distributed system, access to shared resources is not properly synchronized, leading to data inconsistency or deadlock.&lt;/li>
+&lt;/ul>
+&lt;h2 id="defect">Defect
+&lt;/h2>&lt;p>&lt;code>Defect&lt;/code> refers to &lt;strong>any flaw or imperfection in a software product that deviates from requirements or expected behavior&lt;/strong>.&lt;/p>
+&lt;p>It is a broad term, usually referring to any behavior or result found in software that does not meet expectations. In most cases, what we call a &lt;code>Bug&lt;/code> is actually a &lt;code>defect&lt;/code>.&lt;/p>
+&lt;p>A defect can also be understood as the external manifestation of a &lt;code>fault&lt;/code>.&lt;/p>
+&lt;h4 id="case-2">Case
+&lt;/h4>&lt;ol>
+&lt;li>The user correctly enters the account and password, but the login fails or does not redirect properly.&lt;/li>
+&lt;li>The login page has no security protection, allowing unlimited retries to brute-force the account and password.&lt;/li>
+&lt;li>The login error message is too detailed, leaking sensitive information.&lt;/li>
+&lt;/ol>
+&lt;p>All of the above are typical functional or security defects.&lt;/p>
+&lt;h2 id="failure">Failure
+&lt;/h2>&lt;p>&lt;code>Failure&lt;/code> refers to &lt;strong>a software system or component being unable to perform the function it should, exhibiting external behavior at runtime that does not match expectations, a functional deviation directly observable by the user&lt;/strong>.&lt;/p>
+&lt;p>The difference between it and a &lt;code>defect&lt;/code> is that not all defects or faults lead to a failure; only when a defect is &amp;ldquo;activated&amp;rdquo; does it manifest as a &lt;strong>failure&lt;/strong>.&lt;/p>
+&lt;h5 id="case-3">Case
+&lt;/h5>&lt;ol>
+&lt;li>When a user performs a specific operation (such as uploading a large file), the application suddenly exits or the server stops responding. This may be due to a defect such as a memory leak that, under long running time or high load, causes resource exhaustion and ultimately a system failure.&lt;/li>
+&lt;li>After a user successfully submits a form, the data is not correctly saved to the database, resulting in partial data loss. This may be a failure caused by a defect in the database operation logic.&lt;/li>
+&lt;/ol>
+&lt;h3 id="the-causal-chain">The Causal Chain
+&lt;/h3>&lt;p>The four different kinds of problems above actually form the following causal chain:&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250812_hu_a5a4c9cfa251bd6f.webp"
+width="1024"
+height="194"
+srcset="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250812_hu_1d584a7b171d56f.webp 480w, https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250812_hu_a5a4c9cfa251bd6f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="527"
+data-flex-basis="1265px"
+>
+&lt;/p>
+&lt;p>They can be summarized in the table below:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Concept&lt;/th>
+&lt;th>Definition&lt;/th>
+&lt;th>Nature&lt;/th>
+&lt;th>Phase of Occurrence&lt;/th>
+&lt;th>Example&lt;/th>
+&lt;th>Relationship&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>Error&lt;/strong>&lt;/td>
+&lt;td>Human mistakes, errors in judgment, or deviations in decision during development&lt;/td>
+&lt;td>Human behavior&lt;/td>
+&lt;td>Requirements, design, coding phases&lt;/td>
+&lt;td>Wrong algorithm; deviation in requirements understanding; typo&lt;/td>
+&lt;td>&lt;strong>Leads to&lt;/strong> fault&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Fault&lt;/strong>&lt;/td>
+&lt;td>Incorrect steps, processes, or data definitions introduced by an error and existing in code or documentation&lt;/td>
+&lt;td>Static code problem&lt;/td>
+&lt;td>Coding, testing phases&lt;/td>
+&lt;td>Wrong logic for calculating age in a leap year; unhandled null pointer&lt;/td>
+&lt;td>&lt;strong>When activated leads to&lt;/strong> failure&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Defect&lt;/strong>&lt;/td>
+&lt;td>Any flaw in a software system that deviates from its specification, requirements, or expected behavior&lt;/td>
+&lt;td>Behavioral deviation&lt;/td>
+&lt;td>Testing, production phases&lt;/td>
+&lt;td>Login feature unusable; inaccurate report data&lt;/td>
+&lt;td>&lt;strong>Is the external manifestation of a fault and needs fixing once found&lt;/strong>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Failure&lt;/strong>&lt;/td>
+&lt;td>A software system or component unable to perform its required function, or exhibiting observable incorrect behavior&lt;/td>
+&lt;td>Observable consequence&lt;/td>
+&lt;td>Production phase (or found in testing)&lt;/td>
+&lt;td>System crash; data loss; interruption of a critical business flow&lt;/td>
+&lt;td>&lt;strong>Is the final result of a defect/fault being activated&lt;/strong>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="exception">Exception
+&lt;/h2>&lt;p>An &lt;code>exception&lt;/code> is &lt;strong>a special event at program runtime that interrupts the normal flow of instructions&lt;/strong>. It is usually triggered by a code logic error, bad external input, or a system resource problem.&lt;/p>
+&lt;p>An &lt;code>exception&lt;/code> does not necessarily lead to a &lt;code>fault&lt;/code>, because an exception can be caught and handled in code with &lt;code>try ... catch...&lt;/code>. It is a normal part of how software deals with various unconventional scenarios.&lt;/p>
+&lt;h4 id="case-4">Case
+&lt;/h4>&lt;p>The following code is an example of Python handling network connection exceptions, where the network connection state, timeouts, and so on are caught in code and protected with a retry mechanism.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">try&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">response&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">requests&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">url&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">timeout&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">5&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1"># set timeout&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">raise_for_status&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="c1"># check HTTP status code (non-2xx raises HTTPError)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">text&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">except&lt;/span> &lt;span class="ne">ConnectionError&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Connection error: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> (attempt &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">attempt&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">/&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">max_retries&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">)&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">except&lt;/span> &lt;span class="n">Timeout&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Request timed out: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> (attempt &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">attempt&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">/&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">max_retries&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">)&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">except&lt;/span> &lt;span class="n">HTTPError&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;HTTP error: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> (status code: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">status_code&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">)&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="kc">None&lt;/span> &lt;span class="c1"># HTTP errors usually do not need retry&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">except&lt;/span> &lt;span class="n">RequestException&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Request exception: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> (attempt &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">attempt&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">/&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">max_retries&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">)&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="issue">Issue
+&lt;/h2>&lt;p>Anyone who has used &lt;code>Jira&lt;/code> or often visits &lt;code>github&lt;/code> should be familiar with &lt;code>Issue&lt;/code>. Issue is actually a general term; it refers to &lt;strong>any matter or obstacle that needs attention, discussion, and tracking to resolution&lt;/strong>.&lt;/p>
+&lt;p>Very often, an Issue is used as a &lt;strong>work item (workItem)&lt;/strong>. So the &amp;ldquo;issue&amp;rdquo; here has a meaning far broader than the narrow sense of &lt;code>defect&lt;/code> or &lt;code>error&lt;/code>; an issue is not a Bug, it is a matter to be tracked and followed continuously.&lt;/p>
+&lt;h4 id="case-5">Case
+&lt;/h4>&lt;ol>
+&lt;li>In performance testing, we find that as the number of users increases, the system response time becomes noticeably longer and the user reconnection mechanism is triggered more often. This phenomenon does affect user experience, but the behavior is actually within the system design expectations, so it cannot be considered a defect; it is more appropriately recorded as an Issue for continued tracking and observation.&lt;/li>
+&lt;li>During a requirements review, some requirements have ambiguous interpretations. For example, a reporting requirement, &amp;ldquo;count the number of orders within a month&amp;rdquo;. The time expression here is actually not precise enough - are orders within a month counted by order creation time or by order completion time? Such matters awaiting clarification are also &lt;code>issues&lt;/code>, not &lt;code>defects&lt;/code>.&lt;/li>
+&lt;/ol>
+&lt;h2 id="risk">Risk
+&lt;/h2>&lt;p>&lt;code>Risk&lt;/code> is &lt;strong>an uncertain event that may occur and have a negative impact on project objectives (such as quality, cost, schedule, and scope)&lt;/strong>.&lt;/p>
+&lt;p>Compared with the items above, which mainly face the product, &lt;strong>risk&lt;/strong> faces the project more.&lt;/p>
+&lt;p>It mainly includes two dimensions: &lt;strong>the probability of the risk occurring + the impact of the risk (severity)&lt;/strong>.&lt;/p>
+&lt;p>Besides the &lt;strong>quality risks&lt;/strong> of the product itself, there are also &lt;strong>management risks&lt;/strong> of project operation.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813_hu_7516f214108e165e.webp"
+width="1024"
+height="654"
+srcset="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813_hu_bc22cf932c67c15c.webp 480w, https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813_hu_7516f214108e165e.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="156"
+data-flex-basis="375px"
+>
+&lt;/p>
+&lt;h4 id="case-6">Case
+&lt;/h4>&lt;ol>
+&lt;li>Product operation depends on the integration of a third-party module, but when integration testing begins, the third-party module has not yet finished development, thus creating a schedule risk for this product.&lt;/li>
+&lt;li>During product development, major changes to requirements or the design solution occur, leading to delivery risk.&lt;/li>
+&lt;li>A core developer or tester on the team leaves, creating a risk to the project plan.&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;p>Besides the items above, there is another category of new ideas and adjustment items during the continuous evolution of the software itself. These also cannot be considered Bugs, but having them at product release is the icing on the cake. These items fall into two cases: &lt;code>optimization&lt;/code> and &lt;code>enhancement&lt;/code>.&lt;/p>
+&lt;h2 id="improvement">Improvement
+&lt;/h2>&lt;p>&lt;code>Improvement&lt;/code> is &lt;strong>an enhancement to an existing feature or process that does not involve new features or Bug fixes&lt;/strong>, such as improving performance, maintainability, or user experience.&lt;/p>
+&lt;p>The emphasis is on improvement on top of the original basis. It is not necessarily limited to the product&amp;rsquo;s own features; development processes and tool usage can also be included.&lt;/p>
+&lt;h4 id="case-7">Case
+&lt;/h4>&lt;ol>
+&lt;li>Actively introduce an automated testing framework to improve regression testing efficiency.&lt;/li>
+&lt;li>Optimize the page UI design of the current system to achieve better visual effects.&lt;/li>
+&lt;/ol>
+&lt;h2 id="enhancement">Enhancement
+&lt;/h2>&lt;p>&lt;code>Enhancement&lt;/code> is &lt;strong>adding a new feature to the software or extending the capability of an existing feature&lt;/strong>. It is usually driven by user or business needs.&lt;/p>
+&lt;p>An enhancement is an expansion and sublimation of the original requirements by adding new features.&lt;/p>
+&lt;p>In testing, whether an issue is a defect, an optimization, or an enhancement is often a point where disputes easily arise.&lt;/p>
+&lt;p>Actually the difference in nature between a defect and an enhancement is:&lt;/p>
+&lt;ul>
+&lt;li>The fix of a &lt;code>defect&lt;/code> is corrective, intended to make the software &amp;ldquo;correct&amp;rdquo; and reduce quality risk&lt;/li>
+&lt;li>The implementation of an &lt;code>enhancement&lt;/code> is evolutionary, intended to make the software &amp;ldquo;better&amp;rdquo; and increase its value&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-1_hu_85b6becb084937cb.webp"
+width="1024"
+height="236"
+srcset="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-1_hu_19fcdbc818814734.webp 480w, https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-1_hu_85b6becb084937cb.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="434"
+data-flex-basis="1043px"
+>
+&lt;/p>
+&lt;h4 id="case-8">Case
+&lt;/h4>&lt;ol>
+&lt;li>An e-commerce system increases user stickiness by adding a social sharing feature.&lt;/li>
+&lt;li>An enterprise management system adds a reporting feature that provides sales data analysis to support decision-making.&lt;/li>
+&lt;/ol>
+&lt;h2 id="conclusion">Conclusion
+&lt;/h2>&lt;p>By analyzing the nine core concepts related to Bugs - &lt;strong>fault, defect, issue, error, exception, failure, risk, improvement, and enhancement&lt;/strong> -&lt;/p>
+&lt;p>we can describe problems more accurately, communicate with developers more effectively, and understand more clearly the role of our output in the quality system.&lt;/p></description></item></channel></rss>

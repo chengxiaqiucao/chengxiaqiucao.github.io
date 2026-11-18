@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>缺陷分析 on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/%E7%BC%BA%E9%99%B7%E5%88%86%E6%9E%90/</link><description>Recent content in 缺陷分析 on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Wed, 04 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E7%BC%BA%E9%99%B7%E5%88%86%E6%9E%90/index.xml" rel="self" type="application/rss+xml"/><item><title>被重试掩盖的失败：把 CI 里"第二次通过"变成可排查的缺陷队列</title><link>https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/</link><pubDate>Wed, 04 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/cover.webp" alt="Featured image of post 被重试掩盖的失败：把 CI 里"第二次通过"变成可排查的缺陷队列" />&lt;p>一次失败、一次通过、最终绿灯。这是大多数启用自动重试的 CI 流水线每天产生的结果，也是最容易丢失信息的结果：失败的那次尝试在日志里被覆盖、在成功任务的清理中被删除，团队只看到&amp;quot;这次构建是绿的&amp;quot;。真正的问题在于，能让第二次通过的原因往往不是&amp;quot;随机抖动&amp;quot;，而是某个具体的状态、时序或数据条件——它同样会在生产环境里被用户撞上。&lt;/p>
+&lt;p>有一套做法值得完整拆解：在测试套件结束时把每次重试写成结构化记录并单独留存，按周汇成一份按影响面排序的清单，再让编码代理沿着记录进入代码去定位根因。它不追求&amp;quot;让 CI 更绿&amp;quot;，而是反过来，把被重试压下去的失败重新暴露出来。&lt;/p>
+&lt;h2 id="第一步让失败的那次尝试活过成功清理">第一步：让失败的那次尝试活过成功清理
+&lt;/h2>&lt;p>多数 CI 配置会在任务成功后删除应用日志与诊断产物，这是合理的成本控制，但恰好会删掉排查间歇性失败最需要的证据。解决办法不是保留全部日志，而是在套件结束时，为每个发生过重试的测试节点写一个很小的 JSON 文件：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;./spec/features/report_spec.rb[1:2]&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;location&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;./spec/features/report_spec.rb:20&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;description&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;renders a synthetic report&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;failed_attempts&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;final_result&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;passed&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;first_error&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;expected the default window size&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>里面有两个字段值得单独说。&lt;code>id&lt;/code> 是测试框架给出的唯一示例编号，&lt;code>location&lt;/code> 是源码行号。共享示例（shared examples）会让多个不同测试用例指向同一行，只按行号聚合会把互不相关的失败合并成一团，两个都留才能正确分组。&lt;/p>
+&lt;p>这份 JSON 要写到一个&lt;strong>独立于成功任务清理范围&lt;/strong>的目录，并作为构建产物上传。以常见的 CI 服务为例，只需要在配置里加一行把该目录声明为 artifacts；换任何 CI 平台，等价机制都能做到。核心约束只有一条：即便这次测试最终通过，重试历史也必须保留下来。&lt;/p>
+&lt;p>重试策略本身也要写清楚：普通用例给一次重试，涉及 JavaScript 浏览器的用例给两次。次数不是重点，重点是&lt;strong>每次重试都要留下为什么结果会变&lt;/strong>的线索。单纯增加重试次数只会让报告更安静，不会回答问题。&lt;/p>
+&lt;h2 id="第二步把记录汇成一份有优先级的周度队列">第二步：把记录汇成一份有优先级的周度队列
+&lt;/h2>&lt;p>有了记录，下一步是聚合。一个定时任务通过 CI 平台 API 读取过去一周的重试产物，按示例编号分组，然后按&lt;strong>出现过&amp;quot;先失败后通过&amp;quot;的不同流水线数量&lt;/strong>降序排列。&lt;/p>
+&lt;p>这里有个容易做错的细节：同一个流水线里某用例失败两次，排名只算一条流水线。因为排序想衡量的是&amp;quot;这个不稳定问题影响过多少次独立构建&amp;quot;，而不是&amp;quot;它一共失败了多少次&amp;quot;。同时保留首次错误信息、分支名与失败尝试次数，供后续阅读。&lt;/p>
+&lt;p>还有一类要单独计数：&lt;strong>所有尝试都失败&lt;/strong>的用例。这个区分只描述观测到的运行结果，并不等于&amp;quot;根因是确定性的&amp;quot;——一个间歇性问题同样可能把重试次数耗尽，所以不能据此把两类问题贴上不同标签。&lt;/p>
+&lt;p>当某个示例超过设定的周度预算阈值时，让摘要任务本身失败，借用团队已有的 CI 失败通知把清单推到人面前。此时把报告交给能读取代码仓库与构建产物的编码代理，就进入定位环节。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig1_hu_83cb9ef2bd28c4d1.webp"
+width="1024"
+height="820"
+srcset="https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig1_hu_ed4aa59c7fcf933b.webp 480w, https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig1_hu_83cb9ef2bd28c4d1.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="124"
+data-flex-basis="299px"
+>
+&lt;/p>
+&lt;p>重试记录从产生、留存到形成周度优先级队列的完整链路&lt;/p>
+&lt;h2 id="第三步看清第二次为什么通过四个真实案例">第三步：看清&amp;quot;第二次为什么通过&amp;quot;——四个真实案例
+&lt;/h2>&lt;p>下面几类问题有个共同点：重试并不是让测试自己恢复了，而是&lt;strong>重试机制顺手重置了出错的那个状态&lt;/strong>。如果不看第一次失败，根本不会知道产品里有缺陷。&lt;/p>
+&lt;h3 id="浏览器重启抹掉了上一个用例留下的窗口尺寸">浏览器重启抹掉了上一个用例留下的窗口尺寸
+&lt;/h3>&lt;p>一组截图比对失败，报的是截图尺寸变化，重试通常就过了。根因在更早的用例：计费相关测试把浏览器窗口改成了非默认尺寸，却没有还原，后面的截图用例继承了这个 viewport。而重试配置会在重跑前重启浏览器，窗口回到默认尺寸，于是第二次通过。&lt;/p>
+&lt;p>修复方式是在每个浏览器用例开始前显式设定默认窗口尺寸，需要其他尺寸的用例自己再改。这个案例里，&amp;ldquo;重试通过了&amp;quot;恰好提供了关键线索：既然换一个新浏览器就好，说明状态是外部带进来的，不是被测逻辑自己恢复的。&lt;/p>
+&lt;h3 id="一个撇号打断自动生成的-curl-命令">一个撇号打断自动生成的 cURL 命令
+&lt;/h3>&lt;p>某仪表盘会根据模板 schema 生成示例 cURL 命令，测试用生成数据执行这些命令。生成的假姓名里偶尔带撇号，而内联命令用单引号包住 JSON 请求体——撇号提前结束了 shell 字符串，命令就断了。下一次尝试生成了另一个名字，命令又能跑通。&lt;/p>
+&lt;p>同一功能还有一个可下载的 Bash 脚本，把 JSON 放在带引号的 heredoc 里，却错误地套用了为单引号参数准备的转义，结果改坏了请求体。两处需要完全不同的处理：内联命令要为 shell 上下文转义撇号，heredoc 里的 JSON 则必须原样保留。&lt;/p>
+&lt;p>对应的回归测试很值得借鉴：把 &lt;code>curl&lt;/code> 替换成一个函数，在 Bash 里真实执行生成的脚本，用该函数捕获本该发出的请求体，再解析校验原始值，全程不发起网络请求。用 &lt;code>Editor's proof&lt;/code> 这类带撇号的合成值回放修复前后两个版本：修复前内联命令在 Bash 里直接失败，可下载脚本能跑但请求体无法解析为 JSON；修复后两者都保留了原文。&lt;/p>
+&lt;p>这里最容易被选错的&amp;quot;捷径&amp;quot;是改测试数据、不让姓名里出现撇号。那会让测试更稳定，同时让产品对所有合法输入继续出错。&lt;/p>
+&lt;h3 id="临时文件在渲染进程读取前被回收">临时文件在渲染进程读取前被回收
+&lt;/h3>&lt;p>一个内联的 HTML 转 PDF 渲染器，会把页眉页脚 HTML 写入临时文件，再把路径交给渲染进程。代码在构造命令时把临时文件对象放在局部变量里；方法返回后，命令字符串还留着路径，但已经没有任何引用持有那个对象。&lt;/p>
+&lt;p>Ruby 的 &lt;code>Tempfile&lt;/code> 把清理挂在垃圾回收上。如果 GC 恰好在渲染进程打开文件之前触发，文件就已经不在了。测试是否通过，取决于垃圾回收发生的时机——这是最典型的&amp;quot;看似随机&amp;quot;的失败。&lt;/p>
+&lt;p>修复是把页眉页脚对象保存在服务实例上，直到渲染完成，再在 &lt;code>ensure&lt;/code> 块里关闭并删除。回归测试在&amp;quot;构造命令&amp;quot;与&amp;quot;模拟渲染进程读取文件&amp;quot;之间&lt;strong>强制触发 GC&lt;/strong>，断言文件内容仍然可读、且结束后被清理。主动制造确定性的失败条件，比等着在某个 PDF 用例里&amp;quot;撞运气&amp;quot;要可靠得多。&lt;/p>
+&lt;h3 id="冻结了-ruby-的时钟redis-的时钟还在走">冻结了 Ruby 的时钟，Redis 的时钟还在走
+&lt;/h3>&lt;p>限流测试用的计数器按固定时间窗口统计。用例一旦跨过窗口边界，请求就被计到新窗口里，预期阈值永远达不到。第一版修复是冻结进程时钟，但计数器存在 Redis 里并带过期时间，Redis 仍在按真实时间流逝。如果在窗口末尾附近冻结，计数器的剩余存活时间极短，问题依旧。&lt;/p>
+&lt;p>最终做法是冻结在整点起始处，与这批用例使用的时间窗口对齐，让计数器拥有完整过期周期；同时仍需保证用例在该周期内跑完。这个案例的价值在于：评审在第一版修复之后发现了第二个时钟，第一次的解释只覆盖了系统里的一半计时机制。&lt;/p>
+&lt;p>同一轮排查还带出另外几类问题：数据库清理开始时后台 worker 仍在运行、测试辅助函数对共享时钟库的冻结状态相互覆盖、样本数据生成器用真值判断跳过了下界为零时的边界调整（在 JavaScript 里 0 是 falsy，但它在这个 schema 里是合法下界）。每一类都属于&amp;quot;重试会让它消失、用户却可能遇到&amp;quot;的范畴。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig2_hu_81b443d809eab84c.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig2_hu_2bea94c3ea199544.webp 480w, https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig2_hu_81b443d809eab84c.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>四类被重试掩盖的真实缺陷：状态泄漏、转义上下文、对象生命周期、双时钟&lt;/p>
+&lt;h2 id="第四步给编码代理划清任务边界">第四步：给编码代理划清任务边界
+&lt;/h2>&lt;p>把周度报告交给编码代理时，任务描述应当明确到可验收，而不是&amp;quot;帮忙看看这些失败&amp;rdquo;。一套可复用的要求是：&lt;/p>
+&lt;ul>
+&lt;li>找到对应的 CI 运行记录并读取失败产物，沿着测试代码追到应用代码；&lt;/li>
+&lt;li>能在本地复现的先复现，再补一条回归测试，要求修复前失败、修复后通过；&lt;/li>
+&lt;li>互不相关的根因拆成独立提交，便于逐条评审与回滚；&lt;/li>
+&lt;li>跑完受影响的检查并自查 diff，无法复现的项目明确列出，不得含糊带过；&lt;/li>
+&lt;li>推送之前停下来等待人工审批。&lt;/li>
+&lt;/ul>
+&lt;p>之所以强调&amp;quot;产物与代码要一起读&amp;quot;，是因为单看任一边都得不出结论：截图尺寸不匹配本身解释不了 viewport 是被谁改的，文件不存在本身解释不了那个 Ruby 对象为什么会变成可回收状态。代理真正的价值是把这两类信息串起来，而不是替代人做最终判断。&lt;/p>
+&lt;p>排查结论里凡是&amp;quot;后续开发必须遵守&amp;quot;的规则，写进离代码最近的 &lt;code>AGENTS.md&lt;/code>（或等价的团队约定文件）。比如&amp;quot;浏览器用例可以改自己的 viewport，但下一个用例必须从已知尺寸开始&amp;quot;——setup 代码负责强制，注释负责解释原因。更进一步，能把规则做成静态检查的就别靠记忆：为常见的 flaky 写法补一条自定义 lint 规则，让 CI 直接拦下，比指望有人记得半年前那次排查更有效。&lt;/p>
+&lt;h2 id="落地清单">落地清单
+&lt;/h2>&lt;p>如果你的套件已经在重试，不必先重构整套体系，按下面的顺序做即可：&lt;/p>
+&lt;ol>
+&lt;li>在套件结束时为每次重试写一条结构化记录，字段至少包含唯一示例编号、源码位置、失败尝试次数、最终结果和首次错误；&lt;/li>
+&lt;li>把记录放到成功任务清理不到的目录，并配置为构建产物上传；&lt;/li>
+&lt;li>每周按&amp;quot;出现过先失败后通过的不同流水线数&amp;quot;聚合排序，设一个预算阈值，超了就让摘要任务失败并通知；&lt;/li>
+&lt;li>挑一条反复出现的问题，要求给出&amp;quot;第二次为什么通过&amp;quot;的明确解释，而不是简单加重试次数；&lt;/li>
+&lt;li>修复必须附带能确定性复现的回归测试，审查通过后再合入常规 CI、QA 与发布流程。&lt;/li>
+&lt;/ol>
+&lt;p>这套流程目前还没有公开的工时节省数据，修复轮次也太新，暂时无法判断长期能把复发率压到多少，后续几周的周报才能回答。但它的直接效果已经很清楚：过去需要人专门腾出半天去追、且经常追到一半线索就消失的问题，现在可以在启动排查后并行去做别的事，回来只需评估解释是否成立、审查改动是否合理。&lt;/p>
+&lt;p>也正因如此，代理写出的代码质量变得更重要：一个可复现的失败、一条断言真实意图的测试，是它能锚住的具体目标。而把重试历史保留下来，等于把更多这类目标摆到了桌面上。&lt;/p></description></item></channel></rss>

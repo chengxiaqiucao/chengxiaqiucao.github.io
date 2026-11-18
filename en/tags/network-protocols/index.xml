@@ -1,0 +1,797 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Network Protocols on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/network-protocols/</link><description>Recent content in Network Protocols on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Tue, 01 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/network-protocols/index.xml" rel="self" type="application/rss+xml"/><item><title>The Evolution of HTTP Versions and Their Differences</title><link>https://chengxiaqiucao.github.io/en/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/</link><pubDate>Tue, 01 Jul 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/Pasted-20250702.webp" alt="Featured image of post The Evolution of HTTP Versions and Their Differences" />&lt;h2 id="preface">Preface
+&lt;/h2>&lt;p>In this &amp;ldquo;A Plain-Language Guide to Network Protocols&amp;rdquo; series, we previously introduced the OSI seven-layer model and the TCP/IP four-layer model【】, and also covered the HTTPS protocol and the basic principles behind its encrypted communication 【】. The operation of today&amp;rsquo;s Internet cannot do without the cornerstone that is the HTTP protocol; yet we can now see multiple different versions of HTTP, such as HTTP/1.1, HTTP/2, and HTTP/3. So what are the differences among these versions, and what are their specific application scenarios? In this article, we will focus on the similarities and differences among these different versions of the HTTP protocol.&lt;/p>
+&lt;h2 id="introduction-to-the-http-protocol">Introduction to the HTTP Protocol
+&lt;/h2>&lt;h3 id="overview">Overview
+&lt;/h3>&lt;p>&lt;strong>HTTP&lt;/strong> (Hypertext Transfer Protocol) sits at the &lt;strong>application layer&lt;/strong> of the &lt;strong>OSI seven-layer network model&lt;/strong>, and its core mission is to transfer resources between distributed systems. Its relationship with transport-layer protocols such as TCP/UDP is more one of collaboration.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/OSI-7_hu_5e5b35897ec6d8cc.webp"
+width="1024"
+height="764"
+srcset="https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/OSI-7_hu_e34168ed6216b5ca.webp 480w, https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/OSI-7_hu_5e5b35897ec6d8cc.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="134"
+data-flex-basis="321px"
+>
+&lt;/p>
+&lt;p>From its very inception, the HTTP protocol has included the following core characteristics:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Stateless design&lt;/strong>: The server does not store client context information&lt;/li>
+&lt;li>&lt;strong>Request/response model&lt;/strong>: Based on standard request methods and status codes&lt;/li>
+&lt;li>&lt;strong>Extensible headers&lt;/strong>: Metadata transfer via Header fields&lt;/li>
+&lt;li>&lt;strong>Cross-platform compatibility&lt;/strong>: The text-based protocol design ensures interoperability across systems&lt;/li>
+&lt;/ul>
+&lt;p>The HTTP protocol is responsible for transferring hypertext resources between clients and servers. As a &lt;strong>stateless protocol&lt;/strong>, HTTP does not retain records of client interactions, and each request is handled independently. This protocol specification unified the way Web resources are accessed, made it compatible with all kinds of operating systems and devices, and allows functional extension through header fields. It is the foundational protocol of today&amp;rsquo;s Internet world.&lt;/p>
+&lt;h3 id="protocol-composition">Protocol Composition
+&lt;/h3>&lt;p>HTTP communication is based on the request/response model and is transmitted over the TCP/IP protocol stack:&lt;/p>
+&lt;p>&lt;strong>Request message structure&lt;/strong>:
+&lt;img src="https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/Pasted-20250701_hu_b413f9c5177c9644.webp"
+width="1024"
+height="251"
+srcset="https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/Pasted-20250701_hu_63b891379d054cd4.webp 480w, https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/Pasted-20250701_hu_b413f9c5177c9644.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="408"
+data-flex-basis="980px"
+>
+For example:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-http" data-lang="http">&lt;span class="line">&lt;span class="cl">&lt;span class="nf">POST&lt;/span> &lt;span class="nn">/api/v1/users&lt;/span> &lt;span class="kr">HTTP&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="m">1.1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Host&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="l">api.example.com&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Content-Type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="l">application/json&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Authorization&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="l">Bearer xyz123&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Content-Length&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="l">48&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>&lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="s2">&amp;#34;John&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="nt">&amp;#34;email&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="s2">&amp;#34;john@example.com&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>Response message structure&lt;/strong>:&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/Pasted-20250701-1_hu_5e61e873d04fb5f8.webp"
+width="1024"
+height="439"
+srcset="https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/Pasted-20250701-1_hu_d56ed80e514c2347.webp 480w, https://chengxiaqiucao.github.io/post/040-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-http%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC/Pasted-20250701-1_hu_5e61e873d04fb5f8.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="233"
+data-flex-basis="559px"
+>
+For example:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-http" data-lang="http">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">HTTP&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="m">1.1&lt;/span> &lt;span class="m">201&lt;/span> &lt;span class="ne">Created&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Location&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="l">/api/v1/users/789&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Content-Type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="l">application/json&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Date&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="l">Mon, 15 Jul 2024 09:28:53 GMT&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Content-Length&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="l">35&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>&lt;span class="nt">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">789&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="nt">&amp;#34;status&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="s2">&amp;#34;created&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="http-methods">HTTP Methods
+&lt;/h3>&lt;p>HTTP methods define the operational semantics for network resources. The table below summarizes the application scenarios of the different HTTP methods&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;strong>Method&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>Idempotency&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>Safety&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>Application Scenario&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>RESTful Practice Example&lt;/strong>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>GET&lt;/td>
+&lt;td>Yes&lt;/td>
+&lt;td>Yes&lt;/td>
+&lt;td>Retrieve a resource&lt;/td>
+&lt;td>Query user information&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>POST&lt;/td>
+&lt;td>No&lt;/td>
+&lt;td>No&lt;/td>
+&lt;td>Create a resource / perform an action&lt;/td>
+&lt;td>Create a new order&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>PUT&lt;/td>
+&lt;td>Yes&lt;/td>
+&lt;td>No&lt;/td>
+&lt;td>Full update of a resource&lt;/td>
+&lt;td>Update user profile&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DELETE&lt;/td>
+&lt;td>Yes&lt;/td>
+&lt;td>No&lt;/td>
+&lt;td>Delete a resource&lt;/td>
+&lt;td>Cancel an order&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>PATCH&lt;/td>
+&lt;td>No&lt;/td>
+&lt;td>No&lt;/td>
+&lt;td>Partial update of a resource&lt;/td>
+&lt;td>Modify the order address&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>HEAD&lt;/td>
+&lt;td>Yes&lt;/td>
+&lt;td>Yes&lt;/td>
+&lt;td>Retrieve header metadata&lt;/td>
+&lt;td>Check whether a resource exists&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>OPTIONS&lt;/td>
+&lt;td>Yes&lt;/td>
+&lt;td>Yes&lt;/td>
+&lt;td>Retrieve methods supported by the server&lt;/td>
+&lt;td>CORS preflight request&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="http-status-codes">HTTP Status Codes
+&lt;/h3>&lt;p>A status code is the result of request processing, represented by a three-digit number in the response message.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;strong>Category&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>Common Status Codes&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>Technical Meaning&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>Application Scenario&lt;/strong>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>1xx&lt;/td>
+&lt;td>101&lt;/td>
+&lt;td>Protocol switch&lt;/td>
+&lt;td>WebSocket upgrade&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2xx&lt;/td>
+&lt;td>200/201/204&lt;/td>
+&lt;td>Successful processing&lt;/td>
+&lt;td>Resource created successfully&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3xx&lt;/td>
+&lt;td>301/302/304&lt;/td>
+&lt;td>Redirect / cache valid&lt;/td>
+&lt;td>Permanent move / temporary redirect&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>4xx&lt;/td>
+&lt;td>400/401/404&lt;/td>
+&lt;td>Client error&lt;/td>
+&lt;td>Parameter error / unauthorized / resource not found&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>5xx&lt;/td>
+&lt;td>500/502/503&lt;/td>
+&lt;td>Server error&lt;/td>
+&lt;td>Service crash / gateway error / overload&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="the-different-versions-and-evolution-of-http">The Different Versions and Evolution of HTTP
+&lt;/h2>&lt;p>&lt;strong>Evolution roadmap&lt;/strong>:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">timeline
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> title Evolution of HTTP Versions
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 1991 ： HTTP 0.9
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 1996 ： HTTP 1.0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 1997 ： HTTP 1.1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 2015 ： HTTP 2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 2020 ： HTTP 3
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="http09-1991">HTTP/0.9 (1991)
+&lt;/h3>&lt;p>The original version of the HTTP protocol had no version number; it was only later, to distinguish it from subsequent versions, that it was defined as version 0.9. It was based on the initial protocol designed by &lt;strong>Dr. Tim Berners-Lee&lt;/strong> for transferring internal documents at CERN, and is also known as the &lt;strong>one-line protocol&lt;/strong> (one-line).&lt;/p>
+&lt;p>This protocol was extremely simple:&lt;/p>
+&lt;p>Request:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-http" data-lang="http">&lt;span class="line">&lt;span class="cl">&lt;span class="err">GET /mypage.html
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The response contained only the page document itself, and there were no message headers either:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> This is a very simple HTML page
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Its limitations were equally obvious:&lt;/p>
+&lt;p>This protocol could not support complex Web applications; it could only transfer plain HTML documents, and it had no status codes to reflect the state of communication.&lt;/p>
+&lt;h3 id="http10-1996">HTTP/1.0 (1996)
+&lt;/h3>&lt;p>As networks developed and the use of browsers and servers grew rapidly, the HTTP protocol also found wider application. Many features were added on top of the original protocol, and in 1996 these were consolidated and standardized in the specification document &lt;strong>RFC 1945&lt;/strong>, which defined HTTP/1.0. However, this protocol was not an official standard; it was a narrowly standardized version.&lt;/p>
+&lt;p>&lt;strong>Core improvements of HTTP/1.0&lt;/strong>:&lt;/p>
+&lt;ol>
+&lt;li>Introduced a version identifier (HTTP/1.0)&lt;/li>
+&lt;li>Added status codes (200/404, etc.)&lt;/li>
+&lt;li>Supported header fields (Content-Type/Cache-Control)&lt;/li>
+&lt;li>Extended methods (POST/HEAD)&lt;/li>
+&lt;/ol>
+&lt;p>The communication process was as follows:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">sequenceDiagram
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Client-&amp;gt;&amp;gt;Server: GET /index.html (Connection 1)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Server-&amp;gt;&amp;gt;Client: 200 OK + Close
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Client-&amp;gt;&amp;gt;Server: GET /style.css (Connection 2)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Server-&amp;gt;&amp;gt;Client: 200 OK + Close
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>However, this standard had a crucial performance-overhead problem:&lt;/p>
+&lt;ul>
+&lt;li>Short-lived connections, with each resource using a separate connection, incur heavy TCP handshake overhead&lt;/li>
+&lt;li>No compression / caching mechanism&lt;/li>
+&lt;/ul>
+&lt;h3 id="http11-1997">HTTP/1.1 (1997)
+&lt;/h3>&lt;p>To address the inefficiency of loading Web page resources, work on the official standardization of the HTTP protocol had actually begun even before the release of HTTP/1.0. &lt;strong>RFC 2068&lt;/strong> was published in 1997 (some also regard the 1999 revision &lt;strong>RFC 2616&lt;/strong> as the HTTP/1.1 standard), and a further revision, &lt;strong>RFC 7235&lt;/strong>, was published in 2014.&lt;/p>
+&lt;p>The HTTP/1.1 version was extremely successful and remains widely used to this day. It introduced the following major features:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;strong>Feature&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>Implementation Mechanism&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>Performance Improvement&lt;/strong>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Persistent connections&lt;/td>
+&lt;td>Connection: keep-alive&lt;/td>
+&lt;td>Reduces TCP handshakes by 60%&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Pipelining&lt;/td>
+&lt;td>Sending requests in batches&lt;/td>
+&lt;td>Theoretical throughput increase of 30%&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Chunked transfer&lt;/td>
+&lt;td>Transfer-Encoding&lt;/td>
+&lt;td>Supports streaming of large files&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Content negotiation&lt;/td>
+&lt;td>Accept header family&lt;/td>
+&lt;td>Support for multi-format resources&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>To improve efficiency, the HTTP/1.1 protocol provided a &lt;strong>pipelining mechanism&lt;/strong>, which allows the client to send multiple requests to the server at the same time to boost efficiency. The problem here, however, is that although client-side efficiency is improved, the server can still only return responses one at a time. This is the &lt;strong>Head-of-Line Blocking (Head-of-Line Blocking)&lt;/strong> problem.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">sequenceDiagram&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Client&lt;/span>&lt;span class="o">-&amp;gt;&amp;gt;&lt;/span>&lt;span class="n">Server&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Request&lt;/span> &lt;span class="n">A&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">large&lt;/span> &lt;span class="n">file&lt;/span> &lt;span class="n">download&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Client&lt;/span>&lt;span class="o">-&amp;gt;&amp;gt;&lt;/span>&lt;span class="n">Server&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Request&lt;/span> &lt;span class="n">B&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">small&lt;/span> &lt;span class="n">file&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Server&lt;/span>&lt;span class="o">-&amp;gt;&amp;gt;&lt;/span>&lt;span class="n">Client&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Response&lt;/span> &lt;span class="n">A&lt;/span> &lt;span class="n">processing&lt;/span>&lt;span class="o">...&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">blocked&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Note&lt;/span> &lt;span class="n">over&lt;/span> &lt;span class="n">Server&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Request&lt;/span> &lt;span class="n">B&lt;/span> &lt;span class="n">is&lt;/span> &lt;span class="n">complete&lt;/span> &lt;span class="n">but&lt;/span> &lt;span class="n">must&lt;/span> &lt;span class="n">wait&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Server&lt;/span>&lt;span class="o">-&amp;gt;&amp;gt;&lt;/span>&lt;span class="n">Client&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Response&lt;/span> &lt;span class="n">A&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Server&lt;/span>&lt;span class="o">-&amp;gt;&amp;gt;&lt;/span>&lt;span class="n">Client&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Response&lt;/span> &lt;span class="n">B&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>Other limitations&lt;/strong>:&lt;/p>
+&lt;p>In addition, although this version introduced a compression mechanism, it did not provide compression support for message headers, so considerable performance waste remained.&lt;/p>
+&lt;p>Moreover, because of the stateless nature of HTTP/1.1, the server can still only passively wait for the client to submit state information.&lt;/p>
+&lt;h3 id="http2-2015">HTTP/2 (2015)
+&lt;/h3>&lt;p>As Web applications on the Internet grew richer and network bandwidth increased, the demands on transferred content became ever higher. To further improve the transfer efficiency of the HTTP protocol and address its lingering issues, &lt;strong>RFC 7540&lt;/strong> was published in 2015 as an improvement built on Google&amp;rsquo;s &lt;strong>SPDY&lt;/strong> protocol.&lt;/p>
+&lt;p>In HTTP/2, the following major improvements were made:&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>Binary frames&lt;/strong>: It uses binary instead of a text protocol, so it is no longer human-readable and cannot be created manually without assistance.&lt;/li>
+&lt;li>&lt;strong>Multiplexing&lt;/strong>: Concurrent transfer over a single connection&lt;/li>
+&lt;li>&lt;strong>Header compression&lt;/strong>: Message headers are compressed using the HPACK algorithm, reducing overhead by 70-85%&lt;/li>
+&lt;li>&lt;strong>Server push&lt;/strong>: Proactively sending associated resources, allowing the server to populate data in the client&amp;rsquo;s cache&lt;/li>
+&lt;/ol>
+&lt;p>&lt;strong>Limitations&lt;/strong>:&lt;/p>
+&lt;p>Although HTTP/2.0 proposed the use of multiplexing to solve &lt;strong>Head-of-Line Blocking&lt;/strong>, the actual results were not ideal. The root cause is that the HTTP protocol is an application-layer protocol built on top of TCP; that is, &lt;strong>even though multiplexing is possible at the application layer, at the transport layer, because of TCP&amp;rsquo;s retransmission mechanism, one still has to wait for transport-layer messages to return one by one; in other words, Head-of-Line Blocking still exists at the TCP layer&lt;/strong>.&lt;/p>
+&lt;h3 id="http3-2020">HTTP/3 (2020)
+&lt;/h3>&lt;p>To completely solve the &lt;strong>Head-of-Line Blocking&lt;/strong> problem, HTTP/3 was introduced in 2020. The biggest change in this protocol is a thorough restructuring of the protocol stack: the transport layer is no longer based on TCP, but on the &lt;strong>QUIC protocol&lt;/strong> over UDP.&lt;/p>
+&lt;p>Because UDP is designed without TCP&amp;rsquo;s packet-loss retransmission mechanism, its communication efficiency is greatly improved over TCP; and QUIC&amp;rsquo;s redesigned communication method, while offering reliability nearly equivalent to a TCP connection, greatly reduces latency.&lt;/p>
+&lt;p>Currently, more than 95% of browsers already support the HTTP/3 protocol, and more than 30% of websites have also begun to support HTTP/3.&lt;/p>
+&lt;h2 id="summary">Summary
+&lt;/h2>&lt;p>The main differences among the different HTTP versions described above can be summarized as follows:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;strong>Version&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>Core Contribution&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>Main Limitation&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>Adoption Rate&lt;/strong>(2024 )&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>0.9&lt;/td>
+&lt;td>Established the request/response model&lt;/td>
+&lt;td>Only supports GET&lt;/td>
+&lt;td>0%&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>1.0&lt;/td>
+&lt;td>Introduced headers / status codes&lt;/td>
+&lt;td>Inefficient short-lived connections&lt;/td>
+&lt;td>&amp;lt;1%&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>1.1&lt;/td>
+&lt;td>Persistent connections / pipelining&lt;/td>
+&lt;td>Head-of-Line Blocking&lt;/td>
+&lt;td>52%&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2&lt;/td>
+&lt;td>Binary framing / header compression&lt;/td>
+&lt;td>Blocking at the TCP layer&lt;/td>
+&lt;td>96%&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3&lt;/td>
+&lt;td>QUIC protocol / connection migration&lt;/td>
+&lt;td>Infrastructure support still maturing&lt;/td>
+&lt;td>39%&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>According to the Cloudflare 2024 report: HTTP/3 already accounts for 35% of global HTTP traffic and is expected to become the dominant protocol by 2026. The continuous evolution of the HTTP protocol reflects the technical response of Internet infrastructure to the demands for performance, security, and mobility. Developers need to deeply understand the characteristics of each version in order to build high-performance applications adapted to future network environments.&lt;/p></description></item><item><title>A Plain-Language Guide to Network Protocols: The OSI Seven-Layer Model and the TCP/IP Four-Layer Model</title><link>https://chengxiaqiucao.github.io/en/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/</link><pubDate>Mon, 21 Oct 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-2.webp" alt="Featured image of post A Plain-Language Guide to Network Protocols: The OSI Seven-Layer Model and the TCP/IP Four-Layer Model" />&lt;p>To this day, the Internet has become an indispensable part of everyone&amp;rsquo;s daily life. Shopping, ordering food, binge-watching shows, and online courses have permeated every aspect of our lives. But how exactly does the network work? This is especially true for those of us engaged in software development and the ICT industry: understanding and mastering this infrastructure on which our products run is particularly essential.&lt;/p>
+&lt;p>In this article, we will strive, in the simplest and most accessible way, to clarify the foundation of network protocols: the &lt;code>OSI seven-layer model&lt;/code> and the &lt;code>TCP/IP four-layer model&lt;/code>&lt;/p>
+&lt;h2 id="the-origins-of-the-network">The Origins of the Network
+&lt;/h2>&lt;p>To talk about the OSI seven-layer model, we must first review the development and origins of network technology itself.&lt;/p>
+&lt;p>Today&amp;rsquo;s network technology actually began for military purposes, germinating against the backdrop of the Cold War rivalry between the United States and the Soviet Union. In 1957, the Soviet Union successfully launched the first artificial satellite, causing panic in the United States, which led to the establishment of &lt;strong>APRA&lt;/strong> (Advanced Research Project Agency, the U.S. Department of Defense Advanced Research Projects Agency).&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021_hu_2df090c01ba076ee.webp"
+width="1024"
+height="981"
+srcset="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021_hu_7e1cd2ce50767dfa.webp 480w, https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021_hu_2df090c01ba076ee.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="104"
+data-flex-basis="250px"
+>
+&lt;/p>
+&lt;p>In 1961, the Soviet Union successfully test-fired the R-16 intercontinental ballistic missile, making a nuclear strike on the U.S. mainland possible. To cope with a possible attack, the U.S. Department of Defense authorized APRA to develop a &lt;strong>&amp;ldquo;distributed&amp;rdquo; military command system&lt;/strong>.&lt;/p>
+&lt;p>In 1966, the prototype of this system was named &lt;strong>ARPANET&lt;/strong> (Arpa Net), and it became the predecessor of the modern Internet.&lt;/p>
+&lt;p>In 1969, the U.S. Department of Defense officially opened commercial bidding for ARPANET; BBN won the bid and set up a research and development center in the same year.&lt;/p>
+&lt;p>At the end of 1969, the first ARPANET was born, interconnecting four large mainframe computers at four universities: the University of California, Los Angeles; the University of California, Santa Barbara; Stanford University; and the University of Utah. Human society began to enter the &amp;ldquo;network era&amp;rdquo;.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-1_hu_f3b72d4791620d47.webp"
+width="1024"
+height="676"
+srcset="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-1_hu_5e0bcfb3f2eb70f.webp 480w, https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-1_hu_f3b72d4791620d47.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="151"
+data-flex-basis="363px"
+>
+&lt;/p>
+&lt;p>As ARPANET continued to evolve, the need for network protocols was raised in order to solve the problem of signal recognition between different nodes. The first network protocol to be established was called NCP (net control protocol)&lt;/p>
+&lt;p>In 1977, to address the shortcomings of NCP itself, namely its requirement for homogeneous systems and its limited number of supported hosts, versions V1 and V2 of the Transmission Control Protocol (TCP) were proposed.&lt;/p>
+&lt;p>In 1978, based on the idea of layering, TCP V3 split the original protocol into the TCP protocol and the IP protocol. The former is responsible for reliable transmission, and the latter for addressing and interconnection. It further evolved into the stable V4 version.&lt;/p>
+&lt;p>By 1984, the U.S. Department of Defense had divided ARPANET into military and civilian parts. The Internet was thus born&lt;/p>
+&lt;p>Also in 1984, to solve the problem of interoperability between different systems, the International Organization for Standardization, &lt;strong>ISO&lt;/strong>, proposed the &lt;strong>OSI (Open System Interconnect) Open Systems Interconnection model&lt;/strong>, and promoted it vigorously.&lt;/p>
+&lt;p>At the same time, the TCP/IP protocol was bundled with the Unix operating system, and as Unix systems became widespread, TCP/IP came to be supported by various subsequent operating systems. The TCP/IP four-layer model thus became the implementation adopted more often in practice.&lt;/p>
+&lt;p>However, although the OSI seven-layer model and the TCP/IP four-layer model are defined differently, they can essentially be matched and mapped onto each other. The OSI model is more theoretical, while TCP/IP is more widely adopted in practice.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-2_hu_63838c075b0e7598.webp"
+width="1024"
+height="768"
+srcset="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-2_hu_5dc2cf8c02341bb4.webp 480w, https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-2_hu_63838c075b0e7598.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>
+&lt;/p>
+&lt;h2 id="the-osi-seven-layer-network-model">The OSI Seven-Layer Network Model
+&lt;/h2>&lt;p>Let us now explain in detail how the OSI seven-layer model is divided, and the specific function and role of each layer.&lt;/p>
+&lt;h3 id="physical-layer">Physical Layer
+&lt;/h3>&lt;p>The foundation of modern computer network technology, at its lowest level, is still digital circuit technology. That is, the high-level and low-level signals corresponding to voltage levels in electromagnetic waveform signals are processed into the 1s and 0s of binary. This is the bit, &lt;strong>Bit&lt;/strong>, in binary. All the various operations we perform on our computers and phones, ultimately sent out over the network, are in fact nothing more than a string of binary signals, &lt;strong>bits&lt;/strong>, that is, a &lt;strong>bit stream&lt;/strong>.&lt;/p>
+&lt;p>Therefore, the role of the physical layer is to handle connectivity in the physical sense: through network interface cards, network cables, or optical fibers and wireless electromagnetic signals, it establishes a communication channel between the device we are currently using and the target host. Through this channel, the bit stream is conducted to the other end.&lt;/p>
+&lt;h3 id="data-link-layer">Data Link Layer
+&lt;/h3>&lt;p>However, a &lt;strong>bit stream&lt;/strong> is merely a string of binary signals; the physical layer actually has no idea where this string of signals is supposed to go. This is where the data link layer comes in:&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>At this layer, the binary bit stream is first converted, in groups of 8 bits, into &lt;strong>bytes&lt;/strong> (1 byte corresponds to 8 bits); the &lt;strong>byte&lt;/strong> is also the basic unit of storage in our computers.
+Data organized by grouping into bytes is, by definition, called a &lt;strong>frame (frame)&lt;/strong>. The first function of the data link layer is to reorganize the data, converting &lt;strong>bits&lt;/strong> into &lt;strong>frames&lt;/strong>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Another key function of the data link layer also includes the addition of the &lt;strong>MAC address&lt;/strong>, which is used to mark where the data to be sent is going.
+The MAC address here, also called the &lt;strong>network physical address&lt;/strong>, is a unique address that is burned into each of our network interface cards at the time the card leaves the factory, and cannot be changed. Through this unique address, we can know exactly whom the data is to be sent to. It is just as when writing a letter we need an address, so that the letter knows where to be delivered.
+But if at the outset we do not know the MAC address of the device connected through the physical layer, addressing is still required.
+&lt;strong>Addressing&lt;/strong> works through an addressing protocol (ARP): first a broadcast message is sent, carrying one&amp;rsquo;s own MAC address and the IP address obtained from the network layer, asking within the current network for the MAC address corresponding to the target IP to be accessed. The corresponding target, after receiving the broadcast message, will send its own MAC address to the sender based on the source MAC address in the received message. In this way, once the original sender obtains the target MAC address, it can complete the encapsulation of the data frame and deliver it correctly according to the address.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-3_hu_16b22ee84b51f080.webp"
+width="1024"
+height="333"
+srcset="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-3_hu_d785e69205218477.webp 480w, https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-3_hu_16b22ee84b51f080.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="307"
+data-flex-basis="738px"
+>
+&lt;/p>
+&lt;p>At this layer, there are usually Layer 2 switches in the current network, used to forward messages.&lt;/p>
+&lt;p>Therefore, the main functions of the data link layer are the encapsulation of frames and MAC addressing. (And through switches, some error detection and correction, as well as flow control, can also be accomplished.)&lt;/p>
+&lt;h3 id="network-layer">Network Layer
+&lt;/h3>&lt;p>The &lt;strong>addressing&lt;/strong> we mentioned at the data link layer requires that, within the same network, a broadcast shout can be heard by the other party before it can tell you its MAC address. But in reality, when we access the Internet, the target server and we ourselves are thousands of miles apart; in that case, how do we find the other party and complete the communication?&lt;/p>
+&lt;p>This gives rise to the concept of different networks. The Internet is in fact made up of all kinds of networks, large and small. To complete communication between different networks, your data may have to pass through computers on many different networks before reaching the other end, and at the same time we must find the fastest path so that transmission is more efficient.&lt;/p>
+&lt;p>Therefore, for our computers to connect to the network, they all actually have an &lt;strong>IP address&lt;/strong>. In contrast to the MAC address, which corresponds to a physical address, the IP address is a &lt;strong>logical address&lt;/strong>. IP addresses are defined by the IP protocol; the one we commonly use today is IPV4, that is, the four-segment decimal dotted numbers we often see (in a form like 192.168.101.11), which, corresponding to binary, is actually a 32-bit binary number string. Of course, now that IPV4 addresses have been exhausted, network IPs are also transitioning to 128-bit IPV6, but for a considerable time to come, IPV4 will continue to be used.&lt;/p>
+&lt;p>Within this 32-bit IP, both the &lt;strong>network number&lt;/strong> and the &lt;strong>host number&lt;/strong> of the current computer are indicated. Distinguishing the network number from the host number is the role of the subnet mask in an IP address (a detailed review and understanding of the IP protocol will be summarized in a later article)&lt;/p>
+&lt;p>And this is the main function of the network layer: it encapsulates the IP address into a &lt;strong>data packet&lt;/strong>, that is, the data encapsulated at this layer is called a &lt;strong>packet (package)&lt;/strong>. It will include the source IP and the destination IP; after further encapsulation at the next layer down, the data link layer, which adds the MAC address, it is sent to the default gateway of the current network (that is, the default route). After the default gateway receives this packet, if it finds that the destination address is not on the current network, it will use the stored &lt;strong>routing table&lt;/strong> to choose the optimal path for routing and forwarding the data packet. After a series of forwards, it finally reaches the target network, where the gateway of the target network converts the received data packet into a &lt;strong>frame&lt;/strong>, and finally forwards it to the target host.&lt;/p>
+&lt;p>Therefore, the network layer mainly completes the encapsulation of data packets and performs routing and forwarding. It is an extremely critical layer in the entire network communication process.&lt;/p>
+&lt;h3 id="transport-layer">Transport Layer
+&lt;/h3>&lt;p>The data transmission we discussed in the previous layers was from host to host, but we run many different programs on our computers — listening to music, running QQ, playing games&amp;hellip; All these different programs generate network communication, so how is the transmitted data correctly distinguished so that different programs each handle the data they need?&lt;/p>
+&lt;p>This is what the transport layer does. The operating system uses ports to correspond to different application programs; the data corresponding to each application, along with its corresponding port, is encapsulated, and data encapsulated this way is called a &lt;strong>segment (segment)&lt;/strong>. What is mainly added to a segment is the &lt;strong>source port&lt;/strong> and the &lt;strong>destination port&lt;/strong>.
+In addition, another aspect of the segment&amp;rsquo;s role is that the data an application has to process may be quite large; to ensure the continuity and integrity of data processing, it is impossible to wait until all the data has arrived and then process it all at once, so the transport layer also has the function of splitting the data and transmitting it segment by segment. At the transport layer there are two most important protocols: one is TCP (Transmission Control Protocol), and the other is UDP (User Datagram Protocol). They mainly accomplish the segmentation, ordering, and reassembly of data.&lt;/p>
+&lt;h3 id="session-layer">Session Layer
+&lt;/h3>&lt;p>From this layer upward are the upper three layers of the OSI model, which mainly deal with processing at the program level. In the TCP/IP model, these three layers are collectively treated as a single layer.&lt;/p>
+&lt;p>The role of the session layer is to establish a connection between the communicating entities at both ends, and to handle authentication, authorization, and checkpoint recording during communication, so that data transmission can continue even if the session is interrupted unexpectedly. Examples include session persistence, recording of login information, and breakpoint records.&lt;/p>
+&lt;h3 id="presentation-layer">Presentation Layer
+&lt;/h3>&lt;p>The presentation layer is mainly intended to eliminate some of the differences between different systems at the two ends of communication. It is responsible for the representation, encoding, and decoding of data, achieving the conversion of data formats and the unification of representation between different systems. In plain terms, it accomplishes the translation work between the two systems. It also includes, for example, data encryption, compression, and slimming down, which are likewise defined to be done at this layer.&lt;/p>
+&lt;h3 id="application-layer">Application Layer
+&lt;/h3>&lt;p>The application layer is the layer we come into direct contact with when using various applications in our daily lives. It is mainly responsible for processing the user&amp;rsquo;s operations and fulfilling the user&amp;rsquo;s application needs.
+For example, the most commonly used Internet protocol, the HTTP protocol, resides at this layer. In addition, protocols such as the mail protocols SMTP and POP3, the file transfer protocol FTP, and the remote login protocol telnet all belong to the application layer.&lt;/p>
+&lt;p>A single diagram illustrating the transfer of data through the layers is shown below.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-4_hu_e971efde3ce625f.webp"
+width="1024"
+height="627"
+srcset="https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-4_hu_e7389309b39a2009.webp 480w, https://chengxiaqiucao.github.io/post/041-%E5%A4%A7%E8%AF%9D%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE-osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/Pasted-20241021-4_hu_e971efde3ce625f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="163"
+data-flex-basis="392px"
+>
+&lt;/p>
+&lt;h2 id="a-plain-language-understanding-of-the-osi-model">A Plain-Language Understanding of the OSI Model
+&lt;/h2>&lt;p>The above is an analysis of this model from the perspective of technical principles. If we use an example from our daily life as an analogy, it will be easier to understand:&lt;/p>
+&lt;p>The Double Eleven shopping festival is here, and I want to buy a laptop I have long been dreaming of.&lt;/p>
+&lt;ol>
+&lt;li>First, compare prices everywhere, find a platform, and, satisfied with the value for money, decide to buy on this platform. This platform here is actually the application layer, which satisfies the shopping need. (Application layer: concrete application services)&lt;/li>
+&lt;li>After placing the order, before shipping, the seller will certainly repack the computer as well as all the accessories and gifts to make sure they arrive in your hands undamaged. This process of packing and protection is equivalent to the work of the presentation layer. (Presentation layer: data encoding/decoding and formatting)&lt;/li>
+&lt;li>Before placing the order, you may also contact customer service to confirm the gifts, note the shipping time, choose the color, and so on. This process of communicating with customer service is the session layer. (Session layer: maintaining the communication channel between the two parties)&lt;/li>
+&lt;li>Once everything is confirmed, the merchant ships the goods to you. At this point a courier company is needed to handle delivery, whether it is SF Express or the &amp;ldquo;Sitong Yida&amp;rdquo; carriers; their purpose is to deliver the laptop safely and on time into your hands. The role of the courier company here is the transport layer. (Transport layer: responsible for reliable data delivery)&lt;/li>
+&lt;li>How does the courier company deliver the goods? Of course it needs to know the merchant&amp;rsquo;s address and the buyer&amp;rsquo;s address, and, based on the addresses, select the optimal route for the courier to pick up and deliver the goods. This is the network layer. (Network layer: responsible for logical addressing and routing)&lt;/li>
+&lt;li>The laptop you bought has been delivered from the seller to the regional station in your area. At this point a courier will bring it to your door, and will usually give you a call to check whether you are at home. Determining your exact location by phone is equivalent to physical addressing. This is the data link layer. (Data link layer: physical addressing and delivery of data frames)&lt;/li>
+&lt;li>Finally, throughout the whole delivery process, trucks, delivery vans, the courier&amp;rsquo;s three-wheeler, and his own two legs are used. This is the physical layer, the concrete means of transport. (Physical layer: physical media transmitting the bit stream)&lt;/li>
+&lt;/ol>
+&lt;p>Through such an analogy, do we now have a fairly clear picture of how the OSI seven-layer model actually works?&lt;/p>
+&lt;hr></description></item><item><title>A Plain-Language Guide to the HTTPS Protocol</title><link>https://chengxiaqiucao.github.io/en/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/</link><pubDate>Sat, 28 Sep 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-1.webp" alt="Featured image of post A Plain-Language Guide to the HTTPS Protocol" />&lt;p>When you access the network and browse web pages these days, if you pay attention, you will notice that almost every URL starts with the &lt;code>https://&lt;/code> prefix. This prefix indicates that the website uses the HTTPS protocol. So how exactly should we understand HTTPS? In this article, we will try to explain clearly the protocol that is currently the most widely used of all.&lt;/p>
+&lt;h2 id="understanding-the-http-protocol">Understanding the HTTP Protocol
+&lt;/h2>&lt;p>To explain the HTTPS protocol, we first need to understand the HTTP protocol. The HTTP protocol can be said to be the foundation of the modern Internet. In the OSI seven-layer model of modern networks, HTTP is a typical Layer 7 application-layer protocol. That is to say, it is a practical application built on network communication; for example, a browser rendering web page content is a concrete application of network communication.&lt;/p>
+&lt;p>The following figures show the protocol definition formats of the HTTP request message and the response message respectively:&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928_hu_7eb498b857d2e1bb.webp"
+width="1024"
+height="363"
+srcset="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928_hu_d8ed4272eb9a83b7.webp 480w, https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928_hu_7eb498b857d2e1bb.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="282"
+data-flex-basis="677px"
+>
+&lt;/p>
+&lt;p>A request to Baidu is parsed as follows:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">GET https://www.baidu.com/ HTTP/1.1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Request method, URL, HTTP protocol version
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Host: www.baidu.com
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Requested server address
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#The following are the message header fields
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Connection: keep-alive
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Connection method: persistent connection
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Cache-Control: max-age=0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Request cache control; confirm whether the requested content has been modified
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Upgrade-Insecure-Requests: 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Supports the HTTPS protocol
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Requesting client, browser version
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Supported response content types
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Accept-Encoding: gzip, deflate, br
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Supported encoding types
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Supported languages
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Cookie: BAIDUID=C0A2...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Cookie information carried
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#No request message body is carried; body is empty
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928103246_hu_3a273f0588228b3f.webp"
+width="1024"
+height="688"
+srcset="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928103246_hu_8b93022f19b9254.webp 480w, https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928103246_hu_3a273f0588228b3f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="148"
+data-flex-basis="357px"
+>
+&lt;/p>
+&lt;p>The response is parsed as follows:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">HTTP/1.1 200 OK
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Protocol version, status code, status description
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Bdpagetype: 2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Bdqid: 0x8707d7d80001f34e
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Custom message headers
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Cache-Control: private
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Cache control policy
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Connection: Keep-Alive
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Persistent connection
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Content-Type: text/html;charset=utf-8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Response content type
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Date: Sat, 22 Dec 2018 08:54:51 GMT
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Response time
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Expires: Sat, 22 Dec 2018 08:54:51 GMT
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Expiration time
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Server: BWS/1.1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Server system and version
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Set-Cookie: BDSVRTM=372; path=/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Set-Cookie: BD_HOME=1; path=/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Set-Cookie: path=/; domain=.baidu.com
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Set client cookie
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Strict-Transport-Security: max-age=172800
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Strict transport security, validity period
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">X-Ua-Compatible: IE=Edge,chrome=1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Compatible browser versions
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Content-Length: 191722
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#Message body length
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#The following is the message body content
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;lt;!Doctype html&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;lt;html xmlns=http://www.w3.org/1999/xhtml&amp;gt;&amp;lt;head&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>For a detailed explanation of the HTTP protocol, you can refer to the section on HTTP protocol basics in my earlier blog post &lt;a class="link" href="https://chengxiaqiucao.github.io/post/01-postman%E5%9F%BA%E7%A1%80%E7%AF%87/" target="_blank" rel="noopener"
+>API Testing Tool Postman - Basics&lt;/a>&lt;/p>
+&lt;p>But here the requested URL is actually &lt;code>https://www.baidu.com&lt;/code>, which uses the HTTPS protocol. So why do we still say it is the HTTP protocol? What exactly is the relationship between the two?&lt;/p>
+&lt;h2 id="the-https-protocol-tls-and-ssl">The HTTPS Protocol, TLS, and SSL
+&lt;/h2>&lt;p>In fact, the HTTPS protocol stands for &lt;strong>HyperText Transfer Protocol over Secure Socket Layer&lt;/strong>, that is, the HTTP protocol layered on top of SSL.&lt;/p>
+&lt;p>&lt;strong>SSL&lt;/strong> (Secure Socket Layer) refers to the Secure Sockets Layer, a standard protocol proposed by Netscape, a pioneer company of the Internet, to provide security and privacy protection for network communications. After the protocol evolved to version SSL 3.0, the standards organization IETF standardized the SSL protocol and renamed it &lt;strong>TLS&lt;/strong> (Transport Layer Security). It has currently been updated to version TLS 1.3.&lt;/p>
+&lt;p>So SSL and TLS actually come from the same lineage; the two can be regarded as the same protocol at different points in time. And the HTTPS protocol is essentially:&lt;/p>
+&lt;blockquote>
+&lt;p>HTTPS = HTTP + SSL/TLS&lt;/p>&lt;/blockquote>
+&lt;p>Why do we need the HTTPS protocol? Because with the HTTP protocol itself, the information transmitted during transfer is essentially in plain text, and any node along the transmission path can actually see the content of the message body being transmitted.&lt;/p>
+&lt;p>Therefore, for security reasons, there arose a need to encrypt the transmitted content. The role of the SSL/TLS protocol is precisely to protect the security of this content.&lt;/p>
+&lt;p>As can also be seen from the naming of the TLS protocol, it is in fact a protocol that adds security features on top of the TCP protocol (Transmission Control Protocol).&lt;/p>
+&lt;p>The HTTPS protocol is based on the HTTP protocol, so it still belongs to the application layer, while TLS is built on the TCP protocol at Layer 4 and is generally considered to belong to Layer 5, the session layer.&lt;/p>
+&lt;p>Through TLS, the encryption of communication data during network transmission can be achieved&lt;/p>
+&lt;h2 id="about-encryption">About Encryption
+&lt;/h2>&lt;p>So to understand the HTTPS protocol, what we need to figure out here is how TLS completes the encryption of communication data.&lt;/p>
+&lt;h3 id="symmetric-encryption">Symmetric Encryption
+&lt;/h3>&lt;p>Our usual understanding of encryption is that, through a rule agreed upon by both parties—namely an encryption algorithm—the original string is transformed into ciphertext known only to the two communicating parties. In this way, even if others know the communication content, they cannot know the original information.&lt;/p>
+&lt;p>For example, in spy thrillers, passing intelligence usually involves an important item called a &lt;strong>codebook&lt;/strong>. Here the codebook is essentially the encryption algorithm, that is, the &lt;strong>key&lt;/strong>.&lt;/p>
+&lt;p>In this encryption method, the two parties are on an equal footing; the same key is used to encrypt and decrypt the communication content, hence it is called &lt;strong>symmetric encryption&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-1_hu_ec0ad5f1a0051498.webp"
+width="1024"
+height="424"
+srcset="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-1_hu_fe33f56fdddff652.webp 480w, https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-1_hu_ec0ad5f1a0051498.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="241"
+data-flex-basis="580px"
+>
+&lt;/p>
+&lt;p>However, this encryption method has one biggest problem, namely the codebook here. In spy thrillers, intelligence agents risk their lives to protect the codebook; otherwise, once it is leaked, the intelligence is at risk of being exposed.&lt;/p>
+&lt;p>The same applies to network communication: the biggest problem here is how to prevent the key from being leaked. But as long as the key itself also needs to be transmitted over network communication, it is still not secure.&lt;/p>
+&lt;p>This process is analogous to:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">A: 跟你说个秘密，我下面的话你不要直接听，我全部说第几页第几行第几列，你去《红楼梦》找到对应的字连起来读。你回话也告诉我对应字的位置就行
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">B: 好嘞，《红楼梦》已摆好，你说吧
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">。。。。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">C：我偷听到啦，赶快买本《红楼梦》去...
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="asymmetric-encryption">Asymmetric Encryption
+&lt;/h3>&lt;p>Besides symmetric encryption, there is another encryption method called &lt;strong>asymmetric encryption&lt;/strong>. This approach uses some special encryption algorithms to generate two keys, divided into a &lt;strong>public key&lt;/strong> and a &lt;strong>private key&lt;/strong>. Content encrypted with one of the keys can only be decrypted with the other key. Moreover, it is very difficult for this algorithm to be reverse-engineered, deduced, or forged through brute-force attacks so as to reproduce the other key.&lt;/p>
+&lt;p>This is similar to the ancient tiger tally used for deploying troops: only when the two halves fit together perfectly can it be verified as authentic.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-2_hu_b57aa2ea479a2e3.webp"
+width="1024"
+height="579"
+srcset="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-2_hu_438b04ec5eaa4a2.webp 480w, https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-2_hu_b57aa2ea479a2e3.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="176"
+data-flex-basis="424px"
+>
+&lt;/p>
+&lt;p>With this mechanism, the private key can be kept on one&amp;rsquo;s own side and never disclosed, while the public key can be announced to the world and transmitted normally over the network, so that anyone may obtain it. In this way, when the other party wants to send me encrypted information, they only need to encrypt it with the public key, and decryption can only be completed on my own side.&lt;/p>
+&lt;p>So the general process of asymmetric encryption is:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl"> A: 我有点秘密想跟你说, 不能被其他人听到....
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> B：稍等，我给你个公钥，你上个锁以后再说给我听。拿到公钥先念下公钥上的字给我看看对不对
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> A: 收到公钥，上面写着“我是王大锤”
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> B: 对，你收到的就是我给你的公钥，用它上锁吧
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> A：公钥加密上锁，打包发给B
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> B：取出私钥，打开包裹，阅读内容...
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Compared with &lt;strong>symmetric encryption&lt;/strong>, &lt;strong>asymmetric encryption&lt;/strong> is clearly more secure, but its drawback is that it involves a large amount of computation, the encryption and decryption process is inefficient, and the speed is relatively slow. Therefore, in practical applications, the two methods are usually used in combination.&lt;/p>
+&lt;p>That is, the TLS encryption process:&lt;/p>
+&lt;blockquote>
+&lt;p>The two parties first negotiate a symmetric key for communication through an asymmetric encryption process; the generation of this symmetric key is completed locally on each side. After the key negotiation is complete, both parties each have an identical symmetric key, and subsequent symmetric encrypted communication can be carried out based on this same key.&lt;/p>&lt;/blockquote>
+&lt;p>Because this symmetric key is obtained through asymmetric encryption, it is not transmitted during the communication between the two parties. In this way, both security and efficiency are achieved.&lt;/p>
+&lt;h2 id="signatures-and-certificates">Signatures and Certificates
+&lt;/h2>&lt;p>However, there is still a vulnerability when using asymmetric encryption.&lt;/p>
+&lt;p>That is, during communication between the server and the client, the communication actually passes through a large number of intermediate links. If a malicious hijacker exists, after receiving the server&amp;rsquo;s information it wants to impersonate the server itself, tamper with the information, and then send it to the client.&lt;/p>
+&lt;p>In this case it can actually disguise itself as the server, issue its own public key to the client, and after obtaining the client&amp;rsquo;s information, decrypt it with its own private key, then re-encrypt it with the real server&amp;rsquo;s public key and send it to the server.&lt;/p>
+&lt;p>This risk is actually the &lt;strong>man-in-the-middle attack&lt;/strong> vulnerability in the security field.&lt;/p>
+&lt;p>To avoid this problem, the server needs to prove its own identity, and the client must also be able to verify that identity. Hence signatures and certificates came into being.&lt;/p>
+&lt;p>A signature is the server&amp;rsquo;s way of asserting its identity; a client that obtains the public key can use the signature to determine that the sender is the correct server. Here the signature and the public key are actually both stored in a single file, namely the server&amp;rsquo;s signed certificate.&lt;/p>
+&lt;p>To prevent a man-in-the-middle from forging certificates, &lt;strong>CA (Certificate Authority)&lt;/strong> is introduced, that is, an authoritative third-party certificate issuance organization. These authoritative third-party issuance organizations encrypt the server&amp;rsquo;s signature with their private key, so that the client can use the organization&amp;rsquo;s public key to verify whether the signature corresponds to the intended server. Once verification succeeds, the public key carried in the certificate can be used to complete the subsequent communication negotiation with the server.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-4_hu_e8b318fd22303bda.webp"
+width="1024"
+height="1268"
+srcset="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-4_hu_cc2a6784cde59435.webp 480w, https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-4_hu_e8b318fd22303bda.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="80"
+data-flex-basis="193px"
+>
+&lt;/p>
+&lt;h2 id="the-https-protocol-interaction-process">The HTTPS Protocol Interaction Process
+&lt;/h2>&lt;p>With the above foundations, let us take a concrete look at the specific communication process of accessing an HTTPS website.&lt;/p>
+&lt;p>Because TLS has different versions and supports a variety of key exchange and encryption algorithms, before communication it must first complete processes such as deciding which encryption algorithm to use and which key generation method to use. And since TLS is based on the TCP protocol, after the typical TCP three-way handshake completes the connection establishment, the TLS handshake and connection establishment process takes place:&lt;/p>
+&lt;ul>
+&lt;li>For example, when a client accesses a website from a browser, the browser first sends a &lt;code>Client Hello&lt;/code> message to the server. This message mainly contains the &lt;code>cipher suites&lt;/code> supported by the client, the TLS version information, and the &lt;strong>client random number&lt;/strong>. (transmitted in plain text)&lt;/li>
+&lt;li>After receiving the message, the server returns several items, including its supported &lt;code>cipher suites&lt;/code>, the TLS version, its own digital certificate, and a random number generated by the server. (transmitted in plain text)&lt;/li>
+&lt;li>The client verifies the received digital certificate. After successful verification, it generates a new key, namely the &lt;code>pre-master key&lt;/code>, and uses the public key carried in the certificate to encrypt the &lt;code>pre-master key&lt;/code> and send it to the server. (at this point it is transmitted using asymmetric encryption)&lt;/li>
+&lt;li>The server receives the ciphertext from the client, decrypts it with its private key, and obtains the &lt;code>pre-master key&lt;/code>. (transmitted using asymmetric encryption)&lt;/li>
+&lt;li>Up to this point, both the server and the client have three sets of numbers: the &lt;strong>client random number, the server random number, and the pre-master key&lt;/strong>. Although the first two random numbers are transmitted in plain text and carry a risk of leakage, the &lt;code>pre-master key&lt;/code> is not transmitted during communication; it is a secure key obtained by computation. Therefore the three are combined and, using the specific encryption algorithm negotiated earlier, another key is generated. This key is called the &lt;code>shared secert&lt;/code>, which is the subsequent session key and the key used for the subsequent symmetric encryption.&lt;/li>
+&lt;li>After the client computes the symmetric encryption key, it uses that key to symmetrically encrypt the communication content and informs the server that this key will be used for symmetric encryption from then on. (transmitted using symmetric encryption)&lt;/li>
+&lt;li>After receiving the ciphertext, the server uses the previously computed key to perform symmetric decryption. Once decryption succeeds, it likewise uses that key for symmetric encrypted communication, and informs the client that the key is confirmed correct and can be used for communication. (transmitted using symmetric encryption)&lt;/li>
+&lt;/ul>
+&lt;p>At this point, the entire TLS handshake process is complete, and symmetric encrypted communication can begin.&lt;/p>
+&lt;p>If you capture packets with WireShark, the process usually looks like this:&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-5_hu_397cc7abc9dbf4ae.webp"
+width="1024"
+height="245"
+srcset="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-5_hu_ad569b5639e6534.webp 480w, https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-5_hu_397cc7abc9dbf4ae.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="418"
+data-flex-basis="1003px"
+>
+&lt;/p>
+&lt;p>For the specific interaction process, refer to the diagram below (image from the web&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-6_hu_ef85eb581c3b3430.webp"
+width="1024"
+height="741"
+srcset="https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-6_hu_892fef6a854c7b0b.webp 480w, https://chengxiaqiucao.github.io/post/021-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/Pasted-20240928-6_hu_ef85eb581c3b3430.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="138"
+data-flex-basis="331px"
+>
+&lt;/p>
+&lt;hr>
+&lt;p>The above is an overall rundown of the HTTPS protocol communication process. For more articles on testing and technology, feel free to follow &lt;a class="link" href="https://chengxiaqiucao.github.io/" target="_blank" rel="noopener"
+>Chengxia Qiucao&amp;rsquo;s Blog&lt;/a> or the WeChat official account (Qiucao on Testing)&lt;/p></description></item></channel></rss>

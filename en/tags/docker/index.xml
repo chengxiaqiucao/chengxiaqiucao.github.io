@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Docker on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/docker/</link><description>Recent content in Docker on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Sat, 24 May 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/docker/index.xml" rel="self" type="application/rss+xml"/><item><title>The Two Sides of Applying Docker in Test Automation</title><link>https://chengxiaqiucao.github.io/en/post/095-docker%E5%9C%A8%E8%87%AA%E5%8A%A8%E5%8C%96/</link><pubDate>Sat, 24 May 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/095-docker%E5%9C%A8%E8%87%AA%E5%8A%A8%E5%8C%96/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/095-docker%E5%9C%A8%E8%87%AA%E5%8A%A8%E5%8C%96/Docker%E8%87%AA%E5%8A%A8%E5%8C%96.webp" alt="Featured image of post The Two Sides of Applying Docker in Test Automation" />&lt;h2 id="preface">Preface
+&lt;/h2>&lt;p>Test automation is an indispensable part of software development today. To ensure consistency of the test environment, simplify configuration, and speed up test feedback, Docker technology is widely applied in test automation frameworks for containerized packaging.&lt;/p>
+&lt;p>The common consensus is that once a test suite is Dockerized, it achieves the ideal state of &lt;strong>&amp;ldquo;build once, run anywhere&amp;rdquo;&lt;/strong>, completely eliminating the test uncertainty caused by environmental differences.&lt;/p>
+&lt;p>In real engineering practice, however, can Dockerization truly guarantee perfect consistency of test execution? In this article we will take a deeper look at the promises and the reality of Docker in test automation, uncover the key factors that can lead to the &amp;ldquo;illusion of consistency&amp;rdquo;, and offer corresponding mitigation strategies.&lt;/p>
+&lt;h2 id="dockers-promise---environment-packaging-and-consistency">Docker&amp;rsquo;s Promise - Environment Packaging and Consistency
+&lt;/h2>&lt;p>Docker&amp;rsquo;s core value lies in using an image to package the complete runtime environment of an application (the operating system layer, runtime, libraries, tools, code, and configuration). Its workflow is typically as follows:&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>Build the image&lt;/strong>: In a development environment (such as a developer&amp;rsquo;s local PC), define dependency installation and configuration steps through a Dockerfile, and build an image containing the test suite and its runtime environment.&lt;/li>
+&lt;li>&lt;strong>Distribute the image&lt;/strong>: Push the built image to an image registry (such as Docker Hub or Artifactory).&lt;/li>
+&lt;li>&lt;strong>Run the container&lt;/strong>: In the target environment (a CI/CD pipeline, another developer&amp;rsquo;s machine, a pre-production environment, etc.), pull the image and instantiate it as a container to execute the tests.&lt;/li>
+&lt;/ol>
+&lt;p>In theory, this flow should ensure that regardless of the specific configuration of the underlying host, the test execution environment inside the container always stays consistent, thereby eliminating the classic developer problem of &lt;strong>&amp;ldquo;it works on my machine&amp;rdquo;&lt;/strong> and achieving reliable reproduction of test results.&lt;/p>
+&lt;h2 id="the-reality---an-illusion-of-consistency">The Reality - An Illusion of Consistency
+&lt;/h2>&lt;p>Ideals are rich, reality is lean. Although Docker provides powerful environment isolation, the following factors can still break the absolute consistency of tests and create an &amp;ldquo;illusion&amp;rdquo;:&lt;/p>
+&lt;h3 id="cross-platform-host-architecture-differences">Cross-Platform Host Architecture Differences
+&lt;/h3>&lt;p>An image built on an x86 host, when run on an ARM-based CI node (such as Apple Silicon M1/M2), can cause binaries that depend on specific CPU instruction sets, or Python packages containing C extensions, to malfunction or crash, so that tests passing locally fail in CI.&lt;/p>
+&lt;blockquote>
+&lt;p>Reason: Docker containers share the host&amp;rsquo;s kernel. The instruction sets of different CPU architectures (x86_64 vs arm64) are incompatible.&lt;/p>&lt;/blockquote>
+&lt;h4 id="how-to-solve-it">How to Solve It?
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>Multi-architecture image builds&lt;/strong>: Use the &lt;code>docker buildx&lt;/code> tool to build images that support multiple platforms (such as linux/amd64, linux/arm64).&lt;/li>
+&lt;li>&lt;strong>Explicitly specify the platform&lt;/strong>: When running or building, force the target platform via the &lt;code>--platform&lt;/code> parameter (e.g., &lt;code>docker run --platform linux/amd64 my-test-image&lt;/code>).&lt;/li>
+&lt;/ul>
+&lt;h3 id="external-dependencies">External Dependencies
+&lt;/h3>&lt;p>The test container may run perfectly well, but if a test case needs to access real services outside the container (a database, an API, S3, or internal systems reachable only via VPN), then test results can fluctuate due to the status of those external services, network latency, DNS resolution differences, firewall rules, or VPN connection state.&lt;/p>
+&lt;blockquote>
+&lt;p>Reason: What Docker containerizes is the test suite itself, not all the external systems it depends on. Network requests break through the container&amp;rsquo;s isolation boundary.&lt;/p>&lt;/blockquote>
+&lt;h4 id="how-to-solve-it-1">How to Solve It?
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>Containerize dependencies&lt;/strong>: Use Docker Compose to dynamically spin up the required external services (such as a database or a Mock server) as separate containers at test runtime, and establish an internal network connection with the test container.&lt;/li>
+&lt;li>&lt;strong>Mock/Stub techniques&lt;/strong>: Widely apply Mock and Stub techniques in unit and integration tests to replace real external dependency calls.&lt;/li>
+&lt;li>&lt;strong>Network environment control&lt;/strong>: Strictly manage the test environment&amp;rsquo;s network configuration (DNS, proxies, firewalls) to ensure predictability.&lt;/li>
+&lt;/ul>
+&lt;h3 id="host-operating-system-differences">Host Operating System Differences
+&lt;/h3>&lt;p>Volume mount operations or network access (&lt;code>localhost&lt;/code>) that work fine on a Linux host can, on macOS or Windows (via Docker Desktop), produce file permission errors, broken symbolic links, line-ending (CRLF vs LF) issues, failed &lt;code>inotify&lt;/code> event watching, or ambiguity in what &lt;code>localhost&lt;/code> points to.&lt;/p>
+&lt;blockquote>
+&lt;p>Reason: Although the OS inside the container is consistent, the mechanisms by which Docker interacts with the host OS differ:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>File volume mounts&lt;/strong>: These involve mapping the host file system to the container file system, and different OSes support file permissions, metadata, and event notifications differently.&lt;/li>
+&lt;li>&lt;strong>Network model&lt;/strong>: On Linux, container networking is usually more directly integrated; on macOS/Windows, Docker Desktop uses a VM bridge, and accessing host services requires the special hostname &lt;code>host.docker.internal&lt;/code> instead of &lt;code>localhost&lt;/code>.&lt;/li>
+&lt;/ul>&lt;/blockquote>
+&lt;h4 id="how-to-solve-it-2">How to Solve It?
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>Understand platform differences&lt;/strong>: Be clearly aware that Docker is not entirely OS-agnostic and that its behavior is influenced by the host.&lt;/li>
+&lt;li>&lt;strong>Use volume mounts cautiously&lt;/strong>: Avoid having core test logic depend heavily on host volume mounts, especially for write operations (such as generating reports or caches). Prefer in-container paths or the copy (&lt;code>COPY&lt;/code>) mechanism. If a mount is necessary, pay attention to file permissions and line-ending issues.&lt;/li>
+&lt;li>&lt;strong>Use the correct network access method&lt;/strong>: When accessing host services from inside a container, consistently use &lt;code>host.docker.internal&lt;/code> (Mac/Windows) or understand the service access rules under Docker network modes (bridge/host) (Compose service names). Avoid hardcoding &lt;code>localhost&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;h3 id="resource-constraints">Resource Constraints
+&lt;/h3>&lt;p>Tests pass on a well-resourced local development machine (say, 16 cores and 32GB RAM), but when run on a resource-constrained CI node (where the CPU may be throttled, memory may be insufficient, or resources are shared with other tasks), tests fail or become flaky due to timeouts and resource contention (CPU, IO).&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>Reason&lt;/strong>: Docker containers share the host&amp;rsquo;s physical resources (CPU, memory, disk IO, network bandwidth). CI environments usually have lower resource quotas than development machines and are subject to contention.&lt;/p>&lt;/blockquote>
+&lt;h4 id="how-to-solve-it-3">How to Solve It?
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>Resource limits and monitoring&lt;/strong>: Set explicit resource limits (&lt;code>--cpus&lt;/code>, &lt;code>--memory&lt;/code>) for the test container in the Docker run command or Compose file to bring it closer to the CI environment. Monitor resource usage on the CI node.&lt;/li>
+&lt;li>&lt;strong>Performance optimization&lt;/strong>: Optimize test cases and the framework itself to reduce resource consumption (e.g., controlling parallelism, avoiding memory leaks, optimizing I/O operations).&lt;/li>
+&lt;li>&lt;strong>Choose a matching CI environment&lt;/strong>: Ensure the CI environment&amp;rsquo;s baseline resource configuration meets the minimum requirements for running the tests.&lt;/li>
+&lt;/ul>
+&lt;h3 id="mutable-dependencies-and-version-drift---the-hidden-risk-of-the-latest-tag">Mutable Dependencies and Version Drift - The Hidden Risk of the &amp;ldquo;latest&amp;rdquo; Tag
+&lt;/h3>&lt;p>During image builds, using a base image tag like &lt;code>FROM python:latest&lt;/code>, or not strictly locking dependency versions with &lt;code>pip install -r requirements.txt&lt;/code> (without using &lt;code>pip freeze&lt;/code> or a lock file), can cause later builds to introduce incompatibilities or bugs due to unexpected upgrades of underlying dependencies (the Python interpreter, libraries), undermining test stability.&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>Reason&lt;/strong>: A dependency&amp;rsquo;s &amp;ldquo;latest&amp;rdquo; tag or an unlocked version number will point to a new version over time, introducing uncertainty.&lt;/p>&lt;/blockquote>
+&lt;h4 id="how-to-solve-it-4">How to Solve It?
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>Strict version locking&lt;/strong>: In the Dockerfile, use a base image tag with a definite version (such as &lt;code>FROM python:3.11-slim&lt;/code>). Use a lock file (such as &lt;code>requirements.txt&lt;/code> with an explicit version for each dependency, or &lt;code>poetry.lock&lt;/code>/&lt;code>Pipfile.lock&lt;/code>) to manage dependencies.&lt;/li>
+&lt;li>&lt;strong>Reproducible builds&lt;/strong>: Ensure that every build, based on the same lock file, produces a completely identical image. Periodically and deliberately update dependency versions and re-test to verify.&lt;/li>
+&lt;/ul>
+&lt;h2 id="a-rational-view-of-dockers-value-and-engineering-practice">A Rational View of Docker&amp;rsquo;s Value and Engineering Practice
+&lt;/h2>&lt;p>Despite all the problems above, we still &lt;strong>should not deny the tremendous value of Docker in test automation&lt;/strong>. In environment standardization, simplifying dependency management, and making CI/CD pipelines easier to manage, it still has irreplaceable advantages.&lt;/p>
+&lt;p>So when applying Docker, the key is to understand: &lt;strong>Docker is a powerful tool for achieving consistency, but it is not a one-and-for-all &amp;ldquo;silver bullet&amp;rdquo;&lt;/strong>. Technology only delivers its value through sound engineering practices and effective constraints!&lt;/p>
+&lt;h2 id="summary">&lt;strong>Summary&lt;/strong>
+&lt;/h2>&lt;p>Docker has built a sturdy &amp;ldquo;fence&amp;rdquo; around the consistency of test automation environments, greatly improving the credibility and efficiency of testing. Yet that &amp;ldquo;fence&amp;rdquo; is not airtight.&lt;/p>
+&lt;p>Host architecture differences, the intrusion of external dependencies, OS interaction characteristics, resource contention, and dependency version drift can all quietly erode the expected absolute consistency.&lt;/p>
+&lt;p>Achieving truly reliable Dockerized test automation requires not only skillful use of Docker itself, but also rigorous engineering practice - defining environment boundaries, strict dependency management, optimized resource usage, and continuous monitoring and improvement. Only in this way can we effectively dispel the &amp;ldquo;illusion of consistency&amp;rdquo; and let Docker truly become a solid cornerstone for software quality.&lt;/p>
+&lt;p>So the next time we hear &amp;ldquo;&lt;strong>No problem, it has already been containerized with Docker&lt;/strong>&amp;rdquo;, it is worth asking a few more questions:&lt;/p>
+&lt;ul>
+&lt;li>What architecture does it run on?&lt;/li>
+&lt;li>Are the dependencies locked?&lt;/li>
+&lt;li>How are network and file access handled?&lt;/li>
+&lt;li>Are the resources sufficient?&lt;/li>
+&lt;/ul>
+&lt;p>Know yourself and know your enemy, and you can plan with confidence.&lt;/p>
+&lt;hr></description></item><item><title>Setting Up a Private Docker Registry over HTTPS</title><link>https://chengxiaqiucao.github.io/en/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/</link><pubDate>Tue, 11 Feb 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/docker%E4%BB%93%E5%BA%93.webp" alt="Featured image of post Setting Up a Private Docker Registry over HTTPS" />&lt;h2 id="preface">Preface
+&lt;/h2>&lt;p>In our daily work, rapidly deploying and managing development and test environments based on Docker technology has become very common. And for our own product development, we inevitably cannot do without managing many private Docker images. Add to that the difficulty of accessing Docker&amp;rsquo;s official image registry, and setting up a private Docker image registry in our development environment has become a widespread requirement.&lt;/p>
+&lt;h2 id="the-basic-method-for-building-a-private-docker-image-registry---http">The Basic Method for Building a Private Docker Image Registry - HTTP
+&lt;/h2>&lt;p>The basic method for building a private Docker image registry is actually very simple, and it is also the solution most easily found when searching online.&lt;/p>
+&lt;p>You simply start its registry image, &lt;code>registry&lt;/code>, directly through Docker&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">docker&lt;/span> &lt;span class="n">run&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">d&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">restart&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">always&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">name&lt;/span> &lt;span class="n">registry&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span>&lt;span class="n">p&lt;/span> &lt;span class="mi">5100&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">5000&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span>&lt;span class="n">v&lt;/span> &lt;span class="n">registry&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="k">var&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">lib&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">registry&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">registry&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>&amp;ndash;restart&lt;/strong> Automatically restarts the registry if it fails, ensuring availability
+&lt;strong>&amp;ndash;name&lt;/strong> Sets the registry name
+&lt;strong>&amp;ndash;p&lt;/strong> Maps the internal registry service port 5000 to host port 5100
+&lt;strong>&amp;ndash;v&lt;/strong> Persists registry storage to a data volume&lt;/p>
+&lt;p>Once the image is up and running, accessing the &lt;code>v2&lt;/code> endpoint on port 5100 of this host through a browser will normally display an empty json string, indicating that the registry is ready to provide service&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212_hu_cb2c7004e77ac9c5.webp"
+width="1024"
+height="292"
+srcset="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212_hu_5b974bac59d52410.webp 480w, https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212_hu_cb2c7004e77ac9c5.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="351"
+data-flex-basis="842px"
+>
+&lt;/p>
+&lt;p>But at this point, if we use the &lt;code>docker push&lt;/code> command to upload an image to this private registry, we will get a prompt indicating that the default protocol https does not match.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-1_hu_ac63882a27fe335b.webp"
+width="1024"
+height="72"
+srcset="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-1_hu_ad362da8cb11aa84.webp 480w, https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-1_hu_ac63882a27fe335b.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="1414"
+data-flex-basis="3393px"
+>
+&lt;/p>
+&lt;p>Here we also need to configure Docker to accept the http protocol. On Linux systems this is usually done in the Docker daemon configuration file &lt;code>/etc/docker/daemon.json&lt;/code>.&lt;/p>
+&lt;p>Add the private image server address to it:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;insecure-registries&amp;#34;&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;192.168.101.67:5100&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="err">,&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>If you are using Docker Desktop on Windows, configure it in Docker Engine&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-2_hu_ce9905d53573f46.webp"
+width="1024"
+height="476"
+srcset="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-2_hu_8e212999de42d546.webp 480w, https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-2_hu_ce9905d53573f46.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="215"
+data-flex-basis="516px"
+>
+&lt;/p>
+&lt;p>After restarting the Docker engine, you can perform push and pull operations on the private registry you just built normally.&lt;/p>
+&lt;p>However, although a basic image registry based on the http protocol can meet our everyday basic usage requirements, if our product project is not a small one and involves the coordination of multiple Docker images and multiple nodes, a Docker cluster is generally required.&lt;/p>
+&lt;p>Docker&amp;rsquo;s official clustering system, Docker Swarm, is also very simple to use, but in Docker Swarm, for security reasons, access to private image registries is mandatory through the &lt;code>https&lt;/code> protocol. Therefore, the focus of this article is still to introduce how to build a private image registry based on the &lt;code>https&lt;/code> protocol&lt;/p>
+&lt;h2 id="requirements-for-an-https-protocol-image-registry">Requirements for an HTTPS-Protocol Image Registry
+&lt;/h2>&lt;p>Compared with the &lt;code>http&lt;/code> protocol, the &lt;code>https&lt;/code> protocol mainly provides protection for transport security. For a detailed explanation of the principles of the https protocol, please refer to my earlier article&lt;/p>
+&lt;p>&lt;a class="link" href="https://chengxiaqiucao.github.io/post/21-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/" target="_blank" rel="noopener"
+>A Plain-Language Guide to HTTPS: Understanding the Relationship Between SSL, TLS, and HTTP&lt;/a>&lt;/p>
+&lt;p>Therefore, to build an image registry based on the https protocol, the complicated part is mainly satisfying the authentication and authorization requirements imposed by the https protocol. These mainly include:&lt;/p>
+&lt;ul>
+&lt;li>Generate certificates and access keys; non-production environments generally use self-signed certificates.&lt;/li>
+&lt;li>Configure the image registry to mount certificates at startup&lt;/li>
+&lt;li>Configure access nodes to trust the certificates&lt;/li>
+&lt;li>Join the cluster, and push and pull Docker images&lt;/li>
+&lt;/ul>
+&lt;h2 id="deploying-a-private-image-registry-in-a-cluster">Deploying a Private Image Registry in a Cluster
+&lt;/h2>&lt;p>Below, we describe the deployment process step by step in detail&lt;/p>
+&lt;h3 id="generating-a-self-signed-certificate">Generating a Self-Signed Certificate
+&lt;/h3>&lt;h4 id="generating-the-root-ca-private-key-and-certificate">Generating the Root CA Private Key and Certificate
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">openssl req -newkey rsa:4096 -nodes -sha256 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -keyout ca.key -x509 -days &lt;span class="m">3650&lt;/span> -out ca.crt &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -subj &lt;span class="s2">&amp;#34;/C=CN/ST=Beijing/L=Beijing/O=Qiucao Inc./CN=Qiucao Root CA&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="generating-the-server-private-key-and-csr">Generating the Server Private Key and CSR
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">openssl req -newkey rsa:4096 -nodes -sha256 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -keyout registry.key -out registry.csr &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -subj &lt;span class="s2">&amp;#34;/C=CN/ST=Beijing/L=Beijing/O=Qiucao Inc./CN=qiucao.com&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="signing-the-server-certificate-with-the-root-ca">Signing the Server Certificate with the Root CA
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">openssl x509 -req -days &lt;span class="m">3650&lt;/span> -in registry.csr -CA ca.crt -CAkey ca.key &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -CAcreateserial -out registry.crt -extfile &amp;lt;&lt;span class="o">(&lt;/span>&lt;span class="nb">printf&lt;/span> &lt;span class="s2">&amp;#34;subjectAltName=DNS:qiucao.com&amp;#34;&lt;/span>&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The above operations will generate the list of certificates we need&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>ca.crt&lt;/code>: Root certificate&lt;/li>
+&lt;li>&lt;code>registry.crt&lt;/code>: Server certificate&lt;/li>
+&lt;li>&lt;code>registry.key&lt;/code>: Server private key&lt;/li>
+&lt;/ul>
+&lt;h3 id="configuring-the-image-registry">Configuring the Image Registry
+&lt;/h3>&lt;p>To enable the Registry in a Swarm cluster, you can use &lt;code>docker compose&lt;/code>; first configure the compose startup file&lt;/p>
+&lt;p>docker-compose.yml&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">services&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">registry&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">registry:2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ports&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s2">&amp;#34;5100:5000&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">environment&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">REGISTRY_HTTP_TLS_CERTIFICATE&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/certs/registry.crt&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">REGISTRY_HTTP_TLS_KEY&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/certs/registry.key&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/var/lib/registry&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">volumes&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">./certs:/certs&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">/var/docker-registry:/var/lib/registry&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">networks&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">registry-net&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">networks&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">registry-net&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">driver&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">overlay&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Then enable the registry in the cluster through &lt;code>docker stack&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Create the overlay network&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker network create -d overlay registry-net
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Deploy the Registry service&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker stack deploy -c docker-compose.yml registry
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>In this way, we have enabled a registry that supports authentication&lt;/p>
+&lt;h3 id="configuring-access-nodes-to-trust-the-certificate">Configuring Access Nodes to Trust the Certificate
+&lt;/h3>&lt;p>But even though the registry supports authentication, to properly authenticate the service when accessing it, there is one more operation on client nodes, namely trusting the registry&amp;rsquo;s self-signed certificate&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">mkdir -p /etc/docker/certs.d/qiucao.com:5100
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp ca.crt /etc/docker/certs.d/qiucao.com:5100/ca.crt
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Restart the local Docker service to load the trusted certificate&lt;/p>
+&lt;h3 id="verifying-image-pull-from-the-registry">Verifying Image Pull from the Registry
+&lt;/h3>&lt;p>Then, on the client machine, we can pull images through the private registry&lt;/p>
+&lt;p>There is one more step here: the registry address we configured is &lt;code>qiucao.com&lt;/code>, which is not an actually existing public network domain name, so we should also add local resolution for the domain name in &lt;code>/etc/hosts&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">192.168.101.67 qiucao.com
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Then run the &lt;code> docker pull&lt;/code> command to pull the image from the registry, and the image pull can be completed successfully&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-3_hu_62911e748e784725.webp"
+width="1024"
+height="337"
+srcset="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-3_hu_455fb64710733b73.webp 480w, https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-3_hu_62911e748e784725.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="303"
+data-flex-basis="728px"
+>
+&lt;/p>
+&lt;hr>
+&lt;p>For more on using Docker and systematically improving your testing skills, you can learn about my testing course; reply &lt;code>outline&lt;/code> for detailed course content.&lt;/p></description></item></channel></rss>

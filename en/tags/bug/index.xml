@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Bug on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/bug/</link><description>Recent content in Bug on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Sat, 13 Sep 2025 21:44:06 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/bug/index.xml" rel="self" type="application/rss+xml"/><item><title>A Fun Bug Story - The Norway Problem</title><link>https://chengxiaqiucao.github.io/en/post/126-fun_bugs_2/</link><pubDate>Sat, 13 Sep 2025 21:44:06 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/126-fun_bugs_2/</guid><description>&lt;p>In the previous series, we shared &lt;strong>the origin of Bug&lt;/strong>, &lt;strong>some close relatives similar to Bug&lt;/strong>, and also &lt;strong>an interesting classic Bug&lt;/strong>. In this article we share another very typical Bug, one that the author has personally encountered.&lt;/p>
+&lt;h2 id="a-strange-page-crash">A Strange Page Crash
+&lt;/h2>&lt;blockquote>
+&lt;p>The author once tested a web application related to import and export trade. One page displayed information about trading partners, similar to the figure below.&lt;/p>&lt;/blockquote>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/126-fun_bugs_2/Pasted-20250913_hu_20a2972d542a7a6f.webp"
+width="1024"
+height="810"
+srcset="https://chengxiaqiucao.github.io/post/126-fun_bugs_2/Pasted-20250913_hu_76a9194ef486d3df.webp 480w, https://chengxiaqiucao.github.io/post/126-fun_bugs_2/Pasted-20250913_hu_20a2972d542a7a6f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="126"
+data-flex-basis="303px"
+>
+&lt;/p>
+&lt;p>There was an auxiliary feature that could export transaction information as a standard-format document meeting the requirements of the counterparty&amp;rsquo;s country (of course, the format is actually the same for most countries).&lt;/p>
+&lt;p>This feature showed no problems during testing.&lt;/p>
+&lt;p>But after delivery to users, at one particular customer, once this export operation was triggered, the page would intermittently crash - a serious problem.&lt;/p>
+&lt;h2 id="locating-the-problem">Locating the Problem
+&lt;/h2>&lt;p>After receiving this feedback several times, it was found that whenever this user experienced the crash, without exception, the counterparty&amp;rsquo;s trading country was &lt;strong>Norway&lt;/strong>, and the document exported for that country was also a standard document. So it was not a problem with the exported document format.&lt;/p>
+&lt;p>After analyzing the implementation logic of this feature, the crux of the problem was finally found.&lt;/p>
+&lt;p>In this export feature, the matching of document formats is defined in a YAML configuration file, and country identification is configured in YAML via country codes. And Norway&amp;rsquo;s country code is &lt;strong>NO&lt;/strong>&lt;/p>
+&lt;p>Something like:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-YAML" data-lang="YAML">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">config&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">filetype&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">pdf&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">profile&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">standard&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">country&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">NO&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>According to the definition in the &lt;code>YAML V1.1&lt;/code> standard specification (&lt;code>https://yaml.org/type/bool.html&lt;/code>):&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/126-fun_bugs_2/Pasted-20250913-1_hu_b9931117f1ee9c7e.webp"
+width="1024"
+height="144"
+srcset="https://chengxiaqiucao.github.io/post/126-fun_bugs_2/Pasted-20250913-1_hu_f37f9eb5c35cb85a.webp 480w, https://chengxiaqiucao.github.io/post/126-fun_bugs_2/Pasted-20250913-1_hu_b9931117f1ee9c7e.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="711"
+data-flex-basis="1707px"
+>
+&lt;/p>
+&lt;p>After the code interprets &lt;code>NO&lt;/code>, it is treated as the boolean value &lt;code>False&lt;/code>. And the program here lacks configuration validation and exception protection, causing an exception when reading the country code and resulting in a page crash.&lt;/p>
+&lt;p>So the causes can be summarized as:&lt;/p>
+&lt;ol>
+&lt;li>YAML configuration file: the country code configuration is treated as a string by default, without considering special cases like &lt;code>NO&lt;/code>, and no string quotes were added.&lt;/li>
+&lt;li>Program handling: lacks validation of the correctness of YAML configuration values.&lt;/li>
+&lt;li>Insufficient exception protection: an exception directly causes the page to crash.&lt;/li>
+&lt;/ol>
+&lt;h2 id="fixing-the-problem">Fixing the Problem
+&lt;/h2>&lt;p>Once the cause is found, the fix is actually very simple: for the country code, force-convert it to a string before processing, and add validity checks and exception protection code. Of course, for YAML configurations that easily cause ambiguity, string quotes were also added.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-YAML" data-lang="YAML">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">config&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">filetype&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">pdf&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">profile&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">standard&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">country&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;NO&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="reflection">Reflection
+&lt;/h2>&lt;p>Actually it is not just country codes. In string-type fields, using other characters with special meanings, such as &amp;ldquo;Yes&amp;rdquo;, &amp;ldquo;null&amp;rdquo;, etc., can also cause similar problems.&lt;/p>
+&lt;p>Therefore, for us in testing, data handling verification during testing, especially the handling of similar special characters, must take relevant scenarios into account; otherwise it is easy to miss similar serious problems.&lt;/p>
+&lt;hr>
+&lt;h1 id="a-fun-bug-story---the-500-mile-email">A Fun Bug Story - The 500-Mile Email
+&lt;/h1>&lt;p>Let&amp;rsquo;s continue sharing classic Bugs from history.&lt;/p>
+&lt;p>This Bug is also quite bizarre:&lt;/p>
+&lt;blockquote>
+&lt;p>The story takes place in 2002. That day, the head of the statistics department at MIT approached Trey Harris, the person in charge of the campus email system, complaining about a rather bizarre problem: &amp;ldquo;Our emails can&amp;rsquo;t reach anywhere beyond 500 miles. Actually, 520 miles is more accurate.&amp;rdquo;
+The admin&amp;rsquo;s inner voice: ^&amp;amp;^(&lt;em>&amp;amp;………&lt;/em>&amp;amp;))(&amp;amp;^%
+But no matter how hard he disbelieved it, he still tested it himself with his own mailbox. The result was actually true! Just as reported, emails could only be sent within 520 miles, and any email beyond that range failed to send.&lt;/p>&lt;/blockquote>
+&lt;p>After some investigation, the cause was finally figured out.&lt;/p>
+&lt;p>It turned out that not long before, the operating system of the mail server had just been upgraded (still SunOS back then), and OS distributions at that time usually came bundled with some accessory software, but the versions of these pieces of software were often quite old (just like updating Linux, the bundled Python version is usually not the latest). So after the system update, the version of the mail software they used, &lt;code>SendMail&lt;/code>, was downgraded (&lt;strong>SendMail 8 -&amp;gt; SendMail 5&lt;/strong>).&lt;/p>
+&lt;p>And updating the system also kept SendMail&amp;rsquo;s configuration file &lt;code>sendmail.cfg&lt;/code>, so the following situation arose: SendMail 5 would parse SendMail 8&amp;rsquo;s configuration file.&lt;/p>
+&lt;p>Because &lt;code>sendmail.cfg&lt;/code> contained a configuration item &lt;code>timeout to connect to the remote SMTP server&lt;/code> that &lt;code>SendMail 5&lt;/code> did not support, that is, &lt;code>the timeout for connecting to the remote SMTP server&lt;/code>. For this unsupported configuration, &lt;code>SendMail 5&lt;/code> simply ignored it and treated it as the default value 0. And later experiments showed that a timeout of 0 seconds would cause Sendmail to interrupt the connection after &lt;strong>3 milliseconds&lt;/strong>.&lt;/p>
+&lt;p>So why 500 miles?&lt;/p>
+&lt;p>Back then, there were not many routers in MIT&amp;rsquo;s campus network, so network latency was very low - that is, the time to connect to a remote host was roughly close to the speed of light. So 3 milliseconds meant:&lt;/p>
+&lt;p>0.003 * 3 * 10 ^ 8 * 0.001 * 0.621 = 558.9&lt;/p>
+&lt;p>Considering the low network latency, this is how the 500-mile problem came about.&lt;/p></description></item></channel></rss>

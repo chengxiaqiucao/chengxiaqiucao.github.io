@@ -1,0 +1,1522 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Quality Management on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/categories/quality-management/</link><description>Recent content in Quality Management on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Thu, 05 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/categories/quality-management/index.xml" rel="self" type="application/rss+xml"/><item><title>After Development Got Faster, the Queue Stopped at QA - Naming the Cost That Moved</title><link>https://chengxiaqiucao.github.io/en/post/155-qa-bottleneck-after-ai/</link><pubDate>Thu, 05 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/155-qa-bottleneck-after-ai/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/cover.webp" alt="Featured image of post After Development Got Faster, the Queue Stopped at QA - Naming the Cost That Moved" />&lt;p>On a Thursday afternoon at the end of a sprint, the board of a team that has used an AI coding assistant for six months looks like this: &amp;ldquo;In Progress&amp;rdquo; is thinner than before, &amp;ldquo;Code Review&amp;rdquo; is moving, and the &amp;ldquo;To Test&amp;rdquo; column has barely moved in three sprints.&lt;/p>
+&lt;p>At the retrospective someone ventures carefully: testing &amp;ldquo;seems to have got slower&amp;rdquo;. The testers know what the honest answer is &amp;ndash; testing has not got slower, there is simply more coming in. But in a room where everyone else has got faster, that sounds like an excuse.&lt;/p>
+&lt;p>This is an old story in a new edition. When development runs late, testing gets compressed and QA absorbs a cost it did not create; when development speeds up, the same thing happens in the opposite direction. The cost is generated upstream and the bill is delivered to the last gate before production.&lt;/p>
+&lt;h2 id="one-the-speed-did-not-disappear-it-changed-position">One: The Speed Did Not Disappear, It Changed Position
+&lt;/h2>&lt;p>A 2024 study on DevOps delivery performance produced a counter-intuitive set of numbers: developers using AI did report improvements in personal efficiency, documentation and code quality, but at the delivery level the picture flipped &amp;ndash; for every 25% increase in AI adoption, delivery throughput was estimated to fall about 1.5% and delivery stability about 7.2%.&lt;/p>
+&lt;p>The researchers did not blame this on &amp;ldquo;AI writing poor code&amp;rdquo;. The most likely explanation is change batch size: with AI helping write code, individual changes get bigger, and bigger changes are harder to review, harder to test and more likely to cause failures in production.&lt;/p>
+&lt;p>Looked at from the &amp;ldquo;To Test&amp;rdquo; column, this conclusion is not abstract at all. &amp;ldquo;Bigger changes arriving more often&amp;rdquo; is the very definition of increased workload at the testing gate. Anyone who has looked at delivery through the lens of constraint theory knows the next step: speed up a stage that was never the constraint, and the constraint does not disappear, it moves. That Thursday afternoon board is what that movement looks like from the inside. Nobody decided to make QA the bottleneck; they just made coding faster, and the queue moved house by itself.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig1_hu_ca40dc9fc5869375.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig1_hu_11070783fb6862f5.webp 480w, https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig1_hu_ca40dc9fc5869375.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>Once the coding stage speeds up, change batches grow and the delivery constraint moves automatically to the verification gate before release&lt;/p>
+&lt;h2 id="two-giving-qa-the-same-tools-often-makes-the-queue-faster-not-safer">Two: Giving QA the Same Tools Often Makes the Queue Faster, Not Safer
+&lt;/h2>&lt;p>Almost every team&amp;rsquo;s first reaction is to give testers the same tools: let the model generate cases, dozens in minutes, most of them green on the first run. The column empties, the retrospective has good news, and the problem looks solved.&lt;/p>
+&lt;p>What changed is &amp;ldquo;how many tests exist&amp;rdquo;; what did not change is &amp;ldquo;where they look&amp;rdquo;. A model generating tests reads the code, so it tests what the code does. And in a large AI-assisted change the risk is often somewhere else: what assumptions the code makes about existing production data, the integration this ticket did not touch, the configuration items that differ between environments. Those assumptions are not in the diff, so they do not appear in tests generated from the diff.&lt;/p>
+&lt;p>The result is speed without a floor: the team gets faster at every step you can count, and nothing underneath the speed gets stronger. Once &amp;ldquo;how many tests did we write this sprint&amp;rdquo; becomes a watched metric, Goodhart&amp;rsquo;s law applies &amp;ndash; it stops measuring anything the moment it becomes the target. Change failure rate &amp;ndash; the metric for how often a deployment causes a production incident &amp;ndash; does not care how many tests exist at all; it only moves when tests look at where failures actually come from.&lt;/p>
+&lt;p>The study&amp;rsquo;s own conclusion points the same way: AI benefits appear in teams where &lt;strong>the fundamentals are already in place&lt;/strong> &amp;ndash; small change batches, reliable continuous integration, automated tests the team genuinely trusts. AI amplifies what already exists. In teams without that foundation, what gets amplified faster is the gap.&lt;/p>
+&lt;h2 id="three-hand-over-the-mechanical-part-keep-the-judgement">Three: Hand Over the Mechanical Part, Keep the Judgement
+&lt;/h2>&lt;p>This is not about keeping QA away from these tools. A test engineer who refuses the tools is still a bottleneck, just with less thinking time. The useful split is between mechanical work and judgement.&lt;/p>
+&lt;p>The mechanical part is large, and models are genuinely good at it:&lt;/p>
+&lt;ul>
+&lt;li>Generating test data for an entity with dozens of required fields&lt;/li>
+&lt;li>Writing boilerplate for a new page object or API client&lt;/li>
+&lt;li>Grouping this morning&amp;rsquo;s failed pipeline runs by likely cause&lt;/li>
+&lt;li>Reading a long diff and listing which modules, contracts and config files it actually touched&lt;/li>
+&lt;/ul>
+&lt;p>Work that used to be measured in hours is now measured in minutes.&lt;/p>
+&lt;p>The judgement part does not compress like that: which of the modules touched in this release really matter, which risk is worth a slow end-to-end run, which is covered well enough by contract tests, what can honestly go untested this round, and whether to sign off at all. Those judgements depend on knowing the business and where the system has broken in past quarters, which the model cannot obtain and cannot carry for you.&lt;/p>
+&lt;p>The two ways of using it therefore lead to completely different outcomes: the person who spends two minutes having the model summarize a big diff and the saved hour judging &amp;ldquo;where this change could break the system&amp;rdquo; is using AI to get out of the queue; the person who uses it to produce a few dozen more cases is making the queue flow faster.&lt;/p>
+&lt;h2 id="four-making-the-shift-into-numbers-you-can-put-on-the-table">Four: Making the &amp;ldquo;Shift&amp;rdquo; Into Numbers You Can Put on the Table
+&lt;/h2>&lt;p>Behind the &amp;ldquo;To Test&amp;rdquo; column sits a decision the team has made but nobody has said out loud: speed up code production without speeding up anything that verifies it. Treating this as a &amp;ldquo;testing speed problem&amp;rdquo; hides that decision and presses the cost onto the only role that took no part in making it.&lt;/p>
+&lt;p>The way out is to report on the queue in terms of what feeds it, not in terms of the queue itself:&lt;/p>
+&lt;ul>
+&lt;li>How much change entered testing this sprint, compared with three sprints ago?&lt;/li>
+&lt;li>How big is the average change, and how big is the largest?&lt;/li>
+&lt;li>How many tickets could have been split but arrived bundled together?&lt;/li>
+&lt;/ul>
+&lt;p>These numbers translate &amp;ldquo;testing is slow&amp;rdquo; into a conversation about change batch size, and batch size happens to be the lever upstream can actually pull. It also changes who should be at the table: a test engineer asking for more time sounds defensive; a test engineer showing &amp;ldquo;how much the average change entering testing has grown&amp;rdquo; is describing the system, and the system belongs to everyone on the team.&lt;/p>
+&lt;p>The lightest starting action is almost too small to mention: add a number to every card in that column, marking how many lines the change touches. Nobody will look at it for the first sprint. Then one afternoon, a developer will split a ticket in half before moving the card over.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig2_hu_e54bf4d2edd8d683.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig2_hu_d10b170e8436beda.webp 480w, https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig2_hu_e54bf4d2edd8d683.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>Mechanical work goes to the tool, judgement stays with the person; the time and information each side needs are completely different&lt;/p>
+&lt;h2 id="five-an-unresolved-question-of-distinction">Five: An Unresolved Question of Distinction
+&lt;/h2>&lt;p>One thing must be admitted as not thought through: from inside the role, &amp;ldquo;being a bottleneck because you held on to judgement&amp;rdquo; and &amp;ldquo;being a bottleneck because you never changed how you work&amp;rdquo; feel exactly the same. Both show up as a column of unmoving cards, and both produce the same awkward silence at the retrospective.&lt;/p>
+&lt;p>The closest thing to a usable self-check found so far is to take the last ticket that waited in that column and ask what it actually needed QA for. If the answer is a decision only testing can make, then the wait was the work itself; if the answer is a regression run nobody reads plus a checklist that would have passed anyway, then the wait was only habit, and that part should have been absorbed by tools. There is no metric yet that cleanly separates the two, and perhaps none exists.&lt;/p>
+&lt;p>That is exactly why it is more worthwhile to measure upstream than to measure yourself: once &amp;ldquo;change batch size&amp;rdquo; is out in the open, the discussion shifts from &amp;ldquo;is testing fast enough&amp;rdquo; to &amp;ldquo;how much are we choosing to deliver at once&amp;rdquo;. The former can only be answered by testers working overtime; the latter is a design choice the team can adjust together.&lt;/p>
+&lt;h2 id="six-closing-thoughts">Six: Closing Thoughts
+&lt;/h2>&lt;p>The queue stopping at QA is not the testing stage suddenly regressing; it is the bill left behind after speed was redistributed. Treat it as an efficiency problem and you end up with &amp;ldquo;let testing generate more too&amp;rdquo;; treat it as a system problem and you end up at the levers that can really move: batch size, review density and verification capability.&lt;/p>
+&lt;p>For testers, the most powerful move is often not to empty the column but to explain clearly why it is full, whose decision filled it, and what exactly the parts are that cannot be traded away for generation speed.&lt;/p></description></item><item><title>When Finding Vulnerabilities Outpaces Fixing Them - Four Lessons Quality Engineering Has to Add</title><link>https://chengxiaqiucao.github.io/en/post/150-qe-lessons-ai-exploits/</link><pubDate>Wed, 04 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/150-qe-lessons-ai-exploits/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/cover.webp" alt="Featured image of post When Finding Vulnerabilities Outpaces Fixing Them - Four Lessons Quality Engineering Has to Add" />&lt;p>In small and mid-sized teams, application security testing often lands on quality engineers; large companies have dedicated security teams to set and explain security requirements, but &amp;ldquo;making sure those requirements were actually tested&amp;rdquo; is still usually led by the testing role. Role boundaries can differ, but the responsibility cannot be avoided: as the quality gatekeeper, you must bring security into the verifiable scope.&lt;/p>
+&lt;p>A recent wave of public security incidents pushed this to the foreground &amp;ndash; from widely exploited scripting environment vulnerabilities and certificate validation implementation problems to data breaches at large service organisations. There is already plenty of technical post-mortem: how it happened, why it was possible, how to patch it. What quality teams should take away is &lt;strong>how to test the next round&lt;/strong>. The four points below are not trend predictions but checkpoints you can put straight into the iteration.&lt;/p>
+&lt;h2 id="one-still-compute-probability-but-it-is-no-longer-the-first-basis-for-ordering">One: Still Compute Probability, but It Is No Longer the First Basis for Ordering
+&lt;/h2>&lt;p>Classic risk-based testing has you build a matrix: business impact multiplied by likelihood, prioritised by the product. That method carries an implicit assumption: an old defect that has existed for a long time and has never been exploited has low probability and can be pushed back.&lt;/p>
+&lt;p>That assumption is failing. Automation compresses the time from &amp;ldquo;public information&amp;rdquo; to &amp;ldquo;a usable attack path&amp;rdquo; dramatically, and a years-old defect can suddenly become mass-exploitable in a very short window. One practitioner put it precisely: risk equals likelihood times impact, and the age of a defect does not change that equation &amp;ndash; what really changed this week is &lt;strong>likelihood&lt;/strong>.&lt;/p>
+&lt;p>The risk model itself has long been contested. Research on behavioural decision-making shows that human judgement generally carries subjectivity, variance and bias, and that kind of &amp;ldquo;noise&amp;rdquo; pollutes the decision process and puts systematic bias into everything downstream. Leaving the likelihood column to intuitive estimation was never stable enough.&lt;/p>
+&lt;p>A more practical approach keeps the business-importance ordering while adding a column for &lt;strong>exposure feasibility (or exploit maturity)&lt;/strong>, and grading by it:&lt;/p>
+&lt;ul>
+&lt;li>Components directly exposed to the public internet, reachable without preconditions;&lt;/li>
+&lt;li>Dependency issues that require some access and context to exploit;&lt;/li>
+&lt;li>Niche defects inside closed systems that only hold under very special conditions.&lt;/li>
+&lt;/ul>
+&lt;p>This column is easier to back with objective evidence than &amp;ldquo;probability&amp;rdquo;: is there an internet-facing entry point, is it in the bill of materials, is there public exploit code, has a patched version been released. When exposure feasibility is high enough, it should be prioritised into the verification queue even if the estimated probability is low &amp;ndash; because &amp;ldquo;probably nobody will attack it&amp;rdquo; is no longer an assumption you can rely on for long.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig1_hu_9dd60f54405b106d.webp"
+width="1024"
+height="783"
+srcset="https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig1_hu_5f8a39f462f69a18.webp 480w, https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig1_hu_9dd60f54405b106d.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="130"
+data-flex-basis="313px"
+>
+&lt;/p>
+&lt;p>Adding an &amp;ldquo;exposure feasibility&amp;rdquo; dimension alongside business impact, producing an ordering closer to the current threat tempo&lt;/p>
+&lt;h2 id="two-treat-security-hygiene-as-a-testable-product-requirement">Two: Treat Security Hygiene as a Testable Product Requirement
+&lt;/h2>&lt;p>If nobody in the organisation is leading basic hygiene, the quality team should take it over. It is not glamorous work, but the return on investment is extremely high and every item can be written as an acceptance condition.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Insisting on Definition of Ready and Definition of Done is not formality.&lt;/strong> Whether security constraints are written down before a requirement enters development, and whether they were checked before completion, are themselves auditable checkpoints.&lt;/li>
+&lt;li>&lt;strong>Strength and storage of passphrases, PINs and credentials.&lt;/strong> Not just &amp;ldquo;passwords must be complex&amp;rdquo;, but also verifying they are stored appropriately and that the reset flow does not bypass the strength requirement.&lt;/li>
+&lt;li>&lt;strong>Maintain a bill of materials (SBOM).&lt;/strong> Know clearly which framework and which version each site runs, and whether it is still supported. The cost of continuous small-step upgrades is far lower than jumping from one major version to a version years later &amp;ndash; that is no longer technical debt but a total loss of initiative.&lt;/li>
+&lt;li>&lt;strong>Enumerate risk with the CIA triad.&lt;/strong> Confidentiality: information does not flow to unauthorized people or systems; integrity: information is not tampered with, and changes are traceable and trustworthy; availability: the system is usable when needed, and recoverable when it is not. All three dimensions yield concrete test cases and concrete controls to build.&lt;/li>
+&lt;/ul>
+&lt;p>Communication is also quality work. One detail worth remembering: after a personal customer data breach at a regional telecom operator, the operator also notified business customers who were &lt;strong>not affected&lt;/strong>. The reason is realistic &amp;ndash; business customers have management, supervisory boards and auditors who will ask the CEO directly whether it is under control. Preparing a clear, evidence-based explanation in advance so that managers can answer that question is itself a deliverable.&lt;/p>
+&lt;h2 id="three-automate-security-requirements-testing-and-shift-compliance-left">Three: Automate Security Requirements Testing and Shift Compliance Left
+&lt;/h2>&lt;p>A company&amp;rsquo;s security policies and runbooks are a lot like backups: not rehearsed, not invoked, they may as well not exist. Assembling materials at the last minute before an audit is the most expensive and least rewarding option.&lt;/p>
+&lt;p>There are usually two options on the table: one concentrated week a year of disaster recovery drills with documentation the rest of the time, or writing security requirements as executable tests from the requirements stage. The latter is not far off &amp;ndash; the mechanisms needed to confirm security requirements are almost the same set as mature quality engineering practice: turn clauses into assertions, wire assertions into the pipeline, keep results as evidence. Compliance engineering (GRC engineering) is the next step that should be pushed forward after &amp;ldquo;shift testing left&amp;rdquo;.&lt;/p>
+&lt;p>Concretely, start at these points, none of which needs a new platform:&lt;/p>
+&lt;ul>
+&lt;li>Convert each decidable clause in the security policy into an automated check, for example session timeout, transport encryption, sensitive field masking, permission boundaries;&lt;/li>
+&lt;li>Compare dependency versions against the known vulnerability list on every build, rather than waiting for a quarterly scan;&lt;/li>
+&lt;li>Bring &amp;ldquo;recovery&amp;rdquo; into verification too: can backups be restored, can the plan be executed within the required time, can execution records be generated automatically;&lt;/li>
+&lt;li>Produce archivable results from every check, so that what you provide at audit time is run records rather than a collection of screenshots.&lt;/li>
+&lt;/ul>
+&lt;p>The key is to turn &amp;ldquo;we have a policy&amp;rdquo; into &amp;ldquo;we have a pipeline that can fail&amp;rdquo;. A policy is only really in force once it can trigger a red light.&lt;/p>
+&lt;h2 id="four-join-the-incident-response-team-and-treat-drills-as-formal-tests">Four: Join the Incident Response Team, and Treat Drills as Formal Tests
+&lt;/h2>&lt;p>The value of quality people in incident response is often underestimated. There is public practice of quality practitioners directly helping fix community sites and apply patches, and serving on response teams to monitor the effect of fixes and drive the relevant merge requests; quality leads have also been seen serving simultaneously as one of three on-call responders and as escalation manager. This is not overstepping but a natural extension of testing capability under pressure &amp;ndash; the person who best knows how to verify that a fix really works should be on the ground.&lt;/p>
+&lt;p>But &amp;ldquo;throwing people together temporarily&amp;rdquo; is not enough. Response needs runbooks and training against those runbooks, and the training must be run as a formal test: with a test plan, with cases, with a defect tracking record.&lt;/p>
+&lt;p>A counter-example is persuasive: a business continuity drill for a public-sector economic system gathered all key customer-facing staff and simulated total site unavailability, with complete process documentation and formally a proper test. The result was that participants could not execute the plan under &lt;strong>simulated pressure&lt;/strong>, and the drill had to be rerun, with management and key role holders required to be in the same room for the rerun. Most participants would rather have been doing something else at the time, but that discomfort is exactly what buys predictability when a real crisis arrives.&lt;/p>
+&lt;p>A drill never tests the system; it tests people, process and information channels: who knows first, who has authority to decide, whether the notification chain is complete, who issues the external statement. Write these as observable checkpoints and the drill will expose problems instead of becoming an attendance sheet.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig2_hu_7d966233c916fbb1.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig2_hu_7e4e277eaafc5fec.webp 480w, https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig2_hu_7d966233c916fbb1.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>The closed loop from policy clause to executable verification to incident response drill&lt;/p>
+&lt;h2 id="a-checklist-you-can-put-into-a-quarter">A Checklist You Can Put Into a Quarter
+&lt;/h2>&lt;p>Compressing the four points into deliverable actions, this can be done within one quarter:&lt;/p>
+&lt;ol>
+&lt;li>Add an &amp;ldquo;exposure feasibility&amp;rdquo; column to the risk register, reorder internet-reachable components once, and prioritize verifying the items with solid evidence but low estimated probability;&lt;/li>
+&lt;li>Produce or update the bill of materials, confirm framework and dependency versions, and list exceptions that cannot be upgraded soon along with compensating monitoring;&lt;/li>
+&lt;li>Add one group of test cases for each CIA dimension, covering at minimum unauthorized access, tampered data, and recovery when the service is unavailable;&lt;/li>
+&lt;li>Pick the three most common security policy clauses, automate them, wire them into the main pipeline and require a failure to block;&lt;/li>
+&lt;li>Organize one business continuity drill with a test plan and defect records, and make the quality role&amp;rsquo;s responsibilities in the response explicit;&lt;/li>
+&lt;li>Assemble drill results and pipeline run records into an evidence package that can be submitted to management and auditors.&lt;/li>
+&lt;/ol>
+&lt;p>None of these actions depends on a new tool, and none requires a quality engineer to become a security expert. They only require turning &amp;ldquo;security&amp;rdquo; from a checklist maintained by someone else into tests in your own suite that can fail, get fixed and leave records. As the outside world keeps finding vulnerabilities faster, what closes the gap is not more alerts but those few assertions that come earlier and can be verified.&lt;/p></description></item><item><title>Keeping the Acceptance Criteria Away From the People Who Write the Code - Conclusions After 967 Runs</title><link>https://chengxiaqiucao.github.io/en/post/143-spec-driven-verification/</link><pubDate>Wed, 28 Oct 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/143-spec-driven-verification/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/143-spec-driven-verification/cover.webp" alt="Featured image of post Keeping the Acceptance Criteria Away From the People Who Write the Code - Conclusions After 967 Runs" />&lt;p>There is a rule repeatedly validated in safety-critical fields: the people who build a system must never be the people who verify it. It is not bureaucratic ceremony but a precondition of verification validity &amp;ndash; if a person implements according to their own understanding and then verifies according to their own understanding, the two understandings are naturally identical, and verification degenerates into self-confirmation.&lt;/p>
+&lt;p>When the coding work is done by an AI agent, this rule runs into a new situation: the same model can write the code, write the tests, and also deliver the conclusion that &amp;ldquo;all tests pass&amp;rdquo;. So a question worth taking seriously appears &amp;ndash; is there a way to enforce this rule inside a machine pipeline, rather than only writing it in a standard.&lt;/p>
+&lt;h2 id="splitting-a-spec-into-two-halves">Splitting a Spec Into Two Halves
+&lt;/h2>&lt;p>One approach splits the spec file into two parts: requirements and acceptance criteria. The coding agent only receives the requirements part, and the acceptance criteria are cut off before the file is handed over; a separate, independent testing agent writes tests based only on the acceptance criteria and does not read the implementation code.&lt;/p>
+&lt;p>The two agents run in the same pipeline, but the information they see does not overlap:&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/143-spec-driven-verification/03-fig1_hu_7d4a9e891d06bd6e.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/143-spec-driven-verification/03-fig1_hu_12455b82a278d43.webp 480w, https://chengxiaqiucao.github.io/post/143-spec-driven-verification/03-fig1_hu_7d4a9e891d06bd6e.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>The two information channels do not overlap and only meet at the test failure message&lt;/p>
+&lt;ul>
+&lt;li>Coding agent: requirements + test data, no acceptance criteria;&lt;/li>
+&lt;li>Testing agent: requirements + acceptance criteria + test data, no implementation;&lt;/li>
+&lt;li>The only place the two meet is the failure message returned after the test run.&lt;/li>
+&lt;/ul>
+&lt;p>The key is that the &amp;ldquo;cut off&amp;rdquo; step happens in code, not by asking the model in a prompt to be self-disciplined. It is a pipeline property that can be demonstrated and audited, not a promise.&lt;/p>
+&lt;h2 id="one-complete-run-the-failure-message-is-just-one-line">One Complete Run: The Failure Message Is Just One Line
+&lt;/h2>&lt;p>Looking at a fragment of a real run is more useful than describing it.&lt;/p>
+&lt;p>The task is: read recorded radar samples, reject invalid samples, compute the time headway to the vehicle ahead, and warn when the headway is below two seconds. Based only on the requirements, the coding agent wrote this range check &amp;ndash; it kept the upper bound but let the zero-gap case through:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="n">gap_m&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="ow">or&lt;/span> &lt;span class="n">gap_m&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">250&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">rejected&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">...&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1"># the row, with a reason attached&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>And the test fixture CSV contains a row S005, a radar sample whose gap is exactly 0 metres. The test generated from the acceptance criteria requires that row to be rejected, and it was not:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">E AssertionError: &amp;#39;S005&amp;#39; was not rejected
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>That is the entire feedback the coding agent gets: which test failed and what the test asserted, with no hint about the underlying rule. The model inferred from it that an exactly zero gap is not a valid measurement.&lt;/p>
+&lt;p>Then it produced a PATCH changing one character:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-diff" data-lang="diff">&lt;span class="line">&lt;span class="cl">&lt;span class="gd">- if gap_m &amp;lt; 0 or gap_m &amp;gt; 250:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gd">&lt;/span>&lt;span class="gi">+ if gap_m &amp;lt;= 0 or gap_m &amp;gt; 250:
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>From writing the test to all stage suites going green, the whole round took under a minute, with fewer than ten model calls and a cost of a fraction of a cent. But what really deserves attention is not the speed but the causality: the agent tightened the lower bound because a test it had never seen put the 0-metre gap into the &amp;ldquo;must reject&amp;rdquo; pile, not because some written standard told it that zero is invalid.&lt;/p>
+&lt;p>Had it seen that standard directly, it would have written the correct check on the first attempt and the suite would have passed the first time &amp;ndash; and that green result would prove nothing, like a student scoring full marks on an exam they set themselves.&lt;/p>
+&lt;h2 id="the-easiest-mistake-hiding-a-decision-in-the-acceptance-criteria">The Easiest Mistake: Hiding a Decision in the Acceptance Criteria
+&lt;/h2>&lt;p>The run above actually comes from the second version of the task. The problem exposed by the first version is more worth recording, because from the outside it looks a lot like &amp;ldquo;keep editing the spec until it passes&amp;rdquo;.&lt;/p>
+&lt;p>The first version&amp;rsquo;s requirements only said: warn when the headway violates the &amp;ldquo;two-second rule&amp;rdquo;. The question &amp;ldquo;should a headway of exactly 2.00 seconds raise a warning&amp;rdquo; was placed in the hidden acceptance criteria:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># Version 1. The boundary is settled in the half the coding agent never sees.&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">requirements&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s2">&amp;#34;Flag a sample as following too closely when its time headway breaks the two-second rule&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">acceptance_criteria&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># cut before the coding agent is handed the file&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s2">&amp;#34;A headway of exactly 2.00 s does not raise a warning&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Back to that criterion: given only the requirements, would two competent developers disagree about 2.00 seconds? Very easily. &amp;ldquo;Breaks the two-second rule&amp;rdquo; can be read as &amp;ldquo;below&amp;rdquo; or as &amp;ldquo;not above&amp;rdquo;. That is a decision, and a decision hidden inside the test criteria is exactly the mistake this split is meant to avoid.&lt;/p>
+&lt;p>The first batch of runs showed the cost: only three of ten random seeds converged. For the other seven, the agent writing the tests resolved the ambiguity the wrong way and wrote a test that warns at exactly 2.00 seconds &amp;ndash; which contradicts the acceptance criterion it was itself given. That is worth pausing over: the testing agent held both the vague requirement and the clear acceptance criterion, and still went the wrong way. A requirement loose enough to support two readings does not just make the coder guess; it also drags the test writer away from the criterion it was given. And no implementation can pass a test that contradicts its own criterion.&lt;/p>
+&lt;p>The correct fix only moves the decision itself, and only the decision. The acceptance criteria kept every consequence derived from that decision, and the other speed and gap constraints were not touched by a single character, including &amp;ldquo;zero gap must be rejected&amp;rdquo;. Nothing was weakened and nothing was deleted.&lt;/p>
+&lt;p>After moving that one sentence, the same ten seeds converged in all ten cases on the first sweep; the zero-gap fix above still occurred in seven of them, again caught by a test the coding agent had never seen.&lt;/p>
+&lt;h2 id="the-line-between-fixing-the-spec-and-lowering-the-bar">The Line Between Fixing the Spec and Lowering the Bar
+&lt;/h2>&lt;p>There is a very fine but very important line here.&lt;/p>
+&lt;p>Moving a decision that the coder needs is a correction the spec owed all along, and it can justify itself with the single question &amp;ldquo;would two competent developers disagree&amp;rdquo;, without looking at any code. Whereas deleting that criterion, loosening it, or copying its boundary value into the requirements would also make the run pass &amp;ndash; but then nothing is proven.&lt;/p>
+&lt;p>This line is especially dangerous in the AI era because the cost of &amp;ldquo;make it green&amp;rdquo; has been pushed down to a single conversation. When tests do not pass, the least effortful option for an agent is often to change the test or the criterion rather than change the implementation. The pipeline must carry a hard rule: when tests do not pass, you may change the implementation, you may change the wording of the requirements, but you may not loosen the acceptance criteria. What the tool does at this point is &amp;ndash; exit non-zero when a run does not converge, name the tests blocking it, and deliver nothing.&lt;/p>
+&lt;h2 id="what-changes-when-the-code-already-exists">What Changes When the Code Already Exists
+&lt;/h2>&lt;p>Everything above assumes the implementation is written during this run, which is the only situation where isolation can truly be enforced: one process drives both agents and the acceptance criteria are stripped out of one side&amp;rsquo;s prompt by code.&lt;/p>
+&lt;p>But most code in the real world is not like that. It already exists, written months ago by a person or by an assistant, and the team wants &amp;ldquo;this piece of code checked once&amp;rdquo;.&lt;/p>
+&lt;p>The same two-agent workflow can point at existing code, with the suite still generated from the criteria by an agent that never read the implementation. What changes is the weight of each outcome:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Outcome&lt;/th>
+&lt;th>Code written during the run&lt;/th>
+&lt;th>Code that already exists&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Test fails&lt;/td>
+&lt;td>A real finding&lt;/td>
+&lt;td>Still a real finding&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Test passes&lt;/td>
+&lt;td>The code satisfied a criterion it never saw&lt;/td>
+&lt;td>The code agrees with a criterion its author may have seen&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Failure is reliable in both cases, because the test was written from the criterion without reading the implementation, so any mismatch is a real divergence between code and spec. Only &amp;ldquo;pass&amp;rdquo; weakens, and it weakens for a reason unrelated to the tool: the person who wrote that code may have had the acceptance criteria open in a window next to it at the time.&lt;/p>
+&lt;p>This is a claim about timelines, so it is worth drawing clearly. For existing code there is no way to enforce order after the fact; the only thing you can ask is version control, which has been taking notes all along:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">criteria file, last commit ───────────┐
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> │ in this order, the criteria were
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">implementation, first commit ─────────┘ not written against code that was already in the repository
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>A run against existing code now asks exactly this question, and prints the answer together with its limits &amp;ndash; because the limits are most of the truth. A commit date is not a writing date: code can sit in a working tree for weeks without being committed, so this ordering narrows the risk that &amp;ldquo;the criterion was reverse-engineered from the code&amp;rdquo; but does not eliminate it; and the criterion being committed first says nothing at all about whether the developer was allowed to read it before implementing.&lt;/p>
+&lt;p>So this evidence is most valuable when the result is bad: a criterion revised after the code landed is a question someone should answer. That asymmetry matches the table above &amp;ndash; better to deliver a check that states its own limitations than to print a green tick that lets the reader believe it proves more.&lt;/p>
+&lt;p>Version control does know, and can state clearly, one thing: who committed each side. Two different people, which is exactly the separation of duties the whole method borrows.&lt;/p>
+&lt;h2 id="the-numbers-from-967-runs">The Numbers From 967 Runs
+&lt;/h2>&lt;p>The evidence so far is this: on the tool&amp;rsquo;s built-in sample task, three batches totalling 967 runs (using a small, cheap model so the sweeps could be repeated affordably) produced code that passed all integration and system tests in about eighty percent of runs, and passed every stage including unit tests in about sixty percent. After hardening the process and making the task harder in two places, a fourth batch of 390 runs reproduced the same two numbers.&lt;/p>
+&lt;p>That number is listed separately rather than merged with the earlier batches &amp;ndash; describing two different systems with one number is exactly how results get retracted later. Also, these runs used a cheap model, so both percentages should be read as a lower bound on performance.&lt;/p>
+&lt;p>The gap between the two stages comes mainly from unit tests, which run last and are the strictest. Most of the remaining problems can be covered by two questions:&lt;/p>
+&lt;ul>
+&lt;li>If the FIX and PATCH produced on each iteration are nearly identical, the agent is guessing at a decision nobody told it &amp;ndash; the problem is in the spec;&lt;/li>
+&lt;li>If a rule cannot be triggered at all by your sample data, you get a test that passes no matter how the code is written &amp;ndash; the problem is in the data, not the code.&lt;/li>
+&lt;/ul>
+&lt;h2 id="edge-cases-and-experimental-design-why-passes-on-average-is-an-illusion">Edge Cases and Experimental Design: Why &amp;ldquo;Passes on Average&amp;rdquo; Is an Illusion
+&lt;/h2>&lt;p>The concrete form this separation-of-duties principle takes in a production driver-assistance project is the edge case. One class of problem recurs: the perception module met the requirement &amp;ndash; as the developers themselves understood it &amp;ndash; but did not measure what really needed measuring.&lt;/p>
+&lt;p>A detection accuracy requirement will state that the system must stay within some bound. The implementation team read it as &amp;ldquo;the average accuracy across one recorded drive&amp;rdquo;, a very natural reading when you are building as you go, and their own tests matched that reading. An independent team comparing the same data against ground truth based on the requirement itself (rather than the developers&amp;rsquo; reading) exposed failures that average accuracy over a whole drive can never reveal.&lt;/p>
+&lt;p>For example, the acceptance criteria would ask: does it hold on every single frame? Including those frames where a vehicle cuts in from the edge of the sensor field of view, or some occlusion occurs. Averaged over the whole drive, such modules pass easily; frame by frame they do not, because thousands of easy frames drown out the few dozen that determine whether the system is safe. The requirement never said whether the bound was a mean or a worst case, the implementers picked the reading their code naturally produced, and they honestly verified themselves against that reading. Developers usually do not have the time or resources to check every edge case personally, and tend to verify a few important scenarios before moving to the next task.&lt;/p>
+&lt;p>This is the operational design domain (ODD) problem. Defining edge cases accurately and completely in a complex system is an enormous amount of work. The parameter combinations are far too many for brute-force coverage to be practical, and only an ideal oracle could generate perfect coverage over all scenarios. So you need to follow design of experiments (DOE) principles to cover the ODD over the whole test space in an optimal way.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/143-spec-driven-verification/03-fig2_hu_ffdcc34aea1a1732.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/143-spec-driven-verification/03-fig2_hu_d1b52afc884d30be.webp 480w, https://chengxiaqiucao.github.io/post/143-spec-driven-verification/03-fig2_hu_ffdcc34aea1a1732.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>Sample data is evenly distributed in the space, but rare edge regions have almost no coverage points&lt;/p>
+&lt;p>The same problem reproduced at a smaller scale inside this tool: the faults planted to measure &amp;ldquo;whether clearer criteria catch more faults&amp;rdquo; were for the most part invisible to any test suite &amp;ndash; because the inputs the acceptance criteria describe never exist in the fixture data. &lt;strong>A criterion that nothing can trigger is not a criterion.&lt;/strong> If the driving data under test never includes heavy rain, then no matter how good the test team is, they learn nothing about heavy rain.&lt;/p>
+&lt;h2 id="validation-still-needs-a-human-in-the-loop">Validation Still Needs a Human in the Loop
+&lt;/h2>&lt;p>One point must be made clear: everything above belongs to verification &amp;ndash; given a written criterion, does the code satisfy it, checked by a party that could not see the criterion when it was built. It does not touch validation at all: whether the criterion itself describes what should happen.&lt;/p>
+&lt;p>A tool can force a coding agent to never see the acceptance criteria. No tool can tell you whether those criteria are the right ones to write. For now that still requires a person who understands the domain, understands the users, and understands why the system exists at all. It also requires writing &amp;ldquo;correct behaviour&amp;rdquo; as concrete, checkable descriptions, including the edge cases that careless readings miss. AI can of course assist with all of this, but it still needs human experts to supervise, approve the spec and stay in the loop as the spec evolves.&lt;/p>
+&lt;h2 id="three-things-you-can-borrow-right-away">Three Things You Can Borrow Right Away
+&lt;/h2>&lt;p>First, write &amp;ldquo;decisions&amp;rdquo; and &amp;ldquo;consequences&amp;rdquo; separately in the spec. Any statement two competent developers would disagree about is a decision that must be settled on the requirements side; the acceptance criteria keep only the checkable consequences derived from that decision. The test is simple: read the requirement and ask yourself whether two reasonable readings exist.&lt;/p>
+&lt;p>Second, add a hard constraint to the pipeline &amp;ndash; do not allow loosening the criteria when a run does not converge. Changing the implementation is allowed, clarifying the requirements is allowed, but &amp;ldquo;delete or loosen an acceptance criterion&amp;rdquo; becomes an action requiring human approval. Without that constraint, an agent will always take the least effortful path.&lt;/p>
+&lt;p>Third, check that your test data can trigger every rule. When you write a criterion, ask at the same time: which row of sample data would make this fail? A criterion with no answer to that is not a criterion.&lt;/p>
+&lt;p>More fundamentally, verification and validation are not two steps in a process but a professional mindset about &amp;ldquo;who has the right to answer which question, and why&amp;rdquo;. What deserves vigilance is not trust itself but methodological omission: a check performed by the builder is not really a check. That holds whether the builder is a person rushing a deadline or an LLM with a context window and a budget limit, and it will still hold in the next generation of software development.&lt;/p></description></item><item><title>The New National Standard for E-Bikes - A Quality Perspective</title><link>https://chengxiaqiucao.github.io/en/post/137-new_ec_criteria/</link><pubDate>Mon, 15 Dec 2025 23:52:04 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/137-new_ec_criteria/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/137-new_ec_criteria/Pasted-20251223.webp" alt="Featured image of post The New National Standard for E-Bikes - A Quality Perspective" />&lt;h1 id="the-new-national-standard-for-e-bikes---a-quality-perspective">The New National Standard for E-Bikes - A Quality Perspective
+&lt;/h1>&lt;h2 id="background">Background
+&lt;/h2>&lt;blockquote>
+&lt;p>On December 1 this year, the newest national safety technical standard for e-bikes took effect and older-standard e-bikes were banned from sale. Yet the use of new-standard e-bikes has drawn widespread complaints from both riders and dealers.&lt;/p>&lt;/blockquote>
+&lt;p>The main revisions to the standard can be found in its foreword. It is clear that the new standard starts from road safety and adds a series of mandatory requirements covering speed, fire prevention, communications and passenger safety.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/137-new_ec_criteria/Pasted-20251223-1_hu_bfee8191dab5af87.webp"
+width="1024"
+height="473"
+srcset="https://chengxiaqiucao.github.io/post/137-new_ec_criteria/Pasted-20251223-1_hu_d233ed064676b7da.webp 480w, https://chengxiaqiucao.github.io/post/137-new_ec_criteria/Pasted-20251223-1_hu_bfee8191dab5af87.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="216"
+data-flex-basis="520px"
+>
+&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/137-new_ec_criteria/Pasted-20251223_hu_fca7bb0e4e44ba2.webp"
+width="1024"
+height="968"
+srcset="https://chengxiaqiucao.github.io/post/137-new_ec_criteria/Pasted-20251223_hu_24c19829724a7d34.webp 480w, https://chengxiaqiucao.github.io/post/137-new_ec_criteria/Pasted-20251223_hu_fca7bb0e4e44ba2.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="105"
+data-flex-basis="254px"
+>
+&lt;/p>
+&lt;h2 id="the-main-gripes-about-the-new-standard">The Main Gripes About the New Standard
+&lt;/h2>&lt;h3 id="hard-to-carry-a-passenger">Hard to Carry a Passenger
+&lt;/h3>&lt;p>The new standard imposes strict limits on vehicle dimensions and seat design, so many new models cannot carry a child. Families with two children in particular find it hard to seat a child in front of and behind the adult as they could on older e-bikes. For families who rely on an e-bike to take kids to and from school, the impact is significant.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/137-new_ec_criteria/Pasted-20251216-1_hu_d3f20c6872139c35.webp"
+width="1024"
+height="687"
+srcset="https://chengxiaqiucao.github.io/post/137-new_ec_criteria/Pasted-20251216-1_hu_cd45fd5690f4ae2.webp 480w, https://chengxiaqiucao.github.io/post/137-new_ec_criteria/Pasted-20251216-1_hu_d3f20c6872139c35.webp 1024w"
+loading="lazy"
+alt="AI generated image of an e-bike carrying a passenger"
+class="gallery-image"
+data-flex-grow="149"
+data-flex-basis="357px"
+>
+&lt;/p>
+&lt;h3 id="not-enough-storage-space">Not Enough Storage Space
+&lt;/h3>&lt;p>To meet the weight limits of the new standard, many new-standard e-bikes have to drop the rear rack space, leaving nowhere to put a raincoat, helmet or shopping bag. Practicality drops sharply.&lt;/p>
+&lt;h3 id="the-sheet-metal-seat-problem">The &amp;ldquo;Sheet-Metal Seat&amp;rdquo; Problem
+&lt;/h3>&lt;p>Under the new standard, some models design the seat as removable flame-retardant foam in order to meet fire-retardancy and weight requirements, and it can easily be taken off at will.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/137-new_ec_criteria/Pasted-20251223-2_hu_3cce32083151007d.webp"
+width="1024"
+height="604"
+srcset="https://chengxiaqiucao.github.io/post/137-new_ec_criteria/Pasted-20251223-2_hu_2da3f97ef78a557f.webp 480w, https://chengxiaqiucao.github.io/post/137-new_ec_criteria/Pasted-20251223-2_hu_3cce32083151007d.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="169"
+data-flex-basis="406px"
+>
+&lt;/p>
+&lt;h3 id="slow-speed-poor-riding-experience">Slow Speed, Poor Riding Experience
+&lt;/h3>&lt;p>The new standard caps e-bikes at 25 km/h, and power output is cut once that speed is reached. Many riders complain that the riding experience is worse than a bicycle, and that on slopes or when quick acceleration is needed the power does not come through, which actually affects safety too. It is especially unfriendly to delivery riders and couriers.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/137-new_ec_criteria/Pasted-20251223-3_hu_5b489d19280cb8ab.webp"
+width="1024"
+height="639"
+srcset="https://chengxiaqiucao.github.io/post/137-new_ec_criteria/Pasted-20251223-3_hu_885e018067f228b6.webp 480w, https://chengxiaqiucao.github.io/post/137-new_ec_criteria/Pasted-20251223-3_hu_5b489d19280cb8ab.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="160"
+data-flex-basis="384px"
+>
+&lt;/p>
+&lt;hr>
+&lt;p>Beyond the gripes above, there are also issues such as higher prices due to the new safety materials and the rather pointless mandatory pedals. We will not list them one by one.&lt;/p>
+&lt;h2 id="a-quality-perspective">A Quality Perspective
+&lt;/h2>&lt;p>Looking at the complaints about the new standard, it is clear they are not baseless. Many of them do reveal genuinely unreasonable parts of the standard. From a market point of view, you could say the products launched under this standard are actually failed products.&lt;/p>
+&lt;p>&lt;strong>But can we say the quality of such products is bad, or that tightening control from a safety angle is wrong?&lt;/strong>&lt;/p>
+&lt;p>As testers, most of us have run into the situation where a product has clearly not been adequately tested, or still has quite a few unresolved bugs, yet it is rushed out the door anyway.&lt;/p>
+&lt;p>Usually the testing role can only sigh that &amp;ldquo;the arm cannot twist the thigh&amp;rdquo;, and grumble that &amp;ldquo;the project does not care about quality&amp;rdquo;. But does the product team really not care about product quality?&lt;/p>
+&lt;h3 id="what-is-quality">What Is Quality?
+&lt;/h3>&lt;p>So let us return to quality. What exactly is quality?&lt;/p>
+&lt;p>The definition in ISO 9000: &lt;code> Quality is the degree to which a set of inherent characteristics (the attributes a thing itself possesses) fulfils requirements.&lt;/code>&lt;/p>
+&lt;p>So where is the key here? It is precisely the &lt;strong>requirements&lt;/strong> in &lt;code>fulfils requirements&lt;/code>. We usually understand those &lt;code>requirements&lt;/code> as the requirements document, the needs explicitly stated in user stories, or some generally accepted standards and specifications.&lt;/p>
+&lt;p>But for a product, measuring quality is hard to assess as &lt;code>fulfilled&lt;/code> or &lt;code>not fulfilled&lt;/code>, because when we speak of quality we usually only say &lt;code>good&lt;/code> or &lt;code>bad&lt;/code>. It is not quantitative or qualitative; it is more of an experience.&lt;/p>
+&lt;p>So my view is that &lt;strong>quality is a subjective experience in service of product value&lt;/strong>.&lt;/p>
+&lt;p>In other words, quality is an important component of product value, but it does not determine product value.&lt;/p>
+&lt;p>From that angle, products released with bugs suddenly make sense. The judgment of the product team is: although the product still has bugs and some quality problems, the value of shipping it outweighs the impact of those quality problems, so we accept this portion of quality problems in the current product.&lt;/p>
+&lt;p>Passed on to the user side, it is quite similar:&lt;/p>
+&lt;ul>
+&lt;li>Mixue Bingcheng uses overnight lemons, but you cannot argue with its friendly prices!&lt;/li>
+&lt;li>This Burberry bag is as ugly as a woven sack, but the brand is high-end!&lt;/li>
+&lt;li>This software system is so unpleasant to use that I do not want to open it, but only this system lets me get my work done!&lt;/li>
+&lt;/ul>
+&lt;p>Back to the new-standard e-bikes above: quality and safety were considered thoroughly enough and the requirements are very detailed, but the core value users care about most was ignored! At that point, quality and safety become a flashy skill with no dragon to slay.&lt;/p>
+&lt;h3 id="what-should-we-do-at-work">What Should We Do at Work?
+&lt;/h3>&lt;p>So how do we do our work better when we are testing or doing QA?&lt;/p>
+&lt;p>It comes down to one sentence: &lt;strong>evaluate quality in terms of user value&lt;/strong>.&lt;/p>
+&lt;p>The key is &lt;code>in terms of user value&lt;/code> rather than in terms of the requirements document. Requirements are the main carrier of user value, but not a sufficient one.&lt;/p>
+&lt;p>And user value has both a single-user perspective and an overall perspective. Under the single-user and the overall perspective, quality requirements can conflict, and then trade-offs and balance are needed.&lt;/p>
+&lt;p>For example, a feature added for a small set of specific users may affect the experience of most other users. Then whether to add that feature involves a trade-off.&lt;/p>
+&lt;p>In cases like this, we should shift from constantly judging &amp;ldquo;&lt;strong>right or wrong&lt;/strong>&amp;rdquo; in testing to constantly weighing &amp;ldquo;&lt;strong>good or bad&lt;/strong>&amp;rdquo;.&lt;/p>
+&lt;p>No longer obsessing over whether the requirement is implemented correctly, but caring more about whether the code implementation embodies the user value that the requirement represents.&lt;/p>
+&lt;h2 id="closing-thoughts">Closing Thoughts
+&lt;/h2>&lt;p>The thoughts above are one person&amp;rsquo;s opinion, and they do not include detailed measures for implementation. The only point is that, looking at it now, quality is like enlightenment: the way that can be told is not the constant way. It was never easy after all.&lt;/p></description></item><item><title>What to Do When There Is Not Enough Testing Time?</title><link>https://chengxiaqiucao.github.io/en/post/130-when_qa_out_time/</link><pubDate>Sun, 12 Oct 2025 20:51:27 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/130-when_qa_out_time/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/130-when_qa_out_time/Pasted-20251012.webp" alt="Featured image of post What to Do When There Is Not Enough Testing Time?" />&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/130-when_qa_out_time/Pasted-20251012_hu_d3da7868660eed24.webp"
+width="1024"
+height="567"
+srcset="https://chengxiaqiucao.github.io/post/130-when_qa_out_time/Pasted-20251012_hu_7a77c2852ccb1091.webp 480w, https://chengxiaqiucao.github.io/post/130-when_qa_out_time/Pasted-20251012_hu_d3da7868660eed24.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="180"
+data-flex-basis="433px"
+>
+&lt;/p>
+&lt;blockquote>
+&lt;p>Product manager: &amp;ldquo;The client pressure is unbearable, it must go live tomorrow!&amp;rdquo;
+Developer: &amp;ldquo;The code was just merged, no time for thorough self-testing&amp;hellip;.&amp;rdquo;
+Tester: looking at the long list of test cases, can only sigh silently&amp;hellip;&lt;/p>&lt;/blockquote>
+&lt;p>Does this scenario feel all too familiar at the sprint stage of every project?&lt;/p>
+&lt;p>When the project schedule is in jeopardy, development is delayed, requirements change&amp;hellip;&lt;/p>
+&lt;p>All the pressure eventually rolls like a snowball to the last link - &lt;strong>testing&lt;/strong>.&lt;/p>
+&lt;p>So the test engineer becomes the final &amp;ldquo;scapegoat&amp;rdquo; and the &amp;ldquo;gatekeeper&amp;rdquo; deciding the project&amp;rsquo;s fate. And the phrase &amp;ldquo;not enough testing time&amp;rdquo; becomes the sword of Damocles hanging over everyone&amp;rsquo;s head.&lt;/p>
+&lt;p>But: &lt;strong>when testing never has enough time, the problem is by no means only in testing, and the main cause is not even in the testing phase.&lt;/strong>&lt;/p>
+&lt;p>Behind this hides a deeper but more common dilemma of team collaboration.&lt;/p>
+&lt;h2 id="is-the-testing-phase-reasonable-just-because-it-exists">Is &amp;ldquo;the Testing Phase&amp;rdquo; Reasonable Just Because It Exists?
+&lt;/h2>&lt;p>In many teams&amp;rsquo; workflows, testing is seen as an independent, linear &amp;ldquo;phase&amp;rdquo;.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">graph LR
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">A(Requirements) --&amp;gt;B(Design)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> B --&amp;gt; C(Development)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> C --&amp;gt;D[**Testing**]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> D --&amp;gt;E(Release)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The process seems natural, but in actual work it hides great risk.&lt;/p>
+&lt;p>Once any of the preceding links (such as design or development) has a problem and takes longer than expected, the time left for testing will be ruthlessly compressed. Testing goes from a &lt;code>quality assurance&lt;/code> phase to a &lt;code>risk cleanup&lt;/code> phase.&lt;/p>
+&lt;p>QA&amp;rsquo;s work becomes that of a &lt;strong>firefighter&lt;/strong>, as if forced into a room already full of smoke, trying to find possible sources of fire before the house burns down. Not only inefficient, but extremely dangerous.&lt;/p>
+&lt;p>Worse, this model also breeds an &amp;ldquo;us vs. them&amp;rdquo; adversarial culture:&lt;/p>
+&lt;ul>
+&lt;li>Development thinks: &amp;ldquo;Why is it all this module after so long testing? Do you even know how to test?&amp;rdquo;&lt;/li>
+&lt;li>Testing thinks: &amp;ldquo;What lousy code! So many bugs in one module?&amp;rdquo;&lt;/li>
+&lt;/ul>
+&lt;p>Everyone no longer seems to be teammates fighting side by side, but stands in opposition to each other.&lt;/p>
+&lt;p>Obviously, this is not what we want to see!&lt;/p>
+&lt;h2 id="how-to-break-the-deadlock">How to Break the Deadlock?
+&lt;/h2>&lt;p>So how do we break this curse of &amp;ldquo;not enough time&amp;rdquo;?&lt;/p>
+&lt;p>The answer is not the common sight of testers working overtime until dawn, but a fundamental shift in thinking: &lt;strong>from &amp;ldquo;quality assurance&amp;rdquo; to &amp;ldquo;quality built in&amp;rdquo;.&lt;/strong>&lt;/p>
+&lt;p>Quality is not &amp;ldquo;&lt;strong>tested&lt;/strong>&amp;rdquo; out at the last stage, but &amp;ldquo;&lt;strong>built&lt;/strong>&amp;rdquo; throughout the whole process. Testing should not be the final phase of a project either, but a &amp;ldquo;quality coach&amp;rdquo; that runs through the whole thing.&lt;/p>
+&lt;h3 id="1-shift-testing-left-get-involved-early-instead-of-waiting-for-the-wrap-up">**1. Shift Testing Left, Get Involved Early Instead of Waiting for the &amp;ldquo;Wrap-up&amp;rdquo;
+&lt;/h3>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/130-when_qa_out_time/Pasted-20251012-1_hu_9a8c0edfdd2fd9c0.webp"
+width="1024"
+height="573"
+srcset="https://chengxiaqiucao.github.io/post/130-when_qa_out_time/Pasted-20251012-1_hu_ac9988727a486a6.webp 480w, https://chengxiaqiucao.github.io/post/130-when_qa_out_time/Pasted-20251012-1_hu_9a8c0edfdd2fd9c0.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="178"
+data-flex-basis="428px"
+>
+&lt;/p>
+&lt;p>Do not wait until the code is written to think about testing. Let testers get involved from the very beginning, in &lt;strong>requirements review&lt;/strong> and the &lt;strong>design phase&lt;/strong>.&lt;/p>
+&lt;p>What are the benefits of early tester involvement?&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Raise testability questions&lt;/strong>: Is this requirement&amp;rsquo;s logic clear? What are the boundary conditions? Are there &amp;ldquo;black boxes&amp;rdquo; that are hard to test?&lt;/li>
+&lt;li>&lt;strong>Perform risk analysis&lt;/strong>: Which features are core high-risk areas? Which can have their testing priority appropriately lowered?&lt;/li>
+&lt;li>&lt;strong>Prevent defects&lt;/strong>: Many bugs are already determined at the design stage. QA&amp;rsquo;s early intervention can &amp;ldquo;prevent&amp;rdquo; them at the lowest cost, rather than &amp;ldquo;finding&amp;rdquo; them with effort after development is complete.&lt;/li>
+&lt;/ul>
+&lt;p>Turn testers from &amp;ldquo;problem finders&amp;rdquo; into &amp;ldquo;risk preventers&amp;rdquo; - this is how value is maximized.&lt;/p>
+&lt;h3 id="2-embrace-automation-to-maximize-tester-value">&lt;strong>2. Embrace Automation to Maximize Tester Value&lt;/strong>
+&lt;/h3>&lt;p>Manual testing is exploratory and creative, but also time-consuming and error-prone. For regression test cases that are executed repeatedly, test automation is where it shines most.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Unit testing&lt;/strong>: Developers write their own UTs to ensure the stability of code modules.&lt;/li>
+&lt;li>&lt;strong>Integration testing&lt;/strong>: Can ensure collaboration between modules works.&lt;/li>
+&lt;li>&lt;strong>End-to-end (E2E) automation&lt;/strong>: Simulates user operations and covers core business flows.&lt;/li>
+&lt;/ul>
+&lt;p>Integrate test automation into the &lt;strong>CI/CD&lt;/strong> pipeline so it runs automatically on every code commit. This frees testers from heavy regression testing to focus on more valuable &lt;strong>exploratory testing&lt;/strong> and &lt;strong>complex scenario testing&lt;/strong>.&lt;/p>
+&lt;h3 id="3-use-good-steel-on-the-blade">&lt;strong>3. Use Good Steel on the Blade&lt;/strong>
+&lt;/h3>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/130-when_qa_out_time/Pasted-20251012-2_hu_51524e782655fd18.webp"
+width="1024"
+height="1019"
+srcset="https://chengxiaqiucao.github.io/post/130-when_qa_out_time/Pasted-20251012-2_hu_d3dc45da81685d84.webp 480w, https://chengxiaqiucao.github.io/post/130-when_qa_out_time/Pasted-20251012-2_hu_51524e782655fd18.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="100"
+data-flex-basis="241px"
+>
+&lt;/p>
+&lt;p>The cruel reality is that we can never have enough time to test 100% of the features. So testing smartly matters more than testing hard.&lt;/p>
+&lt;p>Together with product and development, define the risk level of each feature based on &lt;strong>business impact&lt;/strong>, &lt;strong>usage frequency&lt;/strong>, and &lt;strong>code complexity&lt;/strong>.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>High-risk features&lt;/strong> (such as payment and login): Invest the most time and effort, doing in-depth, comprehensive testing.&lt;/li>
+&lt;li>&lt;strong>Medium-risk features&lt;/strong>: Execute core cases to ensure the main paths are fine.&lt;/li>
+&lt;li>&lt;strong>Low-risk features&lt;/strong> (such as text changes and color adjustments): Verify quickly, or even only verify online.&lt;/li>
+&lt;/ul>
+&lt;p>Apply limited testing resources precisely where they matter most.&lt;/p>
+&lt;h3 id="4-quality-is-not-free-it-is-expensive">&lt;strong>4. Quality Is Not Free, It Is Expensive&lt;/strong>
+&lt;/h3>&lt;p>&amp;ldquo;This requirement is so simple, why does testing take so long?&amp;rdquo;&lt;/p>
+&lt;p>Behind this sentence is an underestimation of the value of testing work.&lt;/p>
+&lt;p>At the early stage of project planning, all testing-related work - &lt;strong>test analysis, test case design, test execution, automation script maintenance&lt;/strong>, and so on - must be treated as formal tasks and included in project scheduling and effort estimation.&lt;/p>
+&lt;p>Only when quality is regarded as a &amp;ldquo;first-class citizen&amp;rdquo; as important as feature development will it not be easily sacrificed.&lt;/p>
+&lt;h3 id="5-an">&lt;strong>5. An &amp;ldquo;All-Hands Quality&amp;rdquo; Culture&lt;/strong>
+&lt;/h3>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/130-when_qa_out_time/Pasted-20251012-3_hu_975410bb2c633bbd.webp"
+width="1024"
+height="1003"
+srcset="https://chengxiaqiucao.github.io/post/130-when_qa_out_time/Pasted-20251012-3_hu_7360294d587df28c.webp 480w, https://chengxiaqiucao.github.io/post/130-when_qa_out_time/Pasted-20251012-3_hu_975410bb2c633bbd.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="102"
+data-flex-basis="245px"
+>
+&lt;/p>
+&lt;p>This is the most important and also the hardest point.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Development&lt;/strong> should be responsible for code quality, writing clear, maintainable code, and completing necessary unit tests.&lt;/li>
+&lt;li>&lt;strong>Product&lt;/strong> should be responsible for requirements quality, providing clear, unambiguous requirements documents.&lt;/li>
+&lt;li>&lt;strong>QA&lt;/strong> should be responsible for the overall quality process, providing professional test strategies and risk feedback.&lt;/li>
+&lt;/ul>
+&lt;p>Only when everyone in the team regards &amp;ldquo;quality&amp;rdquo; as their own KPI will there no longer be mutual blame and buck-passing.&lt;/p>
+&lt;p>Everyone&amp;rsquo;s goal becomes aligned: &lt;strong>to jointly build a product that satisfies users.&lt;/strong>&lt;/p>
+&lt;h2 id="closing-thoughts">&lt;strong>Closing Thoughts&lt;/strong>
+&lt;/h2>&lt;p>&amp;ldquo;Not enough testing time&amp;rdquo; has never been an isolated technical problem; it is a &lt;strong>process problem, a culture problem, and even more a team collaboration problem.&lt;/strong>&lt;/p>
+&lt;p>What we need is not more desperate testing, but a healthier, more efficient collaboration system.&lt;/p>
+&lt;p>When quality is no longer the endpoint of a phase, but a belief that runs throughout;
+When QA is no longer a gatekeeper fighting alone, but a quality coach empowering the team!&lt;/p>
+&lt;p>Only then can the curse of &amp;ldquo;not enough time&amp;rdquo; truly be broken.&lt;/p></description></item><item><title>Shift-Left Testing Is More Than Testers Getting Involved Early</title><link>https://chengxiaqiucao.github.io/en/post/124-testing_shift_left/</link><pubDate>Wed, 27 Aug 2025 16:31:25 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/124-testing_shift_left/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/124-testing_shift_left/Pasted-20250827-1.webp" alt="Featured image of post Shift-Left Testing Is More Than Testers Getting Involved Early" />&lt;h2 id="preface">Preface
+&lt;/h2>&lt;p>In the traditional waterfall software development process, testing usually sits late in the SDLC, and testers take on the duty of &amp;ldquo;quality gatekeeper&amp;rdquo;. As agile development, DevOps, and other delivery models have been adopted, rapid iteration and continuous delivery have become the norm, and accordingly the concept of &amp;ldquo;shift-left testing&amp;rdquo; is mentioned frequently; many agile teams treat &amp;ldquo;shift-left testing&amp;rdquo; as an important practice.&lt;/p>
+&lt;p>Many teams encourage testers to get involved in projects as early as possible, involving testers in requirements, design, and development, including requirements reviews, design discussions, pairing during development, unit/integration testing, continuous integration pipelines, test automation, and so on.&lt;/p>
+&lt;p>In this article we will not discuss these specific practices of shift-left testing, but rather clarify one point: &lt;strong>&amp;ldquo;shift-left testing&amp;rdquo; is not merely testers moving toward the front end&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/124-testing_shift_left/Pasted-20250827-1_hu_9f4345ad4f2a000f.webp"
+width="1024"
+height="552"
+srcset="https://chengxiaqiucao.github.io/post/124-testing_shift_left/Pasted-20250827-1_hu_d271f541656de579.webp 480w, https://chengxiaqiucao.github.io/post/124-testing_shift_left/Pasted-20250827-1_hu_9f4345ad4f2a000f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="185"
+data-flex-basis="445px"
+>
+&lt;/p>
+&lt;h2 id="software-quality">Software Quality
+&lt;/h2>&lt;p>What is software quality? The definition in &lt;strong>IEEE.1061&lt;/strong> is as follows:&lt;/p>
+&lt;blockquote>
+&lt;p>Software quality is the degree to which a software product satisfies stated requirements as well as implicit needs arising from user needs and expectations.&lt;/p>&lt;/blockquote>
+&lt;p>This definition is quite abstract, and it also shows indirectly that quality is a product attribute that is rather hard to define precisely.&lt;/p>
+&lt;p>Roles with different perspectives actually see quality differently.&lt;/p>
+&lt;h3 id="user-perspective">User Perspective
+&lt;/h3>&lt;p>Quality is the degree to which user needs and expectations are met. That is, can the product help users solve specific problems? Is it convenient and fast? Stable and reliable? Good value for money?&lt;/p>
+&lt;p>&amp;ldquo;This software is really easy to use!&amp;rdquo;
+&amp;ldquo;This system is very stable and never crashes!&amp;rdquo;
+&amp;ldquo;This app feels so smooth~&amp;rdquo;&lt;/p>
+&lt;h3 id="developer-perspective">Developer Perspective
+&lt;/h3>&lt;p>From a developer&amp;rsquo;s perspective, quality is reflected in the code and architecture.&lt;/p>
+&lt;p>&amp;ldquo;Is the code standardized, readable, and maintainable?&amp;rdquo;
+&amp;ldquo;Clear architecture, easy to extend&amp;rdquo;
+&amp;ldquo;Technical debt is under control&amp;rdquo;&lt;/p>
+&lt;h3 id="tester-perspective">Tester Perspective
+&lt;/h3>&lt;p>From a tester&amp;rsquo;s perspective, beyond bringing in the user&amp;rsquo;s experience, quality is more about adaptability across multiple scenarios.&lt;/p>
+&lt;p>The degree to which the software fits various scenarios such as happy path, angry path, scary path, greedy path, and so on.&lt;/p>
+&lt;h3 id="management-perspective">Management Perspective
+&lt;/h3>&lt;p>From a management perspective, quality is reflected in whether delivery is on time, whether the budget is under control, and whether product metrics are met.&lt;/p>
+&lt;p>&amp;ldquo;The product is delivered on time with high quality&amp;rdquo;
+&amp;ldquo;R&amp;amp;D costs are greatly reduced&amp;rdquo;
+&amp;ldquo;The system runs stably with 99.999% availability&amp;rdquo;&lt;/p>
+&lt;h3 id="business-perspective">Business Perspective
+&lt;/h3>&lt;p>From a business operations perspective, quality measures the degree to which the product creates value and competitive advantage.&lt;/p>
+&lt;p>&amp;ldquo;User downloads&amp;rdquo;, &amp;ldquo;user registrations&amp;rdquo;, &amp;ldquo;order conversion rate&amp;rdquo;, &amp;ldquo;user retention rate&amp;rdquo;, and so on&amp;hellip;.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/124-testing_shift_left/Pasted-20250827-2_hu_86f84c6df08d616f.webp"
+width="1024"
+height="561"
+srcset="https://chengxiaqiucao.github.io/post/124-testing_shift_left/Pasted-20250827-2_hu_d76a41f015899b10.webp 480w, https://chengxiaqiucao.github.io/post/124-testing_shift_left/Pasted-20250827-2_hu_86f84c6df08d616f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="182"
+data-flex-basis="438px"
+>
+&lt;code>A thousand Hamlets in a thousand people's eyes&lt;/code> - so it is with quality too!&lt;/p>
+&lt;p>In the end, it comes down to what we often stress: quality is not guaranteed by testing, and testing cannot guarantee it either! Quality is closely tied to the whole team and to everyone in the software lifecycle chain; everyone should be an owner!&lt;/p>
+&lt;h2 id="the-essence-of-shift-left-testing">The Essence of Shift-Left Testing
+&lt;/h2>&lt;p>With the explanation in the previous section, it becomes easy to understand the point of this article&amp;rsquo;s title: &lt;code>&amp;quot;shift-left testing&amp;quot; is not merely testers moving forward!&lt;/code>&lt;/p>
+&lt;p>Because of the adoption of rapid iteration and continuous delivery, this quality control measure that emerged accordingly moves testers forward. Although testing-related activities are no longer confined to late-stage verification, if quality still depends on testers&amp;rsquo; activities, it is still treating the symptoms rather than the root cause.&lt;/p>
+&lt;p>&lt;strong>Shift-left testing&lt;/strong> is essentially the popularization of an all-hands quality culture. Testers shifting left should, more importantly, bring the testing mindset - uniquely sensitive to quality risks - to the front end, and drive the whole team to build a quality-first cultural atmosphere.&lt;/p>
+&lt;p>That is, &lt;strong>testing should transform toward [QA]!&lt;/strong> And the &lt;code>QA&lt;/code> here is not &lt;code>Quality Assurance&lt;/code> in the traditional sense, which focuses on process control and quality assurance work; it should be a new type of QA suited to the agile model.&lt;/p>
+&lt;h2 id="testings-transformation-toward-qa">Testing&amp;rsquo;s Transformation Toward QA
+&lt;/h2>&lt;h3 id="quality-assurance">Quality Assurance
+&lt;/h3>&lt;p>The traditional QA role, &lt;code>Quality Assurance&lt;/code>, is a role dedicated to the quality system and is not the same as the testing role. QA&amp;rsquo;s work is more about formulating and supervising quality standards, with process control across the entire lifecycle; testing, on the other hand, is more of an engineering role based on testing technology.&lt;/p>
+&lt;p>With the shift-left trend, testing should no longer be confined to the application of testing technology, but should turn its perspective to &lt;code>Quality Assurance&lt;/code>, paying attention to quality risks at every link in the entire software development chain.&lt;/p>
+&lt;h3 id="quality-analyzer">Quality Analyzer
+&lt;/h3>&lt;p>That is actually not enough! Shift-left testing is not a role switch; more importantly, it also involves introducing the testing mindset. So at this point, testing should also be a &lt;code>Quality Analyzer&lt;/code>. For example:&lt;/p>
+&lt;h4 id="during-requirements-review">During requirements review:
+&lt;/h4>&lt;p>&lt;strong>Find the gray areas&lt;/strong>: Proactively identify ambiguities in requirements. For example, &amp;ldquo;the system response should be fast&amp;rdquo; - how fast is fast? &amp;ldquo;A friendly user interface&amp;rdquo; - how is friendly defined?&lt;/p>
+&lt;p>&lt;strong>Raise &amp;ldquo;What if&amp;rdquo; questions&lt;/strong>: Explore various scenarios, including normal flows, exception flows, and boundary cases:&lt;/p>
+&lt;ul>
+&lt;li>&amp;ldquo;What happens if the user enters special characters here?&amp;rdquo;&lt;/li>
+&lt;li>&amp;ldquo;If the network suddenly drops, how will the data be handled?&amp;rdquo;&lt;/li>
+&lt;li>&amp;ldquo;If the user has no permission, what prompt should be shown?&amp;rdquo;&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Ensure requirements are testable&lt;/strong>: Assess whether each requirement can be verified through concrete operations and expected results&lt;/p>
+&lt;h4 id="during-the-architecturedesign-phase">During the architecture/design phase:
+&lt;/h4>&lt;p>&lt;strong>Start from the user&amp;rsquo;s perspective&lt;/strong>: Check whether the design&amp;rsquo;s flows are smooth and intuitive&lt;/p>
+&lt;p>&lt;strong>Focus on edge cases&lt;/strong>: Whether loading states, error prompts, empty-state pages, etc. have all been designed&lt;/p>
+&lt;p>&lt;strong>Assess accessibility&lt;/strong>: Consider whether the design is friendly to all user groups&lt;/p>
+&lt;p>&lt;strong>Assess system testability&lt;/strong>: Ensure the system is verifiable, including log recording, traceability of operation flows, third-party mocking, and so on&lt;/p>
+&lt;p>&lt;strong>Assess non-functional requirements and test strategy&lt;/strong>: Ensure that the architecture and design phase has fully considered performance, security, reliability, and other non-functional requirements, and build corresponding test plans&lt;/p>
+&lt;h4 id="during-development">During development:
+&lt;/h4>&lt;p>&lt;strong>Drive unit test coverage&lt;/strong>: Help the development team build unit test frameworks and improve test coverage&lt;/p>
+&lt;p>&lt;strong>Go deep into system integration&lt;/strong>: Work with the development team to build a continuous integration CI pipeline based on a suitable branch management model, and build the &lt;code>quality gate&lt;/code> for test automation&lt;/p>
+&lt;p>By deeply participating in the front-end links, test thinking and reflection on and keen observation of software quality are integrated into software development activities beyond testing.&lt;/p>
+&lt;h3 id="quality-advocator">Quality Advocator
+&lt;/h3>&lt;p>In addition, a quality culture does not happen overnight. In a fast-moving team, a role that puts quality first, continuously advocates quality awareness to the team, and can promptly raise &amp;ldquo;objections&amp;rdquo; when quality is at risk of losing control is even more an important function of testers after &amp;ldquo;shift-left testing&amp;rdquo;.&lt;/p>
+&lt;p>But for this new function to work, it cannot do without the team&amp;rsquo;s and management&amp;rsquo;s consistent recognition of &lt;strong>quality first&lt;/strong>, including institutional support for testers&amp;rsquo; related work after shifting left. Otherwise, quality first will mostly remain a formality, nothing more than a catchy slogan.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/124-testing_shift_left/Pasted-20250827_hu_fad4a6a43da71da3.webp"
+width="1024"
+height="471"
+srcset="https://chengxiaqiucao.github.io/post/124-testing_shift_left/Pasted-20250827_hu_c51cb5cb08423bdd.webp 480w, https://chengxiaqiucao.github.io/post/124-testing_shift_left/Pasted-20250827_hu_fad4a6a43da71da3.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="217"
+data-flex-basis="522px"
+>
+&lt;/p>
+&lt;h2 id="conclusion">Conclusion
+&lt;/h2>&lt;p>With the continuous development of agile and DevOps technologies, the speed, rhythm, and complexity of software development keep increasing. In this context, for shift-left testing to be truly implemented, building a quality culture is actually fundamental.&lt;/p>
+&lt;p>And in this process, testing also needs to complete its role transformation, moving toward quality consultant, quality analyst, and quality advocator, and delivering value on a broader scale.&lt;/p>
+&lt;p>In short, implementing &amp;ldquo;shift-left testing&amp;rdquo; requires integrating quality thinking into every link of development, branding the quality culture into the team&amp;rsquo;s DNA, and ultimately building a quality ecosystem with full participation and continuous improvement.&lt;/p></description></item><item><title>Dare to Be a Dissenter - More on Testers' Perception of Their Role</title><link>https://chengxiaqiucao.github.io/en/post/123-testing_not_valid/</link><pubDate>Wed, 20 Aug 2025 16:01:41 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/123-testing_not_valid/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/123-testing_not_valid/Pasted-20250825-2.webp" alt="Featured image of post Dare to Be a Dissenter - More on Testers' Perception of Their Role" />&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/123-testing_not_valid/Pasted-20250825-2_hu_665c0e470108848e.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/123-testing_not_valid/Pasted-20250825-2_hu_5068e2c36faf82e8.webp 480w, https://chengxiaqiucao.github.io/post/123-testing_not_valid/Pasted-20250825-2_hu_665c0e470108848e.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="149"
+data-flex-basis="359px"
+>
+&lt;/p>
+&lt;h2 id="preface">Preface
+&lt;/h2>&lt;p>A few days ago, I read a &lt;a class="link" href="https://www.ministryoftesting.com/articles/overcoming-the-trap-of-intellectual-conformity-tips-for-software-testers?utm_campaign=Software%2BTesting%2BWeekly&amp;amp;utm_medium=web&amp;amp;utm_source=Software_Testing_Weekly_280" target="_blank" rel="noopener"
+>blog post&lt;/a> by the foreign blogger &lt;code>Vitaly Sharovatov&lt;/code>, about the &amp;ldquo;trap of intellectual conformity&amp;rdquo; in enterprises and R&amp;amp;D teams. Because of the &lt;strong>trap of intellectual conformity&lt;/strong>, many avoidable wrong decisions get pushed through. And testers can play a more critical role in this.&lt;/p>
+&lt;p>It was quite inspiring to read; after some deep thought, I wrote this article to share with you all~&lt;/p>
+&lt;h2 id="the-trap-of-intellectual-conformity">The Trap of Intellectual Conformity
+&lt;/h2>&lt;blockquote>
+&lt;p>The &lt;strong>trap of intellectual conformity&lt;/strong> refers to the tendency of an individual who holds a certain position or perception to selectively accept information consistent with it while ignoring or overlooking inconsistent information, thereby forming a self-reinforcing cognitive loop that makes it difficult to assess reality objectively.&lt;/p>&lt;/blockquote>
+&lt;p>In the 1950s, psychologists such as Festinger, Carlsmith, and Solomon Asch conducted many related experiments, confirming the widespread existence of cognitive conformity bias:&lt;/p>
+&lt;ul>
+&lt;li>When performing boring tasks, subjects paid less were more likely than those paid more to change their original evaluation, to rationalize the conflict between their behavior and the outcome.&lt;/li>
+&lt;li>In another experiment, most subjects changed their originally correct choice because of other people&amp;rsquo;s wrong answers.&lt;/li>
+&lt;li>When the same food was priced differently, subjects tended to believe the more expensive food tasted better.&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/123-testing_not_valid/Pasted-20250825-1_hu_4a1882e6ab3fb1d6.webp"
+width="1024"
+height="684"
+srcset="https://chengxiaqiucao.github.io/post/123-testing_not_valid/Pasted-20250825-1_hu_62e2d3a34d3bde29.webp 480w, https://chengxiaqiucao.github.io/post/123-testing_not_valid/Pasted-20250825-1_hu_4a1882e6ab3fb1d6.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="149"
+data-flex-basis="359px"
+>
+&lt;/p>
+&lt;p>In short, the experiments above are what we call the &amp;ldquo;&lt;strong>conformity mentality&lt;/strong>&amp;rdquo;&lt;/p>
+&lt;h2 id="quality-risks-caused-by-intellectual-conformity">Quality Risks Caused by Intellectual Conformity
+&lt;/h2>&lt;p>In enterprises, quality problems caused by the &amp;ldquo;conformity mentality&amp;rdquo; above and going along with the majority opinion are not uncommon.&lt;/p>
+&lt;ul>
+&lt;li>A development build that cannot even pass smoke testing is hastily submitted for testing, simply because the developers &amp;ldquo;feel&amp;rdquo; it is fine&lt;/li>
+&lt;li>A feature that a leader thought up on a whim is rushed into development, and because it does not meet real user needs, it becomes a white elephant or even has to be rolled back&lt;/li>
+&lt;li>Without investigation of the user base or analysis of real usage scenarios, a new feature is completely unusable&lt;/li>
+&lt;/ul>
+&lt;p>For the problems above, did really no one feel beforehand that something might be wrong? It is just that most people had no opinion, or the process reached a certain node, and it was pushed through by default.&lt;/p>
+&lt;p>I once saw a view from a startup CEO: software testers are &amp;ldquo;more harmful than helpful&amp;rdquo; in terms of cost-effectiveness. If you hire only excellent developers with quality awareness, you do not need a dedicated quality role.&lt;/p>
+&lt;p>But is that really the case? In my earlier articles, I discussed the difference between &amp;ldquo;developer thinking&amp;rdquo; and &amp;ldquo;tester thinking&amp;rdquo;:&lt;/p>
+&lt;ul>
+&lt;li>Developers tend to pursue &lt;strong>certainty&lt;/strong>. Based on definite requirements and steps, they define how the product should behave.&lt;/li>
+&lt;li>Testers need to consider various possible paths and branch scenarios based on &lt;strong>uncertainty&lt;/strong>, and assess the product&amp;rsquo;s possible behavior based on the unknown.&lt;/li>
+&lt;/ul>
+&lt;p>Moreover, in a performance-driven organization, developers are hired to deliver results, not to question. They are evaluated on their ability to build, not on their ability to find and respond to problems.&lt;/p>
+&lt;p>And based on the &lt;strong>trap of intellectual conformity&lt;/strong>, in an output-oriented organization, dissenting voices are continuously weakened, so even &lt;strong>developers with excellent quality awareness&lt;/strong> find it hard to put quality first in such an environment.&lt;/p>
+&lt;h2 id="testing-the-dissenter-assigned-by-the-role">Testing, the &amp;ldquo;Dissenter&amp;rdquo; Assigned by the Role
+&lt;/h2>&lt;p>Many people with a &amp;ldquo;conformity mentality&amp;rdquo; can actually sense that something is wrong; they just lack the courage to raise a &amp;ldquo;dissent&amp;rdquo;. But once a challenger appears who points out the problem, they too can actively offer opinions.&lt;/p>
+&lt;p>And the testing role, by its very design, is assigned and expected to raise questions and challenges.&lt;/p>
+&lt;p>This is precisely the necessity for the testing role to exist and matter: lowering the threshold for others to dissent and creating space for critical thinking in the team.&lt;/p>
+&lt;p>As testers, we should not confine ourselves to the limits of the development lifecycle; we should actively shift testing left and participate more in earlier phases, so as to better demonstrate the value of the role.&lt;/p>
+&lt;p>Of course, recognizing this also means accepting the positioning of being the &amp;ldquo;&lt;strong>bearer of bad news&lt;/strong>&amp;rdquo;. Face it calmly; a team&amp;rsquo;s path to success cannot do without such a role.&lt;/p>
+&lt;h2 id="conclusion">Conclusion
+&lt;/h2>&lt;p>Those who enjoy watching historical costume dramas should be familiar that in every dynasty there was an office such as the &amp;ldquo;censor&amp;rdquo; or &amp;ldquo;remonstrance official&amp;rdquo;. As advisers who spoke truth to power, they were mostly unwelcome to emperors and ministers, yet the operation of the system could not do without this function of supervision and review.&lt;/p>
+&lt;p>And testers are very much like the &amp;ldquo;censors&amp;rdquo; in the system of software development.&lt;/p>
+&lt;p>Do not fear the &amp;ldquo;&lt;strong>fail&lt;/strong>&amp;rdquo; on a test report; that is precisely the meaning of the testing function&amp;rsquo;s existence.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/123-testing_not_valid/Pasted-20250825_hu_9cdb16702f1207a9.webp"
+width="1024"
+height="767"
+srcset="https://chengxiaqiucao.github.io/post/123-testing_not_valid/Pasted-20250825_hu_dd01b0253e8c5428.webp 480w, https://chengxiaqiucao.github.io/post/123-testing_not_valid/Pasted-20250825_hu_9cdb16702f1207a9.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>
+&lt;/p></description></item><item><title>"Bug Count", a Bad Metric</title><link>https://chengxiaqiucao.github.io/en/post/120-bad_metric_bug/</link><pubDate>Fri, 15 Aug 2025 17:21:34 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/120-bad_metric_bug/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/120-bad_metric_bug/Pasted-20250815-2.webp" alt="Featured image of post "Bug Count", a Bad Metric" />&lt;h2 id="preface">Preface
+&lt;/h2>&lt;p>In many software companies, for a long time, &lt;code>Bug count&lt;/code> has been regarded as an intuitive metric for measuring quality and team performance.&lt;/p>
+&lt;p>But in reality, using &lt;code>Bug count&lt;/code> as a performance metric, a seemingly simple and direct way of measuring, actually has fundamental flaws. It not only fails to reflect the real value of individuals and teams, but also gives rise to the &amp;ldquo;Cobra effect&amp;rdquo;, hindering the team from moving toward genuine quality goals.&lt;/p>
+&lt;p>In this article, we will analyze in depth the drawbacks of using &lt;code>Bug count&lt;/code> as a performance metric, and explore more reasonable ways of measuring.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/120-bad_metric_bug/Pasted-20250815-2_hu_12d9771b62f53dc6.webp"
+width="1024"
+height="443"
+srcset="https://chengxiaqiucao.github.io/post/120-bad_metric_bug/Pasted-20250815-2_hu_9308e74afab11a78.webp 480w, https://chengxiaqiucao.github.io/post/120-bad_metric_bug/Pasted-20250815-2_hu_12d9771b62f53dc6.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="231"
+data-flex-basis="555px"
+>
+&lt;/p>
+&lt;h2 id="fundamental-drawbacks-of-the-bug-count-metric">Fundamental Drawbacks of the &amp;ldquo;Bug Count&amp;rdquo; Metric
+&lt;/h2>&lt;p>Taking &lt;strong>defect count&lt;/strong> as a single indicator of performance assessment essentially reduces the complex, multi-dimensional goal of &lt;strong>quality&lt;/strong> to a single, quantifiable number.&lt;/p>
+&lt;p>Such simplification creates a fatal gap between actual measurement and expectation, thereby fundamentally violating the purpose of software engineering.&lt;/p>
+&lt;h3 id="the-cobra-effect">The Cobra Effect
+&lt;/h3>&lt;p>Any single, quantified data metric, once it becomes a performance measure, tends to trigger negative results contrary to its original design intent, giving rise to the &lt;strong>Cobra Effect&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/120-bad_metric_bug/Pasted-20250815-1_hu_f82ea9df9adb8415.webp"
+width="1024"
+height="575"
+srcset="https://chengxiaqiucao.github.io/post/120-bad_metric_bug/Pasted-20250815-1_hu_1f642ef483d76df7.webp 480w, https://chengxiaqiucao.github.io/post/120-bad_metric_bug/Pasted-20250815-1_hu_f82ea9df9adb8415.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="427px"
+>
+&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>The Cobra Effect&lt;/strong> originated in India during British rule. To control the cobra population, the government offered a bounty for killing them, but local residents began breeding cobras artificially to collect the bounty. When the government stopped the bounty, the released cobras caused an even worse infestation.&lt;/p>&lt;/blockquote>
+&lt;p>In the software development process, obsessive metrics like &lt;code>Bug count&lt;/code> can likewise produce outcomes that backfire.&lt;/p>
+&lt;p>&lt;strong>For the testing team&lt;/strong>, this way of measuring gives rise to the typical problem of &amp;ldquo;valuing quantity over quality&amp;rdquo;. To meet a &amp;ldquo;defect quota&amp;rdquo; or performance target, testers tend to waste precious time looking for minor issues that have low impact and low priority but are easy to find, just to &amp;ldquo;pad the numbers&amp;rdquo;. As a result, a great deal of development and business resources are wasted.&lt;/p>
+&lt;p>Beyond that, when the goal focuses on quantity, testers tend to stop doing in-depth analysis of Bugs, that is, they stop pursuing high-value &lt;code>Bug reports&lt;/code> (see the previous article 【】). So this kind of metric design actually punishes those testers committed to providing high-value insights.&lt;/p>
+&lt;p>&lt;strong>For the development team&lt;/strong>, if a developer&amp;rsquo;s performance is tied to the &amp;ldquo;number of bugs fixed&amp;rdquo;, they have more incentive to fix the &amp;ldquo;small and beautiful&amp;rdquo;, easy-to-solve bugs rather than tackle a high-value, complex, deep-seated fault. It may even lead to &amp;ldquo;producing and consuming one&amp;rsquo;s own&amp;rdquo;, where they actively create easy-to-fix defects just to meet the fix-count/fix-rate metric.&lt;/p>
+&lt;p>So it is clear that the result ultimately driven by the metric runs counter to real value.&lt;/p>
+&lt;h3 id="ignoring-the-essence-of-quality-goals">Ignoring the Essence of Quality Goals
+&lt;/h3>&lt;p>In my previous article 【】 I analyzed in depth the real purpose of engaging in software testing. One important point is:&lt;/p>
+&lt;blockquote>
+&lt;p>Software testing is not for finding Bugs&lt;/p>&lt;/blockquote>
+&lt;p>But this metric explicitly sets finding Bugs as the purpose of the testing work.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/120-bad_metric_bug/Pasted-20250815_hu_d0b8fef02b09acad.webp"
+width="1024"
+height="1354"
+srcset="https://chengxiaqiucao.github.io/post/120-bad_metric_bug/Pasted-20250815_hu_4bb34638a71fc987.webp 480w, https://chengxiaqiucao.github.io/post/120-bad_metric_bug/Pasted-20250815_hu_d0b8fef02b09acad.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="75"
+data-flex-basis="181px"
+>
+&lt;/p>
+&lt;p>The purpose of testing is to accurately present the quality status of the product. And the overall quality status is unknown; pursuing Bug count will inevitably make testers invest more energy in the superficial, easy-to-trigger parts that are not critical to the system, while neglecting the parts that require in-depth analysis and more comprehensive exploration.&lt;/p>
+&lt;p>In other words, this metric actually encourages shallow testing but punishes deep testing.&lt;/p>
+&lt;p>And under this orientation, &amp;ldquo;shift-left testing&amp;rdquo; actually becomes empty talk; the greater the contribution of shift-left, the fewer Bugs are found later. It even hinders improvements in team efficiency and knowledge sharing within the testing team.&lt;/p>
+&lt;h3 id="creating-team-conflict-and-destroying-psychological-safety">Creating Team Conflict and Destroying Psychological Safety
+&lt;/h3>&lt;p>Establishing this metric also creates an opposition of &amp;ldquo;Tester vs Developer&amp;rdquo;, thereby destroying the cornerstone of a high-performing team - psychological safety.&lt;/p>
+&lt;p>Psychological safety means team members can freely express ideas, take risks, and admit mistakes without fear of negative consequences.&lt;/p>
+&lt;p>But when testers are incentivized to report more Bugs while developers are expected to produce as few Bugs as possible, the inevitable result is developers questioning whether a Bug is just the tester &amp;ldquo;padding the numbers&amp;rdquo;, and testers believing developers are merely making excuses to reduce the Bug count.&lt;/p>
+&lt;p>Such a metric creates a &amp;ldquo;culture of blame&amp;rdquo;. The trust relationship between the two teams naturally breaks down.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/120-bad_metric_bug/Pasted-20250220-2_hu_b28dfb177ff354a9.webp"
+width="1024"
+height="541"
+srcset="https://chengxiaqiucao.github.io/post/120-bad_metric_bug/Pasted-20250220-2_hu_67e9f792be63dae4.webp 480w, https://chengxiaqiucao.github.io/post/120-bad_metric_bug/Pasted-20250220-2_hu_b28dfb177ff354a9.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="189"
+data-flex-basis="454px"
+>
+&lt;/p>
+&lt;h2 id="building-value-oriented-quality-measurement">Building Value-Oriented Quality Measurement
+&lt;/h2>&lt;p>Since &amp;ldquo;Bug count&amp;rdquo; is clearly unsuitable for performance measurement, and quality, as a black box, is indeed hard to measure fully accurately, here we can establish a value-oriented quality measurement system from the following aspects.&lt;/p>
+&lt;h3 id="product-quality-dimension">Product Quality Dimension
+&lt;/h3>&lt;p>First, for the product itself and delivery quality, consider the following metrics:&lt;/p>
+&lt;h4 id="1-customer-and-user-experience-metrics">(1) Customer and User Experience Metrics
+&lt;/h4>&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>Customer-reported functional defects&lt;/strong>: Compared with Bugs found internally, problems reported by customers better reflect real quality impact. But priority should be given to high-severity issues (such as functional failure, data loss) rather than simple counting.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Customer Satisfaction (CSAT) and Net Promoter Score (NPS)&lt;/strong>: Directly obtain users&amp;rsquo; evaluation of software quality through regular surveys; this is the most direct quality feedback.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="2-system-stability-and-performance-metrics">(2) System Stability and Performance Metrics
+&lt;/h4>&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>System availability (Uptime)&lt;/strong>: Measure normal uptime as a percentage, e.g. 99.9% availability means allowed downtime of no more than 43.2 minutes per month.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Performance metrics&lt;/strong>: Including page load time, API response time, transaction throughput, etc., directly reflecting the user experience.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Deployment success rate&lt;/strong>: Measures the reliability of the release process; a high success rate means a stable release process and fewer deployment-induced problems.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Online failure rate&lt;/strong>: Counts the number of failures occurring in the production environment, prioritizing high-severity failures that affect users.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="3-problem-response-and-fix-efficiency">(3) Problem Response and Fix Efficiency
+&lt;/h4>&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>Average time from problem identification to fix release&lt;/strong>: Measures the team&amp;rsquo;s response speed to problems; the shorter the time, the higher the fix efficiency.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Bug fix success rate&lt;/strong>: Counts the proportion of fixes that do not introduce new problems, reflecting fix quality.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Proportion of support tickets that need no escalation to developers&lt;/strong>: Measures the support team&amp;rsquo;s ability to solve problems independently; a higher proportion means a more stable system and better documentation.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="process-quality-dimension">Process Quality Dimension
+&lt;/h3>&lt;p>Quality is not something the testing or development team can be responsible for alone; to improve quality, we must consider the whole process. For example:&lt;/p>
+&lt;h4 id="1-code-and-process-quality">(1) Code and Process Quality
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>Code review cycle time&lt;/strong>: The average time from code submission to completed review; the shorter the time, the higher the collaboration efficiency.&lt;/li>
+&lt;li>&lt;strong>Test coverage trend&lt;/strong>: Focus on the growth trend of coverage rather than the absolute percentage, reflecting the continuous improvement of the testing system.&lt;/li>
+&lt;li>&lt;strong>Technical debt cleanup ratio&lt;/strong>: Counts the proportion of planned technical debt resolved, reflecting the team&amp;rsquo;s emphasis on long-term quality.&lt;/li>
+&lt;/ul>
+&lt;h4 id="2-team-health">(2) Team Health
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>Sprint goal success rate&lt;/strong>: Measures the team&amp;rsquo;s plan execution ability; a high success rate means reasonable goal setting and efficient team collaboration.&lt;/li>
+&lt;li>&lt;strong>Team member satisfaction&lt;/strong>: Understand team morale and job satisfaction through regular anonymous surveys; high satisfaction is the foundation of a high-performing team.&lt;/li>
+&lt;li>&lt;strong>Number of process improvement suggestions&lt;/strong>: Counts the number of process optimization suggestions raised by the team, reflecting the team&amp;rsquo;s awareness of continuous improvement.&lt;/li>
+&lt;/ul>
+&lt;h3 id="business-value-dimension">Business Value Dimension
+&lt;/h3>&lt;p>Quality ultimately serves business value; considering this aspect:&lt;/p>
+&lt;h4 id="1-feature-delivery-quality">(1) Feature Delivery Quality
+&lt;/h4>&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>Proportion of features requiring hotfix&lt;/strong>: Counts the proportion of new features that need emergency fixes after release; a lower proportion means higher development quality.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Number of support tickets after new feature release&lt;/strong>: Measures user acceptance of and problem feedback on new features; fewer tickets means higher feature quality.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="2-long-term-impact">(2) Long-term Impact
+&lt;/h4>&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>Velocity trend&lt;/strong>: Observe the trend of the team&amp;rsquo;s development velocity; low-quality code causes velocity to gradually decline, while high-quality code maintains a stable velocity.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>System maintainability and scalability assessment&lt;/strong>: Through architecture reviews, code complexity analysis, and other means, regularly evaluate the long-term health of the system.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>Through this set of metrics, we should be able to measure the question &amp;ldquo;How good is the product quality actually?&amp;rdquo; fairly comprehensively.&lt;/p>
+&lt;h2 id="conclusion">Conclusion
+&lt;/h2>&lt;p>Through the analysis above, we have examined why &lt;code>Bug count&lt;/code> should not be used as a team performance metric; it can be said to do a hundred harms and no good.&lt;/p>
+&lt;p>At the same time, we have given a multi-dimensional, value-oriented quality metric system that measures team quality more comprehensively and scientifically from the dimensions of product quality, process quality, and business value.&lt;/p>
+&lt;p>Of course, there is no perfect metric system; every measurement has its limitations. The key is to maintain an open mind, regularly review and adjust the metrics, and avoid &amp;ldquo;metric dependency&amp;rdquo;. As the quality master W. Edwards Deming said, &lt;code>Quality is not determined by metrics, but by culture and systems&lt;/code>.&lt;/p></description></item><item><title>How Should a Software Testing Team Be Well Managed?</title><link>https://chengxiaqiucao.github.io/en/post/109-%E6%B5%8B%E8%AF%95%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86/</link><pubDate>Wed, 09 Jul 2025 15:32:15 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/109-%E6%B5%8B%E8%AF%95%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/109-%E6%B5%8B%E8%AF%95%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86/team.webp" alt="Featured image of post How Should a Software Testing Team Be Well Managed?" />&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/109-%E6%B5%8B%E8%AF%95%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86/team_hu_9599330a6aea1f05.webp"
+width="1024"
+height="617"
+srcset="https://chengxiaqiucao.github.io/post/109-%E6%B5%8B%E8%AF%95%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86/team_hu_a32b0fcec9834db.webp 480w, https://chengxiaqiucao.github.io/post/109-%E6%B5%8B%E8%AF%95%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86/team_hu_9599330a6aea1f05.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="165"
+data-flex-basis="398px"
+>
+&lt;/p>
+&lt;p>Although with the spread of Agile and the practice of shift-left testing, many testers have become more integrated into the same teams as developers, most software enterprises still typically set up a dedicated testing department or software quality department independently.&lt;/p>
+&lt;p>So what aspects do we usually start from when managing such an independent software testing team? Of course, team management has a great deal in common across all types of teams, but the testing function also reflects some characteristics of its own. This article discusses the following aspects.&lt;/p>
+&lt;h2 id="establishing-standards">Establishing Standards
+&lt;/h2>&lt;p>For any team to become effective, the necessary rules, regulations, and processes are indispensable.&lt;/p>
+&lt;p>These include some management standards and systems, such as:&lt;/p>
+&lt;ul>
+&lt;li>Reward and penalty standards&lt;/li>
+&lt;li>Attendance standards&lt;/li>
+&lt;li>Training standards&lt;/li>
+&lt;li>Work reporting systems, and so on&amp;hellip;&lt;/li>
+&lt;/ul>
+&lt;p>They also include establishing some technical standards and template requirements related to the testing function itself, such as:&lt;/p>
+&lt;ul>
+&lt;li>Test plan&lt;/li>
+&lt;li>Test strategy&lt;/li>
+&lt;li>Test cases&lt;/li>
+&lt;li>Test execution&lt;/li>
+&lt;li>Test report&lt;/li>
+&lt;li>Defect management&lt;/li>
+&lt;li>Environment management&lt;/li>
+&lt;li>External testing&lt;/li>
+&lt;li>Asset management&lt;/li>
+&lt;li>Quality analysis, and so on&amp;hellip;&lt;/li>
+&lt;/ul>
+&lt;p>Of course, they also include sorting out testing-related processes, such as:&lt;/p>
+&lt;ul>
+&lt;li>Defect handling process&lt;/li>
+&lt;li>Test entry and exit criteria (build submission and release processes)&lt;/li>
+&lt;li>Quality analysis process, and so on&amp;hellip;&lt;/li>
+&lt;/ul>
+&lt;p>Sorting out and establishing standards and processes is the foundation of a department&amp;rsquo;s work. But standards are not formed and perfected overnight; they are a team consensus that gradually accumulates through daily management and team collaboration, and a tangible guide to behavior.&lt;/p>
+&lt;h2 id="building-capability">Building Capability
+&lt;/h2>&lt;p>Whether a team is successful, and how effective it is, depends on the team&amp;rsquo;s capability.&lt;/p>
+&lt;p>So for a testing team, how do we build this capability?&lt;/p>
+&lt;p>The testing industry, drawing on the &lt;strong>CMMI&lt;/strong> model, has proposed the &lt;strong>TMMI&lt;/strong> model:
+&lt;img src="https://chengxiaqiucao.github.io/post/109-%E6%B5%8B%E8%AF%95%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86/TMMI_hu_1266f00bd06a835.webp"
+width="1024"
+height="666"
+srcset="https://chengxiaqiucao.github.io/post/109-%E6%B5%8B%E8%AF%95%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86/TMMI_hu_6532c026828f7a54.webp 480w, https://chengxiaqiucao.github.io/post/109-%E6%B5%8B%E8%AF%95%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86/TMMI_hu_1266f00bd06a835.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="153"
+data-flex-basis="368px"
+>
+&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>Initial&lt;/strong>
+The default starting level. The organization has no relevant testing capability yet; testing work is coarse and casual, with no separate testing phase.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Managed&lt;/strong>
+Testing work becomes a specialized function, with basic testing standards such as policies, strategies, plans, schemes, design, execution, and so on. There is also a testing environment — a separate testing environment is used to carry out the testing work rather than performing the relevant verification in the development environment.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Defined&lt;/strong>
+Generally it is only at this level that an organization reaches basic maturity in its testing work. Its typical feature is having a dedicated testing organization, with a testing team responsible for organizing and implementing the testing work. In addition to basic functional testing, at this level relevant capabilities are established for various non-functional tests, including performance testing, compatibility testing, usability testing, reliability testing, accessibility testing, and other rich testing types. There is also a strong emphasis on quality-oriented peer review.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Measured&lt;/strong>
+The effectiveness of testing work can be quantified from multiple dimensions through relevant metrics and data, reflecting fairly accurately how well the testing work is being done.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Optimized&lt;/strong>
+It enables continuous self-renewal and ongoing optimization. Through full-process quality control and up-front analysis techniques, defect prevention is achieved.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>Beyond such industry standards, in summary, the capability building of a testing team can also focus on the following four aspects:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Business testing capability&lt;/strong> — the foundation on which the team stands, the ability to find problems&lt;/li>
+&lt;li>&lt;strong>Fast testing capability&lt;/strong> — improving efficiency, building a cost advantage, and establishing confidence in quality in a timely manner&lt;/li>
+&lt;li>&lt;strong>Quality assessment capability&lt;/strong> — accurate measurement and monitoring of quality&lt;/li>
+&lt;li>&lt;strong>Rapid response capability&lt;/strong> — quick reaction to quality problems and risks&lt;/li>
+&lt;/ul>
+&lt;p>Doing a good job of building team capability is the foundation of establishing a team&amp;rsquo;s moat.&lt;/p>
+&lt;h2 id="performance-measurement">Performance Measurement
+&lt;/h2>&lt;p>In the workplace, people work hard ultimately for their own better development and to gain immediate or long-term benefits. Seeking advantage and avoiding harm is only human.&lt;/p>
+&lt;p>In team management, the measurement of performance is essentially about using performance as an anchor to manage the distribution of benefits well and drive the achievement of the team&amp;rsquo;s overall goals.&lt;/p>
+&lt;p>Nowadays there are two main performance management frameworks commonly used in enterprises:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>KPI&lt;/strong> — Key Performance Indicator&lt;/li>
+&lt;li>&lt;strong>OKR&lt;/strong> — Objectives and Key Results&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/109-%E6%B5%8B%E8%AF%95%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86/Pasted-20250710_hu_4ec10d8d3936079a.webp"
+width="1024"
+height="608"
+srcset="https://chengxiaqiucao.github.io/post/109-%E6%B5%8B%E8%AF%95%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86/Pasted-20250710_hu_eb3ad120f33f9a6c.webp 480w, https://chengxiaqiucao.github.io/post/109-%E6%B5%8B%E8%AF%95%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86/Pasted-20250710_hu_4ec10d8d3936079a.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="168"
+data-flex-basis="404px"
+>
+&lt;/p>
+&lt;p>&lt;strong>KPI&lt;/strong> is result-oriented, focusing on some key quantitative indicators that can be measured.
+&lt;strong>OKR&lt;/strong> is goal-driven and revolves around objectives; although its key results are usually quantitative as well, the emphasis is more on the path to achieving the goals.&lt;/p>
+&lt;p>Whether it is KPI or OKR, a team&amp;rsquo;s performance management cannot do without the formulation of various quantitative performance indicators.&lt;/p>
+&lt;p>For a testing team, the relevant indicators can be viewed from three different dimensions:&lt;/p>
+&lt;h3 id="quality-dimension">Quality Dimension
+&lt;/h3>&lt;p>A testing team is oriented toward quality, so measuring performance cannot do without quality assessment. Some commonly used key indicators include:&lt;/p>
+&lt;ul>
+&lt;li>Requirement coverage&lt;/li>
+&lt;li>Defect leakage rate&lt;/li>
+&lt;li>Build rejection rate&lt;/li>
+&lt;li>Release success rate, and so on&amp;hellip;&lt;/li>
+&lt;/ul>
+&lt;h3 id="efficiency-dimension">Efficiency Dimension
+&lt;/h3>&lt;p>As a cost center, the efficiency with which the testing department completes quality assessment directly affects the release cadence and is an important component of product cost. Therefore, the management of the testing department necessarily includes indicators related to work efficiency, such as:&lt;/p>
+&lt;ul>
+&lt;li>Test cycle&lt;/li>
+&lt;li>Automation coverage&lt;/li>
+&lt;li>CI success rate&lt;/li>
+&lt;li>Release efficiency&lt;/li>
+&lt;li>Response efficiency, and so on&amp;hellip;&lt;/li>
+&lt;/ul>
+&lt;h3 id="growth-dimension">Growth Dimension
+&lt;/h3>&lt;p>Beyond the dimensions above that reflect the department&amp;rsquo;s own goals, no team can do without the gradual growth and maturation of its members. Therefore, indicators oriented toward individual and team growth are also an important dimension of team management, such as:&lt;/p>
+&lt;ul>
+&lt;li>Knowledge sharing, training&lt;/li>
+&lt;li>Technical innovation, process improvement, tool development&lt;/li>
+&lt;li>Learning summaries, event organization, and so on&amp;hellip;&lt;/li>
+&lt;/ul>
+&lt;p>From the different dimensions above, in team management we can break things down into a variety of more detailed sub-indicators based on the team&amp;rsquo;s current situation, and combine this with techniques for collecting and analyzing performance data to achieve scientific measurement. This can then be directly linked to tangible interests such as salary raises, bonuses, and job levels.&lt;/p>
+&lt;h2 id="team-collaboration">Team Collaboration
+&lt;/h2>&lt;p>As a collective focused primarily on the testing function, and at the same time a team that must cooperate fully with other functions in software product development such as development and operations, another important part of testing team management is management oriented toward team collaboration.&lt;/p>
+&lt;p>Collaboration cannot do without communication. Here we can make full use of the Johari Window communication model introduced in my earlier article 【】, or the conflict model in 【】, as auxiliary tools for communication and collaboration.&lt;/p>
+&lt;p>From the perspective of the testing team, we can in fact consider team collaboration from four dimensions:&lt;/p>
+&lt;h3 id="internal-collaboration">Internal Collaboration
+&lt;/h3>&lt;p>Here the main thing is to arrange work reasonably according to the different members&amp;rsquo; abilities and personality traits, so that everyone is used to their best advantage and all parties benefit mutually.&lt;/p>
+&lt;h3 id="peer-department-collaboration">Peer-Department Collaboration
+&lt;/h3>&lt;p>Collaboration between peer departments includes cooperation with the development team, operations team, product team, and others. The emphasis is on handling cooperation with peer teams in a spirit of win-win mutual benefit — seeking common ground while reserving differences as far as possible, perfecting processes, arranging interfaces well, and safeguarding the team&amp;rsquo;s interests when disputes and conflicts arise.&lt;/p>
+&lt;h3 id="upward-collaboration">Upward Collaboration
+&lt;/h3>&lt;p>Communication and collaboration with senior leadership or higher-level departments is a lesson that any middle manager must master. Likewise, leaders with different personality traits require different communication skills and approaches. Managing upward well wins space for the healthy development of the team.&lt;/p>
+&lt;p>In short, in an enterprise, an excellent middle manager should be a Leader who can &amp;ldquo;&lt;strong>bear pressure from above, command respect from below, and collaborate (si)(bi) with peers&lt;/strong>&amp;rdquo;.&lt;/p>
+&lt;h3 id="external-collaboration">External Collaboration
+&lt;/h3>&lt;p>In addition to these internal collaborations, the testing team is actually a department that fairly often faces external relationships, in scenarios such as outsourcing, after-sales support, and external testing.&lt;/p>
+&lt;p>In such collaborations, team management must clarify authority and the scope of responsibility. As a representative of the enterprise, it should also safeguard the enterprise&amp;rsquo;s image and interests, maintain good relations with external organizations, and build trust.&lt;/p>
+&lt;h2 id="team-culture">Team Culture
+&lt;/h2>&lt;p>Finally, for any team to remain stable and develop soundly over the long term, it cannot do without the support of team culture.&lt;/p>
+&lt;p>&lt;strong>Processes, standards, and systems are tangible; their emphasis is on telling everyone how to do things correctly, and behavior is passive.&lt;/strong>&lt;/p>
+&lt;p>&lt;strong>But once team culture has formed, everyone consciously acts according to shared values, and behavior is proactive.&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/109-%E6%B5%8B%E8%AF%95%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86/%E5%9B%A2%E9%98%9F_hu_1c2a1ea5a5dd6db6.webp"
+width="1024"
+height="593"
+srcset="https://chengxiaqiucao.github.io/post/109-%E6%B5%8B%E8%AF%95%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86/%E5%9B%A2%E9%98%9F_hu_2ab4c32ab052af42.webp 480w, https://chengxiaqiucao.github.io/post/109-%E6%B5%8B%E8%AF%95%E5%9B%A2%E9%98%9F%E7%AE%A1%E7%90%86/%E5%9B%A2%E9%98%9F_hu_1c2a1ea5a5dd6db6.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="172"
+data-flex-basis="414px"
+>
+&lt;/p>
+&lt;p>Culture takes a long time to form, and the team manager is the key to its formation. Carry it through consistently — &amp;ldquo;what you keep constantly in mind will surely find an echo&amp;rdquo;.&lt;/p>
+&lt;hr>
+&lt;p>Above is my overall explanation of the five key dimensions of testing team management. Friends interested in the details can also follow the management section of my systematic testing-skills improvement course, which contains a detailed analysis of these five dimensions and their implementation. Reply &lt;code>outline&lt;/code> to view the detailed course catalog.&lt;/p></description></item><item><title>Should Testers Provide Test Cases for Developers' Self-Testing?</title><link>https://chengxiaqiucao.github.io/en/post/108-dev_test_cases/</link><pubDate>Sat, 05 Jul 2025 23:57:54 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/108-dev_test_cases/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/108-dev_test_cases/dev-tester.webp" alt="Featured image of post Should Testers Provide Test Cases for Developers' Self-Testing?" />&lt;h2 id="background">Background
+&lt;/h2>&lt;blockquote>
+&lt;p>I have received a good number of inquiries asking whether, as a tester, one should provide test cases or test data when developers carry out self-testing.&lt;/p>&lt;/blockquote>
+&lt;p>This is a real dilemma that people often encounter in actual work, especially as many teams now emphasize &lt;strong>shift-left testing&lt;/strong>, making it quite common to require testers to provide cases and prepare test data. At the same time, some teams still use defects as a KPI metric, and this gives rise to a host of side effects:&lt;/p>
+&lt;ol>
+&lt;li>Problems found during the development phase using the cases provided by testers will inevitably reduce the output of problems found during the testing phase.&lt;/li>
+&lt;li>If testers provide the cases and problems appear later, is that a development omission or a testing omission?&lt;/li>
+&lt;li>Once testers have handed the cases to developers, is it still necessary to run the same cases again during the testing phase?&lt;/li>
+&lt;li>What is the value of testers? Is it simply to write as thorough a set of cases as possible?&lt;/li>
+&lt;/ol>
+&lt;h2 id="the-responsibility-of-testing-and-the-role-of-test-cases">The Responsibility of Testing and the Role of Test Cases
+&lt;/h2>&lt;p>In a previous article【】we discussed the true purpose of testing in detail.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/108-dev_test_cases/Pasted-20250707_hu_688bbc0982b5d334.webp"
+width="1024"
+height="483"
+srcset="https://chengxiaqiucao.github.io/post/108-dev_test_cases/Pasted-20250707_hu_a48377a6e7b78f8d.webp 480w, https://chengxiaqiucao.github.io/post/108-dev_test_cases/Pasted-20250707_hu_688bbc0982b5d334.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="212"
+data-flex-basis="508px"
+>
+&lt;/p>
+&lt;p>So we should be clear: the responsibility of testing is not actually to find bugs, but to reflect the product&amp;rsquo;s &lt;strong>quality status&lt;/strong>.&lt;/p>
+&lt;p>In testing work, the main role of test cases is, in fact, to help us sort out and summarize the various test paths before testing begins, and to arrange in advance, according to the product requirements, the key points that need to be tested, so as to avoid omissions during actual execution.&lt;/p>
+&lt;p>All of the above is the basis for discussing the handover of test cases when we talk about shift-left testing.&lt;/p>
+&lt;h2 id="should-test-cases-be-handed-over-to-developers">Should Test Cases Be Handed Over to Developers?
+&lt;/h2>&lt;p>From the team&amp;rsquo;s perspective, the ultimate concern must be product quality. According to the well-known defect-cost relationship curve, the earlier a defect is found, the lower the cost, and the stronger the confidence in delivery quality.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/108-dev_test_cases/testing_cost_hu_8aa9e0063ae6a50e.webp"
+width="1024"
+height="532"
+srcset="https://chengxiaqiucao.github.io/post/108-dev_test_cases/testing_cost_hu_2f75ed4eb518f1c2.webp 480w, https://chengxiaqiucao.github.io/post/108-dev_test_cases/testing_cost_hu_8aa9e0063ae6a50e.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="192"
+data-flex-basis="461px"
+>
+So from this angle, shift-left testing—including providing test cases to developers—is consistent with the quality goal.&lt;/p>
+&lt;p>But in actual practice, a team&amp;rsquo;s KPI orientation affects how things actually turn out.&lt;/p>
+&lt;p>That is, if a team takes the number of bugs as its KPI, as many do, then the effect of handing over test cases will inevitably be greatly diminished.&lt;/p>
+&lt;p>This KPI artificially splits the output of the development team and the testing team: developers need to produce as few bugs as possible, while testers need to find as many bugs as possible.&lt;/p>
+&lt;p>Test cases and test data actually reflect the testing mindset behind finding bugs. Handing the cases to developers will help them reduce bugs, but it will affect the testers&amp;rsquo; own output of found bugs.&lt;/p>
+&lt;p>So under this orientation, even if testers do provide cases, it is hard to guarantee the coverage of those cases—it only becomes a matter of form.&lt;/p>
+&lt;p>From the standpoint of product quality, then, as a testing role, &lt;strong>it is the duty of the job to provide test cases during the development phase and help the development team complete thorough self-testing—but for this to be truly implemented and to produce results, the prerequisite is that this metric of evaluating by bug count must be abolished&lt;/strong>.&lt;/p>
+&lt;h2 id="how-should-omissions-not-covered-by-cases-be-defined">How Should Omissions Not Covered by Cases Be Defined?
+&lt;/h2>&lt;p>First, we must recognize one fact: it is impossible for testing to achieve 100% full coverage. In the early stages of a project, test cases written on the basis of requirements and a development build that is not yet fully complete can cover an even more limited set of test scenarios.&lt;/p>
+&lt;p>In actual work, even in system testing, the proportion of bugs found by executing test cases is extremely limited compared with the bugs discovered through exploration in real testing. This is precisely the starting point for promoting &lt;code>exploratory testing&lt;/code>.&lt;/p>
+&lt;p>In other words, in the development phase, after testing has been done according to the cases, it is a 100% certainty that the subsequent system testing phase will go on to find problems that were not covered.&lt;/p>
+&lt;p>So how can we ensure adequate case coverage at this stage?&lt;/p>
+&lt;p>First, it must be emphasized once again that quality is a team goal. There is no need to agonize over defining whether it is a development omission or a testing omission—the shared goal is to reduce omissions.&lt;/p>
+&lt;p>Second, test cases should be viewed as the output of a thinking tool and an embodiment of testing ideas. The cases provided by testers are not necessarily the whole story; developers should likewise think about which scenarios to cover.&lt;/p>
+&lt;p>The requirement coverage and code coverage of the test cases are relatively suitable quantitative metrics for measuring how well cases cover this stage.&lt;/p>
+&lt;p>The principle for completing self-testing in the development phase is to ensure that the product&amp;rsquo;s requirements are fully implemented, that no serious blocking problems arise, and that the product&amp;rsquo;s main logic and architecture are verified.&lt;/p>
+&lt;p>Once the goals above have been reached, the development self-testing phase can be considered successfully completed. There is no need to dwell on whether a specific bug was covered during the self-testing phase.&lt;/p>
+&lt;h2 id="should-the-same-set-of-cases-still-be-used-in-the-testing-phase">Should the Same Set of Cases Still Be Used in the Testing Phase?
+&lt;/h2>&lt;p>For a product that has undergone thorough self-testing, the test cases that have already been executed &lt;strong>in principle do not need to be tested again&lt;/strong> after the product is submitted for testing. That is, by default, scenarios that have already been verified will not produce problems.&lt;/p>
+&lt;p>In actual work, however, is the developers&amp;rsquo; self-testing thorough? Is case execution rigorous? Is there any gray area in the coverage of the cases themselves? All of these are unknowns.&lt;/p>
+&lt;p>The tester&amp;rsquo;s job is to prepare and assess the product&amp;rsquo;s quality status before it is released. It is hard to say that the parts already self-tested by development need no further assessment.&lt;/p>
+&lt;p>Therefore, even if the cases themselves have not changed, the same set of cases still needs to be re-verified. Of course, this is a very suitable place to use automated testing to cover the existing cases, so that testers can devote more of their energy to exploratory testing.&lt;/p>
+&lt;h2 id="is-the-main-value-of-testers-producing-test-cases">Is the Main Value of Testers Producing Test Cases?
+&lt;/h2>&lt;p>From the description above, we can also see that, in the testing phase, a more important responsibility of testers is to complete exploratory testing. Test cases themselves are more of an embodiment of testing thinking and a form of expressing testing ideas; they are only an auxiliary output, not the core of testing.&lt;/p>
+&lt;p>For testing, as I have mentioned many times in my previous articles, James Bach has a famous paper discussing the difference between testing and checking. Executing according to cases is merely &lt;strong>checking&lt;/strong> and &lt;strong>cannot count as testing&lt;/strong>. Real testing, beyond checking, also includes many abilities such as &lt;strong>experimentation, research, exploration, questioning, observation, and reasoning&lt;/strong>—these are the true abilities that help us uncover deeper product defects and expose product quality problems.&lt;/p>
+&lt;p>So the value of testers is of course not limited to producing cases. It lies much more in revealing the unknown and in assessing the quality status of a product that is still a black box to the team.&lt;/p>
+&lt;hr></description></item><item><title>The 5P Method for Effective Meetings - Stop Meetings from Stealing Your Time</title><link>https://chengxiaqiucao.github.io/en/post/078-%E4%BC%9A%E8%AE%AE5p/</link><pubDate>Tue, 15 Apr 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/078-%E4%BC%9A%E8%AE%AE5p/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/078-%E4%BC%9A%E8%AE%AE5p/snap_20250515.webp" alt="Featured image of post The 5P Method for Effective Meetings - Stop Meetings from Stealing Your Time" />&lt;h2 id="introduction">Introduction
+&lt;/h2>&lt;blockquote>
+&lt;p>&amp;ldquo;Every day is packed with endless meetings! More than half the time is spent listening to a few people arguing!&amp;rdquo;
+&amp;ldquo;They love pulling a huge crowd into every meeting, yet hardly anyone actually speaks up!&amp;rdquo;
+&amp;ldquo;A single requirement change, and a meeting planned for 10 minutes drags on for two hours!&amp;rdquo;&lt;/p>&lt;/blockquote>
+&lt;p>In fast-paced software development, meetings are an indispensable part of information sharing, decision making, and problem solving. Yet what we often experience is how inefficient they are! According to statistics, a software engineer spends an average of &lt;strong>12 hours&lt;/strong> per week in various meetings, but &lt;strong>60% of those meetings are proven to be inefficient or even useless&lt;/strong> .&lt;/p>
+&lt;p>How can we make meetings a genuine collaboration tool rather than a time sink? In this article, by introducing the 5P method for effective meetings, we will break down the core logic of making meetings more efficient and escape the &amp;ldquo;sea of meetings&amp;rdquo;!&lt;/p>
+&lt;h2 id="what-is-the-5p-method">What Is the 5P Method?
+&lt;/h2>&lt;p>The 5P method for meetings is essentially the five main aspects we need to focus on when holding a meeting. Handle these five aspects well, and meetings will not sink into the mire of being aimless, lengthy, and inefficient.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/078-%E4%BC%9A%E8%AE%AE5p/snap_20250515_hu_2ea5b9723e2dc6e5.webp"
+width="1024"
+height="638"
+srcset="https://chengxiaqiucao.github.io/post/078-%E4%BC%9A%E8%AE%AE5p/snap_20250515_hu_1d1d3c78534d6bbe.webp 480w, https://chengxiaqiucao.github.io/post/078-%E4%BC%9A%E8%AE%AE5p/snap_20250515_hu_2ea5b9723e2dc6e5.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="160"
+data-flex-basis="385px"
+>
+&lt;/p>
+&lt;h2 id="people---who-should-attend">People - Who Should Attend?
+&lt;/h2>&lt;blockquote>
+&lt;p>Case - In a requirements clarification meeting, only the product manager and a few core developers took part, while testers and UI/UX designers were absent. As a result, during development it was discovered that the understanding of the requirements did not match testing expectations, and the UI/UX design also deviated from the implemented features, leading to a large amount of rework later.&lt;/p>&lt;/blockquote>
+&lt;p>One of the most common problems with inefficient meetings is that &amp;ldquo;the people who should be there aren&amp;rsquo;t, while a crowd of people who shouldn&amp;rsquo;t be are.&amp;rdquo; So making sure all key and necessary stakeholders are invited, while avoiding the participation of irrelevant people, is the first step to a successful meeting.&lt;/p>
+&lt;p>Focus on the following points:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Necessity:&lt;/strong> Only invite those who can provide key information, participate in decisions, or are directly affected by the meeting outcomes.&lt;/li>
+&lt;li>&lt;strong>Representation:&lt;/strong> If the team is large, invite representatives from each function to attend.&lt;/li>
+&lt;li>&lt;strong>Clear roles:&lt;/strong> Clarify each person&amp;rsquo;s speaking priorities and responsibilities.&lt;/li>
+&lt;/ul>
+&lt;p>For example, in the requirements clarification meeting above, we can identify the following People roles to attend:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Product Owner:&lt;/strong> Explain the requirements background, user stories, and business value.&lt;/li>
+&lt;li>&lt;strong>Development Team Lead/Members:&lt;/strong> Ask questions from a technical implementation perspective and assess feasibility.&lt;/li>
+&lt;li>&lt;strong>Test Lead/QA Engineer:&lt;/strong> Ask questions from a testability perspective and think through test scenarios.&lt;/li>
+&lt;li>&lt;strong>UI/UX Designer:&lt;/strong> Clarify the details of user interaction and interface design.&lt;/li>
+&lt;li>&lt;strong>(Optional) Architect:&lt;/strong> If the requirements involve complex system architecture changes.&lt;/li>
+&lt;/ul>
+&lt;h2 id="purpose---why-are-we-holding-this-meeting">Purpose - Why Are We Holding This Meeting?
+&lt;/h2>&lt;blockquote>
+&lt;p>Case - An agile retrospective turned into a &amp;ldquo;gripe session&amp;rdquo; or a &amp;ldquo;praise session&amp;rdquo;; everyone chimed in, but nobody focused on how to improve the workflow and collaboration for the next iteration. The meeting was held, yet by the next iteration the existing problems still had not improved.&lt;/p>&lt;/blockquote>
+&lt;p>A meeting without a goal is like a lone boat at sea that has lost its navigation; it easily loses its bearing, with no guarantee of where it will end up, and ultimately fizzles out.&lt;/p>
+&lt;p>Only when every participant understands the meeting&amp;rsquo;s purpose can everyone&amp;rsquo;s understanding be aligned and the discussion be kept from drifting off the main topic.&lt;/p>
+&lt;p>And when setting the goal here, a few things should be kept in mind:&lt;/p>
+&lt;ul>
+&lt;li>Goals should be specific, measurable, achievable, relevant, and time-bound (&lt;strong>SMART principle&lt;/strong>).&lt;/li>
+&lt;li>Try to focus a single meeting on 1-2 core goals, avoiding too many topics that cause loss of focus.&lt;/li>
+&lt;li>Make sure all participants share a common understanding of the meeting goals.&lt;/li>
+&lt;/ul>
+&lt;p>For example, for the iteration retrospective above, we can make the goals explicit:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Primary goal:&lt;/strong> Review what went well and what had problems in the previous iteration, and define concrete improvement measures for the next iteration.&lt;/li>
+&lt;li>&lt;strong>Specific sub-goals:&lt;/strong>
+&lt;ul>
+&lt;li>Identify the 1-2 obstacles that most affect team efficiency and work out solutions;&lt;/li>
+&lt;li>Identify one good practice that should be maintained.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="process---how-should-the-meeting-be-run">Process - How Should the Meeting Be Run?
+&lt;/h2>&lt;blockquote>
+&lt;p>Case - A test case review meeting. Only after the meeting started did everyone receive a thick stack of printed test cases, reading them one by one and raising questions on the spot. The presenter&amp;rsquo;s explanation lacked focus, and reviewers&amp;rsquo; thoughts wandered, causing the meeting to run seriously overtime with extremely poor review results.&lt;/p>&lt;/blockquote>
+&lt;p>If Purpose is about keeping the right heading, then Process is the nautical chart for the ship of the meeting. A clear process guides the meeting in an orderly way, ensures every topic is fully discussed, and reaches the goals within the scheduled time.&lt;/p>
+&lt;p>This includes agreements on the agenda, time allocation, discussion rules, decision-making methods, and so on.&lt;/p>
+&lt;p>Using the case above again, we can agree on the Process before the meeting:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Structured agenda:&lt;/strong>
+&lt;ol>
+&lt;li>&lt;strong>Pre-meeting preparation (5-10 minutes, or completed before the meeting):&lt;/strong> The host briefly states the review scope, goals, and case background. Emphasize that the test cases have been shared in advance and that participants are assumed to have read them beforehand.&lt;/li>
+&lt;li>&lt;strong>Discussion of key/doubtful cases (30-40 minutes):&lt;/strong> Focus the discussion on questions collected in advance or cases flagged as important. Set a time limit for discussing each complex case.&lt;/li>
+&lt;li>&lt;strong>Summary and confirmation (10-15 minutes):&lt;/strong> Consolidate review comments, clarify who is responsible for changes and the deadlines. Confirm whether consensus has been reached on test coverage.&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>&lt;strong>Clear discussion rules:&lt;/strong> For example, encourage constructive opinions, avoid interrupting speakers, and define how to decide when opinions differ (such as majority rule, or a final decision by a specific role).&lt;/li>
+&lt;li>&lt;strong>Time control:&lt;/strong> Set an estimated time for each agenda item and enforce it strictly.&lt;/li>
+&lt;/ul>
+&lt;h2 id="product---what-are-the-outcomes-of-the-meeting">Product - What Are the Outcomes of the Meeting?
+&lt;/h2>&lt;blockquote>
+&lt;p>Case - A release planning meeting. During the meeting, everyone discussed many feature ideas and potential risks for the new version, but no clear release scope, priorities, or owners were established. After the meeting, people were still vague about &amp;ldquo;which features the new version should actually include.&amp;rdquo;&lt;/p>&lt;/blockquote>
+&lt;p>First, let us clear up a misconception: a meeting does not count as having produced output simply because it is over and meeting minutes have been generated.
+The real outcome of a meeting should be a consensus that can be translated into next actions, and one that is traceable. It can be a decision, an action plan, a solution, a record of consensus, updated documents, and so on. Without a clear deliverable, the meeting is effectively a waste.&lt;/p>
+&lt;p>For the case above, clear deliverables could be:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Confirmed release scope:&lt;/strong> A clear Features List or set of User Stories, with priorities distinguished.&lt;/li>
+&lt;li>&lt;strong>Preliminary timeline:&lt;/strong> Key milestones and the estimated release date.&lt;/li>
+&lt;li>&lt;strong>Clear division of responsibilities:&lt;/strong> An owner for each major module or task.&lt;/li>
+&lt;li>&lt;strong>Identified risks and responses:&lt;/strong> Document potential risks and initial mitigation plans.&lt;/li>
+&lt;li>&lt;strong>Meeting minutes:&lt;/strong> Include all of the above and specify follow-up items. It is the written record of the meeting outcomes&lt;/li>
+&lt;/ul>
+&lt;h2 id="pitfall---what-risks-are-anticipated">Pitfall - What Risks Are Anticipated?
+&lt;/h2>&lt;p>&lt;strong>Pitfall&lt;/strong> refers to &amp;ldquo;what potential problems or obstacles might arise during the meeting, and how do we prevent or respond to them?&amp;rdquo;&lt;/p>
+&lt;h3 id="common-meeting-risks-and-how-to-address-them">Common Meeting Risks and How to Address Them
+&lt;/h3>&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>Topics sprawl and the discussion goes off track:&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Pitfall:&lt;/strong> Participants may dig too deeply into a certain detail or bring in unrelated topics.&lt;/li>
+&lt;li>&lt;strong>Response (combining Purpose &amp;amp; Process):&lt;/strong> The host should keep the meeting&amp;rsquo;s core goal in mind at all times and gently steer the discussion back on track. A &amp;ldquo;Parking Lot&amp;rdquo; mechanism can be set up to note points that come up on the spur of the moment but are unrelated to the current topic, to be discussed after the meeting.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Key people absent or late:&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Pitfall:&lt;/strong> Core decision makers or information providers fail to join on time, so the meeting cannot move forward effectively.&lt;/li>
+&lt;li>&lt;strong>Response (combining People):&lt;/strong> Confirm the time with key people in advance and send meeting reminders. If someone is absent at the last minute, assess whether to continue, adjust the agenda, or reschedule the meeting.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>A few people dominate the conversation while others stay silent:&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Pitfall:&lt;/strong> This can lead to incomplete information and biased decisions.&lt;/li>
+&lt;li>&lt;strong>Response (combining Process):&lt;/strong> The host should consciously invite silent participants to speak, or use methods such as round-robin speaking and anonymous opinion collection to ensure everyone has a chance to contribute.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Insufficient preparation and information asymmetry:&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Pitfall:&lt;/strong> Participants have not read the materials in advance, so a lot of time in the meeting is spent syncing basic information.&lt;/li>
+&lt;li>&lt;strong>Response (combining Purpose &amp;amp; Product):&lt;/strong> Send meeting materials (such as requirements documents, design drafts, and cases to be reviewed) clearly to participants in advance, and explicitly ask them to read and prepare before the meeting.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>No clear action plan or follow-up:&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Pitfall:&lt;/strong> The discussion is lively, but nothing is translated into concrete actions, and it ultimately fizzles out.&lt;/li>
+&lt;li>&lt;strong>Response (combining Product):&lt;/strong> Before the meeting ends, be sure to summarize action items, owners, and deadlines, and clarify how progress will be tracked afterwards.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>In short, thinking through potential risks in advance and preparing response strategies can effectively keep meetings from being interrupted by surprises or derailed, ensuring they run smoothly and achieve their intended goals.&lt;/p>
+&lt;h2 id="summary">Summary
+&lt;/h2>&lt;p>Through the case-based introduction of the 5P method above, to run a meeting efficiently, the 5P method can effectively keep it from getting out of control. Its core logic is actually this:&lt;/p>
+&lt;p>&lt;strong>&amp;ldquo;Use structured methods to counter the randomness of human nature&amp;rdquo;&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>People (the right attendees):&lt;/strong> Make sure the right people are in the room.&lt;/li>
+&lt;li>&lt;strong>Purpose (a clear goal):&lt;/strong> Be clear about why we are here and where we are going.&lt;/li>
+&lt;li>&lt;strong>Process (a clear process):&lt;/strong> Plan the path well and move forward in an orderly way.&lt;/li>
+&lt;li>&lt;strong>Product (the expected output):&lt;/strong> Leave with results.&lt;/li>
+&lt;li>&lt;strong>Pitfall (anticipated risks):&lt;/strong> Avoid obstacles and arrive smoothly.&lt;/li>
+&lt;/ul>
+&lt;p>In my earlier articles about the four agile meetings, the related practices also reflect the core logic of the 5P method, and I recommend reading them for reference~&lt;/p></description></item><item><title>Musk's Weekly Report Mandate and What Weekly Reports Really Are</title><link>https://chengxiaqiucao.github.io/en/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/</link><pubDate>Fri, 28 Feb 2025 17:20:23 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228-1.webp" alt="Featured image of post Musk's Weekly Report Mandate and What Weekly Reports Really Are" />&lt;h2 id="introduction">Introduction
+&lt;/h2>&lt;p>One of the hottest topics online these past couple of days has to be Musk&amp;rsquo;s new DOGE policy — the now-famous &amp;ldquo;what did you do last week&amp;rdquo; email requiring every federal employee to send a weekly report listing the five things they did last week, cc&amp;rsquo;ing their supervisor! Miss it twice in a row and it&amp;rsquo;s treated as a resignation!&lt;/p>
+&lt;p>And by now more than 1 million U.S. civil servants have already sent this weekly report! 😂😂😂&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228-1_hu_15914d90a2dc9cb.webp"
+width="1024"
+height="445"
+srcset="https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228-1_hu_fb6c0b0c0841a906.webp 480w, https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228-1_hu_15914d90a2dc9cb.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="230"
+data-flex-basis="552px"
+>
+&lt;/p>
+&lt;p>As corporate wage slaves, we know this routine all too well — but come to think of it, &lt;strong>why do weekly reports even exist&lt;/strong>?&lt;/p>
+&lt;h2 id="what-is-the-essence-of-the-weekly-or-daily-report">What Is the Essence of the Weekly (or Daily) Report?
+&lt;/h2>&lt;p>For these U.S. civil servants, writing a weekly report may still be something of a novelty, but for a business-born boss like Musk, weekly reports are a long-standing favorite — he rolled out similar policies at Tesla and Twitter years ago.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228_hu_f10e1c34ec2f890f.webp"
+width="1024"
+height="821"
+srcset="https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228_hu_b5bb4f277c08c548.webp 480w, https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228_hu_f10e1c34ec2f890f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="124"
+data-flex-basis="299px"
+>
+&lt;/p>
+&lt;p>So why, from a company&amp;rsquo;s or a boss&amp;rsquo;s point of view, do they want to see employees&amp;rsquo; weekly reports?&lt;/p>
+&lt;p>Take a software testing department as an example; the value of a weekly report mainly shows up in the following areas:&lt;/p>
+&lt;ol>
+&lt;li>Risk control&lt;/li>
+&lt;/ol>
+&lt;p>This should be the part every Leader cares about most in a weekly report. Through weekly reports, you can know the overall progress of the whole project and get a grip on overall quality risks — such as testing delays or insufficient quality exposure. The weekly-report level, unlike a daily report, isn&amp;rsquo;t overly detailed, so it&amp;rsquo;s a good input for keeping a handle on the overall status.&lt;/p>
+&lt;ol start="2">
+&lt;li>Resource optimization&lt;/li>
+&lt;/ol>
+&lt;p>By aggregating and analyzing weekly-report data, a Leader can also grasp how much effort every member is putting in, making it easier to dynamically allocate testing resources.&lt;/p>
+&lt;p>And this is also the focus of all the attention on Musk&amp;rsquo;s new policy, because the result the weekly reports point to is that underworked federal employees may get fired 🤪🤪&lt;/p>
+&lt;ol start="3">
+&lt;li>Decision basis&lt;/li>
+&lt;/ol>
+&lt;p>A weekly report usually also contains some quantitative metrics, such as testing progress, defect data, coverage, escape rate, external support, and other quality data that can be captured or actively reported. These data quantify the current quality state and present it visually, serving as important support for decision-making.&lt;/p>
+&lt;h2 id="how-should-testers-write-a-weekly-report">How Should Testers Write a Weekly Report?
+&lt;/h2>&lt;p>So as a test engineer, if we&amp;rsquo;re going to send a weekly report, what should it usually contain?&lt;/p>
+&lt;p>Here is a weekly-report example from an employee working on IoT software (a smart band):&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">I&lt;/span>&lt;span class="o">.&lt;/span> &lt;span class="n">Weekly&lt;/span> &lt;span class="n">Work&lt;/span> &lt;span class="n">Summary&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Test&lt;/span> &lt;span class="n">execution&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">Completed&lt;/span> &lt;span class="n">iterative&lt;/span> &lt;span class="n">testing&lt;/span> &lt;span class="n">of&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">heart&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">rate&lt;/span> &lt;span class="n">monitoring&lt;/span> &lt;span class="n">module&lt;/span> &lt;span class="n">V2&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">covering&lt;/span> &lt;span class="mi">10&lt;/span> &lt;span class="n">exercise&lt;/span> &lt;span class="n">scenarios&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="ow">and&lt;/span> &lt;span class="n">found&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="n">critical&lt;/span> &lt;span class="n">defects&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span> &lt;span class="n">delay&lt;/span> &lt;span class="n">exceeding&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">threshold&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">monitoring&lt;/span> &lt;span class="n">failure&lt;/span> &lt;span class="n">at&lt;/span> &lt;span class="n">low&lt;/span> &lt;span class="n">battery&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">Ran&lt;/span> &lt;span class="n">compatibility&lt;/span> &lt;span class="n">testing&lt;/span> &lt;span class="n">on&lt;/span> &lt;span class="n">iOS&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Android&lt;/span> &lt;span class="n">APP&lt;/span> &lt;span class="n">sync&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="mi">3&lt;/span> &lt;span class="n">device&lt;/span> &lt;span class="n">models&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">including&lt;/span> &lt;span class="n">older&lt;/span> &lt;span class="n">ones&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">showed&lt;/span> &lt;span class="n">data&lt;/span> &lt;span class="n">loss&lt;/span> &lt;span class="n">issues&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">Regression&lt;/span> &lt;span class="n">test&lt;/span> &lt;span class="k">pass&lt;/span> &lt;span class="n">rate&lt;/span> &lt;span class="mi">95&lt;/span>&lt;span class="o">%&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">with&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">remaining&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="o">%&lt;/span> &lt;span class="n">being&lt;/span> &lt;span class="n">low&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">priority&lt;/span> &lt;span class="n">UI&lt;/span> &lt;span class="n">display&lt;/span> &lt;span class="n">issues&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Defect&lt;/span> &lt;span class="n">management&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">Added&lt;/span> &lt;span class="mi">15&lt;/span> &lt;span class="n">defects&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="n">urgent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span> &lt;span class="n">high&lt;/span> &lt;span class="n">priority&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">closed&lt;/span> &lt;span class="mi">8&lt;/span> &lt;span class="n">defects&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="mi">3&lt;/span> &lt;span class="n">of&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">remaining&lt;/span> &lt;span class="n">defects&lt;/span> &lt;span class="n">require&lt;/span> &lt;span class="n">joint&lt;/span> &lt;span class="n">fixes&lt;/span> &lt;span class="n">with&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">hardware&lt;/span> &lt;span class="n">team&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Special&lt;/span> &lt;span class="n">testing&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">Completed&lt;/span> &lt;span class="n">stress&lt;/span> &lt;span class="n">testing&lt;/span> &lt;span class="n">of&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">OTA&lt;/span> &lt;span class="n">upgrade&lt;/span> &lt;span class="n">process&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="n">firmware&lt;/span> &lt;span class="n">verification&lt;/span> &lt;span class="n">failure&lt;/span> &lt;span class="n">occurred&lt;/span> &lt;span class="n">after&lt;/span> &lt;span class="n">simulating&lt;/span> &lt;span class="mi">5&lt;/span> &lt;span class="n">consecutive&lt;/span> &lt;span class="n">upgrades&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">In&lt;/span> &lt;span class="n">power&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">consumption&lt;/span> &lt;span class="n">testing&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">standby&lt;/span> &lt;span class="n">power&lt;/span> &lt;span class="n">of&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">sleep&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">monitoring&lt;/span> &lt;span class="n">function&lt;/span> &lt;span class="n">exceeded&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">standard&lt;/span> &lt;span class="n">by&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="o">%.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">II&lt;/span>&lt;span class="o">.&lt;/span> &lt;span class="n">Core&lt;/span> &lt;span class="n">Issues&lt;/span> &lt;span class="ow">and&lt;/span> &lt;span class="n">Risks&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Blocking&lt;/span> &lt;span class="n">issues&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">The&lt;/span> &lt;span class="n">heart&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">rate&lt;/span> &lt;span class="n">monitoring&lt;/span> &lt;span class="n">data&lt;/span> &lt;span class="n">delay&lt;/span> &lt;span class="n">defect&lt;/span> &lt;span class="n">creates&lt;/span> &lt;span class="n">a&lt;/span> &lt;span class="n">risk&lt;/span> &lt;span class="n">of&lt;/span> &lt;span class="n">version&lt;/span> &lt;span class="n">release&lt;/span> &lt;span class="n">delay&lt;/span> &lt;span class="ow">and&lt;/span> &lt;span class="n">needs&lt;/span> &lt;span class="n">to&lt;/span> &lt;span class="n">be&lt;/span> &lt;span class="n">fixed&lt;/span> &lt;span class="ow">and&lt;/span> &lt;span class="n">verified&lt;/span> &lt;span class="n">by&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">development&lt;/span> &lt;span class="n">team&lt;/span> &lt;span class="n">within&lt;/span> &lt;span class="mi">48&lt;/span> &lt;span class="n">hours&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="ne">Resource&lt;/span> &lt;span class="n">dependencies&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">The&lt;/span> &lt;span class="n">hardware&lt;/span> &lt;span class="n">team&lt;/span>&lt;span class="s1">&amp;#39;s slow response to sensor issues may affect next week&amp;#39;&lt;/span>&lt;span class="n">s&lt;/span> &lt;span class="n">power&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">consumption&lt;/span> &lt;span class="n">test&lt;/span> &lt;span class="n">plan&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">III&lt;/span>&lt;span class="o">.&lt;/span> &lt;span class="n">Next&lt;/span> &lt;span class="n">Week&lt;/span>&lt;span class="s1">&amp;#39;s Plan&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">Execute&lt;/span> &lt;span class="n">V2&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mi">4&lt;/span> &lt;span class="n">feature&lt;/span> &lt;span class="n">testing&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">blood&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">oxygen&lt;/span> &lt;span class="n">monitoring&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">emergency&lt;/span> &lt;span class="n">call&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">Retest&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">remaining&lt;/span> &lt;span class="n">defects&lt;/span> &lt;span class="ow">and&lt;/span> &lt;span class="n">drive&lt;/span> &lt;span class="n">joint&lt;/span> &lt;span class="n">debugging&lt;/span> &lt;span class="n">with&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">hardware&lt;/span> &lt;span class="n">team&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">Launch&lt;/span> &lt;span class="n">user&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">scenario&lt;/span> &lt;span class="n">stress&lt;/span> &lt;span class="n">testing&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">simulating&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mi">000&lt;/span> &lt;span class="n">devices&lt;/span> &lt;span class="n">uploading&lt;/span> &lt;span class="n">data&lt;/span> &lt;span class="n">concurrently&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The weekly report above is summarized from two angles — the project and the testing department — and the value it reflects can be summed up in the table below:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Element&lt;/th>
+&lt;th>Value to the Project&lt;/th>
+&lt;th>Value to the Testing Department&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>Test execution progress&lt;/strong>&lt;/td>
+&lt;td>Clarifies version quality status and helps the PM assess whether release criteria are met.&lt;/td>
+&lt;td>Quantifies team output, making resource allocation and efficiency optimization easier (e.g., adjusting test case priorities).&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Defect distribution and trends&lt;/strong>&lt;/td>
+&lt;td>Exposes module risks and pushes development to focus on core issues (e.g., a high defect rate in the heart-rate module calls for refactoring).&lt;/td>
+&lt;td>Analyzes root causes of defects (code/design/environment) and drives test case library additions and process improvements (e.g., adding low-battery scenarios).&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Risks and dependencies&lt;/strong>&lt;/td>
+&lt;td>Warns of delay risks and promotes cross-department collaboration (e.g., involving the hardware team).&lt;/td>
+&lt;td>Wins support from upper management (e.g., requesting a longer test cycle or more device resources).&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Special test results&lt;/strong>&lt;/td>
+&lt;td>Validates non-functional requirements (e.g., power consumption, stability), avoiding hard hits to user experience.&lt;/td>
+&lt;td>Accumulates performance baseline data to provide a basis for comparison in later versions (e.g., a power-consumption metric library).&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Next week&amp;rsquo;s plan and goals&lt;/strong>&lt;/td>
+&lt;td>Aligns with project milestones, keeping testing in sync with development (e.g., the blood-oxygen feature test plan matches the iteration schedule).&lt;/td>
+&lt;td>Clarifies team division of labor, avoiding overlapping or missed tasks.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="summary">Summary
+&lt;/h2>&lt;p>So, as an employee, there&amp;rsquo;s really nothing to resist about weekly reports — it&amp;rsquo;s just a perfectly normal management practice.
+For testers, the weekly report is both a &amp;ldquo;dashboard&amp;rdquo; for testing work (reflecting quality status in real time) and a &amp;ldquo;bridge&amp;rdquo; for cross-department collaboration (driving problem resolution and resource coordination), while also providing data support for optimizing long-term testing strategy.&lt;/p>
+&lt;p>When it all comes down to it, the goal is still &lt;strong>status synchronization&lt;/strong>&lt;/p>
+&lt;p>Just like agile stand-ups, and the daily reports that traditional projects may also have, their purpose is actually the same; I&amp;rsquo;ve covered this in detail in earlier posts, so feel free to refer to those.&lt;/p>
+&lt;hr></description></item><item><title>How to Handle Conflicts Between Developers and Testers</title><link>https://chengxiaqiucao.github.io/en/post/056-%E5%9B%A2%E9%98%9F%E4%B8%AD%E7%9A%84%E5%86%B2%E7%AA%81%E7%AE%A1%E7%90%86/</link><pubDate>Wed, 19 Feb 2025 12:28:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/056-%E5%9B%A2%E9%98%9F%E4%B8%AD%E7%9A%84%E5%86%B2%E7%AA%81%E7%AE%A1%E7%90%86/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/056-%E5%9B%A2%E9%98%9F%E4%B8%AD%E7%9A%84%E5%86%B2%E7%AA%81%E7%AE%A1%E7%90%86/Pasted-20250220-2.webp" alt="Featured image of post How to Handle Conflicts Between Developers and Testers" />&lt;blockquote>
+&lt;p>A reader asked: on a team, developers and testers often run into friction and conflict — how do we avoid such conflicts within the team?&lt;/p>&lt;/blockquote>
+&lt;h1 id="the-origin-of-conflict">The Origin of Conflict
+&lt;/h1>&lt;p>In a team, conflict between members is actually perfectly normal and very hard to eliminate entirely. The causes vary, but in poor teams conflicts are more likely to arise: mismatched goals and expectations, lack of trust, and poor communication are all common reasons that conflicts arise and even escalate.&lt;/p>
+&lt;h1 id="must-conflict-always-be-avoided">Must Conflict Always Be Avoided?
+&lt;/h1>&lt;p>From the standpoint of the project and the product, the friction and conflict between developers and testers isn&amp;rsquo;t entirely a bad thing. Nor should we take it for granted that conflict must always be avoided.&lt;/p>
+&lt;p>In many R&amp;amp;D project management practices, the conflict between developers and testers is called constructive conflict — that is, this kind of conflict is constructive for improving product quality, and product quality gets improved through the two sides&amp;rsquo; conflict-focused discussions on specific issues.&lt;/p>
+&lt;p>This idea in fact aligns with how conflict management classifies conflict types.&lt;/p>
+&lt;p>In conflict management theory, using the two dimensions of how important the matter behind the conflict is and the interpersonal relationship, conflict types can be divided into the following four categories:&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/056-%E5%9B%A2%E9%98%9F%E4%B8%AD%E7%9A%84%E5%86%B2%E7%AA%81%E7%AE%A1%E7%90%86/Pasted-20250220-1_hu_9c16675ad641f7d9.webp"
+width="1024"
+height="786"
+srcset="https://chengxiaqiucao.github.io/post/056-%E5%9B%A2%E9%98%9F%E4%B8%AD%E7%9A%84%E5%86%B2%E7%AA%81%E7%AE%A1%E7%90%86/Pasted-20250220-1_hu_827295a4fc851e8b.webp 480w, https://chengxiaqiucao.github.io/post/056-%E5%9B%A2%E9%98%9F%E4%B8%AD%E7%9A%84%E5%86%B2%E7%AA%81%E7%AE%A1%E7%90%86/Pasted-20250220-1_hu_9c16675ad641f7d9.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="130"
+data-flex-basis="312px"
+>
+&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>Constructive conflict&lt;/strong>: The conflict is task-related, usually aimed at solving a problem, with little impact on the interpersonal relationship between the two sides. This kind of conflict is actually healthy.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Destructive conflict&lt;/strong>: The conflict is also aimed at solving a problem, but it is more intense and damaging to the relationship, affecting friendly cooperation down the line.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Dysfunctional conflict&lt;/strong>: This one is worse — caused purely by the estrangement between the two sides, with little to do with disagreement over the matter itself; you could call it conflict for conflict&amp;rsquo;s sake.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Functional conflict&lt;/strong>: This is the most common kind, directed at trivial matters and usually showing up as grumbling, joking complaints, and the like.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>For the different conflict types, a team should generally encourage constructive conflict, stop destructive conflict promptly, isolate dysfunctional conflict, and tolerate functional conflict while keeping it from accumulating.&lt;/p>
+&lt;h1 id="the-thomas-kilmann-conflict-model">The Thomas-Kilmann Conflict Model
+&lt;/h1>&lt;p>For individuals, there is also a theoretical model for how to handle conflict — the Thomas-Kilmann conflict management model:&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/056-%E5%9B%A2%E9%98%9F%E4%B8%AD%E7%9A%84%E5%86%B2%E7%AA%81%E7%AE%A1%E7%90%86/Pasted-20250220_hu_148e1d87e68b7485.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/056-%E5%9B%A2%E9%98%9F%E4%B8%AD%E7%9A%84%E5%86%B2%E7%AA%81%E7%AE%A1%E7%90%86/Pasted-20250220_hu_ab13167beeb5b84a.webp 480w, https://chengxiaqiucao.github.io/post/056-%E5%9B%A2%E9%98%9F%E4%B8%AD%E7%9A%84%E5%86%B2%E7%AA%81%E7%AE%A1%E7%90%86/Pasted-20250220_hu_148e1d87e68b7485.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+&lt;/p>
+&lt;p>From two dimensions when facing conflict — your personal assertiveness in solving the problem and your cooperativeness in managing the relationship with the other party — come the following five conflict-handling strategies:&lt;/p>
+&lt;p>&lt;strong>Competing&lt;/strong>: When an individual is assertive, they can adopt a competing strategy. It creates a win-or-lose situation, where the stronger party forces the other to accept their demands. &lt;strong>Win-Lose&lt;/strong>&lt;/p>
+&lt;p>&lt;strong>Collaborating&lt;/strong>: This is the best strategy — through cooperation and teamwork, both sides find a win-win path where 1+1&amp;gt;2. &lt;strong>Win-Win&lt;/strong>&lt;/p>
+&lt;p>&lt;strong>Avoiding&lt;/strong>: Does not solve the problem; a cold treatment that shelves the issue. &lt;strong>Lose-Lose&lt;/strong>&lt;/p>
+&lt;p>&lt;strong>Accommodating&lt;/strong>: One side voluntarily yields in order to preserve the relationship. &lt;strong>Lose-Win&lt;/strong>&lt;/p>
+&lt;p>&lt;strong>Compromising&lt;/strong>: Meeting in the middle — both sides give a little and make mutual concessions to reach a middle-ground solution, forming a compromise. &lt;strong>Half-Half&lt;/strong>&lt;/p>
+&lt;p>Different individuals, when facing conflict, consciously or unconsciously adopt different strategies. Understanding this model helps us assess conflicts more rationally and choose an appropriate way to respond.&lt;/p>
+&lt;h1 id="how-should-a-team-manage-conflict">How Should a Team Manage Conflict?
+&lt;/h1>&lt;p>For an R&amp;amp;D team, managing conflict well fundamentally comes down to building a strong team culture on the foundation of sound processes and systems, and fostering a transparent, trust-based cooperative relationship and environment.&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>Sound systems. For example, disputes over bugs should have an arbitration mechanism, rather than leaving developers and testers to argue themselves red in the face.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Team culture. Testing and development work should not be set against each other; instead, everyone collaborates toward a shared quality goal.&lt;/p>
+&lt;/li>
+&lt;/ul></description></item><item><title>The 5 Whys Root Cause Analysis Method You Should Know</title><link>https://chengxiaqiucao.github.io/en/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/</link><pubDate>Sat, 05 Oct 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/5why.webp" alt="Featured image of post The 5 Whys Root Cause Analysis Method You Should Know" />&lt;p>In the field of quality management, an important process for improving quality is discovering problems and solving them. Within this, in the practice of solving problems, a key step is Root Cause Analysis (RCA). There are many RCA methods; commonly used ones include the Fishbone Diagram, the Affinity Diagram, and FMEA (Failure mode and effects analysis), among others.&lt;/p>
+&lt;p>However, the easiest to apply and the most widely used is probably the 5 Whys root cause analysis method&lt;/p>
+&lt;h2 id="the-origin-of-the-5-whys">The Origin of the 5 Whys
+&lt;/h2>&lt;p>The &lt;strong>5 Whys&lt;/strong> method originated at Toyota and was proposed by &lt;strong>Akio Toyoda&lt;/strong>, the father of Toyota. But its introduction into the mainstream was thanks to &lt;strong>Taiichi Ohno&lt;/strong>, the head of the Toyota Production System.&lt;/p>
+&lt;p>Toyota&amp;rsquo;s website has the following passage describing Taiichi Ohno&amp;rsquo;s advocacy of this method:&lt;/p>
+&lt;blockquote>
+&lt;p>Whenever a problem cropped up, Taiichi Ohno encouraged his staff to explore problems first-hand until the root causes were found. “Observe the production floor without preconceptions,” he would advise. “Ask ‘why’ five times about every matter.”&lt;/p>&lt;/blockquote>
+&lt;p>The 5 Whys method is based on the following basic understanding:&lt;/p>
+&lt;blockquote>
+&lt;p>&amp;ldquo;Behind every problem there is a cause, but superficial analysis can only describe the symptoms.&amp;rdquo; To find the root cause behind a problem, continuous investigation is needed; only by obtaining the root cause can targeted, lasting solutions be adopted so that the problem does not recur.&lt;/p>&lt;/blockquote>
+&lt;p>So the 5 Whys is actually about this: when we encounter a problem, we should not look only at the superficial causes that led to it, but should embrace the spirit of &amp;ldquo;getting to the bottom of the matter&amp;rdquo; and dig out its root cause. Only by solving the root cause that gives rise to the problem can we possibly avoid its repeated recurrence.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007_hu_83c5bf6cc8544e67.webp"
+width="1024"
+height="554"
+srcset="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007_hu_408f310afb8edb6c.webp 480w, https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007_hu_83c5bf6cc8544e67.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="184"
+data-flex-basis="443px"
+>
+&lt;/p>
+&lt;p>To take an example from the software industry: during customer acceptance, a fairly serious functional bug was found that affected the final delivery of the product. At this point, the 5 Whys method is used to analyze the root cause:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>&lt;strong>Why did the customer encounter this problem?&lt;/strong> According to the technical lead, the testing team had not reported any such issue to the development team&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Why was the testing team unable to find the problem?&lt;/strong> The testing team only performed smoke testing and did not carry out complete regression verification of the functionality&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Why did the testing team only perform smoke testing&lt;/strong>? Because they did not have enough time to perform thorough regression verification of the entire application&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Why was there not enough time for thorough regression&lt;/strong>? Because the version submitted by development for testing was only one day ahead of the final delivery to the customer for acceptance, while thorough functional testing requires at least 3 days.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Why did development submit the build for testing only one day before delivery&lt;/strong>? Because the implementation of one key feature turned out to be more complex than expected and took more time.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>Analyzing up to this point, two root causes are actually discovered:&lt;/p>
+&lt;ul>
+&lt;li>Team members made a serious misestimation of the workload, and development time was underestimated&lt;/li>
+&lt;li>Problems in project management: the build was submitted for testing much later than the testing estimate, sacrificing quality by delivering to the customer without regression. Release-exit control was insufficient.&lt;/li>
+&lt;/ul>
+&lt;p>Therefore, based on the causes identified, improvements are needed in two areas to prevent similar situations from recurring.&lt;/p>
+&lt;ol>
+&lt;li>Improve the development team&amp;rsquo;s accuracy in estimating feature implementation, including training, requirements breakdown, and understanding requirements as early as possible.&lt;/li>
+&lt;li>Improve project management by strengthening test entry/exit control and risk prevention. If the build is submitted late, the delivery time should be postponed accordingly; if a product is released without completing regression, at minimum an exception-release review process must be completed.&lt;/li>
+&lt;/ol>
+&lt;h2 id="implementation-steps-of-the-5-whys">Implementation Steps of the 5 Whys
+&lt;/h2>&lt;p>Although the 5 Whys method is very simple, its implementation still needs to follow a certain process of steps:&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-3_hu_54d6781991275b33.webp"
+width="1024"
+height="182"
+srcset="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-3_hu_e79cba6762181cbf.webp 480w, https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-3_hu_54d6781991275b33.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="561"
+data-flex-basis="1347px"
+>
+&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>First, of course, the key members related to the problem need to jointly analyze it. In this step, all relevant roles in the team connected to the problem should be able to participate. Otherwise, the absence of key personnel may cause the analysis to be unable to proceed.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>After determining the team members who will participate, it is also necessary to ensure that everyone is fairly clear about the problem: what needs to be analyzed? What background information is there? The team should reach a consensus on the understanding of the problem, rather than entering the Why discussion with different interpretations&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>During the specific analysis meeting, the facilitator should, through appropriate questioning, gradually help the team unearth the real causes&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Of course, the ultimate purpose of analyzing a problem is to solve it, so we also need to discuss corresponding corrective measures for the root cause obtained, in order to prevent similar problems from happening again.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Finally, how effective the implementation of the corrective measures is also needs to be tracked with corresponding actions and time nodes, so as to verify and confirm the effectiveness of the root cause analysis.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>Only through such a process is it a complete root cause analysis implementation based on the 5 Whys method.&lt;/p>
+&lt;h2 id="considerations-when-implementing-the-5-whys">Considerations When Implementing the 5 Whys
+&lt;/h2>&lt;p>Although the 5 Whys method is simple, in practice it is actually not easy to do well. Here are some key points to note:&lt;/p>
+&lt;h3 id="a-team-activity">A Team Activity
+&lt;/h3>&lt;p>The 5 Whys analysis is a team activity that requires the active participation of people related to the problem. Only when the key roles along the problem analysis path can give effective answers can the validity of the analysis chain be guaranteed&lt;/p>
+&lt;h3 id="not-an-efficient-method">Not an Efficient Method
+&lt;/h3>&lt;p>Although this method is simple to understand, because it is a team activity and is closely tied to whether the various background information about the problem is sufficient, activities including information collection, gathering personnel, and brainstorming in meetings all require an investment of time. It is not an activity that reaches conclusions efficiently or quickly; sometimes it even requires multiple meeting discussions.&lt;/p>
+&lt;h3 id="the-facilitators-experience">The Facilitator&amp;rsquo;s Experience
+&lt;/h3>&lt;p>Whether the 5 Whys method succeeds depends critically on the role of the meeting facilitator. This role should have a full understanding of the 5 Whys method and be fairly familiar with the problem-related domain, able to guide the team to dig for root causes in the right direction and avoid excessive divergence&lt;/p>
+&lt;h3 id="focus-on-the-issue-not-the-person-avoid-shifting-blame">Focus on the Issue, Not the Person; Avoid Shifting Blame
+&lt;/h3>&lt;p>Root cause analysis is not about assigning blame; that is, the focus of the meeting is to discover points for future improvement, not to define responsibility for the current problem, so as to avoid turning the analysis meeting into a blame-shifting or finger-pointing session&lt;/p>
+&lt;h3 id="focus-on-controllable-factors">Focus on Controllable Factors
+&lt;/h3>&lt;p>The root causes obtained from root cause analysis should be controllable factors on which action can be taken, rather than finding force majeure factors that simply cannot be corrected. For example, if there is a shortage of staff, the root cause is that the company is not performing well, and the company&amp;rsquo;s poor performance is due to an economic downturn.. The conclusion would then fizzle out with nothing being done.&lt;/p>
+&lt;p>All in all, the 5 Whys analysis method is a simple and practical root cause analysis method, but it is not an efficient one, and its effectiveness is closely related to the concerted effort of team members and the way it is implemented. Only by understanding its internal logic and implementing it selectively according to the team&amp;rsquo;s actual situation can it truly have the effect it should.&lt;/p>
+&lt;h2 id="analysis-templates">Analysis Templates
+&lt;/h2>&lt;p>Two common analysis templates are attached below for your reference&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-1_hu_562a91aa259b54e.webp"
+width="1024"
+height="628"
+srcset="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-1_hu_c2702d3a55e65e01.webp 480w, https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-1_hu_562a91aa259b54e.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="162"
+data-flex-basis="391px"
+>
+&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-2_hu_c1bd76f09bb2689a.webp"
+width="1024"
+height="634"
+srcset="https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-2_hu_59330e6a7c9c33be.webp 480w, https://chengxiaqiucao.github.io/post/027-%E8%B4%A8%E9%87%8F%E7%AE%A1%E7%90%86%E4%B8%8D%E5%8F%AF%E4%B8%8D%E7%9F%A5%E7%9A%845why%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E6%B3%95/Pasted-20241007-2_hu_c1bd76f09bb2689a.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="161"
+data-flex-basis="387px"
+>
+&lt;/p>
+&lt;hr></description></item></channel></rss>

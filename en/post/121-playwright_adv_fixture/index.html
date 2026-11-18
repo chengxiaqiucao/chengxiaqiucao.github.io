@@ -1,0 +1,1612 @@
+<!doctype html><html lang=en dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="In this article we will sort out and discuss some advanced applications of built-in fixtures in Playwright, to help us use `Playwright` better"><title>Advanced Fixture Techniques in Playwright</title>
+<link rel=canonical href=https://chengxiaqiucao.github.io/en/post/121-playwright_adv_fixture/><link rel=stylesheet href=/scss/style.min.1ff05243156c6b1fe33c54e504d4d763b1955737a95e17034967a679a1f192c8.css><meta property='og:title' content="Advanced Fixture Techniques in Playwright"><meta property='og:description' content="In this article we will sort out and discuss some advanced applications of built-in fixtures in Playwright, to help us use `Playwright` better"><meta property='og:url' content='https://chengxiaqiucao.github.io/en/post/121-playwright_adv_fixture/'><meta property='og:site_name' content='Testing Observation'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Testing Tools'><meta property='article:tag' content='Test Automation'><meta property='article:published_time' content='2025-08-17T22:19:55+08:00'><meta property='article:modified_time' content='2025-08-17T22:19:55+08:00'><meta property='og:image' content='https://chengxiaqiucao.github.io/post/121-playwright_adv_fixture/playwright_logo.webp'><meta name=twitter:title content="Advanced Fixture Techniques in Playwright"><meta name=twitter:description content="In this article we will sort out and discuss some advanced applications of built-in fixtures in Playwright, to help us use `Playwright` better"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://chengxiaqiucao.github.io/post/121-playwright_adv_fixture/playwright_logo.webp'><script async src="https://www.googletagmanager.com/gtag/js?id=G-0SZVJZGMHX"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-0SZVJZGMHX")}</script><meta name=google-adsense-account content="ca-pub-8076532964743402"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8076532964743402" crossorigin=anonymous></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/en/><img src=/img/automnGrass_hu_47f1e3d9e082e7bd.webp width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/en>Testing Observation</a></h1><h2 class=site-description>Testing is not just checking...</h2></div></header><ol class=menu-social><li><a href=https://github.com/chengxiaqiucao target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://space.bilibili.com/472272606 target=_blank title=Bilibili rel=me><!doctype html><svg t="1750732982440" class="icon" viewBox="0 0 1024 1024" p-id="4593" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632 444.330667 256h135.296l138.368-138.325333A42.666667 42.666667.0 01778.368 178.048L700.330667 256H789.333333A149.333333 149.333333.0 01938.666667 405.333333v341.333334A149.333333 149.333333.0 01789.333333 896H234.666667A149.333333 149.333333.0 0185.333333 746.666667V405.333333A149.333333 149.333333.0 01234.666667 256h88.96L245.632 177.962667a42.666667 42.666667.0 0160.373333-60.373334zm483.328 223.701333H234.666667a64 64 0 00-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0057.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0063.701334-57.856L853.333333 746.666667V405.333333a64 64 0 00-64-64zm-448 128A42.666667 42.666667.0 01384 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666666-42.666667zm341.333334.0A42.666667 42.666667.0 01725.333333 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666667-42.666667z" p-id="4594" fill="#8a8a8a"/></svg></a></li><li><a href=https://www.zhihu.com/people/qiucao target=_blank title=zhihu rel=me><!doctype html><svg t="1750733049138" class="icon" viewBox="0 0 1024 1024" p-id="5820" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M570.581333 806.272h61.952L652.928 876.117333 764.074667 806.272h130.986666V230.186667h-324.48V806.272zM636.501333 292.693333h192.64V743.68h-73.898666l-73.813334 46.378667L668.032 743.808l-31.530667-.128V292.736zM515.754667 493.738667H377.429333a2999.466667 2999.466667.0 005.802667-194.56h135.338667S523.776 239.445334 495.872 240.128H261.76c9.216-34.730667 20.821333-70.613333 34.688-107.690667.0.0-63.701333.0-85.333333 57.130667C202.112 213.12 176.128 303.786667 129.877333 396.416c15.573333-1.706667 67.114667-3.114667 97.450667-58.794667 5.589333-15.616 6.656-17.621333 13.568-38.485333h76.373333c0 27.776-3.157333 177.109333-4.437333 194.474667h-138.24c-31.104.0-41.173333 62.549333-41.173333 62.549333h173.482666C295.253333 688.256 232.789333 799.573333 119.466667 887.466667c54.186667 15.488 108.202667-2.432 134.912-26.197334.0.0 60.8-55.338667 94.122666-183.381333L491.264 849.834667s20.906667-71.168-3.285333-105.856c-20.053333-23.637333-74.24-87.552-97.322667-110.72l-38.698667 30.72c11.52-36.992 18.474667-72.96 20.821334-107.690667h163.072s-.213333-62.549333-20.053334-62.549333z" p-id="5821" fill="#8a8a8a"/></svg></a></li><li><a href=mailto:%20danmyw@qq.com target=_blank title=e-mail rel=me><!doctype html><svg t="1750733089669" class="icon" viewBox="0 0 1451 1024" p-id="6983" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759.0 97.881301C0 3.997201 71.046997.0 71.046997.0H474.477909 961.649408h399.992405s71.046998 3.997201 71.046998 97.881301L771.345323 681.472759S764.482731 685.154773 753.594283 688.65053V688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858V688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759zm53.281707 130.131124C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633.0 212.052267.0 212.052267V942.809523S0 1024 83.726336 1024H682.532949 753.579947h595.368192C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523V212.052267S893.138176 701.759633 817.019477 767.734955c-39.771477 34.470494-74.671786 43.295855-98.955861 43.868928z" fill="#8a8a8a" p-id="6984"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/en/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/en/page/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/en/page/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/en/page/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li><a href=/en/page/about/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>About..</span></a></li><li><a href=/en/page/releases/><svg class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M9.828 9.172a4 4 0 100 5.656A10 10 0 0012 12a10 10 0 012.172-2.828 4 4 0 110 5.656A10 10 0 0112 12 10 10 0 009.828 9.172"/></svg>
+<span>OpenSources</span></a></li><li class=menu-bottom-section><ol class=menu><li id=i18n-switch><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg>
+<select name=language title=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://chengxiaqiucao.github.io/post/121-playwright_adv_fixture/>中文</option><option value=https://chengxiaqiucao.github.io/en/post/121-playwright_adv_fixture/ selected>English</option></select></li><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#overview-of-playwright-built-in-fixtures>Overview of Playwright Built-in Fixtures</a></li><li><a href=#advanced-usage-of-browser-fixtures>Advanced Usage of browser Fixtures</a><ol><li><a href=#multi-browser-parallel-testing>Multi-browser Parallel Testing</a></li><li><a href=#advanced-browser-context-configuration>Advanced Browser Context Configuration</a></li><li><a href=#browser-performance-monitoring>Browser Performance Monitoring</a></li></ol></li><li><a href=#advanced-usage-of-page-fixtures>Advanced Usage of page Fixtures</a><ol><li><a href=#smart-wait-strategy>Smart Wait Strategy</a></li><li><a href=#network-interception-and-mocking>Network Interception and Mocking</a></li><li><a href=#page-screenshot-and-video-recording>Page Screenshot and Video Recording</a></li></ol></li><li><a href=#advanced-usage-of-device-and-viewport-fixtures>Advanced Usage of device and viewport Fixtures</a><ol><li><a href=#responsive-testing>Responsive Testing</a></li><li><a href=#device-simulation>Device Simulation</a></li></ol></li><li><a href=#advanced-usage-of-api-fixtures>Advanced Usage of API Fixtures</a><ol><li><a href=#api-test-authentication>API Test Authentication</a></li><li><a href=#api-response-validation>API Response Validation</a></li></ol></li><li><a href=#combined-application>Combined Application</a><ol><li><a href=#a-complete-test-environment>A Complete Test Environment</a></li><li><a href=#test-data-management>Test Data Management</a></li></ol></li><li><a href=#performance-optimization>Performance Optimization</a><ol><li><a href=#context-reuse>Context Reuse</a></li><li><a href=#parallel-test-optimization>Parallel Test Optimization</a></li></ol></li><li><a href=#conclusion>Conclusion</a></li><li><a href=#9-summary-of-best-practices>9. Summary of Best Practices</a><ol><li><a href=#91-fixture-design-principles>9.1 Fixture Design Principles</a></li><li><a href=#92-performance-optimization-suggestions>9.2 Performance Optimization Suggestions</a></li><li><a href=#93-maintainability-suggestions>9.3 Maintainability Suggestions</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/en/post/121-playwright_adv_fixture/><img src=/post/121-playwright_adv_fixture/playwright_logo_hu_45b92ae3161ff7fd.webp srcset="/post/121-playwright_adv_fixture/playwright_logo_hu_45b92ae3161ff7fd.webp 800w, /post/121-playwright_adv_fixture/playwright_logo_hu_1f93ede0352166ba.webp 1600w" width=800 height=483 loading=lazy alt="Featured image of post Advanced Fixture Techniques in Playwright"></a></div><div class=article-details><header class=article-category><a href=/en/categories/testing-tools/>Testing Tools</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/en/post/121-playwright_adv_fixture/>Advanced Fixture Techniques in Playwright</a></h2><h3 class=article-subtitle>In this article we will sort out and discuss some advanced applications of built-in fixtures in Playwright, to help us use `Playwright` better</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Aug 17, 2025</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>14 minute read</time></div></footer><footer class=article-translations><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg><div><a href=https://chengxiaqiucao.github.io/post/121-playwright_adv_fixture/ class=link>中文</a></div></footer></div></header><section class=article-content><p><img src=/post/121-playwright_adv_fixture/playwright_logo_hu_a08218a6cce97189.webp width=1024 height=619 srcset="/post/121-playwright_adv_fixture/playwright_logo_hu_c1cbb4db5ac2e7d6.webp 480w, /post/121-playwright_adv_fixture/playwright_logo_hu_a08218a6cce97189.webp 1024w" loading=lazy class=gallery-image data-flex-grow=165 data-flex-basis=397px></p><h1 id=advanced-fixture-techniques-in-playwright>Advanced Fixture Techniques in Playwright</h1><p>As the most promising automated testing tool today, Playwright has fully absorbed the strengths of many other frameworks. A key one is borrowing the fixture advantages of pytest; its JavaScript and .NET versions also provide fixture support. Of course, its <code>Python</code> version also continues to include a rich set of built-in <code>fixtures</code>.</p><p>In this article we will sort out and discuss some advanced applications of built-in fixtures in Playwright, to help us use <code>Playwright</code> better.</p><h2 id=overview-of-playwright-built-in-fixtures>Overview of Playwright Built-in Fixtures</h2><p>The Playwright Python version includes the following core built-in fixtures:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># basic fixtures</span>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>browser</span><span class=p>():</span>  <span class=c1># browser instance</span>
+</span></span><span class=line><span class=cl>    <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>context</span><span class=p>():</span>  <span class=c1># browser context</span>
+</span></span><span class=line><span class=cl>    <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>page</span><span class=p>():</span>  <span class=c1># page instance</span>
+</span></span><span class=line><span class=cl>    <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>playwright</span><span class=p>():</span>  <span class=c1># Playwright instance</span>
+</span></span><span class=line><span class=cl>    <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># configuration fixtures</span>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>browser_name</span><span class=p>():</span>  <span class=c1># browser name</span>
+</span></span><span class=line><span class=cl>    <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>browser_channel</span><span class=p>():</span>  <span class=c1># browser channel</span>
+</span></span><span class=line><span class=cl>    <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>is_mobile</span><span class=p>():</span>  <span class=c1># whether it is a mobile device</span>
+</span></span><span class=line><span class=cl>    <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>device_name</span><span class=p>():</span>  <span class=c1># device name</span>
+</span></span><span class=line><span class=cl>    <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>viewport_size</span><span class=p>():</span>  <span class=c1># viewport size</span>
+</span></span><span class=line><span class=cl>    <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># API fixtures</span>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>request</span><span class=p>():</span>  <span class=c1># API request context</span>
+</span></span><span class=line><span class=cl>    <span class=k>pass</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=advanced-usage-of-browser-fixtures>Advanced Usage of browser Fixtures</h2><h3 id=multi-browser-parallel-testing>Multi-browser Parallel Testing</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_browsers.py</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>pytest</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>playwright.sync_api</span> <span class=kn>import</span> <span class=n>Browser</span><span class=p>,</span> <span class=n>Page</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span><span class=p>(</span><span class=n>params</span><span class=o>=</span><span class=p>[</span><span class=s2>&#34;chromium&#34;</span><span class=p>,</span> <span class=s2>&#34;firefox&#34;</span><span class=p>,</span> <span class=s2>&#34;webkit&#34;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>cross_browser_page</span><span class=p>(</span><span class=n>request</span><span class=p>,</span> <span class=n>playwright</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Page</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Cross-browser testing fixture&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>request</span><span class=o>.</span><span class=n>param</span> <span class=o>==</span> <span class=s2>&#34;chromium&#34;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>browser</span> <span class=o>=</span> <span class=n>playwright</span><span class=o>.</span><span class=n>chromium</span><span class=o>.</span><span class=n>launch</span><span class=p>(</span><span class=n>headless</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>elif</span> <span class=n>request</span><span class=o>.</span><span class=n>param</span> <span class=o>==</span> <span class=s2>&#34;firefox&#34;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>browser</span> <span class=o>=</span> <span class=n>playwright</span><span class=o>.</span><span class=n>firefox</span><span class=o>.</span><span class=n>launch</span><span class=p>(</span><span class=n>headless</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>browser</span> <span class=o>=</span> <span class=n>playwright</span><span class=o>.</span><span class=n>webkit</span><span class=o>.</span><span class=n>launch</span><span class=p>(</span><span class=n>headless</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>context</span> <span class=o>=</span> <span class=n>browser</span><span class=o>.</span><span class=n>new_context</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>page</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>browser</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_cross_browser_compatibility</span><span class=p>(</span><span class=n>cross_browser_page</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Cross-browser compatibility test&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>cross_browser_page</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=s2>&#34;http://localhost:8080&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>cross_browser_page</span><span class=o>.</span><span class=n>title</span><span class=p>()</span> <span class=o>==</span> <span class=s2>&#34;Test Page&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>cross_browser_page</span><span class=o>.</span><span class=n>locator</span><span class=p>(</span><span class=s2>&#34;h1&#34;</span><span class=p>)</span><span class=o>.</span><span class=n>text_content</span><span class=p>()</span> <span class=o>==</span> <span class=s2>&#34;Test Page&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=advanced-browser-context-configuration>Advanced Browser Context Configuration</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_context.py</span>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>stealth_context</span><span class=p>(</span><span class=n>browser</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Anti-detection browser context&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span> <span class=o>=</span> <span class=n>browser</span><span class=o>.</span><span class=n>new_context</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=n>viewport</span><span class=o>=</span><span class=p>{</span><span class=s2>&#34;width&#34;</span><span class=p>:</span> <span class=mi>1920</span><span class=p>,</span> <span class=s2>&#34;height&#34;</span><span class=p>:</span> <span class=mi>1080</span><span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=n>user_agent</span><span class=o>=</span><span class=s2>&#34;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>locale</span><span class=o>=</span><span class=s2>&#34;en-US&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>timezone_id</span><span class=o>=</span><span class=s2>&#34;America/New_York&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>geolocation</span><span class=o>=</span><span class=p>{</span><span class=s2>&#34;longitude&#34;</span><span class=p>:</span> <span class=o>-</span><span class=mf>73.935242</span><span class=p>,</span> <span class=s2>&#34;latitude&#34;</span><span class=p>:</span> <span class=mf>40.730610</span><span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=n>permissions</span><span class=o>=</span><span class=p>[</span><span class=s2>&#34;geolocation&#34;</span><span class=p>,</span> <span class=s2>&#34;notifications&#34;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>        <span class=n>extra_http_headers</span><span class=o>=</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;Accept-Language&#34;</span><span class=p>:</span> <span class=s2>&#34;en-US,en;q=0.9&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=n>ignore_https_errors</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>java_script_enabled</span><span class=o>=</span><span class=kc>True</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># inject anti-detection script</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span><span class=o>.</span><span class=n>add_init_script</span><span class=p>(</span><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        Object.defineProperty(navigator, &#39;webdriver&#39;, {
+</span></span></span><span class=line><span class=cl><span class=s2>            get: () =&gt; undefined
+</span></span></span><span class=line><span class=cl><span class=s2>        });
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>context</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>context</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>stealth_page</span><span class=p>(</span><span class=n>stealth_context</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Anti-detection page&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=n>stealth_context</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>page</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_stealth_browser</span><span class=p>(</span><span class=n>stealth_page</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Test anti-detection browser&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>stealth_page</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=s2>&#34;http://localhost:8080&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># check whether the webdriver attribute is hidden</span>
+</span></span><span class=line><span class=cl>    <span class=n>is_webdriver</span> <span class=o>=</span> <span class=n>stealth_page</span><span class=o>.</span><span class=n>evaluate</span><span class=p>(</span><span class=s2>&#34;() =&gt; navigator.webdriver&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>is_webdriver</span> <span class=ow>is</span> <span class=kc>None</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># check the user agent</span>
+</span></span><span class=line><span class=cl>    <span class=n>user_agent</span> <span class=o>=</span> <span class=n>stealth_page</span><span class=o>.</span><span class=n>evaluate</span><span class=p>(</span><span class=s2>&#34;() =&gt; navigator.userAgent&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=s2>&#34;Windows NT 10.0&#34;</span> <span class=ow>in</span> <span class=n>user_agent</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=browser-performance-monitoring>Browser Performance Monitoring</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_performance.py</span>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>performance_page</span><span class=p>(</span><span class=n>context</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Performance monitoring page&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>new_context</span><span class=p>()</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># enable performance monitoring</span>
+</span></span><span class=line><span class=cl>    <span class=n>metrics</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>on_metrics</span><span class=p>(</span><span class=n>metrics_data</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>metrics</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>metrics_data</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>on</span><span class=p>(</span><span class=s2>&#34;metrics&#34;</span><span class=p>,</span> <span class=n>on_metrics</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>page</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># output performance metrics</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>metrics</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;Page performance metrics: </span><span class=si>{</span><span class=n>metrics</span><span class=p>[</span><span class=o>-</span><span class=mi>1</span><span class=p>]</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_page_performance</span><span class=p>(</span><span class=n>performance_page</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Page performance test&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>performance_page</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=s2>&#34;http://localhost:8080&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># wait for the page to finish loading</span>
+</span></span><span class=line><span class=cl>    <span class=n>performance_page</span><span class=o>.</span><span class=n>wait_for_load_state</span><span class=p>(</span><span class=s2>&#34;networkidle&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># get performance metrics</span>
+</span></span><span class=line><span class=cl>    <span class=n>metrics</span> <span class=o>=</span> <span class=n>performance_page</span><span class=o>.</span><span class=n>evaluate</span><span class=p>(</span><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        () =&gt; ({
+</span></span></span><span class=line><span class=cl><span class=s2>            timing: window.performance.timing,
+</span></span></span><span class=line><span class=cl><span class=s2>            memory: window.performance.memory,
+</span></span></span><span class=line><span class=cl><span class=s2>            navigation: window.performance.navigation
+</span></span></span><span class=line><span class=cl><span class=s2>        })
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># calculate page load time</span>
+</span></span><span class=line><span class=cl>    <span class=n>load_time</span> <span class=o>=</span> <span class=n>metrics</span><span class=p>[</span><span class=s1>&#39;timing&#39;</span><span class=p>][</span><span class=s1>&#39;loadEventEnd&#39;</span><span class=p>]</span> <span class=o>-</span> <span class=n>metrics</span><span class=p>[</span><span class=s1>&#39;timing&#39;</span><span class=p>][</span><span class=s1>&#39;navigationStart&#39;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;Page load time: </span><span class=si>{</span><span class=n>load_time</span><span class=si>}</span><span class=s2>ms&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># verify page load time is within a reasonable range</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>load_time</span> <span class=o>&lt;</span> <span class=mi>5000</span>  <span class=c1># less than 5 seconds</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=advanced-usage-of-page-fixtures>Advanced Usage of page Fixtures</h2><h3 id=smart-wait-strategy>Smart Wait Strategy</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_smart_wait.py</span>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>smart_wait_page</span><span class=p>(</span><span class=n>context</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Smart wait page&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># set default timeout</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>set_default_timeout</span><span class=p>(</span><span class=mi>10000</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>set_default_navigation_timeout</span><span class=p>(</span><span class=mi>30000</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># custom wait strategy</span>
+</span></span><span class=line><span class=cl>    <span class=n>original_wait_for_selector</span> <span class=o>=</span> <span class=n>page</span><span class=o>.</span><span class=n>wait_for_selector</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>enhanced_wait_for_selector</span><span class=p>(</span><span class=n>selector</span><span class=p>,</span> <span class=o>**</span><span class=n>kwargs</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;Enhanced wait-for-selector method&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=c1># first try a fast lookup</span>
+</span></span><span class=line><span class=cl>            <span class=n>element</span> <span class=o>=</span> <span class=n>page</span><span class=o>.</span><span class=n>query_selector</span><span class=p>(</span><span class=n>selector</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>element</span> <span class=ow>and</span> <span class=n>element</span><span class=o>.</span><span class=n>is_visible</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>                <span class=k>return</span> <span class=n>element</span>
+</span></span><span class=line><span class=cl>            
+</span></span><span class=line><span class=cl>            <span class=c1># if not found, use the original method to wait</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>original_wait_for_selector</span><span class=p>(</span><span class=n>selector</span><span class=p>,</span> <span class=o>**</span><span class=n>kwargs</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;Waiting for selector </span><span class=si>{</span><span class=n>selector</span><span class=si>}</span><span class=s2> failed: </span><span class=si>{</span><span class=n>e</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>raise</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>wait_for_selector</span> <span class=o>=</span> <span class=n>enhanced_wait_for_selector</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>page</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_smart_waiting</span><span class=p>(</span><span class=n>smart_wait_page</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Test smart waiting&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>smart_wait_page</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=s2>&#34;http://localhost:8080&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># use the enhanced wait method</span>
+</span></span><span class=line><span class=cl>    <span class=n>header</span> <span class=o>=</span> <span class=n>smart_wait_page</span><span class=o>.</span><span class=n>wait_for_selector</span><span class=p>(</span><span class=s2>&#34;h1&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>header</span><span class=o>.</span><span class=n>is_visible</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>header</span><span class=o>.</span><span class=n>text_content</span><span class=p>()</span> <span class=o>==</span> <span class=s2>&#34;Test Page&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=network-interception-and-mocking>Network Interception and Mocking</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_network_mock.py</span>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>network_mock_page</span><span class=p>(</span><span class=n>context</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Network mocking page&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># intercept all network requests</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>handle_request</span><span class=p>(</span><span class=n>request</span><span class=p>:</span> <span class=n>Request</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=s2>&#34;localhost:8080/api&#34;</span> <span class=ow>in</span> <span class=n>request</span><span class=o>.</span><span class=n>url</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=c1># mock API response</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=s2>&#34;/api/user&#34;</span> <span class=ow>in</span> <span class=n>request</span><span class=o>.</span><span class=n>url</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>request</span><span class=o>.</span><span class=n>respond</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;status&#34;</span><span class=p>:</span> <span class=mi>200</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;headers&#34;</span><span class=p>:</span> <span class=p>{</span><span class=s2>&#34;Content-Type&#34;</span><span class=p>:</span> <span class=s2>&#34;application/json&#34;</span><span class=p>},</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;body&#34;</span><span class=p>:</span> <span class=s1>&#39;{&#34;status&#34;: &#34;success&#34;, &#34;data&#34;: {&#34;id&#34;: 1, &#34;name&#34;: &#34;Mock User&#34;, &#34;email&#34;: &#34;mock@example.com&#34;}}&#39;</span>
+</span></span><span class=line><span class=cl>                <span class=p>})</span>
+</span></span><span class=line><span class=cl>            <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>request</span><span class=o>.</span><span class=n>continue_</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>request</span><span class=o>.</span><span class=n>continue_</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>route</span><span class=p>(</span><span class=s2>&#34;**/*&#34;</span><span class=p>,</span> <span class=n>handle_request</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>page</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_network_mocking</span><span class=p>(</span><span class=n>network_mock_page</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Test network mocking&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>network_mock_page</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=s2>&#34;http://localhost:8080&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># create a test page containing an API call</span>
+</span></span><span class=line><span class=cl>    <span class=n>html_content</span> <span class=o>=</span> <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;!DOCTYPE html&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;html&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;head&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>        &lt;title&gt;Mock Test&lt;/title&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;/head&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;body&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>        &lt;button id=&#34;fetch-btn&#34;&gt;Fetch User&lt;/button&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>        &lt;div id=&#34;result&#34;&gt;&lt;/div&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>        &lt;script&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>            document.getElementById(&#39;fetch-btn&#39;).addEventListener(&#39;click&#39;, async () =&gt; {
+</span></span></span><span class=line><span class=cl><span class=s2>                try {
+</span></span></span><span class=line><span class=cl><span class=s2>                    const response = await fetch(&#39;http://localhost:8080/api/user&#39;);
+</span></span></span><span class=line><span class=cl><span class=s2>                    const data = await response.json();
+</span></span></span><span class=line><span class=cl><span class=s2>                    document.getElementById(&#39;result&#39;).innerHTML = 
+</span></span></span><span class=line><span class=cl><span class=s2>                        `&lt;p&gt;Name: $</span><span class=si>{data.data.name}</span><span class=s2>&lt;/p&gt;&lt;p&gt;Email: $</span><span class=si>{data.data.email}</span><span class=s2>&lt;/p&gt;`;
+</span></span></span><span class=line><span class=cl><span class=s2>                } catch (error) {
+</span></span></span><span class=line><span class=cl><span class=s2>                    document.getElementById(&#39;result&#39;).innerText = &#39;Error: &#39; + error.message;
+</span></span></span><span class=line><span class=cl><span class=s2>                }
+</span></span></span><span class=line><span class=cl><span class=s2>            });
+</span></span></span><span class=line><span class=cl><span class=s2>        &lt;/script&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;/body&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;/html&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>network_mock_page</span><span class=o>.</span><span class=n>set_content</span><span class=p>(</span><span class=n>html_content</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># click the button to trigger the API call</span>
+</span></span><span class=line><span class=cl>    <span class=n>network_mock_page</span><span class=o>.</span><span class=n>click</span><span class=p>(</span><span class=s2>&#34;#fetch-btn&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># wait for the result to display</span>
+</span></span><span class=line><span class=cl>    <span class=n>result</span> <span class=o>=</span> <span class=n>network_mock_page</span><span class=o>.</span><span class=n>locator</span><span class=p>(</span><span class=s2>&#34;#result&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>result</span><span class=o>.</span><span class=n>wait_for</span><span class=p>(</span><span class=n>state</span><span class=o>=</span><span class=s2>&#34;visible&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># verify the result</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=s2>&#34;Mock User&#34;</span> <span class=ow>in</span> <span class=n>result</span><span class=o>.</span><span class=n>text_content</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=s2>&#34;mock@example.com&#34;</span> <span class=ow>in</span> <span class=n>result</span><span class=o>.</span><span class=n>text_content</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=page-screenshot-and-video-recording>Page Screenshot and Video Recording</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_recording.py</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>os</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>time</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>recording_page</span><span class=p>(</span><span class=n>context</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Recording page&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=c1># create the results directory</span>
+</span></span><span class=line><span class=cl>    <span class=n>os</span><span class=o>.</span><span class=n>makedirs</span><span class=p>(</span><span class=s2>&#34;test-results/screenshots&#34;</span><span class=p>,</span> <span class=n>exist_ok</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>os</span><span class=o>.</span><span class=n>makedirs</span><span class=p>(</span><span class=s2>&#34;test-results/videos&#34;</span><span class=p>,</span> <span class=n>exist_ok</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>context</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>new_context</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=n>record_video_dir</span><span class=o>=</span><span class=s2>&#34;test-results/videos/&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>record_video_size</span><span class=o>=</span><span class=p>{</span><span class=s2>&#34;width&#34;</span><span class=p>:</span> <span class=mi>1280</span><span class=p>,</span> <span class=s2>&#34;height&#34;</span><span class=p>:</span> <span class=mi>720</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>page</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># take a screenshot when the test ends</span>
+</span></span><span class=line><span class=cl>    <span class=n>timestamp</span> <span class=o>=</span> <span class=nb>int</span><span class=p>(</span><span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>screenshot</span><span class=p>(</span><span class=n>path</span><span class=o>=</span><span class=sa>f</span><span class=s2>&#34;test-results/screenshots/test_</span><span class=si>{</span><span class=n>timestamp</span><span class=si>}</span><span class=s2>.png&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>screenshot_on_failure_page</span><span class=p>(</span><span class=n>context</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Page that takes a screenshot on failure&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>page</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># check whether the test failed</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nb>hasattr</span><span class=p>(</span><span class=n>page</span><span class=p>,</span> <span class=s1>&#39;_test_failed&#39;</span><span class=p>)</span> <span class=ow>and</span> <span class=n>page</span><span class=o>.</span><span class=n>_test_failed</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>timestamp</span> <span class=o>=</span> <span class=nb>int</span><span class=p>(</span><span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>        <span class=n>page</span><span class=o>.</span><span class=n>screenshot</span><span class=p>(</span><span class=n>path</span><span class=o>=</span><span class=sa>f</span><span class=s2>&#34;test-results/screenshots/failure_</span><span class=si>{</span><span class=n>timestamp</span><span class=si>}</span><span class=s2>.png&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_recording</span><span class=p>(</span><span class=n>recording_page</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Test the recording feature&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>recording_page</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=s2>&#34;http://localhost:8080&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># perform some actions</span>
+</span></span><span class=line><span class=cl>    <span class=n>recording_page</span><span class=o>.</span><span class=n>click</span><span class=p>(</span><span class=s2>&#34;h1&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>recording_page</span><span class=o>.</span><span class=n>wait_for_timeout</span><span class=p>(</span><span class=mi>1000</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># verify page content</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>recording_page</span><span class=o>.</span><span class=n>title</span><span class=p>()</span> <span class=o>==</span> <span class=s2>&#34;Test Page&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_screenshot_on_failure</span><span class=p>(</span><span class=n>screenshot_on_failure_page</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Test screenshot on failure&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=c1># mark the test as failed (for demonstration only)</span>
+</span></span><span class=line><span class=cl>    <span class=n>screenshot_on_failure_page</span><span class=o>.</span><span class=n>_test_failed</span> <span class=o>=</span> <span class=kc>True</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>screenshot_on_failure_page</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=s2>&#34;http://localhost:8080&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># this assertion will fail, triggering the screenshot</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=kc>False</span><span class=p>,</span> <span class=s2>&#34;This test is designed to fail to demonstrate screenshot on failure&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=advanced-usage-of-device-and-viewport-fixtures>Advanced Usage of device and viewport Fixtures</h2><h3 id=responsive-testing>Responsive Testing</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_responsive.py</span>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span><span class=p>(</span><span class=n>params</span><span class=o>=</span><span class=p>[</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span><span class=s2>&#34;width&#34;</span><span class=p>:</span> <span class=mi>1920</span><span class=p>,</span> <span class=s2>&#34;height&#34;</span><span class=p>:</span> <span class=mi>1080</span><span class=p>,</span> <span class=s2>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Desktop&#34;</span><span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span><span class=s2>&#34;width&#34;</span><span class=p>:</span> <span class=mi>768</span><span class=p>,</span> <span class=s2>&#34;height&#34;</span><span class=p>:</span> <span class=mi>1024</span><span class=p>,</span> <span class=s2>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Tablet&#34;</span><span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span><span class=s2>&#34;width&#34;</span><span class=p>:</span> <span class=mi>375</span><span class=p>,</span> <span class=s2>&#34;height&#34;</span><span class=p>:</span> <span class=mi>667</span><span class=p>,</span> <span class=s2>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Mobile&#34;</span><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>])</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>responsive_page</span><span class=p>(</span><span class=n>request</span><span class=p>,</span> <span class=n>browser</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Responsive testing page&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>viewport</span> <span class=o>=</span> <span class=n>request</span><span class=o>.</span><span class=n>param</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span> <span class=o>=</span> <span class=n>browser</span><span class=o>.</span><span class=n>new_context</span><span class=p>(</span><span class=n>viewport</span><span class=o>=</span><span class=n>viewport</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># add viewport info to the page</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>_viewport_info</span> <span class=o>=</span> <span class=n>viewport</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>page</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_responsive_design</span><span class=p>(</span><span class=n>responsive_page</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Responsive design test&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>responsive_page</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=s2>&#34;http://localhost:8080&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>viewport</span> <span class=o>=</span> <span class=n>responsive_page</span><span class=o>.</span><span class=n>_viewport_info</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># perform different verifications based on viewport size</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>viewport</span><span class=p>[</span><span class=s2>&#34;name&#34;</span><span class=p>]</span> <span class=o>==</span> <span class=s2>&#34;Desktop&#34;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=c1># desktop verification</span>
+</span></span><span class=line><span class=cl>        <span class=k>assert</span> <span class=n>responsive_page</span><span class=o>.</span><span class=n>viewport_size</span><span class=p>[</span><span class=s2>&#34;width&#34;</span><span class=p>]</span> <span class=o>==</span> <span class=mi>1920</span>
+</span></span><span class=line><span class=cl>        <span class=k>assert</span> <span class=n>responsive_page</span><span class=o>.</span><span class=n>viewport_size</span><span class=p>[</span><span class=s2>&#34;height&#34;</span><span class=p>]</span> <span class=o>==</span> <span class=mi>1080</span>
+</span></span><span class=line><span class=cl>    <span class=k>elif</span> <span class=n>viewport</span><span class=p>[</span><span class=s2>&#34;name&#34;</span><span class=p>]</span> <span class=o>==</span> <span class=s2>&#34;Tablet&#34;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=c1># tablet verification</span>
+</span></span><span class=line><span class=cl>        <span class=k>assert</span> <span class=n>responsive_page</span><span class=o>.</span><span class=n>viewport_size</span><span class=p>[</span><span class=s2>&#34;width&#34;</span><span class=p>]</span> <span class=o>==</span> <span class=mi>768</span>
+</span></span><span class=line><span class=cl>        <span class=k>assert</span> <span class=n>responsive_page</span><span class=o>.</span><span class=n>viewport_size</span><span class=p>[</span><span class=s2>&#34;height&#34;</span><span class=p>]</span> <span class=o>==</span> <span class=mi>1024</span>
+</span></span><span class=line><span class=cl>    <span class=k>elif</span> <span class=n>viewport</span><span class=p>[</span><span class=s2>&#34;name&#34;</span><span class=p>]</span> <span class=o>==</span> <span class=s2>&#34;Mobile&#34;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=c1># mobile verification</span>
+</span></span><span class=line><span class=cl>        <span class=k>assert</span> <span class=n>responsive_page</span><span class=o>.</span><span class=n>viewport_size</span><span class=p>[</span><span class=s2>&#34;width&#34;</span><span class=p>]</span> <span class=o>==</span> <span class=mi>375</span>
+</span></span><span class=line><span class=cl>        <span class=k>assert</span> <span class=n>responsive_page</span><span class=o>.</span><span class=n>viewport_size</span><span class=p>[</span><span class=s2>&#34;height&#34;</span><span class=p>]</span> <span class=o>==</span> <span class=mi>667</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=device-simulation>Device Simulation</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_device_simulation.py</span>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span><span class=p>(</span><span class=n>params</span><span class=o>=</span><span class=p>[</span><span class=s2>&#34;iPhone 12&#34;</span><span class=p>,</span> <span class=s2>&#34;iPad Pro&#34;</span><span class=p>,</span> <span class=s2>&#34;Pixel 5&#34;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>device_page</span><span class=p>(</span><span class=n>request</span><span class=p>,</span> <span class=n>playwright</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Device simulation page&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>device</span> <span class=o>=</span> <span class=n>playwright</span><span class=o>.</span><span class=n>devices</span><span class=p>[</span><span class=n>request</span><span class=o>.</span><span class=n>param</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>browser</span> <span class=o>=</span> <span class=n>playwright</span><span class=o>.</span><span class=n>chromium</span><span class=o>.</span><span class=n>launch</span><span class=p>(</span><span class=n>headless</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span> <span class=o>=</span> <span class=n>browser</span><span class=o>.</span><span class=n>new_context</span><span class=p>(</span><span class=o>**</span><span class=n>device</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># add device information</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>_device_info</span> <span class=o>=</span> <span class=n>device</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>page</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>browser</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_device_simulation</span><span class=p>(</span><span class=n>device_page</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Device simulation test&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>device_page</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=s2>&#34;http://localhost:8080&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>device</span> <span class=o>=</span> <span class=n>device_page</span><span class=o>.</span><span class=n>_device_info</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># verify the user agent</span>
+</span></span><span class=line><span class=cl>    <span class=n>user_agent</span> <span class=o>=</span> <span class=n>device_page</span><span class=o>.</span><span class=n>evaluate</span><span class=p>(</span><span class=s2>&#34;() =&gt; navigator.userAgent&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>device</span><span class=p>[</span><span class=s2>&#34;user_agent&#34;</span><span class=p>]</span> <span class=ow>in</span> <span class=n>user_agent</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># verify viewport size</span>
+</span></span><span class=line><span class=cl>    <span class=n>viewport</span> <span class=o>=</span> <span class=n>device_page</span><span class=o>.</span><span class=n>viewport_size</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>viewport</span><span class=p>[</span><span class=s2>&#34;width&#34;</span><span class=p>]</span> <span class=o>==</span> <span class=n>device</span><span class=p>[</span><span class=s2>&#34;viewport&#34;</span><span class=p>][</span><span class=s2>&#34;width&#34;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>viewport</span><span class=p>[</span><span class=s2>&#34;height&#34;</span><span class=p>]</span> <span class=o>==</span> <span class=n>device</span><span class=p>[</span><span class=s2>&#34;viewport&#34;</span><span class=p>][</span><span class=s2>&#34;height&#34;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># verify device pixel ratio</span>
+</span></span><span class=line><span class=cl>    <span class=n>device_pixel_ratio</span> <span class=o>=</span> <span class=n>device_page</span><span class=o>.</span><span class=n>evaluate</span><span class=p>(</span><span class=s2>&#34;() =&gt; window.devicePixelRatio&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>device_pixel_ratio</span> <span class=o>==</span> <span class=n>device</span><span class=p>[</span><span class=s2>&#34;device_scale_factor&#34;</span><span class=p>]</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=advanced-usage-of-api-fixtures>Advanced Usage of API Fixtures</h2><h3 id=api-test-authentication>API Test Authentication</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_api_auth.py</span>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>authenticated_api_context</span><span class=p>(</span><span class=n>playwright</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Authenticated API context&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>api_context</span> <span class=o>=</span> <span class=n>playwright</span><span class=o>.</span><span class=n>request</span><span class=o>.</span><span class=n>new_context</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># log in to get the token</span>
+</span></span><span class=line><span class=cl>    <span class=n>login_response</span> <span class=o>=</span> <span class=n>api_context</span><span class=o>.</span><span class=n>post</span><span class=p>(</span><span class=s2>&#34;http://localhost:8080/api/login&#34;</span><span class=p>,</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;username&#34;</span><span class=p>:</span> <span class=s2>&#34;testuser&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;password&#34;</span><span class=p>:</span> <span class=s2>&#34;testpass&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>})</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>login_response</span><span class=o>.</span><span class=n>status</span> <span class=o>==</span> <span class=mi>200</span>
+</span></span><span class=line><span class=cl>    <span class=n>token</span> <span class=o>=</span> <span class=n>login_response</span><span class=o>.</span><span class=n>json</span><span class=p>()[</span><span class=s2>&#34;token&#34;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># set the authorization header</span>
+</span></span><span class=line><span class=cl>    <span class=n>api_context</span><span class=o>.</span><span class=n>set_extra_http_headers</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;Authorization&#34;</span><span class=p>:</span> <span class=sa>f</span><span class=s2>&#34;Bearer </span><span class=si>{</span><span class=n>token</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;Content-Type&#34;</span><span class=p>:</span> <span class=s2>&#34;application/json&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>})</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>api_context</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>api_context</span><span class=o>.</span><span class=n>dispose</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_authenticated_api</span><span class=p>(</span><span class=n>authenticated_api_context</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Authenticated API test&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>response</span> <span class=o>=</span> <span class=n>authenticated_api_context</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&#34;http://localhost:8080/api/user&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>response</span><span class=o>.</span><span class=n>status</span> <span class=o>==</span> <span class=mi>200</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>user_data</span> <span class=o>=</span> <span class=n>response</span><span class=o>.</span><span class=n>json</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>user_data</span><span class=p>[</span><span class=s2>&#34;name&#34;</span><span class=p>]</span> <span class=o>==</span> <span class=s2>&#34;Test User&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>user_data</span><span class=p>[</span><span class=s2>&#34;email&#34;</span><span class=p>]</span> <span class=o>==</span> <span class=s2>&#34;test@example.com&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=api-response-validation>API Response Validation</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_api_validation.py</span>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>api_validator</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;API response validator&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>validate_schema</span><span class=p>(</span><span class=n>response</span><span class=p>,</span> <span class=n>schema</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;Validate the response schema&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=n>data</span> <span class=o>=</span> <span class=n>response</span><span class=o>.</span><span class=n>json</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=k>def</span> <span class=nf>validate_object</span><span class=p>(</span><span class=n>obj</span><span class=p>,</span> <span class=n>schema_def</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=k>for</span> <span class=n>key</span><span class=p>,</span> <span class=n>expected_type</span> <span class=ow>in</span> <span class=n>schema_def</span><span class=o>.</span><span class=n>items</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=n>key</span> <span class=ow>not</span> <span class=ow>in</span> <span class=n>obj</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                    <span class=k>raise</span> <span class=ne>AssertionError</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;Missing key: </span><span class=si>{</span><span class=n>key</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>expected_type</span><span class=p>,</span> <span class=nb>dict</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>                    <span class=k>if</span> <span class=ow>not</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>obj</span><span class=p>[</span><span class=n>key</span><span class=p>],</span> <span class=nb>dict</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>                        <span class=k>raise</span> <span class=ne>AssertionError</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;Expected dict for key: </span><span class=si>{</span><span class=n>key</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                    <span class=n>validate_object</span><span class=p>(</span><span class=n>obj</span><span class=p>[</span><span class=n>key</span><span class=p>],</span> <span class=n>expected_type</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=k>elif</span> <span class=ow>not</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>obj</span><span class=p>[</span><span class=n>key</span><span class=p>],</span> <span class=n>expected_type</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>                    <span class=k>raise</span> <span class=ne>AssertionError</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;Expected type </span><span class=si>{</span><span class=n>expected_type</span><span class=si>}</span><span class=s2> for key: </span><span class=si>{</span><span class=n>key</span><span class=si>}</span><span class=s2>, got </span><span class=si>{</span><span class=nb>type</span><span class=p>(</span><span class=n>obj</span><span class=p>[</span><span class=n>key</span><span class=p>])</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=n>validate_object</span><span class=p>(</span><span class=n>data</span><span class=p>,</span> <span class=n>schema</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>True</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>validate_schema</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_api_schema_validation</span><span class=p>(</span><span class=n>authenticated_api_context</span><span class=p>,</span> <span class=n>api_validator</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;API schema validation test&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>response</span> <span class=o>=</span> <span class=n>authenticated_api_context</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&#34;http://localhost:8080/api/user&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>user_schema</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;id&#34;</span><span class=p>:</span> <span class=nb>int</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;name&#34;</span><span class=p>:</span> <span class=nb>str</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;email&#34;</span><span class=p>:</span> <span class=nb>str</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>api_validator</span><span class=p>(</span><span class=n>response</span><span class=p>,</span> <span class=n>user_schema</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p><img src=/post/121-playwright_adv_fixture/Pasted-20250818_hu_fb1962b9a51b7697.webp width=1024 height=544 srcset="/post/121-playwright_adv_fixture/Pasted-20250818_hu_801236a3be5dc75d.webp 480w, /post/121-playwright_adv_fixture/Pasted-20250818_hu_fb1962b9a51b7697.webp 1024w" loading=lazy class=gallery-image data-flex-grow=188 data-flex-basis=452px></p><h2 id=combined-application>Combined Application</h2><h3 id=a-complete-test-environment>A Complete Test Environment</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_complete_environment.py</span>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>complete_test_environment</span><span class=p>(</span><span class=n>playwright</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Complete test environment&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=c1># launch the browser</span>
+</span></span><span class=line><span class=cl>    <span class=n>browser</span> <span class=o>=</span> <span class=n>playwright</span><span class=o>.</span><span class=n>chromium</span><span class=o>.</span><span class=n>launch</span><span class=p>(</span><span class=n>headless</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># create the context</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span> <span class=o>=</span> <span class=n>browser</span><span class=o>.</span><span class=n>new_context</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=n>viewport</span><span class=o>=</span><span class=p>{</span><span class=s2>&#34;width&#34;</span><span class=p>:</span> <span class=mi>1920</span><span class=p>,</span> <span class=s2>&#34;height&#34;</span><span class=p>:</span> <span class=mi>1080</span><span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=n>locale</span><span class=o>=</span><span class=s2>&#34;en-US&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>timezone_id</span><span class=o>=</span><span class=s2>&#34;America/New_York&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>permissions</span><span class=o>=</span><span class=p>[</span><span class=s2>&#34;geolocation&#34;</span><span class=p>,</span> <span class=s2>&#34;notifications&#34;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># create the page</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># create the API context</span>
+</span></span><span class=line><span class=cl>    <span class=n>api_context</span> <span class=o>=</span> <span class=n>playwright</span><span class=o>.</span><span class=n>request</span><span class=o>.</span><span class=n>new_context</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;base_url&#34;</span><span class=p>:</span> <span class=s2>&#34;http://localhost:8080&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;extra_http_headers&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;Content-Type&#34;</span><span class=p>:</span> <span class=s2>&#34;application/json&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>})</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># set up network interception</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>handle_route</span><span class=p>(</span><span class=n>route</span><span class=p>:</span> <span class=n>Route</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=s2>&#34;localhost:8080/api&#34;</span> <span class=ow>in</span> <span class=n>route</span><span class=o>.</span><span class=n>request</span><span class=o>.</span><span class=n>url</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=c1># log the API call</span>
+</span></span><span class=line><span class=cl>            <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;API Call: </span><span class=si>{</span><span class=n>route</span><span class=o>.</span><span class=n>request</span><span class=o>.</span><span class=n>method</span><span class=si>}</span><span class=s2> </span><span class=si>{</span><span class=n>route</span><span class=o>.</span><span class=n>request</span><span class=o>.</span><span class=n>url</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>route</span><span class=o>.</span><span class=n>continue_</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>route</span><span class=p>(</span><span class=s2>&#34;**/*&#34;</span><span class=p>,</span> <span class=n>handle_route</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># set up performance monitoring</span>
+</span></span><span class=line><span class=cl>    <span class=n>performance_data</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>handle_metrics</span><span class=p>(</span><span class=n>metrics</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>performance_data</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>metrics</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>on</span><span class=p>(</span><span class=s2>&#34;metrics&#34;</span><span class=p>,</span> <span class=n>handle_metrics</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># create the test toolset</span>
+</span></span><span class=line><span class=cl>    <span class=n>test_tools</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;page&#34;</span><span class=p>:</span> <span class=n>page</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;context&#34;</span><span class=p>:</span> <span class=n>context</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;browser&#34;</span><span class=p>:</span> <span class=n>browser</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;api_context&#34;</span><span class=p>:</span> <span class=n>api_context</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;performance_data&#34;</span><span class=p>:</span> <span class=n>performance_data</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=c1># utility methods</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;login&#34;</span><span class=p>:</span> <span class=k>lambda</span> <span class=n>username</span><span class=p>,</span> <span class=n>password</span><span class=p>:</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>            <span class=n>page</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=s2>&#34;http://localhost:8080&#34;</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>            <span class=n>page</span><span class=o>.</span><span class=n>fill</span><span class=p>(</span><span class=s2>&#34;#username&#34;</span><span class=p>,</span> <span class=n>username</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>            <span class=n>page</span><span class=o>.</span><span class=n>fill</span><span class=p>(</span><span class=s2>&#34;#password&#34;</span><span class=p>,</span> <span class=n>password</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>            <span class=n>page</span><span class=o>.</span><span class=n>click</span><span class=p>(</span><span class=s2>&#34;#login-button&#34;</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>            <span class=n>page</span><span class=o>.</span><span class=n>wait_for_url</span><span class=p>(</span><span class=s2>&#34;http://localhost:8080/dashboard&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>),</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;screenshot_on_failure&#34;</span><span class=p>:</span> <span class=k>lambda</span><span class=p>:</span> <span class=n>page</span><span class=o>.</span><span class=n>screenshot</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>            <span class=n>path</span><span class=o>=</span><span class=sa>f</span><span class=s2>&#34;test-results/screenshots/failure_</span><span class=si>{</span><span class=nb>int</span><span class=p>(</span><span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>())</span><span class=si>}</span><span class=s2>.png&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>),</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;get_performance_metrics&#34;</span><span class=p>:</span> <span class=k>lambda</span><span class=p>:</span> <span class=n>performance_data</span><span class=p>[</span><span class=o>-</span><span class=mi>1</span><span class=p>]</span> <span class=k>if</span> <span class=n>performance_data</span> <span class=k>else</span> <span class=kc>None</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>test_tools</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># cleanup</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>browser</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>api_context</span><span class=o>.</span><span class=n>dispose</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_complete_workflow</span><span class=p>(</span><span class=n>complete_test_environment</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Complete workflow test&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>tools</span> <span class=o>=</span> <span class=n>complete_test_environment</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># create a login form</span>
+</span></span><span class=line><span class=cl>    <span class=n>tools</span><span class=p>[</span><span class=s2>&#34;page&#34;</span><span class=p>]</span><span class=o>.</span><span class=n>set_content</span><span class=p>(</span><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;!DOCTYPE html&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;html&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;head&gt;&lt;title&gt;Login&lt;/title&gt;&lt;/head&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;body&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>        &lt;form id=&#34;login-form&#34;&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>            &lt;input type=&#34;text&#34; id=&#34;username&#34; placeholder=&#34;Username&#34;&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>            &lt;input type=&#34;password&#34; id=&#34;password&#34; placeholder=&#34;Password&#34;&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>            &lt;button type=&#34;submit&#34; id=&#34;login-button&#34;&gt;Login&lt;/button&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>        &lt;/form&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>        &lt;script&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>            document.getElementById(&#39;login-form&#39;).addEventListener(&#39;submit&#39;, async (e) =&gt; {
+</span></span></span><span class=line><span class=cl><span class=s2>                e.preventDefault();
+</span></span></span><span class=line><span class=cl><span class=s2>                const username = document.getElementById(&#39;username&#39;).value;
+</span></span></span><span class=line><span class=cl><span class=s2>                const password = document.getElementById(&#39;password&#39;).value;
+</span></span></span><span class=line><span class=cl><span class=s2>                
+</span></span></span><span class=line><span class=cl><span class=s2>                const response = await fetch(&#39;/api/login&#39;, {
+</span></span></span><span class=line><span class=cl><span class=s2>                    method: &#39;POST&#39;,
+</span></span></span><span class=line><span class=cl><span class=s2>                    headers: {&#39;Content-Type&#39;: &#39;application/json&#39;},
+</span></span></span><span class=line><span class=cl><span class=s2>                    body: JSON.stringify({username, password})
+</span></span></span><span class=line><span class=cl><span class=s2>                });
+</span></span></span><span class=line><span class=cl><span class=s2>                
+</span></span></span><span class=line><span class=cl><span class=s2>                if (response.ok) {
+</span></span></span><span class=line><span class=cl><span class=s2>                    window.location.href = &#39;/dashboard&#39;;
+</span></span></span><span class=line><span class=cl><span class=s2>                }
+</span></span></span><span class=line><span class=cl><span class=s2>            });
+</span></span></span><span class=line><span class=cl><span class=s2>        &lt;/script&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;/body&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;/html&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># log in</span>
+</span></span><span class=line><span class=cl>    <span class=n>tools</span><span class=p>[</span><span class=s2>&#34;login&#34;</span><span class=p>](</span><span class=s2>&#34;testuser&#34;</span><span class=p>,</span> <span class=s2>&#34;testpass&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># verify login succeeded</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>tools</span><span class=p>[</span><span class=s2>&#34;page&#34;</span><span class=p>]</span><span class=o>.</span><span class=n>url</span> <span class=o>==</span> <span class=s2>&#34;http://localhost:8080/dashboard&#34;</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># verify user info is displayed</span>
+</span></span><span class=line><span class=cl>    <span class=n>user_info</span> <span class=o>=</span> <span class=n>tools</span><span class=p>[</span><span class=s2>&#34;page&#34;</span><span class=p>]</span><span class=o>.</span><span class=n>locator</span><span class=p>(</span><span class=s2>&#34;#user-info&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>user_info</span><span class=o>.</span><span class=n>is_visible</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=s2>&#34;Test User&#34;</span> <span class=ow>in</span> <span class=n>user_info</span><span class=o>.</span><span class=n>text_content</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=s2>&#34;test@example.com&#34;</span> <span class=ow>in</span> <span class=n>user_info</span><span class=o>.</span><span class=n>text_content</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># get performance metrics</span>
+</span></span><span class=line><span class=cl>    <span class=n>metrics</span> <span class=o>=</span> <span class=n>tools</span><span class=p>[</span><span class=s2>&#34;get_performance_metrics&#34;</span><span class=p>]()</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>metrics</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;Page performance metrics: </span><span class=si>{</span><span class=n>metrics</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=test-data-management>Test Data Management</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_data_management.py</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>time</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_data_manager</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Test data manager&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>class</span> <span class=nc>DataManager</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>data</span> <span class=o>=</span> <span class=p>{}</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=k>def</span> <span class=nf>create_user</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=o>**</span><span class=n>kwargs</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;&#34;&#34;Create a test user&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=n>user_data</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;username&#34;</span><span class=p>:</span> <span class=sa>f</span><span class=s2>&#34;testuser_</span><span class=si>{</span><span class=nb>int</span><span class=p>(</span><span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>())</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;email&#34;</span><span class=p>:</span> <span class=sa>f</span><span class=s2>&#34;test_</span><span class=si>{</span><span class=nb>int</span><span class=p>(</span><span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>())</span><span class=si>}</span><span class=s2>@example.com&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;password&#34;</span><span class=p>:</span> <span class=s2>&#34;TestPassword123!&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=o>**</span><span class=n>kwargs</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>data</span><span class=p>[</span><span class=s2>&#34;user&#34;</span><span class=p>]</span> <span class=o>=</span> <span class=n>user_data</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>user_data</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=k>def</span> <span class=nf>create_product</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=o>**</span><span class=n>kwargs</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;&#34;&#34;Create a test product&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=n>product_data</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;name&#34;</span><span class=p>:</span> <span class=sa>f</span><span class=s2>&#34;Test Product </span><span class=si>{</span><span class=nb>int</span><span class=p>(</span><span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>())</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;price&#34;</span><span class=p>:</span> <span class=mf>99.99</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;description&#34;</span><span class=p>:</span> <span class=s2>&#34;Test product description&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=o>**</span><span class=n>kwargs</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>data</span><span class=p>[</span><span class=s2>&#34;product&#34;</span><span class=p>]</span> <span class=o>=</span> <span class=n>product_data</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>product_data</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=k>def</span> <span class=nf>get_data</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>key</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;&#34;&#34;Get test data&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>data</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>key</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=k>def</span> <span class=nf>cleanup</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;&#34;&#34;Clean up test data&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>data</span><span class=o>.</span><span class=n>clear</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>manager</span> <span class=o>=</span> <span class=n>DataManager</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>manager</span>
+</span></span><span class=line><span class=cl>    <span class=n>manager</span><span class=o>.</span><span class=n>cleanup</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>data_driven_test_page</span><span class=p>(</span><span class=n>browser</span><span class=p>,</span> <span class=n>test_data_manager</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Data-driven test page&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span> <span class=o>=</span> <span class=n>browser</span><span class=o>.</span><span class=n>new_context</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># create test data</span>
+</span></span><span class=line><span class=cl>    <span class=n>test_user</span> <span class=o>=</span> <span class=n>test_data_manager</span><span class=o>.</span><span class=n>create_user</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>test_product</span> <span class=o>=</span> <span class=n>test_data_manager</span><span class=o>.</span><span class=n>create_product</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># inject test data into the page</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>_test_data</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;user&#34;</span><span class=p>:</span> <span class=n>test_user</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;product&#34;</span><span class=p>:</span> <span class=n>test_product</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>page</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_data_driven_workflow</span><span class=p>(</span><span class=n>data_driven_test_page</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Data-driven workflow test&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=n>data_driven_test_page</span>
+</span></span><span class=line><span class=cl>    <span class=n>test_data</span> <span class=o>=</span> <span class=n>page</span><span class=o>.</span><span class=n>_test_data</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># create a registration form</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>set_content</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;!DOCTYPE html&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;html&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;head&gt;&lt;title&gt;Register&lt;/title&gt;&lt;/head&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;body&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>        &lt;form id=&#34;register-form&#34;&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>            &lt;input type=&#34;text&#34; id=&#34;username&#34; placeholder=&#34;Username&#34;&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>            &lt;input type=&#34;email&#34; id=&#34;email&#34; placeholder=&#34;Email&#34;&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>            &lt;input type=&#34;password&#34; id=&#34;password&#34; placeholder=&#34;Password&#34;&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>            &lt;button type=&#34;submit&#34; id=&#34;register-button&#34;&gt;Register&lt;/button&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>        &lt;/form&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>        &lt;div id=&#34;welcome-message&#34; style=&#34;display:none;&#34;&gt;&lt;/div&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>        &lt;script&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>            document.getElementById(&#39;register-form&#39;).addEventListener(&#39;submit&#39;, (e) =&gt; </span><span class=se>{{</span><span class=s2>
+</span></span></span><span class=line><span class=cl><span class=s2>                e.preventDefault();
+</span></span></span><span class=line><span class=cl><span class=s2>                const username = document.getElementById(&#39;username&#39;).value;
+</span></span></span><span class=line><span class=cl><span class=s2>                const email = document.getElementById(&#39;email&#39;).value;
+</span></span></span><span class=line><span class=cl><span class=s2>                
+</span></span></span><span class=line><span class=cl><span class=s2>                document.getElementById(&#39;welcome-message&#39;).style.display = &#39;block&#39;;
+</span></span></span><span class=line><span class=cl><span class=s2>                document.getElementById(&#39;welcome-message&#39;).textContent = `Welcome $</span><span class=se>{{</span><span class=s2>username</span><span class=se>}}</span><span class=s2>!`;
+</span></span></span><span class=line><span class=cl><span class=s2>            </span><span class=se>}}</span><span class=s2>);
+</span></span></span><span class=line><span class=cl><span class=s2>        &lt;/script&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;/body&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &lt;/html&gt;
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># test with the test data</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=s2>&#34;about:blank&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>fill</span><span class=p>(</span><span class=s2>&#34;#username&#34;</span><span class=p>,</span> <span class=n>test_data</span><span class=p>[</span><span class=s2>&#34;user&#34;</span><span class=p>][</span><span class=s2>&#34;username&#34;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>fill</span><span class=p>(</span><span class=s2>&#34;#email&#34;</span><span class=p>,</span> <span class=n>test_data</span><span class=p>[</span><span class=s2>&#34;user&#34;</span><span class=p>][</span><span class=s2>&#34;email&#34;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>fill</span><span class=p>(</span><span class=s2>&#34;#password&#34;</span><span class=p>,</span> <span class=n>test_data</span><span class=p>[</span><span class=s2>&#34;user&#34;</span><span class=p>][</span><span class=s2>&#34;password&#34;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>click</span><span class=p>(</span><span class=s2>&#34;#register-button&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># verify registration succeeded</span>
+</span></span><span class=line><span class=cl>    <span class=n>welcome_message</span> <span class=o>=</span> <span class=n>page</span><span class=o>.</span><span class=n>locator</span><span class=p>(</span><span class=s2>&#34;#welcome-message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>welcome_message</span><span class=o>.</span><span class=n>is_visible</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>test_data</span><span class=p>[</span><span class=s2>&#34;user&#34;</span><span class=p>][</span><span class=s2>&#34;username&#34;</span><span class=p>]</span> <span class=ow>in</span> <span class=n>welcome_message</span><span class=o>.</span><span class=n>text_content</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p><img src=/post/121-playwright_adv_fixture/Pasted-20250818-1_hu_af42d0490d8abc70.webp width=1024 height=586 srcset="/post/121-playwright_adv_fixture/Pasted-20250818-1_hu_29761cb07c427eba.webp 480w, /post/121-playwright_adv_fixture/Pasted-20250818-1_hu_af42d0490d8abc70.webp 1024w" loading=lazy class=gallery-image data-flex-grow=174 data-flex-basis=419px></p><h2 id=performance-optimization>Performance Optimization</h2><h3 id=context-reuse>Context Reuse</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_context_reuse.py</span>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span><span class=p>(</span><span class=n>scope</span><span class=o>=</span><span class=s2>&#34;session&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>shared_browser</span><span class=p>(</span><span class=n>playwright</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Session-scoped shared browser&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>browser</span> <span class=o>=</span> <span class=n>playwright</span><span class=o>.</span><span class=n>chromium</span><span class=o>.</span><span class=n>launch</span><span class=p>(</span><span class=n>headless</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>browser</span>
+</span></span><span class=line><span class=cl>    <span class=n>browser</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span><span class=p>(</span><span class=n>scope</span><span class=o>=</span><span class=s2>&#34;module&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>shared_context</span><span class=p>(</span><span class=n>shared_browser</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Module-scoped shared context&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span> <span class=o>=</span> <span class=n>shared_browser</span><span class=o>.</span><span class=n>new_context</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>context</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>optimized_page</span><span class=p>(</span><span class=n>shared_context</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Optimized page fixture&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=n>shared_context</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># preload common resources</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=s2>&#34;about:blank&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>evaluate</span><span class=p>(</span><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        () =&gt; {
+</span></span></span><span class=line><span class=cl><span class=s2>            // preload common libraries
+</span></span></span><span class=line><span class=cl><span class=s2>            const preload = (src) =&gt; {
+</span></span></span><span class=line><span class=cl><span class=s2>                const link = document.createElement(&#39;link&#39;);
+</span></span></span><span class=line><span class=cl><span class=s2>                link.rel = &#39;preload&#39;;
+</span></span></span><span class=line><span class=cl><span class=s2>                link.as = &#39;script&#39;;
+</span></span></span><span class=line><span class=cl><span class=s2>                link.href = src;
+</span></span></span><span class=line><span class=cl><span class=s2>                document.head.appendChild(link);
+</span></span></span><span class=line><span class=cl><span class=s2>            };
+</span></span></span><span class=line><span class=cl><span class=s2>            
+</span></span></span><span class=line><span class=cl><span class=s2>            // preload common scripts
+</span></span></span><span class=line><span class=cl><span class=s2>            preload(&#39;http://localhost:8080/common.js&#39;);
+</span></span></span><span class=line><span class=cl><span class=s2>        }
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>page</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_context_reuse</span><span class=p>(</span><span class=n>optimized_page</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Test context reuse&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>optimized_page</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=s2>&#34;http://localhost:8080&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>optimized_page</span><span class=o>.</span><span class=n>title</span><span class=p>()</span> <span class=o>==</span> <span class=s2>&#34;Test Page&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=parallel-test-optimization>Parallel Test Optimization</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_parallel_optimization.py</span>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>parallel_test_page</span><span class=p>(</span><span class=n>browser</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Parallel test optimization page&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span> <span class=o>=</span> <span class=n>browser</span><span class=o>.</span><span class=n>new_context</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=c1># reduce resource consumption</span>
+</span></span><span class=line><span class=cl>        <span class=n>java_script_enabled</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>ignore_https_errors</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>bypass_csp</span><span class=o>=</span><span class=kc>True</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>page</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>new_page</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># set fast timeouts</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>set_default_timeout</span><span class=p>(</span><span class=mi>5000</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>set_default_navigation_timeout</span><span class=p>(</span><span class=mi>10000</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># disable unnecessary features</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>block_resources</span><span class=p>(</span><span class=n>route</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>route</span><span class=o>.</span><span class=n>request</span><span class=o>.</span><span class=n>resource_type</span> <span class=ow>in</span> <span class=p>[</span><span class=s2>&#34;image&#34;</span><span class=p>,</span> <span class=s2>&#34;stylesheet&#34;</span><span class=p>,</span> <span class=s2>&#34;font&#34;</span><span class=p>]:</span>
+</span></span><span class=line><span class=cl>            <span class=n>route</span><span class=o>.</span><span class=n>abort</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>route</span><span class=o>.</span><span class=n>continue_</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>route</span><span class=p>(</span><span class=s2>&#34;**/*&#34;</span><span class=p>,</span> <span class=n>block_resources</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>yield</span> <span class=n>page</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>page</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@pytest.mark.parametrize</span><span class=p>(</span><span class=s2>&#34;test_case&#34;</span><span class=p>,</span> <span class=p>[</span><span class=s2>&#34;case1&#34;</span><span class=p>,</span> <span class=s2>&#34;case2&#34;</span><span class=p>,</span> <span class=s2>&#34;case3&#34;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_parallel_execution</span><span class=p>(</span><span class=n>parallel_test_page</span><span class=p>,</span> <span class=n>test_case</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Parallel execution test&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>parallel_test_page</span><span class=o>.</span><span class=n>goto</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;http://localhost:8080?test=</span><span class=si>{</span><span class=n>test_case</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># quick verification</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>parallel_test_page</span><span class=o>.</span><span class=n>locator</span><span class=p>(</span><span class=s2>&#34;h1&#34;</span><span class=p>)</span><span class=o>.</span><span class=n>is_visible</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>parallel_test_page</span><span class=o>.</span><span class=n>title</span><span class=p>()</span> <span class=o>==</span> <span class=s2>&#34;Test Page&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=conclusion>Conclusion</h2><p>The above is a summary of some advanced techniques for using Fixtures in the Playwright Python version. Reply <code>playwright fixture</code> in our official account to get the source code above</p><h2 id=9-summary-of-best-practices>9. Summary of Best Practices</h2><h3 id=91-fixture-design-principles>9.1 Fixture Design Principles</h3><ol><li><strong>Single responsibility</strong>: Each fixture is responsible for only one function</li><li><strong>Reasonable scope</strong>: Choose an appropriate scope based on the resource lifecycle</li><li><strong>Resource cleanup</strong>: Ensure resources are properly cleaned up when the fixture ends</li><li><strong>Error handling</strong>: Add appropriate error handling in the fixture</li></ol><h3 id=92-performance-optimization-suggestions>9.2 Performance Optimization Suggestions</h3><ol><li><strong>Reuse resources</strong>: Use session or module scope to reuse browsers and contexts</li><li><strong>Parallel execution</strong>: Design fixtures that support parallel execution</li><li><strong>Resource management</strong>: Manage memory and network resources reasonably</li><li><strong>Timeout settings</strong>: Set reasonable timeouts based on test needs</li></ol><h3 id=93-maintainability-suggestions>9.3 Maintainability Suggestions</h3><ol><li><strong>Documentation</strong>: Add docstrings to complex fixtures</li><li><strong>Type hints</strong>: Use type hints to improve code readability</li><li><strong>Configuration</strong>: Extract hard-coded values into configuration parameters</li><li><strong>Modularity</strong>: Organize related functionality into modules</li></ol><p>Through these fully executable examples, you can gain an in-depth understanding of the advanced application techniques of Playwright Python fixtures, and apply these patterns in real projects to build efficient, reliable test frameworks.</p></section><footer class=article-footer><section class=article-tags><a href=/en/tags/testing-tools/>Testing Tools</a>
+<a href=/en/tags/test-automation/>Test Automation</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/en/post/117-pom_replacement/><div class=article-image><img src=/post/117-pom_replacement/Pasted-20250806.c991c5b42f7b7db1f927a86eb8737b52_hu_9da61416b96f9f2a.webp width=250 height=150 loading=lazy alt="Featured image of post UI Automation, Another Pattern Beyond POM" data-hash="md5-yZHFtC97fbH5J6huuHN7Ug=="></div><div class=article-details><h2 class=article-title>UI Automation, Another Pattern Beyond POM</h2></div></a></article><article class=has-image><a href=/en/post/066-playwright%E6%96%B0%E7%89%88%E6%9C%AC%E7%AD%9B%E9%80%89%E5%8A%9F%E8%83%BD/><div class=article-image><img src=/post/066-playwright%E6%96%B0%E7%89%88%E6%9C%AC%E7%AD%9B%E9%80%89%E5%8A%9F%E8%83%BD/playwright_logo.784bdb51842e76f8a0893b31270f8984_hu_b3903db931a059ec.webp width=250 height=150 loading=lazy alt="Featured image of post Filtering Features in the New Playwright Version" data-hash="md5-eEvbUYQudvigiTsxJw+JhA=="></div><div class=article-details><h2 class=article-title>Filtering Features in the New Playwright Version</h2></div></a></article><article class=has-image><a href=/en/post/050-%E8%87%AA%E5%8A%A8%E5%8C%96%E5%A5%BD%E5%B8%AE%E6%89%8B_chrome%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E5%BD%95%E5%88%B6%E5%99%A8/><div class=article-image><img src=/post/050-%E8%87%AA%E5%8A%A8%E5%8C%96%E5%A5%BD%E5%B8%AE%E6%89%8B_chrome%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E5%BD%95%E5%88%B6%E5%99%A8/Pasted-20250218.789f69f34c4e1182b14249dc7231f034_hu_ea8372cf887c927.webp width=250 height=150 loading=lazy alt="Featured image of post Chrome Recorder as a Handy Test Automation Helper" data-hash="md5-eJ9p80xOEYKxQknccjHwNA=="></div><div class=article-details><h2 class=article-title>Chrome Recorder as a Handy Test Automation Helper</h2></div></a></article><article class=has-image><a href=/en/post/152-self-healing-locator-architecture/><div class=article-image><img src=/post/152-self-healing-locator-architecture/cover.a6e576c781637efd1c2fe973a9ca6883_hu_c8df04097fa1f814.webp width=250 height=150 loading=lazy alt="Featured image of post The Locator Broke but the Test Stayed Green - Runtime Self-Healing and Its Three Audit Gates" data-hash="md5-puV2x4Fjfv0cL+lzqcpogw=="></div><div class=article-details><h2 class=article-title>The Locator Broke but the Test Stayed Green - Runtime Self-Healing and Its Three Audit Gates</h2></div></a></article><article class=has-image><a href=/en/post/142-browser-extension-testing/><div class=article-image><img src=/post/142-browser-extension-testing/cover.891a12f9804045abdd702672b2599790_hu_4e0d6478098b6f69.webp width=250 height=150 loading=lazy alt="Featured image of post Automated Testing for Browser Extensions - From Install to Popup to Version Migration" data-hash="md5-iRoS+YBARavdcCZyslmXkA=="></div><div class=article-details><h2 class=article-title>Automated Testing for Browser Extensions - From Install to Popup to Version Migration</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2023 -
+2026 |by Daniel Wei</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

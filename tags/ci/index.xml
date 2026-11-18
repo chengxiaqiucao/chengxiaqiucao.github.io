@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>CI on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/ci/</link><description>Recent content in CI on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Thu, 05 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/ci/index.xml" rel="self" type="application/rss+xml"/><item><title>没有专职 QA，每晚跑 300 条端到端流程：一套自建设备实验室怎么搭起来</title><link>https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/</link><pubDate>Thu, 05 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/cover.webp" alt="Featured image of post 没有专职 QA，每晚跑 300 条端到端流程：一套自建设备实验室怎么搭起来" />&lt;p>「谁做的功能谁测」，在应用还小的时候是很好的分工。业务线一条条加、工程师一个个进来之后，裂缝出现了：新功能被认真测过，几个月前上线的功能却几乎没人再回头看。回归缺陷开始先到用户手里，再回到团队。&lt;/p>
+&lt;p>有个具体的场景很典型：火车业务里改了一个共享组件，结果把大巴业务的某个页面弄坏了，团队在发布前一天从聊天群里才知道。当时唯一的安全网是全员集中手测，覆盖度取决于谁还记得什么；每多一位工程师，就多出几种「没人负责」的破坏路径。&lt;/p>
+&lt;p>缺的不是更多测的人手，是让应用自己反复检查自己的能力。&lt;/p>
+&lt;h2 id="一选型要的是能在-pr-里评审的测试">一、选型：要的是能在 PR 里评审的测试
+&lt;/h2>&lt;p>团队先定了标准：开发者应该能在几分钟内写出可靠的端到端测试，而且覆盖的不只是应用自身的页面，还要能走进第三方支付应用、系统弹窗和相机。&lt;/p>
+&lt;p>把现成方案摆开评估：&lt;/p>
+&lt;ul>
+&lt;li>框架自带的集成测试方案要把测试编译进应用，每改一次都要走一遍慢速重建&lt;/li>
+&lt;li>面向跨端的另一套 Flutter 方案同样绕不开编译与重建开销&lt;/li>
+&lt;li>老牌跨平台自动化框架能力很全，但配置重、等待不稳&lt;/li>
+&lt;li>两套原生框架都很强，代价是 Android 与 iOS 各维护一套用例&lt;/li>
+&lt;/ul>
+&lt;p>每个都解决了问题的一部分，没有一个同时给出「快速反馈 + 跨端覆盖 + 开发者愿意写」这三样。&lt;/p>
+&lt;p>最后选中的方案是纯 YAML 的流程描述。第一条流程只花了大约五分钟：启动应用、进入火车、选一个站点、确认票价出现。它是纯文本，任何人都能读，在合并请求里像其他代码一样被评审。&lt;/p>
+&lt;p>真正让这套方案立住的是六个特性：&lt;/p>
+&lt;ul>
+&lt;li>内置等待：每一步之前等界面稳定，大部分不稳定问题就此消失&lt;/li>
+&lt;li>黑盒驱动：直接操作已安装的应用，因此能跳进第三方支付应用或系统弹窗&lt;/li>
+&lt;li>稳定选择器：用语义 ID 定位，而不是屏幕文字或坐标&lt;/li>
+&lt;li>一套流程两端跑：同一份 YAML 在 Android 模拟器、iOS 模拟器和真机上执行&lt;/li>
+&lt;li>边看边写：可视化工具与 MCP 接口让开发者（和编码代理）能看着实时屏幕写流程&lt;/li>
+&lt;li>可复用子流程：登录、引导、导航只写一次，全业务线共享&lt;/li>
+&lt;/ul>
+&lt;h2 id="二两台机器当一个池子">二、两台机器当一个池子
+&lt;/h2>&lt;p>这套夜间回归系统是一间自建设备实验室：两台 Mac mini 跑着 18 个 Android 模拟器和 2 个 iOS 模拟器，另加一台真机专门处理支付。它从五个仓库里拉取超过 300 条流程、分成 15 个套件。&lt;/p>
+&lt;p>云设备农场被评估过，但两个理由让团队选择自建：按运行次数增长的成本，以及租不到一台插着绑定真实银行账户 SIM 卡的手机——而本地支付流程必须要它。成本结构因此变成一次性硬件投入，加上自托管 runner 的电费与维护，CI 执行本身几乎不额外花钱。&lt;/p>
+&lt;p>一次运行的流水线是固定的：&lt;/p>
+&lt;ul>
+&lt;li>取最新构建&lt;/li>
+&lt;li>把流程切片分散到 18 个模拟器上并行执行&lt;/li>
+&lt;li>相机相关流程交给专用模拟器，支付相关流程交给那台真机&lt;/li>
+&lt;li>每条流程都从干净的应用状态开始，失败时留下截图与日志&lt;/li>
+&lt;li>结果以 HTML 报告的形式发到工作群&lt;/li>
+&lt;/ul>
+&lt;p>全量套件不会在每个 PR 上跑，那会把实验室整天占满。它只在三个点触发：&lt;/p>
+&lt;ul>
+&lt;li>每个 PR 上做一次轻量检查：新 UI 必须有对应流程，新加的语义 ID 必须真的被某条流程用到，且变更屏幕上至少 80% 的 ID 被覆盖，否则阻断合并&lt;/li>
+&lt;li>每晚跑一次全量回归&lt;/li>
+&lt;li>大版本前的全员手测之前先跑全量，让团队一开始就知道老功能里哪些已经坏了，把人力留给新功能与边界情况&lt;/li>
+&lt;/ul>
+&lt;p>有个工程细节很能说明「自建」的真实代价：最初两台机器通过 Wi-Fi 相连，每条发往远端模拟器的命令、每张截图、每次安装包传输都要过网络，600–700 毫秒的往返让一个本该很快的步骤变成肉眼可见的卡顿。把两台机器改接有线之后，这个数字降到约 1 毫秒，远端模拟器用起来和本地几乎没有区别，扩容也从「改 runner」变成「再加一台机器」。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig1_hu_c2780f94e3ec2bbb.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig1_hu_542c4bff94a2de63.webp 480w, https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig1_hu_c2780f94e3ec2bbb.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>一个共享模拟器池：取构建、分片并行、专用设备承接特殊流程、失败留证、早间汇总报告&lt;/p>
+&lt;h2 id="三支付upi-与相机这三块硬骨头">三、支付、UPI 与相机这三块硬骨头
+&lt;/h2>&lt;p>绝大多数旅程的终点是支付。停在「支付」按钮上的测试，其实什么也没测到——它没验证扣款、没验证结果页，也没验证失败路径。&lt;/p>
+&lt;p>团队的做法是把应用构建成测试模式：几家支付网关与支付 SDK 被替换成一个只有「成功」和「失败」两个按钮的模拟网关。共享子流程会先确认屏幕上出现了「模拟已启用」标记，才允许继续支付，保证任何流程都不可能碰到真实网关。于是每条业务线的旅程都能端到端跑完成功与失败两种结果。&lt;/p>
+&lt;p>本地统一支付接口（UPI）更麻烦：它要求 SIM 绑定和 PIN 键盘，必须有真实 SIM 卡的真实手机。这类流程固定落在实验室那台专用真机上；扫码支付则由系统生成二维码，预先放进手机相册，让流程从相册取图完成扫描。&lt;/p>
+&lt;p>机场权益类流程从扫描登机牌开始。系统把生成的登机牌二维码转成一段循环视频，用它作为某个模拟器的「后置摄像头」启动，扫描器像平时一样读取画面，19 条机场流程（扫描、校验、核销）就此无人值守地跑完；上传路径则是把登机牌图片或 PDF 推进设备相册。&lt;/p>
+&lt;p>这三块没有捷径，共同思路是&lt;strong>把不可控的外部依赖改造成可控、可断言、且不会误触真实世界的替身&lt;/strong>。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig2_hu_6687853a2d7506c5.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig2_hu_ac34922e738d4fa9.webp 480w, https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig2_hu_6687853a2d7506c5.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>模拟网关、专用真机与「视频摄像头」分别解决支付结果、SIM 绑定与扫码输入三个问题&lt;/p>
+&lt;h2 id="四早上的报告以及从规格就开始的测试">四、早上的报告，以及从规格就开始的测试
+&lt;/h2>&lt;p>夜间运行从零点开始，早上工作群里已经有一份报告：每条失败都带着逐步截图和一段自动生成的可能原因说明，各业务线的通过率直接 @ 到责任人。真缺陷当天修掉或建单，过时的流程当天更新，不会攒成债。&lt;/p>
+&lt;p>更关键的是流程从哪儿来。团队采用规格驱动开发：需求与低层设计在写代码之前就定稿，而端到端流程现在是这个流程的一部分：&lt;/p>
+&lt;ul>
+&lt;li>先规划旅程：从规格里写出一份清单，列明每个屏幕、每条用户旅程、以及每个元素需要的语义 ID——此时 UI 代码还不存在&lt;/li>
+&lt;li>带着 ID 实现：每个可点击、可校验的组件都拿到规划好的 ID&lt;/li>
+&lt;li>生成流程：把旅程写成 YAML，模拟真实使用顺序，先浏览、改选项、再完成任务&lt;/li>
+&lt;li>在设备上跑到通过：每条流程都要在实时设备上跑绿才算完成&lt;/li>
+&lt;/ul>
+&lt;p>这些步骤被做成编码代理的技能，开发者可以从一份批准的设计，一次坐下来就把端到端测试跑到通过，代理通过工具接口查看实时应用来写流程。于是「完成」的定义也变了：不是在开发自己手机上能跑，是它的旅程在设备上通过。&lt;/p>
+&lt;h2 id="五它真的能抓到-bug-吗植入一个试试">五、它真的能抓到 bug 吗：植入一个试试
+&lt;/h2>&lt;p>连续好几周没有报出任何回归，团队反而警觉起来：这到底说明应用稳定，还是说明断言太弱？&lt;/p>
+&lt;p>于是有人在一个分支上，把卡片首页快捷操作里的一个分期入口删掉，跑了一遍 Cards 套件。结果：50 条流程中 9 条失败，全部指向同一个缺失的语义 ID；另外 41 条不经过这个入口的流程保持全绿。失败报告还列出了当时屏幕上实际剩下的元素，不用复现就能定位原因。&lt;/p>
+&lt;p>这是一个植入缺陷，不是证明，团队正在跨业务线补更多。但它至少回答了那个问题：断言确实在看东西。&lt;/p>
+&lt;h2 id="六几百条绿灯不等于覆盖了多少">六、几百条绿灯，不等于覆盖了多少
+&lt;/h2>&lt;p>语义 ID 覆盖率只能说明「这个屏幕有测试」，说明不了「测了屏幕上多少东西」。于是团队又做了一层度量，问一个更难的问题：在某个业务线里用户能做的一切动作中，有多少是我们的流程&lt;strong>可证明地&lt;/strong>检查过的？&lt;/p>
+&lt;p>这件工具不运行应用，而是用 Dart 分析器静态读代码，把每个屏幕、每种状态（加载中、空、错误、已加载）、每个动作（按钮、返回、排序、筛选、开关）都映射出来，且每个动作只计一次。然后把每条流程在这张「纸面地图」上重放，给每个动作三种判定：确定覆盖、可能覆盖、未覆盖。同一份代码在任何机器上得到同一个数字，因此可以在 CI 里追踪每个 PR 带来的增量。&lt;/p>
+&lt;p>截至十月中的基线数字相当清醒：&lt;/p>
+&lt;ul>
+&lt;li>商城流程确定覆盖了 commerce 544 个动作中的 24.6%，下单后旅程覆盖 34%&lt;/li>
+&lt;li>机票、火车、推荐三条业务线各自都低于 15%，火车低于 2%&lt;/li>
+&lt;li>换句话说，几百条流程每晚全绿，应用里大部分行为仍未被证明&lt;/li>
+&lt;/ul>
+&lt;p>最有价值的反而是「确定」与「可能」之间的落差：机票业务确定覆盖只有 7%，可能覆盖却高达 54%。流程其实已经走过那些屏幕，只是按位置或文字点击、或者跳过了一条断言，所以没有任何证据能证明发生了什么。补一个语义 ID 或加一条 &lt;code>assertVisible&lt;/code>，就能把这段落差闭合，完全不必新写测试。&lt;/p>
+&lt;p>「未覆盖」清单则直接指出了真正的空洞：错误态、返回按钮、筛选与排序、以及取消这类下单后旅程。现在每个屏幕都有一张「还差什么」的列表。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig3_hu_b7a571aae2ce7680.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig3_hu_aa972fd9d0b2877d.webp 480w, https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig3_hu_b7a571aae2ce7680.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>把静态分析得到的动作地图与流程重放结果对照，动作被分为确定覆盖、可能覆盖、未覆盖三档&lt;/p>
+&lt;h2 id="七代价与节奏">七、代价与节奏
+&lt;/h2>&lt;p>从七月的一条火车流程，到十月每晚 300 多条，大约三个月，且是与正常产品工作并行完成的。核心是四名工程师搭起 runner、支付替身和 PR 检查；约 25 名开发者分头写各自业务线的流程；第二台 Mac mini 在十月加入。&lt;/p>
+&lt;p>维持健康状态的成本是每周一小时的自动化同步会，加上各团队按早报修自己的失败，全队合计大约每周两小时。&lt;/p>
+&lt;p>这套东西改变了日常：开发者只手测新东西，所有已上线的功能——包括支付、UPI 与登机牌扫描——每晚被自动重测；全员手测开始前老流程已经查过；新屏幕没有测试就不合并。&lt;/p>
+&lt;h2 id="八结语">八、结语
+&lt;/h2>&lt;p>没有专职 QA 团队，并不意味着质量没人负责，而是责任被分散到了每个做功能的人身上。难点不在于「该不该让开发者测」，而在于给他们一条成本足够低、反馈足够可信的路径：写一条流程要几分钟、跑一次全量在一夜之间、早上能拿到可行动的失败证据、还得有人诚实地量出「这些绿灯到底证明了多少」。&lt;/p>
+&lt;p>最后那一层度量尤其值得留住。能每晚跑完 300 条流程是工程能力；敢把确定覆盖率只有 24.6%、火车低于 2% 摆出来，才是让这套系统继续变好的前提。&lt;/p></description></item><item><title>被重试掩盖的失败：把 CI 里"第二次通过"变成可排查的缺陷队列</title><link>https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/</link><pubDate>Wed, 04 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/cover.webp" alt="Featured image of post 被重试掩盖的失败：把 CI 里"第二次通过"变成可排查的缺陷队列" />&lt;p>一次失败、一次通过、最终绿灯。这是大多数启用自动重试的 CI 流水线每天产生的结果，也是最容易丢失信息的结果：失败的那次尝试在日志里被覆盖、在成功任务的清理中被删除，团队只看到&amp;quot;这次构建是绿的&amp;quot;。真正的问题在于，能让第二次通过的原因往往不是&amp;quot;随机抖动&amp;quot;，而是某个具体的状态、时序或数据条件——它同样会在生产环境里被用户撞上。&lt;/p>
+&lt;p>有一套做法值得完整拆解：在测试套件结束时把每次重试写成结构化记录并单独留存，按周汇成一份按影响面排序的清单，再让编码代理沿着记录进入代码去定位根因。它不追求&amp;quot;让 CI 更绿&amp;quot;，而是反过来，把被重试压下去的失败重新暴露出来。&lt;/p>
+&lt;h2 id="第一步让失败的那次尝试活过成功清理">第一步：让失败的那次尝试活过成功清理
+&lt;/h2>&lt;p>多数 CI 配置会在任务成功后删除应用日志与诊断产物，这是合理的成本控制，但恰好会删掉排查间歇性失败最需要的证据。解决办法不是保留全部日志，而是在套件结束时，为每个发生过重试的测试节点写一个很小的 JSON 文件：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;./spec/features/report_spec.rb[1:2]&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;location&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;./spec/features/report_spec.rb:20&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;description&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;renders a synthetic report&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;failed_attempts&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;final_result&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;passed&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;first_error&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;expected the default window size&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>里面有两个字段值得单独说。&lt;code>id&lt;/code> 是测试框架给出的唯一示例编号，&lt;code>location&lt;/code> 是源码行号。共享示例（shared examples）会让多个不同测试用例指向同一行，只按行号聚合会把互不相关的失败合并成一团，两个都留才能正确分组。&lt;/p>
+&lt;p>这份 JSON 要写到一个&lt;strong>独立于成功任务清理范围&lt;/strong>的目录，并作为构建产物上传。以常见的 CI 服务为例，只需要在配置里加一行把该目录声明为 artifacts；换任何 CI 平台，等价机制都能做到。核心约束只有一条：即便这次测试最终通过，重试历史也必须保留下来。&lt;/p>
+&lt;p>重试策略本身也要写清楚：普通用例给一次重试，涉及 JavaScript 浏览器的用例给两次。次数不是重点，重点是&lt;strong>每次重试都要留下为什么结果会变&lt;/strong>的线索。单纯增加重试次数只会让报告更安静，不会回答问题。&lt;/p>
+&lt;h2 id="第二步把记录汇成一份有优先级的周度队列">第二步：把记录汇成一份有优先级的周度队列
+&lt;/h2>&lt;p>有了记录，下一步是聚合。一个定时任务通过 CI 平台 API 读取过去一周的重试产物，按示例编号分组，然后按&lt;strong>出现过&amp;quot;先失败后通过&amp;quot;的不同流水线数量&lt;/strong>降序排列。&lt;/p>
+&lt;p>这里有个容易做错的细节：同一个流水线里某用例失败两次，排名只算一条流水线。因为排序想衡量的是&amp;quot;这个不稳定问题影响过多少次独立构建&amp;quot;，而不是&amp;quot;它一共失败了多少次&amp;quot;。同时保留首次错误信息、分支名与失败尝试次数，供后续阅读。&lt;/p>
+&lt;p>还有一类要单独计数：&lt;strong>所有尝试都失败&lt;/strong>的用例。这个区分只描述观测到的运行结果，并不等于&amp;quot;根因是确定性的&amp;quot;——一个间歇性问题同样可能把重试次数耗尽，所以不能据此把两类问题贴上不同标签。&lt;/p>
+&lt;p>当某个示例超过设定的周度预算阈值时，让摘要任务本身失败，借用团队已有的 CI 失败通知把清单推到人面前。此时把报告交给能读取代码仓库与构建产物的编码代理，就进入定位环节。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig1_hu_83cb9ef2bd28c4d1.webp"
+width="1024"
+height="820"
+srcset="https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig1_hu_ed4aa59c7fcf933b.webp 480w, https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig1_hu_83cb9ef2bd28c4d1.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="124"
+data-flex-basis="299px"
+>
+&lt;/p>
+&lt;p>重试记录从产生、留存到形成周度优先级队列的完整链路&lt;/p>
+&lt;h2 id="第三步看清第二次为什么通过四个真实案例">第三步：看清&amp;quot;第二次为什么通过&amp;quot;——四个真实案例
+&lt;/h2>&lt;p>下面几类问题有个共同点：重试并不是让测试自己恢复了，而是&lt;strong>重试机制顺手重置了出错的那个状态&lt;/strong>。如果不看第一次失败，根本不会知道产品里有缺陷。&lt;/p>
+&lt;h3 id="浏览器重启抹掉了上一个用例留下的窗口尺寸">浏览器重启抹掉了上一个用例留下的窗口尺寸
+&lt;/h3>&lt;p>一组截图比对失败，报的是截图尺寸变化，重试通常就过了。根因在更早的用例：计费相关测试把浏览器窗口改成了非默认尺寸，却没有还原，后面的截图用例继承了这个 viewport。而重试配置会在重跑前重启浏览器，窗口回到默认尺寸，于是第二次通过。&lt;/p>
+&lt;p>修复方式是在每个浏览器用例开始前显式设定默认窗口尺寸，需要其他尺寸的用例自己再改。这个案例里，&amp;ldquo;重试通过了&amp;quot;恰好提供了关键线索：既然换一个新浏览器就好，说明状态是外部带进来的，不是被测逻辑自己恢复的。&lt;/p>
+&lt;h3 id="一个撇号打断自动生成的-curl-命令">一个撇号打断自动生成的 cURL 命令
+&lt;/h3>&lt;p>某仪表盘会根据模板 schema 生成示例 cURL 命令，测试用生成数据执行这些命令。生成的假姓名里偶尔带撇号，而内联命令用单引号包住 JSON 请求体——撇号提前结束了 shell 字符串，命令就断了。下一次尝试生成了另一个名字，命令又能跑通。&lt;/p>
+&lt;p>同一功能还有一个可下载的 Bash 脚本，把 JSON 放在带引号的 heredoc 里，却错误地套用了为单引号参数准备的转义，结果改坏了请求体。两处需要完全不同的处理：内联命令要为 shell 上下文转义撇号，heredoc 里的 JSON 则必须原样保留。&lt;/p>
+&lt;p>对应的回归测试很值得借鉴：把 &lt;code>curl&lt;/code> 替换成一个函数，在 Bash 里真实执行生成的脚本，用该函数捕获本该发出的请求体，再解析校验原始值，全程不发起网络请求。用 &lt;code>Editor's proof&lt;/code> 这类带撇号的合成值回放修复前后两个版本：修复前内联命令在 Bash 里直接失败，可下载脚本能跑但请求体无法解析为 JSON；修复后两者都保留了原文。&lt;/p>
+&lt;p>这里最容易被选错的&amp;quot;捷径&amp;quot;是改测试数据、不让姓名里出现撇号。那会让测试更稳定，同时让产品对所有合法输入继续出错。&lt;/p>
+&lt;h3 id="临时文件在渲染进程读取前被回收">临时文件在渲染进程读取前被回收
+&lt;/h3>&lt;p>一个内联的 HTML 转 PDF 渲染器，会把页眉页脚 HTML 写入临时文件，再把路径交给渲染进程。代码在构造命令时把临时文件对象放在局部变量里；方法返回后，命令字符串还留着路径，但已经没有任何引用持有那个对象。&lt;/p>
+&lt;p>Ruby 的 &lt;code>Tempfile&lt;/code> 把清理挂在垃圾回收上。如果 GC 恰好在渲染进程打开文件之前触发，文件就已经不在了。测试是否通过，取决于垃圾回收发生的时机——这是最典型的&amp;quot;看似随机&amp;quot;的失败。&lt;/p>
+&lt;p>修复是把页眉页脚对象保存在服务实例上，直到渲染完成，再在 &lt;code>ensure&lt;/code> 块里关闭并删除。回归测试在&amp;quot;构造命令&amp;quot;与&amp;quot;模拟渲染进程读取文件&amp;quot;之间&lt;strong>强制触发 GC&lt;/strong>，断言文件内容仍然可读、且结束后被清理。主动制造确定性的失败条件，比等着在某个 PDF 用例里&amp;quot;撞运气&amp;quot;要可靠得多。&lt;/p>
+&lt;h3 id="冻结了-ruby-的时钟redis-的时钟还在走">冻结了 Ruby 的时钟，Redis 的时钟还在走
+&lt;/h3>&lt;p>限流测试用的计数器按固定时间窗口统计。用例一旦跨过窗口边界，请求就被计到新窗口里，预期阈值永远达不到。第一版修复是冻结进程时钟，但计数器存在 Redis 里并带过期时间，Redis 仍在按真实时间流逝。如果在窗口末尾附近冻结，计数器的剩余存活时间极短，问题依旧。&lt;/p>
+&lt;p>最终做法是冻结在整点起始处，与这批用例使用的时间窗口对齐，让计数器拥有完整过期周期；同时仍需保证用例在该周期内跑完。这个案例的价值在于：评审在第一版修复之后发现了第二个时钟，第一次的解释只覆盖了系统里的一半计时机制。&lt;/p>
+&lt;p>同一轮排查还带出另外几类问题：数据库清理开始时后台 worker 仍在运行、测试辅助函数对共享时钟库的冻结状态相互覆盖、样本数据生成器用真值判断跳过了下界为零时的边界调整（在 JavaScript 里 0 是 falsy，但它在这个 schema 里是合法下界）。每一类都属于&amp;quot;重试会让它消失、用户却可能遇到&amp;quot;的范畴。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig2_hu_81b443d809eab84c.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig2_hu_2bea94c3ea199544.webp 480w, https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig2_hu_81b443d809eab84c.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>四类被重试掩盖的真实缺陷：状态泄漏、转义上下文、对象生命周期、双时钟&lt;/p>
+&lt;h2 id="第四步给编码代理划清任务边界">第四步：给编码代理划清任务边界
+&lt;/h2>&lt;p>把周度报告交给编码代理时，任务描述应当明确到可验收，而不是&amp;quot;帮忙看看这些失败&amp;rdquo;。一套可复用的要求是：&lt;/p>
+&lt;ul>
+&lt;li>找到对应的 CI 运行记录并读取失败产物，沿着测试代码追到应用代码；&lt;/li>
+&lt;li>能在本地复现的先复现，再补一条回归测试，要求修复前失败、修复后通过；&lt;/li>
+&lt;li>互不相关的根因拆成独立提交，便于逐条评审与回滚；&lt;/li>
+&lt;li>跑完受影响的检查并自查 diff，无法复现的项目明确列出，不得含糊带过；&lt;/li>
+&lt;li>推送之前停下来等待人工审批。&lt;/li>
+&lt;/ul>
+&lt;p>之所以强调&amp;quot;产物与代码要一起读&amp;quot;，是因为单看任一边都得不出结论：截图尺寸不匹配本身解释不了 viewport 是被谁改的，文件不存在本身解释不了那个 Ruby 对象为什么会变成可回收状态。代理真正的价值是把这两类信息串起来，而不是替代人做最终判断。&lt;/p>
+&lt;p>排查结论里凡是&amp;quot;后续开发必须遵守&amp;quot;的规则，写进离代码最近的 &lt;code>AGENTS.md&lt;/code>（或等价的团队约定文件）。比如&amp;quot;浏览器用例可以改自己的 viewport，但下一个用例必须从已知尺寸开始&amp;quot;——setup 代码负责强制，注释负责解释原因。更进一步，能把规则做成静态检查的就别靠记忆：为常见的 flaky 写法补一条自定义 lint 规则，让 CI 直接拦下，比指望有人记得半年前那次排查更有效。&lt;/p>
+&lt;h2 id="落地清单">落地清单
+&lt;/h2>&lt;p>如果你的套件已经在重试，不必先重构整套体系，按下面的顺序做即可：&lt;/p>
+&lt;ol>
+&lt;li>在套件结束时为每次重试写一条结构化记录，字段至少包含唯一示例编号、源码位置、失败尝试次数、最终结果和首次错误；&lt;/li>
+&lt;li>把记录放到成功任务清理不到的目录，并配置为构建产物上传；&lt;/li>
+&lt;li>每周按&amp;quot;出现过先失败后通过的不同流水线数&amp;quot;聚合排序，设一个预算阈值，超了就让摘要任务失败并通知；&lt;/li>
+&lt;li>挑一条反复出现的问题，要求给出&amp;quot;第二次为什么通过&amp;quot;的明确解释，而不是简单加重试次数；&lt;/li>
+&lt;li>修复必须附带能确定性复现的回归测试，审查通过后再合入常规 CI、QA 与发布流程。&lt;/li>
+&lt;/ol>
+&lt;p>这套流程目前还没有公开的工时节省数据，修复轮次也太新，暂时无法判断长期能把复发率压到多少，后续几周的周报才能回答。但它的直接效果已经很清楚：过去需要人专门腾出半天去追、且经常追到一半线索就消失的问题，现在可以在启动排查后并行去做别的事，回来只需评估解释是否成立、审查改动是否合理。&lt;/p>
+&lt;p>也正因如此，代理写出的代码质量变得更重要：一个可复现的失败、一条断言真实意图的测试，是它能锚住的具体目标。而把重试历史保留下来，等于把更多这类目标摆到了桌面上。&lt;/p></description></item><item><title>每天 25 万次测试：一个集中式测试执行平台的架构与取舍</title><link>https://chengxiaqiucao.github.io/post/144-centralized-test-platform/</link><pubDate>Wed, 28 Oct 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/144-centralized-test-platform/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/144-centralized-test-platform/cover.webp" alt="Featured image of post 每天 25 万次测试：一个集中式测试执行平台的架构与取舍" />&lt;p>测试自动化通常被当成一个框架问题来讨论。但当数千个仓库都要跑自己的套件时，问题的性质就变了——它变成了一个基础设施问题。早上九点所有团队同时推送，谁能拿到执行容量？夜间全量回归和阻塞着某个开发者的合入前检查撞在一起时，谁先跑？当相当一部分失败并不是真实缺陷时，又凭什么判定一个版本&amp;quot;已认证&amp;quot;？&lt;/p>
+&lt;p>有一类平台正是从这种压力里长出来的：它不负责帮你写测试，而是提供一套共享的执行与认证基础设施。本文拆解这类平台的架构、关键策略与真实取舍，数据来自一个在四个 Amazon EKS 集群上、每天执行约 25 万次自动化测试、服务大型金融机构全部工程仓库的实例。&lt;/p>
+&lt;h2 id="先看清工作负载的五个特征">先看清工作负载的五个特征
+&lt;/h2>&lt;p>设计之前必须先承认，测试执行负载有几条会击穿朴素设计的性质：&lt;/p>
+&lt;p>&lt;strong>极端突发。&lt;/strong> 工作时段和版本发布窗口需求陡增，其余时间容量闲置，永远在&amp;quot;不够&amp;quot;和&amp;quot;浪费&amp;quot;之间摇摆。&lt;/p>
+&lt;p>&lt;strong>紧急度混合。&lt;/strong> 合入前检查牵着一个工程师的时间，夜间全量回归不牵任何人，但两者抢的是同一批资源，延迟要求却完全不同。&lt;/p>
+&lt;p>&lt;strong>租户异构。&lt;/strong> 不同团队带来不同的运行时、浏览器栈和数据依赖；一个没有资源约束的套件可以饿死其他所有套件。&lt;/p>
+&lt;p>&lt;strong>信号不可信。&lt;/strong> 经验研究表明，异步等待、并发、测试顺序依赖会持续产生不稳定（flaky）结果。公开的工程经验里，约 1.5% 的测试运行产生过 flaky 结果，近 16% 的测试表现出某种程度的不稳定。把这个比例放到每天 25 万次执行上，1.5% 就是约 3750 条误导性结果——如果重试、分类与隔离不是平台级策略，而是各团队自选动作，那么&amp;quot;红灯&amp;quot;将彻底失去意义。&lt;/p>
+&lt;p>&lt;strong>审计要求。&lt;/strong> 在受监管环境里，&amp;ldquo;这个版本通过了认证&amp;quot;必须能从记录中复现，而不是凭记忆。&lt;/p>
+&lt;h2 id="三个-kubernetes-原语撑起大部分设计">三个 Kubernetes 原语撑起大部分设计
+&lt;/h2>&lt;p>这类平台通常只依赖 Kubernetes 的少数几个能力：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Job 的 Indexed 完成模式&lt;/strong>：每个 Pod 拿到一个稳定索引，天然映射到测试分片；&lt;/li>
+&lt;li>&lt;strong>PriorityClass&lt;/strong>：高优先级 Pod 无法调度时，可以抢占低优先级 Pod；&lt;/li>
+&lt;li>&lt;strong>ResourceQuota 与 LimitRange&lt;/strong>：限制命名空间能消耗多少资源，并设置默认请求值，避免共享集群上出现无边界的容器。&lt;/li>
+&lt;/ul>
+&lt;p>在此之上，Kueue 这类队列管理器提供队列级配额，决定一个作业是等待、准入还是被抢占；Karpenter 这类扩容器则为无法调度的 Pod 直接供应节点。&lt;/p>
+&lt;h2 id="架构控制平面执行平面结果平面">架构：控制平面、执行平面、结果平面
+&lt;/h2>&lt;p>平台把&amp;quot;决定跑什么&amp;rdquo;（控制平面）、&amp;ldquo;真正去跑&amp;rdquo;（执行平面）和&amp;quot;把执行变成决策&amp;quot;（结果平面）三者分开。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/144-centralized-test-platform/04-fig1_hu_93a37452f58422c9.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/144-centralized-test-platform/04-fig1_hu_33329837ce4e233a.webp 480w, https://chengxiaqiucao.github.io/post/144-centralized-test-platform/04-fig1_hu_93a37452f58422c9.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>控制平面、执行平面与结果平面分离，三者必须作为一个系统建设&lt;/p>
+&lt;p>&lt;strong>提交。&lt;/strong> 各团队的 CI 系统触发一次运行，声明套件、目标环境和紧急度分类。团队始终不直接接触 Kubernetes——提交 API 才是契约，这样执行细节可以更换而不影响调用方。&lt;/p>
+&lt;p>&lt;strong>准入与排队。&lt;/strong> 每个租户一个命名空间，配一份配额和一个本地队列。队列管理器在配额可用前挂起工作负载，并在一个 cohort（容量池）内做抢占与公平共享：某团队借走的空闲容量，在另一个团队需要自己份额时可以被回收。借用上限则防止单个租户在发布冲刺期吞掉整个池子。&lt;/p>
+&lt;p>&lt;strong>分片规划。&lt;/strong> 大套件被切成多个分片，用 Indexed Job 执行，分片索引通过环境变量暴露给 runner——与 Bazel 的 &lt;code>TEST_TOTAL_SHARDS&lt;/code> / &lt;code>TEST_SHARD_INDEX&lt;/code> 是同一套契约。&lt;/p>
+&lt;p>&lt;strong>执行平面。&lt;/strong> 四个 EKS 集群承载平台的 40 个应用与大量临时测试 Pod。多集群用更高的控制平面与工具链成本，换取隔离性和更小的爆炸半径——这是多租户设计里被明确记录过的取舍。放置策略需要刻意设计：给每个租户一个&amp;quot;主集群&amp;quot;，上面保持镜像缓存与测试数据是热的；当主集群排队时间超过阈值时，由控制平面把&lt;strong>整个运行&lt;/strong>溢出到另一个集群，而不是把一次运行拆到多个集群——拆分会让结果收集和基础设施故障定位变得极难。&lt;/p>
+&lt;p>&lt;strong>结果与认证。&lt;/strong> 每个分片把结构化结果消息发给报告与洞察服务，由它判定每个套件的通过/失败、识别 flake、并在发布上登记一个认证结论。整个平台里最重要的契约就是这条事件 schema：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;runId&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;checkout-regression-7f3a&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;shardIndex&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">17&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;attempt&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;test&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;CheckoutFlowTest.appliesPromoCode&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;outcome&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;passed&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;failureCause&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">null&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;previousAttemptCause&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;environment&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;node&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;ip-10-0-42-7&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;durationMs&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">48210&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>failureCause&lt;/code>（test / environment / platform）与 &lt;code>attempt&lt;/code> 是让结果层区分&amp;quot;flaky 测试&amp;quot;与&amp;quot;丢了一个节点&amp;quot;的关键，也是把基础设施故障记到平台账上而不是团队账上的依据。&lt;/p>
+&lt;h2 id="配置长什么样">配置长什么样
+&lt;/h2>&lt;p>租户的队列与配额由平台团队声明一次：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">apiVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">kueue.x-k8s.io/v1beta1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">kind&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ClusterQueue&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">metadata&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">team-payments }&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">cohort&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">shared-test-capacity&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">preemption&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">reclaimWithinCohort&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Any&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">withinClusterQueue&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">LowerPriority&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">resourceGroups&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">coveredResources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;cpu&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;memory&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">flavors&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">default&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- {&lt;span class="w"> &lt;/span>&lt;span class="nt">name: cpu, nominalQuota: 200, borrowingLimit&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">100&lt;/span>&lt;span class="w"> &lt;/span>}&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- {&lt;span class="w"> &lt;/span>&lt;span class="nt">name: memory, nominalQuota&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">800Gi }&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>cohort 让团队借用空闲容量，&lt;code>reclaimWithinCohort&lt;/code> 让所有者把容量收回来，&lt;code>borrowingLimit&lt;/code> 阻止任何单一租户在发布冲刺期吸干整个池。&lt;/p>
+&lt;p>一个分片化套件则是一个普通的带优先级类的 Indexed Job：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">apiVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">batch/v1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">kind&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Job&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">metadata&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">checkout-regression-7f3a&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">labels&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="w"> &lt;/span>&lt;span class="nt">kueue.x-k8s.io/queue-name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">team-payments }&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">completionMode&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Indexed&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">completions&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">40&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">parallelism&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">40&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">backoffLimitPerIndex&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">template&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">priorityClassName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">premerge-high&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">restartPolicy&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Never&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">containers&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">runner&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">registry.internal/test-runner:2.14&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">env&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- {&lt;span class="w"> &lt;/span>&lt;span class="nt">name: TEST_TOTAL_SHARDS, value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;40&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>}&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- {&lt;span class="w"> &lt;/span>&lt;span class="nt">name: TEST_SHARD_INDEX, valueFrom&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="w"> &lt;/span>&lt;span class="nt">fieldRef&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="w"> &lt;/span>&lt;span class="nt">fieldPath&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">metadata.annotations[&amp;#39;batch.kubernetes.io/job-completion-index&amp;#39;] } } }&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">requests&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="w"> &lt;/span>&lt;span class="nt">cpu&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;2&amp;#34;&lt;/span>&lt;span class="nt">, memory&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">4Gi }&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">limits&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="w"> &lt;/span>&lt;span class="nt">memory&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">4Gi }&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>几个细节值得照抄：&lt;code>backoffLimitPerIndex&lt;/code> 只重试失败的那一个分片，不重跑其余 39 个——某个分片撞上基础设施故障时这非常重要；内存必须设 limit，因为共享节点上一个 OOM 的 runner 会拖累邻居；CPU 在 request 之上不设上限，用于吸收短时突发。&lt;/p>
+&lt;p>还有一条容易被忽略：&lt;strong>分片要按历史执行时长来切，不能按用例数量切&lt;/strong>。一个套件的完成时间取决于它最慢的那个分片，而不是分片里有多少条用例。&lt;/p>
+&lt;h2 id="延迟来自三次等待各有各的杠杆">延迟来自三次等待，各有各的杠杆
+&lt;/h2>&lt;p>运行延迟基本由三段等待构成，每一段的优化手段和代价都不同：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>等待&lt;/th>
+&lt;th>杠杆&lt;/th>
+&lt;th>代价&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>排队&lt;/td>
+&lt;td>提高名义配额、cohort 借用&lt;/td>
+&lt;td>预留的空闲容量&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>节点供给&lt;/td>
+&lt;td>预热缓冲节点、预拉取 runner 镜像&lt;/td>
+&lt;td>为闲置节点付费&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>最慢分片&lt;/td>
+&lt;td>按时长分片、更多分片&lt;/td>
+&lt;td>每 Pod 的启动开销&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>扩容器在这类尖峰且多样的需求上表现好，因为它直接按挂起 Pod 的要求供应节点；传统节点组方案在设计得当时依然可用。无论选哪个，都要让 runner 镜像小而可缓存——在这个量级上，镜像拉取时间一天要被支付几万次。&lt;/p>
+&lt;h2 id="安全测试代码是半可信代码">安全：测试代码是&amp;quot;半可信代码&amp;quot;
+&lt;/h2>&lt;p>测试代码会执行仓库提交的任何东西，因此它不能被当作可信负载。实践要点包括：Pod 尽量遵循 Restricted 级别的安全标准；用命名空间 + RBAC 保证某团队的服务账号读不到另一团队的作业；云资源访问走 IAM Roles for Service Accounts 或 EKS Pod Identity，而不是长期密钥；测试凭证放在具备最小权限访问的密钥管理系统里；runner 镜像要扫描并固定版本。在受监管场景里，测试环境还要通过网络策略与生产数据隔离，而不是靠约定。&lt;/p>
+&lt;h2 id="一次典型故障场景发布日早晨">一次典型故障场景：发布日早晨
+&lt;/h2>&lt;p>三个团队赶在发布截止时间前提交全量回归套件，同时几十位工程师在跑合入前检查。&lt;/p>
+&lt;p>没有配额时，先提交的回归套件会占满所有可用节点，合入前检查只能排队，整个组织的开发节奏被拖停。有了上面的设计：每个回归套件在团队名义配额加有限借用额度内运行；合入前 Pod 带更高的优先级类，在节点不足时抢占夜间级的工作；扩容器为剩余积压补充容量。结果是回归套件的完成时间比在空集群上更晚，但没有任何单一团队能踩下全局的刹车。这就是共享平台给出的取舍。&lt;/p>
+&lt;h2 id="权衡与局限必须提前说清">权衡与局限，必须提前说清
+&lt;/h2>&lt;p>中心化会造出一个所有人都依赖的团队：它的路线图成了瓶颈，它的一次故障会同时停掉所有发布。多集群降低了爆炸半径，却让升级、插件版本和配置漂移成倍增加。每个团队该分多少，本质是组织问题——调度器不解决这个。&lt;/p>
+&lt;p>自动重试还会掩盖真正的间歇性问题：生产代码里的竞态，表现和 flaky 测试一模一样。如果一律重试了事，二者永远分不开。&lt;/p>
+&lt;p>为什么不用 CI 系统自带的并行能力？因为按流水线分配的 runner 一次只服务一个仓库，做不到组织级的公平调度、做不到基础设施失败的统一归因、也产不出单一的认证报告。集中式平台解决的是这几件事，代价是团队自主性。对只有少量仓库的小团队，或者需要特殊硬件、共享池无法常驻保温的作业，它是错误的选择。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/144-centralized-test-platform/04-fig2_hu_de42ba8d20771171.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/144-centralized-test-platform/04-fig2_hu_3d2757c65d2f0434.webp 480w, https://chengxiaqiucao.github.io/post/144-centralized-test-platform/04-fig2_hu_de42ba8d20771171.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>一次运行的生命周期：准入、分片执行、失败分类、单分片重试、隔离后认证&lt;/p>
+&lt;h2 id="五条来自生产的教训">五条来自生产的教训
+&lt;/h2>&lt;p>&lt;strong>在源头区分基础设施失败与测试失败。&lt;/strong> 如果节点被驱逐和断言失败产出的是同一种红色，团队会迅速不再信任平台。runner 应当把失败原因作为一等字段上报：test、environment 还是 platform。&lt;/p>
+&lt;p>&lt;strong>重试一次，换一个 Pod，并且记录下来。&lt;/strong> 在不同基础设施上重试一次，可以把环境噪声和确定性失败分开。静默的、反复的重试只会抬高成本，并把真正的并发缺陷埋掉——而并发正是 flaky 的头号根因。&lt;/p>
+&lt;p>&lt;strong>隔离（quarantine）是一个工作流，不是一个开关。&lt;/strong> 被隔离的测试必须有责任人、有工单、有到期时间，否则隔离清单会一直变长，直到&amp;quot;认证&amp;quot;两个字失去意义。&lt;/p>
+&lt;p>&lt;strong>报告层就是产品本身。&lt;/strong> 团队是通过结果视图来评价平台的，而不是通过调度器。报告与洞察服务值得一支专门的工程队伍，而不是被当作附属功能。&lt;/p>
+&lt;p>&lt;strong>入职培训也是平台的一部分。&lt;/strong> 当所有仓库都依赖同一个执行平台时，误用——无边界的套件、缺失资源声明、测试代码里自带重试循环——成本由所有人承担。给新人做持续交付 onboarding，在效果上和任何一条配额一样是平台控制手段。&lt;/p>
+&lt;h2 id="可以直接照搬的最佳实践">可以直接照搬的最佳实践
+&lt;/h2>&lt;ul>
+&lt;li>暴露稳定的提交 API，绝不让租户依赖集群内部细节；&lt;/li>
+&lt;li>从第一天起就给每个租户配额、队列和默认资源限制；&lt;/li>
+&lt;li>按历史时长分片；按分片重试，绝不按整个套件重试；&lt;/li>
+&lt;li>公布每个套件的 flake 率，并对每次运行做端到端追踪。&lt;/li>
+&lt;/ul>
+&lt;p>可观测性要建在平台层面，而不只是测试层面：一次运行从提交、准入、调度到结果 ingest 全程埋点，&amp;ldquo;我的这次运行为什么慢&amp;quot;要能按阶段给出答案。核心服务级别指标是四个：准入时间、首个结果返回时间、基础设施失败率（与测试失败率分开统计）、以及每个套件的 flake 率。交付成效可以用 DORA 指标跟踪，看平台是否真的缩短了前置时间、降低了变更失败率。&lt;/p>
+&lt;h2 id="接下来最值钱的两个方向">接下来最值钱的两个方向
+&lt;/h2>&lt;p>一个是基于变更的测试选择。公开数据表明绝大多数测试极少失败，因此&amp;quot;跑哪些&amp;quot;仍然是最大的成本杠杆。另一个是 AI 辅助分诊：它可以按可能原因给失败聚类，但它应该辅助责任人，而不是自动隔离测试——误分类会直接削弱认证的可信度。&lt;/p>
+&lt;p>结论可以浓缩成一句：集中式测试编排平台做的事不只是调度。它还安全地隔离租户，并提供质量的权威记录。Kubernetes 提供了好用的原语——Indexed Job、优先级、配额、队列管理器——但真正决定价值的是策略：哪些团队拿到容量、失败如何归类、什么才算&amp;quot;已认证&amp;rdquo;。队列、失败分类法和报告层必须作为一个系统来建设，三者中任何一个不可信，其余两个也不可信。&lt;/p></description></item></channel></rss>

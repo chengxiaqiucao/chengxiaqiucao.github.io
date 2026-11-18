@@ -1,0 +1,803 @@
+<!doctype html><html lang=en dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Preface In a previous article 【】we learned about the AI testing tool Midscene.js launched by ByteDance. Whether it is intelligent project parsing, test execution, or the final report generation, it is quite impressive; moreover, in addition to browser-based web applications, it also supports the automation of Android apps.\nSo how exactly does this project use AI intelligence to complete test execution tasks? In this article, we will draw on the open-source project source code of Midscene.js to conduct an in-depth analysis of the project&rsquo;s implementation as well as its application of large models.\n"><title>Source Code Analysis of the AI Automation Tool Midscene.js</title>
+<link rel=canonical href=https://chengxiaqiucao.github.io/en/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/><link rel=stylesheet href=/scss/style.min.1ff05243156c6b1fe33c54e504d4d763b1955737a95e17034967a679a1f192c8.css><meta property='og:title' content="Source Code Analysis of the AI Automation Tool Midscene.js"><meta property='og:description' content="Preface In a previous article 【】we learned about the AI testing tool Midscene.js launched by ByteDance. Whether it is intelligent project parsing, test execution, or the final report generation, it is quite impressive; moreover, in addition to browser-based web applications, it also supports the automation of Android apps.\nSo how exactly does this project use AI intelligence to complete test execution tasks? In this article, we will draw on the open-source project source code of Midscene.js to conduct an in-depth analysis of the project&rsquo;s implementation as well as its application of large models.\n"><meta property='og:url' content='https://chengxiaqiucao.github.io/en/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/'><meta property='og:site_name' content='Testing Observation'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Test Automation'><meta property='article:tag' content='AI'><meta property='article:published_time' content='2025-06-22T00:00:00+00:00'><meta property='article:modified_time' content='2025-06-22T00:00:00+00:00'><meta property='og:image' content='https://chengxiaqiucao.github.io/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-5.webp'><meta name=twitter:title content="Source Code Analysis of the AI Automation Tool Midscene.js"><meta name=twitter:description content="Preface In a previous article 【】we learned about the AI testing tool Midscene.js launched by ByteDance. Whether it is intelligent project parsing, test execution, or the final report generation, it is quite impressive; moreover, in addition to browser-based web applications, it also supports the automation of Android apps.\nSo how exactly does this project use AI intelligence to complete test execution tasks? In this article, we will draw on the open-source project source code of Midscene.js to conduct an in-depth analysis of the project&rsquo;s implementation as well as its application of large models.\n"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://chengxiaqiucao.github.io/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-5.webp'><script async src="https://www.googletagmanager.com/gtag/js?id=G-0SZVJZGMHX"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-0SZVJZGMHX")}</script><meta name=google-adsense-account content="ca-pub-8076532964743402"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8076532964743402" crossorigin=anonymous></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/en/><img src=/img/automnGrass_hu_47f1e3d9e082e7bd.webp width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/en>Testing Observation</a></h1><h2 class=site-description>Testing is not just checking...</h2></div></header><ol class=menu-social><li><a href=https://github.com/chengxiaqiucao target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://space.bilibili.com/472272606 target=_blank title=Bilibili rel=me><!doctype html><svg t="1750732982440" class="icon" viewBox="0 0 1024 1024" p-id="4593" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632 444.330667 256h135.296l138.368-138.325333A42.666667 42.666667.0 01778.368 178.048L700.330667 256H789.333333A149.333333 149.333333.0 01938.666667 405.333333v341.333334A149.333333 149.333333.0 01789.333333 896H234.666667A149.333333 149.333333.0 0185.333333 746.666667V405.333333A149.333333 149.333333.0 01234.666667 256h88.96L245.632 177.962667a42.666667 42.666667.0 0160.373333-60.373334zm483.328 223.701333H234.666667a64 64 0 00-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0057.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0063.701334-57.856L853.333333 746.666667V405.333333a64 64 0 00-64-64zm-448 128A42.666667 42.666667.0 01384 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666666-42.666667zm341.333334.0A42.666667 42.666667.0 01725.333333 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666667-42.666667z" p-id="4594" fill="#8a8a8a"/></svg></a></li><li><a href=https://www.zhihu.com/people/qiucao target=_blank title=zhihu rel=me><!doctype html><svg t="1750733049138" class="icon" viewBox="0 0 1024 1024" p-id="5820" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M570.581333 806.272h61.952L652.928 876.117333 764.074667 806.272h130.986666V230.186667h-324.48V806.272zM636.501333 292.693333h192.64V743.68h-73.898666l-73.813334 46.378667L668.032 743.808l-31.530667-.128V292.736zM515.754667 493.738667H377.429333a2999.466667 2999.466667.0 005.802667-194.56h135.338667S523.776 239.445334 495.872 240.128H261.76c9.216-34.730667 20.821333-70.613333 34.688-107.690667.0.0-63.701333.0-85.333333 57.130667C202.112 213.12 176.128 303.786667 129.877333 396.416c15.573333-1.706667 67.114667-3.114667 97.450667-58.794667 5.589333-15.616 6.656-17.621333 13.568-38.485333h76.373333c0 27.776-3.157333 177.109333-4.437333 194.474667h-138.24c-31.104.0-41.173333 62.549333-41.173333 62.549333h173.482666C295.253333 688.256 232.789333 799.573333 119.466667 887.466667c54.186667 15.488 108.202667-2.432 134.912-26.197334.0.0 60.8-55.338667 94.122666-183.381333L491.264 849.834667s20.906667-71.168-3.285333-105.856c-20.053333-23.637333-74.24-87.552-97.322667-110.72l-38.698667 30.72c11.52-36.992 18.474667-72.96 20.821334-107.690667h163.072s-.213333-62.549333-20.053334-62.549333z" p-id="5821" fill="#8a8a8a"/></svg></a></li><li><a href=mailto:%20danmyw@qq.com target=_blank title=e-mail rel=me><!doctype html><svg t="1750733089669" class="icon" viewBox="0 0 1451 1024" p-id="6983" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759.0 97.881301C0 3.997201 71.046997.0 71.046997.0H474.477909 961.649408h399.992405s71.046998 3.997201 71.046998 97.881301L771.345323 681.472759S764.482731 685.154773 753.594283 688.65053V688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858V688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759zm53.281707 130.131124C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633.0 212.052267.0 212.052267V942.809523S0 1024 83.726336 1024H682.532949 753.579947h595.368192C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523V212.052267S893.138176 701.759633 817.019477 767.734955c-39.771477 34.470494-74.671786 43.295855-98.955861 43.868928z" fill="#8a8a8a" p-id="6984"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/en/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/en/page/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/en/page/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/en/page/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li><a href=/en/page/about/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>About..</span></a></li><li><a href=/en/page/releases/><svg class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M9.828 9.172a4 4 0 100 5.656A10 10 0 0012 12a10 10 0 012.172-2.828 4 4 0 110 5.656A10 10 0 0112 12 10 10 0 009.828 9.172"/></svg>
+<span>OpenSources</span></a></li><li class=menu-bottom-section><ol class=menu><li id=i18n-switch><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg>
+<select name=language title=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://chengxiaqiucao.github.io/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/>中文</option><option value=https://chengxiaqiucao.github.io/en/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/ selected>English</option></select></li><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#preface>Preface</a></li><li><a href=#overall-project-architecture>Overall Project Architecture</a></li><li><a href=#main-built-in-system-prompts>Main Built-in System Prompts</a><ol><li><a href=#1-task-planning-system-prompts>1. Task Planning System Prompts</a></li><li><a href=#2-element-locating-system-prompts>2. Element Locating System Prompts</a></li><li><a href=#3-data-extraction-system-prompts>3. Data Extraction System Prompts</a></li><li><a href=#4-assertion-verification-system-prompts>4. Assertion Verification System Prompts</a></li><li><a href=#5-element-description-system-prompts>5. Element Description System Prompts</a></li><li><a href=#6-code-generation-system-prompts>6. Code Generation System Prompts</a></li></ol></li><li><a href=#supplements-and-constraints-on-user-prompts>Supplements and Constraints on User Prompts</a><ol><li><a href=#1-intelligent-generation-of-background-context><strong>1. Intelligent Generation of Background Context</strong></a></li><li><a href=#2-multimodal-adapted-user-prompts><strong>2. Multimodal-Adapted User Prompts</strong></a></li><li><a href=#3-structured-json-schema-validation><strong>3. Structured JSON Schema Validation</strong></a></li></ol></li><li><a href=#large-model-context-window-limitations>Large Model Context Window Limitations</a><ol><li><a href=#1-token-count-limit-control>1. Token Count Limit Control</a></li><li><a href=#2-image-size-limits-and-automatic-adjustment>2. Image Size Limits and Automatic Adjustment</a></li><li><a href=#3-image-compression-and-optimization>3. Image Compression and Optimization</a></li><li><a href=#4-choosing-the-right-model-architecture>4. Choosing the Right Model Architecture</a></li><li><a href=#5-token-usage-monitoring>5. Token Usage Monitoring</a></li></ol></li><li><a href=#memory-management-for-long-chain-tasks>Memory Management for Long-Chain Tasks</a><ol><li><a href=#task-caching-mechanism>Task Caching Mechanism</a></li><li><a href=#conversation-history-management>Conversation History Management</a></li><li><a href=#replanning-limit-mechanism>Replanning Limit Mechanism</a></li><li><a href=#resource-cleanup-mechanism>Resource Cleanup Mechanism</a></li><li><a href=#context-optimization>Context Optimization</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/en/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/><img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-5_hu_f0c4b37cae69349d.webp srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-5_hu_f0c4b37cae69349d.webp 800w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-5_hu_3401c82c018ad9a2.webp 1600w" width=800 height=356 loading=lazy alt="Featured image of post Source Code Analysis of the AI Automation Tool Midscene.js"></a></div><div class=article-details><header class=article-category><a href=/en/categories/ai/>AI
+</a><a href=/en/categories/testing-tools/>Testing Tools</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/en/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/>Source Code Analysis of the AI Automation Tool Midscene.js</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Jun 22, 2025</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>18 minute read</time></div></footer><footer class=article-translations><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg><div><a href=https://chengxiaqiucao.github.io/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/ class=link>中文</a></div></footer></div></header><section class=article-content><h2 id=preface>Preface</h2><p>In a previous article 【】we learned about the AI testing tool <code>Midscene.js</code> launched by ByteDance. Whether it is intelligent project parsing, test execution, or the final report generation, it is quite impressive; moreover, in addition to browser-based web applications, it also supports the automation of Android apps.</p><p>So how exactly does this project use AI intelligence to complete test execution tasks? In this article, we will draw on the open-source project source code of Midscene.js to conduct an in-depth analysis of the project&rsquo;s implementation as well as its application of large models.</p><h2 id=overall-project-architecture>Overall Project Architecture</h2><p>Through the analysis of the project source code, the overall architecture of the project can be summarized by the following diagram:
+<img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/midscene_arch_hu_aacd2c6e6996adc4.webp width=1024 height=467 srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/midscene_arch_hu_bb82451fd09cd442.webp 480w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/midscene_arch_hu_aacd2c6e6996adc4.webp 1024w" loading=lazy class=gallery-image data-flex-grow=219 data-flex-basis=526px></p><ul><li><p><strong>User</strong>: The user is the starting point of Midscene, defining automation tasks and goals through natural language descriptions, the JavaScript SDK, or YAML scripts.</p></li><li><p><strong>MCP Clients</strong>: Midscene also supports other MCP clients directly using its capabilities, which indicates that it may have an API or integration point for other systems to call.</p></li><li><p><strong>Midscene Core</strong>: This is the core logic layer of Midscene. It is responsible for parsing user instructions, interacting with AI models, and coordinating automation agents to perform operations. It also manages report generation and caching.</p></li><li><p><strong>AI Models</strong>: Midscene supports multiple AI models, including:</p><ul><li><p><strong>Multimodal LLM</strong>: such as GPT-4o and Gemini-2.5-Pro, used to understand more complex instructions and context.</p></li><li><p><strong>Visual-Language Models</strong>: such as Qwen2.5-VL, Doubao-1.5-thinking-vision-pro, and UI-TARS, which are especially recommended for UI automation because they can better understand visual information. The AI model receives requests from Midscene Core and returns instructions to execute actions or retrieve information.</p></li></ul></li><li><p><strong>Automation Agent</strong>: This is a key execution layer, responsible for actually operating the target application or UI according to the instructions of Midscene Core. It can obtain the UI state and screenshots and feed them back to Midscene Core.</p></li><li><p><strong>Target Application/UI</strong>: This is the actual object of automation operations, which can be:</p><ul><li><strong>Browser</strong>: Web automation through tools such as Playwright or Puppeteer.</li><li><strong>Android App</strong>: Performing Android automation.</li></ul></li><li><p><strong>Visual Reports</strong>: Midscene provides visual reports to help users understand, replay, and debug the entire automation process.</p></li><li><p><strong>Playground</strong>: The built-in Playground environment allows users to debug through natural language instructions.</p></li><li><p><strong>Caching Mechanism</strong>: Midscene uses a caching mechanism to improve efficiency, allowing scripts to replay more quickly to obtain results.</p></li></ul><h2 id=main-built-in-system-prompts>Main Built-in System Prompts</h2><p>The intelligent parsing capability of <code>MidScene</code> mainly relies on LLM large models, so when calling the LLM, its configured system prompts are especially critical. By analyzing the source code, we can see that MidScene has set different system prompts for different types of tasks. They are summarized as follows:</p><h3 id=1-task-planning-system-prompts>1. Task Planning System Prompts</h3><p>The project contains three different task planning prompts:</p><p><strong>Task planning prompt for traditional LLM models</strong> - Used to guide traditional language models to decompose user instructions into a series of executable UI operation actions.</p><p><code>packages/core/src/ai-model/prompt/llm-planning.ts</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span><span class=lnt>78
+</span><span class=lnt>79
+</span><span class=lnt>80
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=kr>const</span> <span class=nx>llmLocateParam</span> <span class=o>=</span> <span class=sb>`locate: {{&#34;id&#34;: string, &#34;prompt&#34;: string}} | null`</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>systemTemplateOfLLM</span> <span class=o>=</span> <span class=p>({</span> <span class=nx>pageType</span> <span class=p>}</span><span class=o>:</span> <span class=p>{</span> <span class=nx>pageType</span>: <span class=kt>PageType</span> <span class=p>})</span> <span class=o>=&gt;</span> <span class=sb>`
+</span></span></span><span class=line><span class=cl><span class=sb>## Role
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>You are a versatile professional in software UI automation. Your outstanding contributions will impact the user experience of billions of users.
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>## Objective
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>- Decompose the instruction user asked into a series of actions
+</span></span></span><span class=line><span class=cl><span class=sb>- Locate the target element if possible
+</span></span></span><span class=line><span class=cl><span class=sb>- If the instruction cannot be accomplished, give a further plan.
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>## Workflow
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>1. Receive the screenshot, element description of screenshot(if any), user&#39;s instruction and previous logs.
+</span></span></span><span class=line><span class=cl><span class=sb>2. Decompose the user&#39;s task into a sequence of actions, and place it in the \`actions\` field. There are different types of actions (Tap / Hover / Input / KeyboardPress / Scroll / FalsyConditionStatement / Sleep </span><span class=si>${</span><span class=nx>pageType</span> <span class=o>===</span> <span class=s1>&#39;android&#39;</span> <span class=o>?</span> <span class=s1>&#39;/ AndroidBackButton / AndroidHomeButton / AndroidRecentAppsButton&#39;</span> <span class=o>:</span> <span class=s1>&#39;&#39;</span><span class=si>}</span><span class=sb>). The &#34;About the action&#34; section below will give you more details.
+</span></span></span><span class=line><span class=cl><span class=sb>3. Precisely locate the target element if it&#39;s already shown in the screenshot, put the location info in the \`locate\` field of the action.
+</span></span></span><span class=line><span class=cl><span class=sb>4. If some target elements is not shown in the screenshot, consider the user&#39;s instruction is not feasible on this page. Follow the next steps.
+</span></span></span><span class=line><span class=cl><span class=sb>5. Consider whether the user&#39;s instruction will be accomplished after all the actions
+</span></span></span><span class=line><span class=cl><span class=sb> - If yes, set \`taskWillBeAccomplished\` to true
+</span></span></span><span class=line><span class=cl><span class=sb> - If no, don&#39;t plan more actions by closing the array. Get ready to reevaluate the task. Some talent people like you will handle this. Give him a clear description of what have been done and what to do next. Put your new plan in the \`furtherPlan\` field. The &#34;How to compose the \`taskWillBeAccomplished\` and \`furtherPlan\` fields&#34; section will give you more details.
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>## Constraints
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>- All the actions you composed MUST be based on the page context information you get.
+</span></span></span><span class=line><span class=cl><span class=sb>- Trust the &#34;What have been done&#34; field about the task (if any), don&#39;t repeat actions in it.
+</span></span></span><span class=line><span class=cl><span class=sb>- Respond only with valid JSON. Do not write an introduction or summary or markdown prefix like \`\`\`json\`\`\`.
+</span></span></span><span class=line><span class=cl><span class=sb>- If the screenshot and the instruction are totally irrelevant, set reason in the \`error\` field.
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>## About the \`actions\` field
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>The \`locate\` param is commonly used in the \`param\` field of the action, means to locate the target element to perform the action, it conforms to the following scheme:
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>type LocateParam = {{
+</span></span></span><span class=line><span class=cl><span class=sb>  &#34;id&#34;: string, // the id of the element found. It should either be the id marked with a rectangle in the screenshot or the id described in the description.
+</span></span></span><span class=line><span class=cl><span class=sb>  &#34;prompt&#34;?: string // the description of the element to find. It can only be omitted when locate is null.
+</span></span></span><span class=line><span class=cl><span class=sb>}} | null // If it&#39;s not on the page, the LocateParam should be null
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>## Supported actions
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>Each action has a \`type\` and corresponding \`param\`. To be detailed:
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;Tap&#39;
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ </span><span class=si>${</span><span class=nx>llmLocateParam</span><span class=si>}</span><span class=sb> }}
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;RightClick&#39;
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ </span><span class=si>${</span><span class=nx>llmLocateParam</span><span class=si>}</span><span class=sb> }}
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;Hover&#39;
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ </span><span class=si>${</span><span class=nx>llmLocateParam</span><span class=si>}</span><span class=sb> }}
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;Input&#39;, replace the value in the input field
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ </span><span class=si>${</span><span class=nx>llmLocateParam</span><span class=si>}</span><span class=sb>, param: {{ value: string }} }}
+</span></span></span><span class=line><span class=cl><span class=sb>  * \`value\` is the final value that should be filled in the input field. No matter what modifications are required, just provide the final value user should see after the action is done. 
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;KeyboardPress&#39;, press a key
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ param: {{ value: string }} }}
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;Scroll&#39;, scroll up or down.
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ 
+</span></span></span><span class=line><span class=cl><span class=sb>      </span><span class=si>${</span><span class=nx>llmLocateParam</span><span class=si>}</span><span class=sb>, 
+</span></span></span><span class=line><span class=cl><span class=sb>      param: {{ 
+</span></span></span><span class=line><span class=cl><span class=sb>        direction: &#39;down&#39;(default) | &#39;up&#39; | &#39;right&#39; | &#39;left&#39;, 
+</span></span></span><span class=line><span class=cl><span class=sb>        scrollType: &#39;once&#39; (default) | &#39;untilBottom&#39; | &#39;untilTop&#39; | &#39;untilRight&#39; | &#39;untilLeft&#39;, 
+</span></span></span><span class=line><span class=cl><span class=sb>        distance: null | number 
+</span></span></span><span class=line><span class=cl><span class=sb>      }} 
+</span></span></span><span class=line><span class=cl><span class=sb>    }}
+</span></span></span><span class=line><span class=cl><span class=sb>    * To scroll some specific element, put the element at the center of the region in the \`locate\` field. If it&#39;s a page scroll, put \`null\` in the \`locate\` field. 
+</span></span></span><span class=line><span class=cl><span class=sb>    * \`param\` is required in this action. If some fields are not specified, use direction \`down\`, \`once\` scroll type, and \`null\` distance.
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ param: {{ button: &#39;Back&#39; | &#39;Home&#39; | &#39;RecentApp&#39; }} }}
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;ExpectedFalsyCondition&#39;
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ param: {{ reason: string }} }}
+</span></span></span><span class=line><span class=cl><span class=sb>  * use this action when the conditional statement talked about in the instruction is falsy.
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;Sleep&#39;
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ param: {{ timeMs: number }} }}
+</span></span></span><span class=line><span class=cl><span class=sb></span><span class=si>${</span>
+</span></span><span class=line><span class=cl>  <span class=nx>pageType</span> <span class=o>===</span> <span class=s1>&#39;android&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=o>?</span> <span class=sb>`- type: &#39;AndroidBackButton&#39;, trigger the system &#34;back&#34; operation on Android devices
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ param: {{}} }}
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;AndroidHomeButton&#39;, trigger the system &#34;home&#34; operation on Android devices
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ param: {{}} }}
+</span></span></span><span class=line><span class=cl><span class=sb>- type: &#39;AndroidRecentAppsButton&#39;, trigger the system &#34;recent apps&#34; operation on Android devices
+</span></span></span><span class=line><span class=cl><span class=sb>  * {{ param: {{}} }}`</span>
+</span></span><span class=line><span class=cl>    <span class=o>:</span> <span class=s1>&#39;&#39;</span>
+</span></span><span class=line><span class=cl><span class=si>}</span><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>`</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>Task planning prompt for visual-language models</strong> - Specifically designed for AI models with visual capabilities (such as Qwen-VL and Gemini), able to directly process screenshots and plan the next action.</p><p><img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621_hu_6926387f76c94f6c.webp width=1024 height=462 srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621_hu_f7b37730f5926b68.webp 480w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621_hu_6926387f76c94f6c.webp 1024w" loading=lazy class=gallery-image data-flex-grow=221 data-flex-basis=532px></p><p><strong>Task planning prompt for the UI-Tars model</strong> - A GUI agent prompt specifically designed for UI-Tars, adopting a think-act format.</p><p><img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-1_hu_5a6b6af294bf16.webp width=1024 height=463 srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-1_hu_fd6046f84b1e202b.webp 480w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-1_hu_5a6b6af294bf16.webp 1024w" loading=lazy class=gallery-image data-flex-grow=220 data-flex-basis=530px></p><h3 id=2-element-locating-system-prompts>2. Element Locating System Prompts</h3><p><strong>Element locating prompt</strong> - Used to precisely locate target elements in page screenshots and element descriptions, supporting both traditional LLM and visual-language model modes.
+<img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-2_hu_794412b4956ea81a.webp width=1024 height=493 srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-2_hu_b974cd93440bf69c.webp 480w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-2_hu_794412b4956ea81a.webp 1024w" loading=lazy class=gallery-image data-flex-grow=207 data-flex-basis=498px></p><p><strong>Region locating prompt</strong> - Used to locate the page region containing the target element, usually an area no larger than 300x300 pixels.</p><p><img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-3_hu_7778d0f9d172b0af.webp width=1024 height=463 srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-3_hu_e17b445ca9a858d0.webp 480w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-3_hu_7778d0f9d172b0af.webp 1024w" loading=lazy class=gallery-image data-flex-grow=220 data-flex-basis=530px></p><h3 id=3-data-extraction-system-prompts>3. Data Extraction System Prompts</h3><p><strong>Data extraction prompt</strong> - Guides the AI to extract structured data from the UI, supporting multiple data types and format requirements.</p><p><img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-4_hu_c08d31eb5b85587c.webp width=1024 height=463 srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-4_hu_b89d8169ac029c30.webp 480w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-4_hu_c08d31eb5b85587c.webp 1024w" loading=lazy class=gallery-image data-flex-grow=220 data-flex-basis=530px></p><h3 id=4-assertion-verification-system-prompts>4. Assertion Verification System Prompts</h3><p><strong>Assertion verification prompt</strong> - Used to verify whether the page state meets the expected assertion conditions, supporting both the UI-Tars and ordinary model formats.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=kr>const</span> <span class=nx>defaultAssertionPrompt</span> <span class=o>=</span>
+</span></span><span class=line><span class=cl>  <span class=s1>&#39;You are a senior testing engineer. User will give an assertion and a screenshot of a page. By carefully viewing the screenshot, please tell whether the assertion is truthy.&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>defaultAssertionResponseJsonFormat</span> <span class=o>=</span> <span class=sb>`Return in the following JSON format:
+</span></span></span><span class=line><span class=cl><span class=sb>{
+</span></span></span><span class=line><span class=cl><span class=sb>  pass: boolean, // whether the assertion is truthy
+</span></span></span><span class=line><span class=cl><span class=sb>  thought: string | null, // string, if the result is falsy, give the reason why it is falsy. Otherwise, put null.
+</span></span></span><span class=line><span class=cl><span class=sb>}`</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=5-element-description-system-prompts>5. Element Description System Prompts</h3><p><strong>Element description prompt</strong> - Used to generate precise element descriptions to help identify specific UI elements in the page (given elements).</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl> <span class=kr>export</span> <span class=kr>const</span> <span class=nx>elementDescriberInstruction</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=sb>`Describe the element in the red rectangle for precise identification. Use </span><span class=si>${</span><span class=nx>getPreferredLanguage</span><span class=p>()</span><span class=si>}</span><span class=sb>.
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>Rules:
+</span></span></span><span class=line><span class=cl><span class=sb>1. Start with element type (button, input, link, etc.)    
+</span></span></span><span class=line><span class=cl><span class=sb>2. Include key identifiers:
+</span></span></span><span class=line><span class=cl><span class=sb>   - Text content: &#34;with text &#39;Submit&#39;&#34;
+</span></span></span><span class=line><span class=cl><span class=sb>   - Visual features: &#34;blue background&#34;, &#34;icon only&#34;
+</span></span></span><span class=line><span class=cl><span class=sb>   - Position: &#34;top-right&#34;, &#34;below search bar&#34;
+</span></span></span><span class=line><span class=cl><span class=sb>3. Keep description under 20 words
+</span></span></span><span class=line><span class=cl><span class=sb>4. Don&#39;t mention the red rectangle
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>Return JSON:
+</span></span></span><span class=line><span class=cl><span class=sb>{
+</span></span></span><span class=line><span class=cl><span class=sb>  &#34;description&#34;: &#34;brief element type with key identifiers&#34;,
+</span></span></span><span class=line><span class=cl><span class=sb>  &#34;error&#34;?: &#34;error message if any&#34;
+</span></span></span><span class=line><span class=cl><span class=sb>}`</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=6-code-generation-system-prompts>6. Code Generation System Prompts</h3><p><strong>Playwright test code generation prompt</strong> - Generates executable Playwright test code based on recorded browser session events.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl> <span class=c1>// Create system prompt
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kr>const</span> <span class=nx>systemPrompt</span> <span class=o>=</span> <span class=sb>`You are an expert test automation engineer specializing in Playwright and Midscene. 
+</span></span></span><span class=line><span class=cl><span class=sb>Your task is to generate a complete, executable Playwright test using @midscene/web/playwright that reproduces a recorded browser session.
+</span></span></span></code></pre></td></tr></table></div></div><blockquote><p>By adopting a modular design for these system prompts, they are dynamically adjusted according to different AI model types (traditional LLM vs. visual-language model) and page types (web vs. Android). The project also includes complete JSON schema definitions to ensure structured and consistent AI output, and supports multi-language environments <code>${getPreferredLanguage()}</code></p></blockquote><h2 id=supplements-and-constraints-on-user-prompts>Supplements and Constraints on User Prompts</h2><p>Beyond the configuration of these system prompts that helps the LLM better understand the current task, the user&rsquo;s input instructions — namely the <code>user prompts</code> — inevitably require a certain degree of expansion and constraint supplementation during actual processing.</p><p>Here we further analyze the handling of user prompts:</p><h3 id=1-intelligent-generation-of-background-context><strong>1. Intelligent Generation of Background Context</strong></h3><p>The project adds structured background context to user instructions through the <code>generateTaskBackgroundContext</code> function, including high-priority knowledge and historical execution logs, to prevent repeating the same operations.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=kr>export</span> <span class=kr>const</span> <span class=nx>generateTaskBackgroundContext</span> <span class=o>=</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>  <span class=nx>userInstruction</span>: <span class=kt>string</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>log?</span>: <span class=kt>string</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>userActionContext?</span>: <span class=kt>string</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>log</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=sb>`
+</span></span></span><span class=line><span class=cl><span class=sb>Here is the user&#39;s instruction:
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>&lt;instruction&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>  &lt;high_priority_knowledge&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>    </span><span class=si>${</span><span class=nx>userActionContext</span><span class=si>}</span><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>  &lt;/high_priority_knowledge&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>  </span><span class=si>${</span><span class=nx>userInstruction</span><span class=si>}</span><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>&lt;/instruction&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>These are the logs from previous executions, which indicate what was done in the previous actions.
+</span></span></span><span class=line><span class=cl><span class=sb>Do NOT repeat these actions.
+</span></span></span><span class=line><span class=cl><span class=sb>&lt;previous_logs&gt;
+</span></span></span><span class=line><span class=cl><span class=sb></span><span class=si>${</span><span class=nx>log</span><span class=si>}</span><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>&lt;/previous_logs&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>`</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=sb>`
+</span></span></span><span class=line><span class=cl><span class=sb>Here is the user&#39;s instruction:
+</span></span></span><span class=line><span class=cl><span class=sb>&lt;instruction&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>  &lt;high_priority_knowledge&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>    </span><span class=si>${</span><span class=nx>userActionContext</span><span class=si>}</span><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>  &lt;/high_priority_knowledge&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>  </span><span class=si>${</span><span class=nx>userInstruction</span><span class=si>}</span><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>&lt;/instruction&gt;
+</span></span></span><span class=line><span class=cl><span class=sb>`</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=2-multimodal-adapted-user-prompts><strong>2. Multimodal-Adapted User Prompts</strong></h3><p>Depending on the capabilities of the AI model, user prompts adopt different formats. For visual-language models, the task background is passed directly; for traditional LLMs, page description information is combined.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=kr>export</span> <span class=kr>const</span> <span class=nx>automationUserPrompt</span> <span class=o>=</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>  <span class=nx>vlMode</span>: <span class=kt>ReturnType</span><span class=p>&lt;</span><span class=nt>typeof</span> <span class=na>vlLocateMode</span><span class=p>&gt;,</span>
+</span></span><span class=line><span class=cl><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>vlMode</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=k>new</span> <span class=nx>PromptTemplate</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>      <span class=nx>template</span><span class=o>:</span> <span class=s1>&#39;{taskBackgroundContext}&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nx>inputVariables</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;taskBackgroundContext&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=k>new</span> <span class=nx>PromptTemplate</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>    <span class=nx>template</span><span class=o>:</span> <span class=sb>`
+</span></span></span><span class=line><span class=cl><span class=sb>pageDescription:
+</span></span></span><span class=line><span class=cl><span class=sb>=====================================
+</span></span></span><span class=line><span class=cl><span class=sb>{pageDescription}
+</span></span></span><span class=line><span class=cl><span class=sb>=====================================
+</span></span></span><span class=line><span class=cl><span class=sb>
+</span></span></span><span class=line><span class=cl><span class=sb>{taskBackgroundContext}`</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>inputVariables</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;pageDescription&#39;</span><span class=p>,</span> <span class=s1>&#39;taskBackgroundContext&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>  <span class=p>});</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=3-structured-json-schema-validation><strong>3. Structured JSON Schema Validation</strong></h3><p>The project uses OpenAI&rsquo;s structured output schema to strictly constrain the AI&rsquo;s response format, ensuring that the returned data conforms to a predefined structure, including necessary fields such as actions, log, and error.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=kr>export</span> <span class=kr>const</span> <span class=nx>planSchema</span>: <span class=kt>ResponseFormatJSONSchema</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;json_schema&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>json_schema</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>name</span><span class=o>:</span> <span class=s1>&#39;action_items&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>strict</span>: <span class=kt>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>schema</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;object&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nx>strict</span>: <span class=kt>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nx>properties</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>actions</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>          <span class=c1>//  TODO
+</span></span></span><span class=line><span class=cl><span class=c1></span>          <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;array&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=nx>items</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;object&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nx>strict</span>: <span class=kt>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nx>properties</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>              <span class=nx>thought</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=nx>description</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>                  <span class=s1>&#39;Reasons for generating this task, and why this task is feasible on this page&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>              <span class=p>},</span>
+</span></span><span class=line><span class=cl>              <span class=kr>type</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=nx>description</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>                  <span class=s1>&#39;Type of action, one of &#34;Tap&#34;, &#34;RightClick&#34;, &#34;Hover&#34; , &#34;Input&#34;, &#34;KeyboardPress&#34;, &#34;Scroll&#34;, &#34;ExpectedFalsyCondition&#34;, &#34;Sleep&#34;, &#34;AndroidBackButton&#34;, &#34;AndroidHomeButton&#34;, &#34;AndroidRecentAppsButton&#34;&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>              <span class=p>},</span>
+</span></span><span class=line><span class=cl>              <span class=nx>param</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=nx>anyOf</span><span class=o>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>                  <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;null&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                  <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;object&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>properties</span><span class=o>:</span> <span class=p>{</span> <span class=nx>value</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;string&#39;</span><span class=p>,</span> <span class=s1>&#39;number&#39;</span><span class=p>]</span> <span class=p>}</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>required</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;value&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>additionalProperties</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                  <span class=p>},</span>
+</span></span><span class=line><span class=cl>                  <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;object&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>properties</span><span class=o>:</span> <span class=p>{</span> <span class=nx>timeMs</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;number&#39;</span><span class=p>,</span> <span class=s1>&#39;string&#39;</span><span class=p>]</span> <span class=p>}</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>required</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;timeMs&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>additionalProperties</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                  <span class=p>},</span>
+</span></span><span class=line><span class=cl>                  <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;object&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>properties</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                      <span class=nx>direction</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                      <span class=nx>scrollType</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                      <span class=nx>distance</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;number&#39;</span><span class=p>,</span> <span class=s1>&#39;string&#39;</span><span class=p>,</span> <span class=s1>&#39;null&#39;</span><span class=p>]</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                    <span class=p>},</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>required</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;direction&#39;</span><span class=p>,</span> <span class=s1>&#39;scrollType&#39;</span><span class=p>,</span> <span class=s1>&#39;distance&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>additionalProperties</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                  <span class=p>},</span>
+</span></span><span class=line><span class=cl>                  <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;object&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>properties</span><span class=o>:</span> <span class=p>{</span> <span class=nx>reason</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span> <span class=p>}</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>required</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;reason&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>additionalProperties</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                  <span class=p>},</span>
+</span></span><span class=line><span class=cl>                  <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;object&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>properties</span><span class=o>:</span> <span class=p>{</span> <span class=nx>button</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span> <span class=p>}</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>required</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;button&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>additionalProperties</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                  <span class=p>},</span>
+</span></span><span class=line><span class=cl>                <span class=p>],</span>
+</span></span><span class=line><span class=cl>                <span class=nx>description</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>                  <span class=s1>&#39;Parameter of the action, can be null ONLY when the type field is Tap or Hover&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>              <span class=p>},</span>
+</span></span><span class=line><span class=cl>              <span class=nx>locate</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=kr>type</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;object&#39;</span><span class=p>,</span> <span class=s1>&#39;null&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>                <span class=nx>properties</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                  <span class=nx>id</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                  <span class=nx>prompt</span><span class=o>:</span> <span class=p>{</span> <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>                <span class=p>},</span>
+</span></span><span class=line><span class=cl>                <span class=nx>required</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;id&#39;</span><span class=p>,</span> <span class=s1>&#39;prompt&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>                <span class=nx>additionalProperties</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=nx>description</span><span class=o>:</span> <span class=s1>&#39;Location information for the target element&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>              <span class=p>},</span>
+</span></span><span class=line><span class=cl>            <span class=p>},</span>
+</span></span><span class=line><span class=cl>            <span class=nx>required</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;thought&#39;</span><span class=p>,</span> <span class=s1>&#39;type&#39;</span><span class=p>,</span> <span class=s1>&#39;param&#39;</span><span class=p>,</span> <span class=s1>&#39;locate&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>            <span class=nx>additionalProperties</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=p>},</span>
+</span></span><span class=line><span class=cl>          <span class=nx>description</span><span class=o>:</span> <span class=s1>&#39;List of actions to be performed&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nx>more_actions_needed_by_instruction</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>          <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;boolean&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=nx>description</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>            <span class=s1>&#39;If all the actions described in the instruction have been covered by this action and logs, set this field to false.&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nx>log</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>          <span class=kr>type</span><span class=o>:</span> <span class=s1>&#39;string&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=nx>description</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>            <span class=s1>&#39;Log what these planned actions do. Do not include further actions that have not been planned.&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nx>error</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>          <span class=kr>type</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;string&#39;</span><span class=p>,</span> <span class=s1>&#39;null&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>          <span class=nx>description</span><span class=o>:</span> <span class=s1>&#39;Error messages about unexpected situations&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>      <span class=p>},</span>
+</span></span><span class=line><span class=cl>      <span class=nx>required</span><span class=o>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=s1>&#39;actions&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s1>&#39;more_actions_needed_by_instruction&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s1>&#39;log&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s1>&#39;error&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=p>],</span>
+</span></span><span class=line><span class=cl>      <span class=nx>additionalProperties</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>  <span class=p>},</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><blockquote><p>Through these multi-layered enhancement and constraint mechanisms, the AI model is ensured to accurately understand user intent while its behavioral boundaries are strictly controlled. Judging from the definition of the prompts, the project places great emphasis on preventing the AI from hallucinating or performing operations beyond the scope of user instructions, which is crucial for scenarios such as UI automation that require high-precision operations.</p></blockquote><h2 id=large-model-context-window-limitations>Large Model Context Window Limitations</h2><p>When using various AI large models to complete intelligent tasks, a very important constraint is that large models usually have a <code>context window size limit</code>; historical information exceeding this limit is discarded in order to conserve the resources of the large model and improve performance.</p><p>For an automated testing task, however, the execution chain after decomposition is often long and usually exceeds the LLM&rsquo;s context limit.</p><p>So here we further analyze how this project handles the context window limit.</p><h3 id=1-token-count-limit-control>1. Token Count Limit Control</h3><p>The project sets the maximum number of tokens in the response through the <code>OPENAI_MAX_TOKENS</code> environment variable</p><p><img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-6_hu_7d543a71488ff914.webp width=1024 height=413 srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-6_hu_eb15cf7c4eb277d3.webp 480w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-6_hu_7d543a71488ff914.webp 1024w" loading=lazy class=gallery-image data-flex-grow=248 data-flex-basis=595px></p><h3 id=2-image-size-limits-and-automatic-adjustment>2. Image Size Limits and Automatic Adjustment</h3><p>The project implements image size limits for different models, especially strict size control for the GPT-4o model. When it detects that the image size exceeds the maximum input limit of GPT-4o (2000x768 or 768x2000 pixels), the system issues a warning.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=kd>let</span> <span class=nx>warned</span> <span class=o>=</span> <span class=kc>false</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kr>export</span> <span class=kd>function</span> <span class=nx>warnGPT4oSizeLimit</span><span class=p>(</span><span class=nx>size</span>: <span class=kt>Size</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>warned</span><span class=p>)</span> <span class=k>return</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>getModelName</span><span class=p>()</span><span class=o>?</span><span class=p>.</span><span class=nx>toLowerCase</span><span class=p>().</span><span class=nx>includes</span><span class=p>(</span><span class=s1>&#39;gpt-4o&#39;</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>warningMsg</span> <span class=o>=</span> <span class=sb>`GPT-4o has a maximum image input size of 2000x768 or 768x2000, but got </span><span class=si>${</span><span class=nx>size</span><span class=p>.</span><span class=nx>width</span><span class=si>}</span><span class=sb>x</span><span class=si>${</span><span class=nx>size</span><span class=p>.</span><span class=nx>height</span><span class=si>}</span><span class=sb>. Please set your page to a smaller resolution. Otherwise, the result may be inaccurate.`</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>      <span class=nb>Math</span><span class=p>.</span><span class=nx>max</span><span class=p>(</span><span class=nx>size</span><span class=p>.</span><span class=nx>width</span><span class=p>,</span> <span class=nx>size</span><span class=p>.</span><span class=nx>height</span><span class=p>)</span> <span class=o>&gt;</span> <span class=mi>2000</span> <span class=o>||</span>
+</span></span><span class=line><span class=cl>      <span class=nb>Math</span><span class=p>.</span><span class=nx>min</span><span class=p>(</span><span class=nx>size</span><span class=p>.</span><span class=nx>width</span><span class=p>,</span> <span class=nx>size</span><span class=p>.</span><span class=nx>height</span><span class=p>)</span> <span class=o>&gt;</span> <span class=mi>768</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>console</span><span class=p>.</span><span class=nx>warn</span><span class=p>(</span><span class=nx>warningMsg</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=nx>warned</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=nx>size</span><span class=p>.</span><span class=nx>width</span> <span class=o>&gt;</span> <span class=mi>1800</span> <span class=o>||</span> <span class=nx>size</span><span class=p>.</span><span class=nx>height</span> <span class=o>&gt;</span> <span class=mi>1800</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>warn</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>      <span class=sb>`The image size seems too large (</span><span class=si>${</span><span class=nx>size</span><span class=p>.</span><span class=nx>width</span><span class=si>}</span><span class=sb>x</span><span class=si>${</span><span class=nx>size</span><span class=p>.</span><span class=nx>height</span><span class=si>}</span><span class=sb>). It may lead to more token usage, slower response, and inaccurate result.`</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nx>warned</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=3-image-compression-and-optimization>3. Image Compression and Optimization</h3><p>The system reduces the amount of data transferred through image compression (<code>packages/shared/src/img/transform.ts</code>), including:</p><ul><li>Setting the image quality to 90% to balance quality and file size</li><li>Providing image resizing functionality</li><li>Supporting image processing and conversion in base64 format</li></ul><h3 id=4-choosing-the-right-model-architecture>4. Choosing the Right Model Architecture</h3><p>The project supports two different types of AI models to optimize token usage:</p><p><strong>General-purpose multimodal LLM (such as GPT-4o)</strong>: Requires sending both the screenshot and the DOM tree, resulting in higher token consumption.</p><p><strong>Visual grounding VL model (such as Qwen-2.5-VL)</strong>: Supports visual grounding and does not need to send the DOM tree, saving 30% to 50% of tokens.</p><p>See the explanation in the <code>apps/site/docs/zh/choose-a-model.mdx</code> document</p><p><img src=/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-7_hu_913b7eab79ce8506.webp width=1024 height=309 srcset="/post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-7_hu_e335fd6cdfa834bc.webp 480w, /post/081-midscene%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/snap_20250621-7_hu_913b7eab79ce8506.webp 1024w" loading=lazy class=gallery-image data-flex-grow=331 data-flex-basis=795px></p><h3 id=5-token-usage-monitoring>5. Token Usage Monitoring</h3><p>The project also provides detailed token usage tracking and debugging features, recording prompt tokens, completion tokens, and the total number of tokens.</p><p>In summary, the project&rsquo;s strategy for handling context window limits mainly focuses on three aspects:</p><ul><li><strong>Controlling the input data volume</strong> (through image compression and size limits)</li><li><strong>Choosing the right model architecture</strong> (VL model vs. general-purpose LLM)</li><li><strong>Monitoring and optimizing token usage</strong></li></ul><p>This multi-layered approach effectively reduces the need for large context windows while also maintaining functional completeness.</p><h2 id=memory-management-for-long-chain-tasks>Memory Management for Long-Chain Tasks</h2><p>For large models, the memory of completed steps and historical tasks is of great significance for ensuring result accuracy, avoiding unnecessary repetition, and saving costs. As introduced in our previous articles, tools such as <code>Browser-Use</code> bring in memory frameworks like <code>mem0</code> to implement AI memory capabilities; so how does Midscene handle this aspect?</p><p>Based on the analysis of the Midscene code, memory management for long-chain tasks is mainly implemented through the following core mechanisms:</p><h3 id=task-caching-mechanism>Task Caching Mechanism</h3><p>Midscene implements an intelligent task caching system to manage the memory of AI operations. This system caches planning results and element location information to avoid repeated AI calls, thereby reducing memory consumption and improving execution efficiency.</p><p><code>packages/web-integration/src/common/task-cache.ts</code></p><p>The caching system supports two types of cache:</p><ul><li><strong>Planning Cache (PlanningCache)</strong> is used to store the AI-planned YAML workflows</li><li><strong>Locate Cache (LocateCache)</strong> is used to store the XPath information of elements.</li></ul><h3 id=conversation-history-management>Conversation History Management</h3><p>To prevent the conversation history in long-chain tasks from growing indefinitely and causing memory overflow, Midscene implements an intelligent conversation history management strategy. The system limits user image messages to a maximum of 4 retained entries and adopts a first-in-first-out (FIFO) strategy to automatically clean up old conversation records.</p><p><code>packages/web-integration/src/common/tasks.ts</code></p><h3 id=replanning-limit-mechanism>Replanning Limit Mechanism</h3><p>To prevent the AI from falling into an infinite replanning loop in long-chain tasks, the system sets a limit on the number of replanning attempts. When the number of replanning attempts exceeds the limit, the task proactively terminates and returns an error message.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=k>while</span> <span class=p>(</span><span class=nx>planningTask</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=p>(</span><span class=nx>replanCount</span> <span class=o>&gt;</span> <span class=nx>replanningCountLimit</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kr>const</span> <span class=nx>errorMsg</span> <span class=o>=</span>
+</span></span><span class=line><span class=cl>          <span class=s1>&#39;Replanning too many times, please split the task into multiple steps&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=k>this</span><span class=p>.</span><span class=nx>appendErrorPlan</span><span class=p>(</span><span class=nx>taskExecutor</span><span class=p>,</span> <span class=nx>errorMsg</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=resource-cleanup-mechanism>Resource Cleanup Mechanism</h3><p>Midscene uses the FreeFn pattern to ensure that all resources — including network connections, temporary files, timers, and so on — are properly cleaned up after a long-chain task is completed. Even under exceptional circumstances, the resource cleanup mechanism guarantees that system resources are released.</p><p><code>packages/web-integration/src/yaml/player.ts</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=nx>freeFn</span> <span class=o>=</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=p>...(</span><span class=nx>newFreeFn</span> <span class=o>||</span> <span class=p>[]),</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>          <span class=nx>name</span><span class=o>:</span> <span class=s1>&#39;restore-agent-onTaskStartTip&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=nx>fn</span><span class=o>:</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=p>(</span><span class=nx>agent</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>              <span class=nx>agent</span><span class=p>.</span><span class=nx>onTaskStartTip</span> <span class=o>=</span> <span class=nx>originalOnTaskStartTip</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>          <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>      <span class=p>];</span>
+</span></span><span class=line><span class=cl>  <span class=p>....</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// free the resources
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>for</span> <span class=p>(</span><span class=kr>const</span> <span class=nx>fn</span> <span class=k>of</span> <span class=nx>freeFn</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>try</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// console.log(&#39;freeing&#39;, fn.name);
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>await</span> <span class=nx>fn</span><span class=p>.</span><span class=nx>fn</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// console.log(&#39;freed&#39;, fn.name);
+</span></span></span><span class=line><span class=cl><span class=c1></span>      <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>e</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// console.error(&#39;error freeing&#39;, fn.name, e);
+</span></span></span><span class=line><span class=cl><span class=c1></span>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=context-optimization>Context Optimization</h3><p>To reduce memory usage, Midscene also implements several context optimization strategies:</p><ul><li><strong>Visible element filtering</strong>: Only extract the visible elements on the page, reducing the size of the DOM tree</li><li><strong>Image compression</strong>: Intelligently compress screenshots to reduce memory and transmission overhead</li><li><strong>Viewport cropping</strong>: Crop context data according to the viewport range</li></ul><blockquote><p>It can be seen that although Mdscene has not introduced a dedicated memory framework to handle historical memory, it has nevertheless established a memory management mechanism to handle this collaboratively, enabling Midscene to maintain efficient memory usage when processing complex long-chain tasks. Through conversation history management to control memory growth, replanning limits to prevent infinite loops, and resource cleanup to ensure system stability, it ultimately achieves a reliable long-chain task execution system.</p></blockquote><hr><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>graph TD
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    A[User] --&gt;|Provide natural language description/JS SDK/YAML script| B(Midscene Core)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    B --&gt;|Call| C{AI Model}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    C --&gt;|Return action/info| B
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    B --&gt;|Control| D[Automation Agent]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    D --&gt;|Operate| E[Target App/UI]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    E --&gt;|Return UI state/screenshot| D
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    D --&gt;|Send| B
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    B --&gt;|Generate| F[Visual Reports]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    B --&gt;|Provide| G[Playground&lt;Debug&gt; ]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    B --&gt;|Use| H[Caching Mechanism]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    subgraph Target Platforms
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        E -- Web --&gt; E1[Browser&lt;Playwright/Puppeteer&gt;]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        E -- Android --&gt; E2[Android App]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    end
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    subgraph AI Model Types
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        C -- Multimodal LLM --&gt; C1[GPT-4o, Gemini-2.5-Pro]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        C -- Visual-Language Model --&gt; C2[Qwen2.5-VL, Doubao-1.5-thinking-vision-pro, UI-TARS]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    end
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    subgraph Auxiliary Tools
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        F --&gt; F1[Report Files]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        G --&gt; G1[Built-in Debug Environment]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        H --&gt; H1[Improve efficiency/replay]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    end
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    I[MCP Clients] --&gt;|Use capabilities directly| B
+</span></span></code></pre></td></tr></table></div></div></section><footer class=article-footer><section class=article-tags><a href=/en/tags/test-automation/>Test Automation</a>
+<a href=/en/tags/ai/>AI</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/en/post/072-%E5%BE%AE%E8%BD%AF%E5%B7%B2%E5%8F%91%E5%B8%83playwright-mcp/><div class=article-image><img src=/post/072-%E5%BE%AE%E8%BD%AF%E5%B7%B2%E5%8F%91%E5%B8%83playwright-mcp/Pasted-20250402.4caae59d8115364eba923b597c89cacb_hu_93c9e139025e4f8b.webp width=250 height=150 loading=lazy alt="Featured image of post Microsoft Has Released Playwright MCP" data-hash="md5-TKrlnYEVNk66kjtZfInKyw=="></div><div class=article-details><h2 class=article-title>Microsoft Has Released Playwright MCP</h2></div></a></article><article class=has-image><a href=/en/post/152-self-healing-locator-architecture/><div class=article-image><img src=/post/152-self-healing-locator-architecture/cover.a6e576c781637efd1c2fe973a9ca6883_hu_c8df04097fa1f814.webp width=250 height=150 loading=lazy alt="Featured image of post The Locator Broke but the Test Stayed Green - Runtime Self-Healing and Its Three Audit Gates" data-hash="md5-puV2x4Fjfv0cL+lzqcpogw=="></div><div class=article-details><h2 class=article-title>The Locator Broke but the Test Stayed Green - Runtime Self-Healing and Its Three Audit Gates</h2></div></a></article><article class=has-image><a href=/en/post/142-browser-extension-testing/><div class=article-image><img src=/post/142-browser-extension-testing/cover.891a12f9804045abdd702672b2599790_hu_4e0d6478098b6f69.webp width=250 height=150 loading=lazy alt="Featured image of post Automated Testing for Browser Extensions - From Install to Popup to Version Migration" data-hash="md5-iRoS+YBARavdcCZyslmXkA=="></div><div class=article-details><h2 class=article-title>Automated Testing for Browser Extensions - From Install to Popup to Version Migration</h2></div></a></article><article><a href=/en/post/136-anti_automation/><div class=article-details><h2 class=article-title>Antipatterns in Test Automation</h2></div></a></article><article><a href=/en/post/134-playwright_unstable/><div class=article-details><h2 class=article-title>Handling Retries for Unstable Tests in Playwright</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2023 -
+2026 |by Daniel Wei</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

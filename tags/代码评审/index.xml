@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>代码评审 on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/%E4%BB%A3%E7%A0%81%E8%AF%84%E5%AE%A1/</link><description>Recent content in 代码评审 on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Thu, 05 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E4%BB%A3%E7%A0%81%E8%AF%84%E5%AE%A1/index.xml" rel="self" type="application/rss+xml"/><item><title>AI 写完 Playwright 测试之后：让它值得信任的七道检查</title><link>https://chengxiaqiucao.github.io/post/159-trust-ai-written-playwright-tests/</link><pubDate>Thu, 05 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/159-trust-ai-written-playwright-tests/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/159-trust-ai-written-playwright-tests/cover.webp" alt="Featured image of post AI 写完 Playwright 测试之后：让它值得信任的七道检查" />&lt;p>下面这段自动化代码，模型几秒钟就能写出来：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">test&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">expect&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@playwright/test&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;should create a invoice&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">page&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">goto&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;/invoices/new&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByLabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Supplier&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">fill&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Supplier A&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByLabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Invoice Number&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">fill&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;INV-001&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByRole&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;button&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Save&amp;#39;&lt;/span> &lt;span class="p">}).&lt;/span>&lt;span class="nx">click&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByText&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Invoice created successfully&amp;#39;&lt;/span>&lt;span class="p">)).&lt;/span>&lt;span class="nx">toBeVisible&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>定位器选得不错，&lt;code>await&lt;/code> 齐全，用的是会自动重试的 web-first 断言，首次运行就绿，快速评审大概直接就批了。&lt;/p>
+&lt;p>现在假设应用里有个缺陷：发票保存失败时，页面照样弹出「创建成功」。这段测试仍然全绿。&lt;/p>
+&lt;p>这就是问题所在。生成自动化代码正在变得越来越容易，让它可靠、有意义、可维护，仍然是我们的工作。模型擅长产出「看起来对」的测试，而它是否真的在保护我们，是另一个问题。所以生成之后，还有七道检查值得逐条过一遍。&lt;/p>
+&lt;h2 id="一先回到需求缺口往往在场景里不在代码里">一、先回到需求：缺口往往在场景里，不在代码里
+&lt;/h2>&lt;p>在逐行读 TypeScript 之前，先问这条测试本该证明什么。以「创建发票」为例，真正要紧的问题可能是：&lt;/p>
+&lt;ul>
+&lt;li>发票编号是否唯一？&lt;/li>
+&lt;li>必填项缺失时会怎样？&lt;/li>
+&lt;li>允许重复的发票编号吗？&lt;/li>
+&lt;li>保存之后，发票会不会出现在列表里？&lt;/li>
+&lt;li>有没有决定「能否保存」的业务规则？&lt;/li>
+&lt;/ul>
+&lt;p>模型只知道我们告诉它的东西。提示里没提重复编号，生成的测试就不会去查重复编号。而这类缺口&lt;strong>读代码是看不出来的&lt;/strong>——代码本身完全正确，缺的是场景。&lt;/p>
+&lt;p>所以第一道检查永远是读需求、把该覆盖的场景列出来，再回头看生成结果覆盖了哪几条。跳这一步，很容易得到一条跑得很顺、却只保护了极窄一条路径的用例。&lt;/p>
+&lt;h2 id="二检查断言验的是结果还是一次点击">二、检查断言：验的是结果，还是一次点击
+&lt;/h2>&lt;p>回到「创建成功」那句提示。如果需求就是「显示一条成功提示」，断言它没问题；如果需求是「创建出发票」，这句提示就不是足够的证据。&lt;/p>
+&lt;p>应用若在保存后跳转到新发票详情页，就可以把断言换成页面上的实际数据：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="p">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByRole&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;heading&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;INV-001&amp;#39;&lt;/span> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">).&lt;/span>&lt;span class="nx">toBeVisible&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByText&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Supplier A&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">exact&lt;/span>: &lt;span class="kt">true&lt;/span> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">).&lt;/span>&lt;span class="nx">toBeVisible&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">...&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>也可以按应用形态去发票列表里找这条记录，或者通过接口查落库数据。共同点是把证据从「UI 说它成功了」挪到「东西确实产生了」。&lt;/p>
+&lt;p>模型容易停在成功提示上，原因不难理解：它只能看见页面上有什么，并不知道页面上哪部分才算数。更糟的一种情况是应用本来就有 bug，模型可能写出一条&lt;strong>期待这个 bug&lt;/strong> 的断言，然后稳定地绿下去。&lt;/p>
+&lt;p>评审断言时问自己三个问题就够：&lt;/p>
+&lt;ul>
+&lt;li>如果这个功能坏了，这条测试还能通过吗？&lt;/li>
+&lt;li>期望值具体到足以区分对错吗？&lt;/li>
+&lt;li>我验的是结果，还是只验了「点击发生过」？&lt;/li>
+&lt;/ul>
+&lt;p>断言不是越多越好，是把证据选对。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/159-trust-ai-written-playwright-tests/05-fig1_hu_c9c2c7ed3b6f7a14.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/159-trust-ai-written-playwright-tests/05-fig1_hu_101e14962ec86559.webp 480w, https://chengxiaqiucao.github.io/post/159-trust-ai-written-playwright-tests/05-fig1_hu_c9c2c7ed3b6f7a14.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>从「成功提示可见」升级到「详情页存在且字段正确」，断言的证据强度完全不同&lt;/p>
+&lt;h2 id="三检查定位器是不是有人刻意选过">三、检查定位器：是不是有人刻意选过
+&lt;/h2>&lt;p>模型也很乐意写出这样的代码：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="k">await&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">locator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;.btn-primary:nth-child(2)&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">click&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>它能跑通，但依赖 CSS 类名和元素在父节点里的位置。一次小改版就可能让它失效，或者更隐蔽——让它点到另一个按钮，测试依旧全绿，只是测错了东西。&lt;/p>
+&lt;p>更符合用户找元素方式的写法是：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="k">await&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByRole&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;button&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Save&amp;#39;&lt;/span> &lt;span class="p">}).&lt;/span>&lt;span class="nx">click&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">await&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByLabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Invoice Number&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">fill&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;INV-001&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>并不存在唯一正确的定位策略：有些元素没有可访问名称，团队刻意加的 &lt;code>data-testid&lt;/code> 就是合理选择。要紧的是&lt;strong>有人做过选择&lt;/strong>，而不是让生成器顺手挑了一个能跑通的表达式。逐个确认三件事：它是否唯一、是否命中我们想操作的那个元素、下一次界面改版后是否大概率还在。&lt;/p>
+&lt;h2 id="四检查时序别拿秒数当等待条件">四、检查时序：别拿秒数当等待条件
+&lt;/h2>&lt;p>本地跑得通的测试，在 CI 里可能随机失败——机器更慢、接口响应更长。最顺手的「修复」是加一段固定等待：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="k">await&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByRole&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;button&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Save&amp;#39;&lt;/span> &lt;span class="p">}).&lt;/span>&lt;span class="nx">click&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">await&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">waitForTimeout&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">3000&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这行代码无论动作是否完成都等三秒：应用快的时候白白拖慢，应用慢于三秒时依然不稳定。Playwright 本身会为动作自动等待、对 web-first 断言自动重试，绝大多数情况下直接删掉即可：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="p">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByRole&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;button&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Save&amp;#39;&lt;/span> &lt;span class="p">}).&lt;/span>&lt;span class="nx">click&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByText&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Invoice created successfully&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">).&lt;/span>&lt;span class="nx">toBeVisible&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">...&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>如果确实依赖某个网络请求，就显式等那个响应（&lt;code>page.waitForResponse()&lt;/code>）——等你需要发生的那件事，而不是等一个数字。&lt;/p>
+&lt;p>还有一个只差一个词、评审极易漏掉的问题：&lt;code>expect&lt;/code> 前面漏写 &lt;code>await&lt;/code>。断言没被等待，测试可能在断言执行完之前就结束，于是「通过」得毫无根据。&lt;/p>
+&lt;h2 id="五检查它是否属于我们的工程">五、检查它是否属于我们的工程
+&lt;/h2>&lt;p>单看能跑通，不等于可以合并。多数项目已经有 fixtures、认证设置、测试数据助手和页面对象，而模型通常看不到这些，于是自己另写一套。最常见的例子是：项目里明明有已认证的 fixture，生成的测试却老老实实从 UI 登录一遍。&lt;/p>
+&lt;p>合并之前逐条确认：&lt;/p>
+&lt;ul>
+&lt;li>是否复用了已有的 fixture 与认证设置？&lt;/li>
+&lt;li>是否遵循项目的命名与目录约定？&lt;/li>
+&lt;li>是否自己创建测试数据，因而可以安全地并行运行？&lt;/li>
+&lt;li>是否能独立运行，不依赖另一条测试先跑？&lt;/li>
+&lt;li>是否重复实现了仓库里已有的 helper？&lt;/li>
+&lt;/ul>
+&lt;p>这不等于每条测试都要层层抽象，有时一条朴素的直线测试就是最合适的写法；它只需要真的属于这个代码库。&lt;/p>
+&lt;p>一部分检查可以交给工具：&lt;code>eslint-plugin-playwright&lt;/code> 覆盖了上面多数代码层错误，例如 &lt;code>no-wait-for-timeout&lt;/code>、&lt;code>missing-playwright-await&lt;/code>、以及针对无断言测试的 &lt;code>expect-expect&lt;/code>。另外，Playwright 执行 TypeScript 时并不做类型检查，CI 里补一条 &lt;code>tsc --noEmit&lt;/code>，能抓出模型偶尔发明出来的方法名。&lt;/p>
+&lt;h2 id="六绿灯不是证明让它先失败一次">六、绿灯不是证明：让它先失败一次
+&lt;/h2>&lt;p>一次通过只说明「这次通过了」，不说明「它能抓到 bug」。还有几件事值得做：&lt;/p>
+&lt;ul>
+&lt;li>重复跑。&lt;code>npx playwright test --repeat-each=2&lt;/code> 能把时序和共享状态带来的间歇性问题逼出来。&lt;/li>
+&lt;li>放到 CI 跑。不同浏览器、更少资源、更多并行 worker，有些问题只在那里现身。&lt;/li>
+&lt;li>失败时读 trace。逐步动作与当时的页面状态，能让「只在 CI 复现」的失败变得可解释。&lt;/li>
+&lt;li>故意让它失败。这一条最有价值：如果测试本该验证发票被保存，就在测试环境里让保存失败——用 &lt;code>page.route()&lt;/code> 把接口改成返回错误，或临时改一行本地代码。若测试仍然全绿，它就没有在测我们以为它测的东西。&lt;/li>
+&lt;/ul>
+&lt;p>同样的思路也适用于「自愈」能力。现在的工具提供了会在测试失败时自动修复的代理，按钮改个名确实省事；但有时测试失败是因为应用真的坏了，修复代理未必分辨得出。一旦它把测试改成匹配坏行为，一个真实缺陷就变成了一个绿色对勾。把自愈结果当作一条「建议变更」来评审，和评审任何其他代码一样。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/159-trust-ai-written-playwright-tests/05-fig2_hu_3adf29cd17b1480e.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/159-trust-ai-written-playwright-tests/05-fig2_hu_3091287a84e17d3e.webp 480w, https://chengxiaqiucao.github.io/post/159-trust-ai-written-playwright-tests/05-fig2_hu_3adf29cd17b1480e.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>刻意让保存失败，观察测试是否变红：这是验证断言有效性的最直接方法&lt;/p>
+&lt;h2 id="七最后问一句这条测试值得留吗">七、最后问一句：这条测试值得留吗
+&lt;/h2>&lt;p>即使一条测试写得很好，也还要问需不需要它。生成变便宜了，但每条测试都有运行成本与维护成本：第二条只是把字段值换了一下的「创建发票」用例，几乎不增加任何覆盖；而一条边界条件或一条尚未被覆盖的业务规则，价值可能很高。&lt;/p>
+&lt;p>判断标准就两个量：它覆盖了什么风险，以及留着它要付多少代价。目标是拥有一套能抓回归的套件，不是拥有尽可能大的测试数量。&lt;/p>
+&lt;h2 id="八结语">八、结语
+&lt;/h2>&lt;p>模型省下了大量时间：写重复部分、给场景建议、让第一版快速跑起来，这些都没理由抗拒。但写代码从来不是这份工作的全部。理解需求、识别风险、挑选断言、管理测试数据、调查失败，仍然是人要承担的部分——而且随着「写」越来越容易，「判断」的分量只会更重。&lt;/p>
+&lt;p>最该警惕的不是一眼看上去就写错的测试，而是那些看起来没问题、每次都通过、却给了我们一份并不配得到的信心。&lt;/p></description></item></channel></rss>

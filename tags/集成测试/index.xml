@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>集成测试 on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%95/</link><description>Recent content in 集成测试 on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Thu, 05 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%95/index.xml" rel="self" type="application/rss+xml"/><item><title>集成测试里到底该 mock 什么：先回答「这条测试要证明什么」</title><link>https://chengxiaqiucao.github.io/post/158-integration-test-mocking/</link><pubDate>Thu, 05 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/158-integration-test-mocking/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/158-integration-test-mocking/cover.webp" alt="Featured image of post 集成测试里到底该 mock 什么：先回答「这条测试要证明什么」" />&lt;p>「集成测试要不要打桩」大概是测试团队里最容易反复吵、又最难吵出结论的问题。有人说必须全真，打桩就不叫集成测试；有人说外部服务不稳定，不打桩 CI 永远红；还有人干脆按依赖归谁所有划线：自己写的连真，第三方的全打掉。&lt;/p>
+&lt;p>争到后面，大家其实在争一个被跳过的前提：这条测试究竟想证明什么。把这个前提写清楚，答案往往自己就出来了。&lt;/p>
+&lt;h2 id="一真正要的不是-mock是隔离">一、真正要的不是 mock，是隔离
+&lt;/h2>&lt;p>「mock」这个词容易把注意力引到工具上：用哪个库、怎么替换、要不要验证调用次数。但设计测试时想要的东西更朴素——&lt;strong>隔离&lt;/strong>：让这条测试只检查我们关心的那部分行为，不被其他不受控因素干扰。&lt;/p>
+&lt;p>从最小的单元测试看最清楚。给计算器的加法写一条测试：无论这个计算器是手机应用、网页还是 API，&lt;code>1 + 2&lt;/code> 都应该等于 &lt;code>3&lt;/code>。这条测试默认外部世界不会影响这段代码的结果，这就是隔离。&lt;/p>
+&lt;p>如果被测代码确实有一个会影响行为的依赖，而我们既不能控制它、也不想控制它，就只剩两个选择：把两者放在一起测，或者把依赖替换掉。替换的目的仍然是回到最初那件事——让测试只检查我们想检查的行为。换句话说，隔离是目标，打桩只是达到目标的一种手段。&lt;/p>
+&lt;p>带着这个定义再看集成测试，问题就不是「该不该打桩」，而是「在这条测试里，哪一段行为算我们要证明的对象」。&lt;/p>
+&lt;h2 id="二同一个接口两种目的两种写法">二、同一个接口，两种目的，两种写法
+&lt;/h2>&lt;p>看一个有外部依赖的接口：查询某本书在指定币种下的价格，价格由实时汇率服务换算得来。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">get_rate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">currency&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">response&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">requests&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">RATES_API&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">params&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="s2">&amp;#34;from&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;USD&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;to&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">currency&lt;/span>&lt;span class="p">},&lt;/span> &lt;span class="n">timeout&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">5&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">raise_for_status&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">json&lt;/span>&lt;span class="p">()[&lt;/span>&lt;span class="s2">&amp;#34;rate&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@app.get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;/books/&amp;lt;int:book_id&amp;gt;/price&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">book_price&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">book_id&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">currency&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">request&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;currency&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;USD&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">book&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">BOOKS&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">book_id&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">rate&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">get_rate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">currency&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">jsonify&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">title&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">book&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">price&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">round&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">book&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;price_usd&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">rate&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">currency&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">currency&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>依赖很明显：它调用了另一个 API。要不要打掉？取决于这次想证明什么。&lt;/p>
+&lt;p>如果目标是「整条链路协同工作」——我们的接口确实能连上汇率服务、把返回的币种和价格正确带回来——那就让它们一起跑：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">bookstore&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">bookstore&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">app&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">client&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">app&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">test_client&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_book_price_in_euros_comes_back_from_the_rates_service&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">response&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">client&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;/books/42/price?currency=EUR&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">status_code&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">200&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">json&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;currency&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;EUR&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">json&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;price&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>注意断言只能写到 &lt;code>price &amp;gt; 0&lt;/code>：真实汇率会变，没法断言一个具体数值。这就是连真要付的代价——结果不确定，断言必须放宽。&lt;/p>
+&lt;p>如果目标是「换算逻辑本身正确」——给定某个汇率，价格是否按预期算出——那就把依赖固定住：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_book_price_is_converted_with_the_current_rate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">monkeypatch&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">monkeypatch&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">setattr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">bookstore&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;get_rate&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">lambda&lt;/span> &lt;span class="n">currency&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">response&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">client&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;/books/42/price?currency=EUR&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">status_code&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">200&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">json&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;price&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mf">6.00&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>书价 12 美元，汇率固定为 0.5，于是可以精确断言 6.00。把两段测试并排看，最有意思的细节是&lt;strong>连测试名都变了&lt;/strong>：一个叫「欧元价格从汇率服务返回」，一个叫「按当前汇率换算」。名字不是装饰，它把这条测试要证明的东西说清楚了。&lt;/p>
+&lt;p>所以顺序是：先设计「要检查什么」，再决定要不要隔离，最后让测试名、断言和这个决定保持一致。反过来做——先挑一个打桩策略，再往里塞断言——就会得到一堆看着整齐、却谁也说不清在保护什么的用例。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/158-integration-test-mocking/03-fig1_hu_2e2077c84193c3e5.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/158-integration-test-mocking/03-fig1_hu_865b27b43ce9c26d.webp 480w, https://chengxiaqiucao.github.io/post/158-integration-test-mocking/03-fig1_hu_2e2077c84193c3e5.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>同一段接口代码，按「链路协同」与「换算逻辑」两种目的，分别走向连真与隔离两种写法&lt;/p>
+&lt;h2 id="三一张能拿去开会的判断表">三、一张能拿去开会的判断表
+&lt;/h2>&lt;p>依赖本身的特征确实会影响选择，但它是第二顺位的依据。常见的倾向是：不属于自己团队的第三方 API、响应慢、调用要花钱、结果不稳定、有副作用，这些更适合被隔离。原因不是「第三方不可信」，而是我们无法保证它在每次运行时表现一致，而测试需要可重复。&lt;/p>
+&lt;p>但这条经验有明确的例外，而且例外正好是集成测试这个名字的由来：&lt;strong>当集成本身就是被测对象时，必须连真&lt;/strong>。参数拼错了、超时没处理、返回结构变了、鉴权头没带上——这些问题只在真实调用里出现，把依赖打掉之后，它们从测试视野里彻底消失。&lt;/p>
+&lt;p>可以把它压成一张按序执行的判断表：&lt;/p>
+&lt;ul>
+&lt;li>第一步，用一句话写出这条测试要证明的行为，写不出就先别写代码。&lt;/li>
+&lt;li>第二步，问这个行为是否包含「与外部依赖正确协作」；包含就连真，不包含就隔离。&lt;/li>
+&lt;li>第三步，若连真，确认依赖在 CI 里可用、结果是否可重复、断言该放宽到什么程度、失败时能否区分是己方还是对方的问题。&lt;/li>
+&lt;li>第四步，若隔离，确认替换的边界在哪一层、固定值从哪来、是否覆盖异常返回而只覆盖成功路径。&lt;/li>
+&lt;li>第五步，让测试名、断言强度与上述决定对齐；名字含糊就重写。&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/158-integration-test-mocking/03-fig2_hu_ddc0baf129510e41.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/158-integration-test-mocking/03-fig2_hu_deff09366bd708ae.webp 480w, https://chengxiaqiucao.github.io/post/158-integration-test-mocking/03-fig2_hu_ddc0baf129510e41.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>先定「要证明什么」，再判断被测行为是否包含协作，最后才落到连真或隔离的实现选择&lt;/p>
+&lt;h2 id="四四个常见的反模式">四、四个常见的反模式
+&lt;/h2>&lt;p>&lt;strong>按「依赖归谁」一刀切。&lt;/strong> 把「自己写的连真、别人的打掉」当规则，会在两个方向上同时出错：自己的模块之间也可能有不该被真实调用的重依赖，第三方接口也可能正是这次要验证的集成点。归谁所有不携带关于测试目的的信息。&lt;/p>
+&lt;p>&lt;strong>为了跑得快，把整条链路都打掉。&lt;/strong> 这是集成测试最常见的退化：每个外部调用都被替换，最后只剩下框架路由和一段内存里的计算，实际上变成了一条写得很重的单元测试。绿灯很快，但「服务之间能不能对得上」这个真正的问题一次也没被回答。&lt;/p>
+&lt;p>&lt;strong>只断言桩被调用，不断言结果。&lt;/strong> 验证 &lt;code>get_rate&lt;/code> 被以 &lt;code>EUR&lt;/code> 调用了一次，能证明代码走过了那行，却不能证明价格算对了。桩的调用记录适合作为辅助证据，不适合作为唯一断言——它把测试绑在了实现细节上，重构一下就红。&lt;/p>
+&lt;p>&lt;strong>测试名、断言与策略互相矛盾。&lt;/strong> 名字写着「与汇率服务集成」，实现里却把汇率写死；或者名字写着「换算正确」，断言却是 &lt;code>price &amp;gt; 0&lt;/code>。这类不一致不会让测试失败，但会让后来读的人对这条用例的可靠性作出错误判断，比缺一条测试更伤。&lt;/p>
+&lt;h2 id="五把决策交给-ai-之前先把决策写清楚">五、把决策交给 AI 之前，先把决策写清楚
+&lt;/h2>&lt;p>现在生成测试已经很容易。同一个接口，模型既能给出带桩的版本，也能给出连真的版本，两个版本通常都能跑绿。&lt;/p>
+&lt;p>问题恰恰在这里：前面整段讨论都建立在「我们知道自己要检查什么」之上，而模型并不知道。它只能从代码和提示里推断，推断不出来就按自己的偏好选一种。于是团队拿到的不是「我们决定的隔离边界」，而是「模型替我们做的默认选择」——而且这个选择被包在一段看起来很专业的代码里，评审时极难察觉。&lt;/p>
+&lt;p>要让它真正可用，提示里至少要把三件事说明白：&lt;/p>
+&lt;ul>
+&lt;li>被测行为：这条测试要证明的是链路协同，还是换算逻辑，或者其他。&lt;/li>
+&lt;li>隔离边界：哪些依赖必须真实调用，哪些必须固定，固定的取值从哪来。&lt;/li>
+&lt;li>断言依据：期望值为什么是这个数，连真时允许放宽到什么程度。&lt;/li>
+&lt;/ul>
+&lt;p>把这三句写进提示，再让模型生成两种版本、由人来挑，效率会高很多；不写，就等着拿到一份「替你决定好了」的代码。工具能替我们写测试，不能替我们承担选择的后果。&lt;/p>
+&lt;h2 id="六结语">六、结语
+&lt;/h2>&lt;p>争论「集成测试该不该 mock」之所以没有终点，是因为它把一个设计问题当成了一个工具问题。隔离所要服务的目标始终只有一个：让测试明确地检查某一件我们真正在意的事。&lt;/p>
+&lt;p>先写下那件事，再决定边界，最后让测试名和断言替这个决定作证。做到这一点，用不用桩、用哪个库、AI 生成还是手写，都只是实现细节。&lt;/p></description></item><item><title>没有专职 QA，每晚跑 300 条端到端流程：一套自建设备实验室怎么搭起来</title><link>https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/</link><pubDate>Thu, 05 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/cover.webp" alt="Featured image of post 没有专职 QA，每晚跑 300 条端到端流程：一套自建设备实验室怎么搭起来" />&lt;p>「谁做的功能谁测」，在应用还小的时候是很好的分工。业务线一条条加、工程师一个个进来之后，裂缝出现了：新功能被认真测过，几个月前上线的功能却几乎没人再回头看。回归缺陷开始先到用户手里，再回到团队。&lt;/p>
+&lt;p>有个具体的场景很典型：火车业务里改了一个共享组件，结果把大巴业务的某个页面弄坏了，团队在发布前一天从聊天群里才知道。当时唯一的安全网是全员集中手测，覆盖度取决于谁还记得什么；每多一位工程师，就多出几种「没人负责」的破坏路径。&lt;/p>
+&lt;p>缺的不是更多测的人手，是让应用自己反复检查自己的能力。&lt;/p>
+&lt;h2 id="一选型要的是能在-pr-里评审的测试">一、选型：要的是能在 PR 里评审的测试
+&lt;/h2>&lt;p>团队先定了标准：开发者应该能在几分钟内写出可靠的端到端测试，而且覆盖的不只是应用自身的页面，还要能走进第三方支付应用、系统弹窗和相机。&lt;/p>
+&lt;p>把现成方案摆开评估：&lt;/p>
+&lt;ul>
+&lt;li>框架自带的集成测试方案要把测试编译进应用，每改一次都要走一遍慢速重建&lt;/li>
+&lt;li>面向跨端的另一套 Flutter 方案同样绕不开编译与重建开销&lt;/li>
+&lt;li>老牌跨平台自动化框架能力很全，但配置重、等待不稳&lt;/li>
+&lt;li>两套原生框架都很强，代价是 Android 与 iOS 各维护一套用例&lt;/li>
+&lt;/ul>
+&lt;p>每个都解决了问题的一部分，没有一个同时给出「快速反馈 + 跨端覆盖 + 开发者愿意写」这三样。&lt;/p>
+&lt;p>最后选中的方案是纯 YAML 的流程描述。第一条流程只花了大约五分钟：启动应用、进入火车、选一个站点、确认票价出现。它是纯文本，任何人都能读，在合并请求里像其他代码一样被评审。&lt;/p>
+&lt;p>真正让这套方案立住的是六个特性：&lt;/p>
+&lt;ul>
+&lt;li>内置等待：每一步之前等界面稳定，大部分不稳定问题就此消失&lt;/li>
+&lt;li>黑盒驱动：直接操作已安装的应用，因此能跳进第三方支付应用或系统弹窗&lt;/li>
+&lt;li>稳定选择器：用语义 ID 定位，而不是屏幕文字或坐标&lt;/li>
+&lt;li>一套流程两端跑：同一份 YAML 在 Android 模拟器、iOS 模拟器和真机上执行&lt;/li>
+&lt;li>边看边写：可视化工具与 MCP 接口让开发者（和编码代理）能看着实时屏幕写流程&lt;/li>
+&lt;li>可复用子流程：登录、引导、导航只写一次，全业务线共享&lt;/li>
+&lt;/ul>
+&lt;h2 id="二两台机器当一个池子">二、两台机器当一个池子
+&lt;/h2>&lt;p>这套夜间回归系统是一间自建设备实验室：两台 Mac mini 跑着 18 个 Android 模拟器和 2 个 iOS 模拟器，另加一台真机专门处理支付。它从五个仓库里拉取超过 300 条流程、分成 15 个套件。&lt;/p>
+&lt;p>云设备农场被评估过，但两个理由让团队选择自建：按运行次数增长的成本，以及租不到一台插着绑定真实银行账户 SIM 卡的手机——而本地支付流程必须要它。成本结构因此变成一次性硬件投入，加上自托管 runner 的电费与维护，CI 执行本身几乎不额外花钱。&lt;/p>
+&lt;p>一次运行的流水线是固定的：&lt;/p>
+&lt;ul>
+&lt;li>取最新构建&lt;/li>
+&lt;li>把流程切片分散到 18 个模拟器上并行执行&lt;/li>
+&lt;li>相机相关流程交给专用模拟器，支付相关流程交给那台真机&lt;/li>
+&lt;li>每条流程都从干净的应用状态开始，失败时留下截图与日志&lt;/li>
+&lt;li>结果以 HTML 报告的形式发到工作群&lt;/li>
+&lt;/ul>
+&lt;p>全量套件不会在每个 PR 上跑，那会把实验室整天占满。它只在三个点触发：&lt;/p>
+&lt;ul>
+&lt;li>每个 PR 上做一次轻量检查：新 UI 必须有对应流程，新加的语义 ID 必须真的被某条流程用到，且变更屏幕上至少 80% 的 ID 被覆盖，否则阻断合并&lt;/li>
+&lt;li>每晚跑一次全量回归&lt;/li>
+&lt;li>大版本前的全员手测之前先跑全量，让团队一开始就知道老功能里哪些已经坏了，把人力留给新功能与边界情况&lt;/li>
+&lt;/ul>
+&lt;p>有个工程细节很能说明「自建」的真实代价：最初两台机器通过 Wi-Fi 相连，每条发往远端模拟器的命令、每张截图、每次安装包传输都要过网络，600–700 毫秒的往返让一个本该很快的步骤变成肉眼可见的卡顿。把两台机器改接有线之后，这个数字降到约 1 毫秒，远端模拟器用起来和本地几乎没有区别，扩容也从「改 runner」变成「再加一台机器」。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig1_hu_c2780f94e3ec2bbb.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig1_hu_542c4bff94a2de63.webp 480w, https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig1_hu_c2780f94e3ec2bbb.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>一个共享模拟器池：取构建、分片并行、专用设备承接特殊流程、失败留证、早间汇总报告&lt;/p>
+&lt;h2 id="三支付upi-与相机这三块硬骨头">三、支付、UPI 与相机这三块硬骨头
+&lt;/h2>&lt;p>绝大多数旅程的终点是支付。停在「支付」按钮上的测试，其实什么也没测到——它没验证扣款、没验证结果页，也没验证失败路径。&lt;/p>
+&lt;p>团队的做法是把应用构建成测试模式：几家支付网关与支付 SDK 被替换成一个只有「成功」和「失败」两个按钮的模拟网关。共享子流程会先确认屏幕上出现了「模拟已启用」标记，才允许继续支付，保证任何流程都不可能碰到真实网关。于是每条业务线的旅程都能端到端跑完成功与失败两种结果。&lt;/p>
+&lt;p>本地统一支付接口（UPI）更麻烦：它要求 SIM 绑定和 PIN 键盘，必须有真实 SIM 卡的真实手机。这类流程固定落在实验室那台专用真机上；扫码支付则由系统生成二维码，预先放进手机相册，让流程从相册取图完成扫描。&lt;/p>
+&lt;p>机场权益类流程从扫描登机牌开始。系统把生成的登机牌二维码转成一段循环视频，用它作为某个模拟器的「后置摄像头」启动，扫描器像平时一样读取画面，19 条机场流程（扫描、校验、核销）就此无人值守地跑完；上传路径则是把登机牌图片或 PDF 推进设备相册。&lt;/p>
+&lt;p>这三块没有捷径，共同思路是&lt;strong>把不可控的外部依赖改造成可控、可断言、且不会误触真实世界的替身&lt;/strong>。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig2_hu_6687853a2d7506c5.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig2_hu_ac34922e738d4fa9.webp 480w, https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig2_hu_6687853a2d7506c5.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>模拟网关、专用真机与「视频摄像头」分别解决支付结果、SIM 绑定与扫码输入三个问题&lt;/p>
+&lt;h2 id="四早上的报告以及从规格就开始的测试">四、早上的报告，以及从规格就开始的测试
+&lt;/h2>&lt;p>夜间运行从零点开始，早上工作群里已经有一份报告：每条失败都带着逐步截图和一段自动生成的可能原因说明，各业务线的通过率直接 @ 到责任人。真缺陷当天修掉或建单，过时的流程当天更新，不会攒成债。&lt;/p>
+&lt;p>更关键的是流程从哪儿来。团队采用规格驱动开发：需求与低层设计在写代码之前就定稿，而端到端流程现在是这个流程的一部分：&lt;/p>
+&lt;ul>
+&lt;li>先规划旅程：从规格里写出一份清单，列明每个屏幕、每条用户旅程、以及每个元素需要的语义 ID——此时 UI 代码还不存在&lt;/li>
+&lt;li>带着 ID 实现：每个可点击、可校验的组件都拿到规划好的 ID&lt;/li>
+&lt;li>生成流程：把旅程写成 YAML，模拟真实使用顺序，先浏览、改选项、再完成任务&lt;/li>
+&lt;li>在设备上跑到通过：每条流程都要在实时设备上跑绿才算完成&lt;/li>
+&lt;/ul>
+&lt;p>这些步骤被做成编码代理的技能，开发者可以从一份批准的设计，一次坐下来就把端到端测试跑到通过，代理通过工具接口查看实时应用来写流程。于是「完成」的定义也变了：不是在开发自己手机上能跑，是它的旅程在设备上通过。&lt;/p>
+&lt;h2 id="五它真的能抓到-bug-吗植入一个试试">五、它真的能抓到 bug 吗：植入一个试试
+&lt;/h2>&lt;p>连续好几周没有报出任何回归，团队反而警觉起来：这到底说明应用稳定，还是说明断言太弱？&lt;/p>
+&lt;p>于是有人在一个分支上，把卡片首页快捷操作里的一个分期入口删掉，跑了一遍 Cards 套件。结果：50 条流程中 9 条失败，全部指向同一个缺失的语义 ID；另外 41 条不经过这个入口的流程保持全绿。失败报告还列出了当时屏幕上实际剩下的元素，不用复现就能定位原因。&lt;/p>
+&lt;p>这是一个植入缺陷，不是证明，团队正在跨业务线补更多。但它至少回答了那个问题：断言确实在看东西。&lt;/p>
+&lt;h2 id="六几百条绿灯不等于覆盖了多少">六、几百条绿灯，不等于覆盖了多少
+&lt;/h2>&lt;p>语义 ID 覆盖率只能说明「这个屏幕有测试」，说明不了「测了屏幕上多少东西」。于是团队又做了一层度量，问一个更难的问题：在某个业务线里用户能做的一切动作中，有多少是我们的流程&lt;strong>可证明地&lt;/strong>检查过的？&lt;/p>
+&lt;p>这件工具不运行应用，而是用 Dart 分析器静态读代码，把每个屏幕、每种状态（加载中、空、错误、已加载）、每个动作（按钮、返回、排序、筛选、开关）都映射出来，且每个动作只计一次。然后把每条流程在这张「纸面地图」上重放，给每个动作三种判定：确定覆盖、可能覆盖、未覆盖。同一份代码在任何机器上得到同一个数字，因此可以在 CI 里追踪每个 PR 带来的增量。&lt;/p>
+&lt;p>截至十月中的基线数字相当清醒：&lt;/p>
+&lt;ul>
+&lt;li>商城流程确定覆盖了 commerce 544 个动作中的 24.6%，下单后旅程覆盖 34%&lt;/li>
+&lt;li>机票、火车、推荐三条业务线各自都低于 15%，火车低于 2%&lt;/li>
+&lt;li>换句话说，几百条流程每晚全绿，应用里大部分行为仍未被证明&lt;/li>
+&lt;/ul>
+&lt;p>最有价值的反而是「确定」与「可能」之间的落差：机票业务确定覆盖只有 7%，可能覆盖却高达 54%。流程其实已经走过那些屏幕，只是按位置或文字点击、或者跳过了一条断言，所以没有任何证据能证明发生了什么。补一个语义 ID 或加一条 &lt;code>assertVisible&lt;/code>，就能把这段落差闭合，完全不必新写测试。&lt;/p>
+&lt;p>「未覆盖」清单则直接指出了真正的空洞：错误态、返回按钮、筛选与排序、以及取消这类下单后旅程。现在每个屏幕都有一张「还差什么」的列表。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig3_hu_b7a571aae2ce7680.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig3_hu_aa972fd9d0b2877d.webp 480w, https://chengxiaqiucao.github.io/post/160-nightly-e2e-device-lab/06-fig3_hu_b7a571aae2ce7680.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>把静态分析得到的动作地图与流程重放结果对照，动作被分为确定覆盖、可能覆盖、未覆盖三档&lt;/p>
+&lt;h2 id="七代价与节奏">七、代价与节奏
+&lt;/h2>&lt;p>从七月的一条火车流程，到十月每晚 300 多条，大约三个月，且是与正常产品工作并行完成的。核心是四名工程师搭起 runner、支付替身和 PR 检查；约 25 名开发者分头写各自业务线的流程；第二台 Mac mini 在十月加入。&lt;/p>
+&lt;p>维持健康状态的成本是每周一小时的自动化同步会，加上各团队按早报修自己的失败，全队合计大约每周两小时。&lt;/p>
+&lt;p>这套东西改变了日常：开发者只手测新东西，所有已上线的功能——包括支付、UPI 与登机牌扫描——每晚被自动重测；全员手测开始前老流程已经查过；新屏幕没有测试就不合并。&lt;/p>
+&lt;h2 id="八结语">八、结语
+&lt;/h2>&lt;p>没有专职 QA 团队，并不意味着质量没人负责，而是责任被分散到了每个做功能的人身上。难点不在于「该不该让开发者测」，而在于给他们一条成本足够低、反馈足够可信的路径：写一条流程要几分钟、跑一次全量在一夜之间、早上能拿到可行动的失败证据、还得有人诚实地量出「这些绿灯到底证明了多少」。&lt;/p>
+&lt;p>最后那一层度量尤其值得留住。能每晚跑完 300 条流程是工程能力；敢把确定覆盖率只有 24.6%、火车低于 2% 摆出来，才是让这套系统继续变好的前提。&lt;/p></description></item></channel></rss>

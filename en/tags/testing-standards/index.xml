@@ -1,0 +1,1370 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Testing Standards on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/testing-standards/</link><description>Recent content in Testing Standards on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Sun, 10 Aug 2025 21:29:57 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/testing-standards/index.xml" rel="self" type="application/rss+xml"/><item><title>On Bugs and Their Nine Close Relatives</title><link>https://chengxiaqiucao.github.io/en/post/118-bug_and_others/</link><pubDate>Sun, 10 Aug 2025 21:29:57 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/118-bug_and_others/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-2.webp" alt="Featured image of post On Bugs and Their Nine Close Relatives" />&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-2_hu_ca59889505746387.webp"
+width="1024"
+height="574"
+srcset="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-2_hu_34b32afcccc63c1f.webp 480w, https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-2_hu_ca59889505746387.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="178"
+data-flex-basis="427px"
+>
+&lt;/p>
+&lt;h2 id="preface">Preface
+&lt;/h2>&lt;p>In testing work, finding Bugs and reporting Bugs are daily routine, and it is inevitable to argue with developers about whether a certain issue is a Bug.&lt;/p>
+&lt;p>Although it is normal for different people to disagree on the identification of a Bug because of different perspectives.&lt;/p>
+&lt;p>But in the process of testing a product, we really cannot treat all the problems and issues found as Bugs. &lt;code>Bug&lt;/code> is actually a fairly general term; some companies also call a &lt;code>Bug report&lt;/code> a &amp;ldquo;fault ticket&amp;rdquo; or &amp;ldquo;issue ticket&amp;rdquo;, which strictly speaking is not accurate either. Because conceptually, Bug has quite a few &lt;strong>close relatives&lt;/strong> that are similar in function and meaning but actually different. In this article we will sort out and clarify the different concepts of Bug and these relatives, and their relationship with our work.&lt;/p>
+&lt;h2 id="fault">Fault
+&lt;/h2>&lt;p>&lt;code>Fault&lt;/code> is often equated with Bug in daily work, but strictly speaking, a &lt;strong>fault&lt;/strong> refers to a &lt;strong>static defect in software code or design&lt;/strong>, such as an incorrect step, process, or data definition.&lt;/p>
+&lt;p>In other words, it is more of an &amp;ldquo;internal&amp;rdquo; problem of the software, usually the manifestation of a human error made by the developer in the software.&lt;/p>
+&lt;p>Because it is more static, faults are usually exposed during &lt;strong>code review or static analysis&lt;/strong>.&lt;/p>
+&lt;h4 id="case">Case
+&lt;/h4>&lt;p>For example, in the following Java code, when handling a boundary value, &lt;code>i&amp;gt;=0&lt;/code> is written as &lt;code>i&amp;gt;0&lt;/code>, which causes the first element to be skipped during traversal. This is a fault.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">arr&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">length&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">0&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">arr&lt;/span>&lt;span class="o">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">==&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Or, for the calculation of a user&amp;rsquo;s age, failing to account for February 29 in a leap year leads to an incorrect result; this is also a fault.&lt;/p>
+&lt;h2 id="error">Error
+&lt;/h2>&lt;p>&lt;code>Error&lt;/code> refers to a &lt;strong>human mistake, error in judgment, or deviation in decision made by a developer or other participant (such as a requirements analyst or designer) during software development&lt;/strong>. Errors are usually the root cause of other problems downstream; their occurrence is mainly caused by human factors, such as a deviation in requirements understanding, a logic slip, or a typo in code.&lt;/p>
+&lt;h4 id="case-1">Case
+&lt;/h4>&lt;p>Although an &lt;strong>error&lt;/strong> is &amp;ldquo;human-made&amp;rdquo;, the types of errors that occur can generally be summarized into a limited number of categories, which can also better help testers identify risks when they participate early. For example:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Logic error:&lt;/strong> When writing code, the developer&amp;rsquo;s implementation of an algorithm or business logic does not match expectations, such as the incorrect application of an algorithm formula.&lt;/li>
+&lt;li>&lt;strong>Syntax error:&lt;/strong> The code does not comply with the syntax rules of the programming language. Although modern IDEs can catch most syntax errors, some syntax or configuration errors that only appear at runtime can still occur.&lt;/li>
+&lt;li>&lt;strong>Requirements misunderstanding error:&lt;/strong> The understanding of a requirement deviates from the real requirement, so the implemented feature is not what the user truly needs. For example, for the requirement &amp;ldquo;sort by order size&amp;rdquo;, the developer implements sorting by order amount, but the user actually wants sorting by the number of items in the order.&lt;/li>
+&lt;li>&lt;strong>Concurrency error:&lt;/strong> For example, in a multithreaded or distributed system, access to shared resources is not properly synchronized, leading to data inconsistency or deadlock.&lt;/li>
+&lt;/ul>
+&lt;h2 id="defect">Defect
+&lt;/h2>&lt;p>&lt;code>Defect&lt;/code> refers to &lt;strong>any flaw or imperfection in a software product that deviates from requirements or expected behavior&lt;/strong>.&lt;/p>
+&lt;p>It is a broad term, usually referring to any behavior or result found in software that does not meet expectations. In most cases, what we call a &lt;code>Bug&lt;/code> is actually a &lt;code>defect&lt;/code>.&lt;/p>
+&lt;p>A defect can also be understood as the external manifestation of a &lt;code>fault&lt;/code>.&lt;/p>
+&lt;h4 id="case-2">Case
+&lt;/h4>&lt;ol>
+&lt;li>The user correctly enters the account and password, but the login fails or does not redirect properly.&lt;/li>
+&lt;li>The login page has no security protection, allowing unlimited retries to brute-force the account and password.&lt;/li>
+&lt;li>The login error message is too detailed, leaking sensitive information.&lt;/li>
+&lt;/ol>
+&lt;p>All of the above are typical functional or security defects.&lt;/p>
+&lt;h2 id="failure">Failure
+&lt;/h2>&lt;p>&lt;code>Failure&lt;/code> refers to &lt;strong>a software system or component being unable to perform the function it should, exhibiting external behavior at runtime that does not match expectations, a functional deviation directly observable by the user&lt;/strong>.&lt;/p>
+&lt;p>The difference between it and a &lt;code>defect&lt;/code> is that not all defects or faults lead to a failure; only when a defect is &amp;ldquo;activated&amp;rdquo; does it manifest as a &lt;strong>failure&lt;/strong>.&lt;/p>
+&lt;h5 id="case-3">Case
+&lt;/h5>&lt;ol>
+&lt;li>When a user performs a specific operation (such as uploading a large file), the application suddenly exits or the server stops responding. This may be due to a defect such as a memory leak that, under long running time or high load, causes resource exhaustion and ultimately a system failure.&lt;/li>
+&lt;li>After a user successfully submits a form, the data is not correctly saved to the database, resulting in partial data loss. This may be a failure caused by a defect in the database operation logic.&lt;/li>
+&lt;/ol>
+&lt;h3 id="the-causal-chain">The Causal Chain
+&lt;/h3>&lt;p>The four different kinds of problems above actually form the following causal chain:&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250812_hu_a5a4c9cfa251bd6f.webp"
+width="1024"
+height="194"
+srcset="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250812_hu_1d584a7b171d56f.webp 480w, https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250812_hu_a5a4c9cfa251bd6f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="527"
+data-flex-basis="1265px"
+>
+&lt;/p>
+&lt;p>They can be summarized in the table below:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Concept&lt;/th>
+&lt;th>Definition&lt;/th>
+&lt;th>Nature&lt;/th>
+&lt;th>Phase of Occurrence&lt;/th>
+&lt;th>Example&lt;/th>
+&lt;th>Relationship&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>Error&lt;/strong>&lt;/td>
+&lt;td>Human mistakes, errors in judgment, or deviations in decision during development&lt;/td>
+&lt;td>Human behavior&lt;/td>
+&lt;td>Requirements, design, coding phases&lt;/td>
+&lt;td>Wrong algorithm; deviation in requirements understanding; typo&lt;/td>
+&lt;td>&lt;strong>Leads to&lt;/strong> fault&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Fault&lt;/strong>&lt;/td>
+&lt;td>Incorrect steps, processes, or data definitions introduced by an error and existing in code or documentation&lt;/td>
+&lt;td>Static code problem&lt;/td>
+&lt;td>Coding, testing phases&lt;/td>
+&lt;td>Wrong logic for calculating age in a leap year; unhandled null pointer&lt;/td>
+&lt;td>&lt;strong>When activated leads to&lt;/strong> failure&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Defect&lt;/strong>&lt;/td>
+&lt;td>Any flaw in a software system that deviates from its specification, requirements, or expected behavior&lt;/td>
+&lt;td>Behavioral deviation&lt;/td>
+&lt;td>Testing, production phases&lt;/td>
+&lt;td>Login feature unusable; inaccurate report data&lt;/td>
+&lt;td>&lt;strong>Is the external manifestation of a fault and needs fixing once found&lt;/strong>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Failure&lt;/strong>&lt;/td>
+&lt;td>A software system or component unable to perform its required function, or exhibiting observable incorrect behavior&lt;/td>
+&lt;td>Observable consequence&lt;/td>
+&lt;td>Production phase (or found in testing)&lt;/td>
+&lt;td>System crash; data loss; interruption of a critical business flow&lt;/td>
+&lt;td>&lt;strong>Is the final result of a defect/fault being activated&lt;/strong>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="exception">Exception
+&lt;/h2>&lt;p>An &lt;code>exception&lt;/code> is &lt;strong>a special event at program runtime that interrupts the normal flow of instructions&lt;/strong>. It is usually triggered by a code logic error, bad external input, or a system resource problem.&lt;/p>
+&lt;p>An &lt;code>exception&lt;/code> does not necessarily lead to a &lt;code>fault&lt;/code>, because an exception can be caught and handled in code with &lt;code>try ... catch...&lt;/code>. It is a normal part of how software deals with various unconventional scenarios.&lt;/p>
+&lt;h4 id="case-4">Case
+&lt;/h4>&lt;p>The following code is an example of Python handling network connection exceptions, where the network connection state, timeouts, and so on are caught in code and protected with a retry mechanism.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">try&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">response&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">requests&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">url&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">timeout&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">5&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1"># set timeout&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">raise_for_status&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="c1"># check HTTP status code (non-2xx raises HTTPError)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">text&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">except&lt;/span> &lt;span class="ne">ConnectionError&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Connection error: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> (attempt &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">attempt&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">/&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">max_retries&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">)&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">except&lt;/span> &lt;span class="n">Timeout&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Request timed out: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> (attempt &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">attempt&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">/&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">max_retries&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">)&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">except&lt;/span> &lt;span class="n">HTTPError&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;HTTP error: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> (status code: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">status_code&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">)&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="kc">None&lt;/span> &lt;span class="c1"># HTTP errors usually do not need retry&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">except&lt;/span> &lt;span class="n">RequestException&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Request exception: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> (attempt &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">attempt&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">/&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">max_retries&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">)&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="issue">Issue
+&lt;/h2>&lt;p>Anyone who has used &lt;code>Jira&lt;/code> or often visits &lt;code>github&lt;/code> should be familiar with &lt;code>Issue&lt;/code>. Issue is actually a general term; it refers to &lt;strong>any matter or obstacle that needs attention, discussion, and tracking to resolution&lt;/strong>.&lt;/p>
+&lt;p>Very often, an Issue is used as a &lt;strong>work item (workItem)&lt;/strong>. So the &amp;ldquo;issue&amp;rdquo; here has a meaning far broader than the narrow sense of &lt;code>defect&lt;/code> or &lt;code>error&lt;/code>; an issue is not a Bug, it is a matter to be tracked and followed continuously.&lt;/p>
+&lt;h4 id="case-5">Case
+&lt;/h4>&lt;ol>
+&lt;li>In performance testing, we find that as the number of users increases, the system response time becomes noticeably longer and the user reconnection mechanism is triggered more often. This phenomenon does affect user experience, but the behavior is actually within the system design expectations, so it cannot be considered a defect; it is more appropriately recorded as an Issue for continued tracking and observation.&lt;/li>
+&lt;li>During a requirements review, some requirements have ambiguous interpretations. For example, a reporting requirement, &amp;ldquo;count the number of orders within a month&amp;rdquo;. The time expression here is actually not precise enough - are orders within a month counted by order creation time or by order completion time? Such matters awaiting clarification are also &lt;code>issues&lt;/code>, not &lt;code>defects&lt;/code>.&lt;/li>
+&lt;/ol>
+&lt;h2 id="risk">Risk
+&lt;/h2>&lt;p>&lt;code>Risk&lt;/code> is &lt;strong>an uncertain event that may occur and have a negative impact on project objectives (such as quality, cost, schedule, and scope)&lt;/strong>.&lt;/p>
+&lt;p>Compared with the items above, which mainly face the product, &lt;strong>risk&lt;/strong> faces the project more.&lt;/p>
+&lt;p>It mainly includes two dimensions: &lt;strong>the probability of the risk occurring + the impact of the risk (severity)&lt;/strong>.&lt;/p>
+&lt;p>Besides the &lt;strong>quality risks&lt;/strong> of the product itself, there are also &lt;strong>management risks&lt;/strong> of project operation.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813_hu_7516f214108e165e.webp"
+width="1024"
+height="654"
+srcset="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813_hu_bc22cf932c67c15c.webp 480w, https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813_hu_7516f214108e165e.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="156"
+data-flex-basis="375px"
+>
+&lt;/p>
+&lt;h4 id="case-6">Case
+&lt;/h4>&lt;ol>
+&lt;li>Product operation depends on the integration of a third-party module, but when integration testing begins, the third-party module has not yet finished development, thus creating a schedule risk for this product.&lt;/li>
+&lt;li>During product development, major changes to requirements or the design solution occur, leading to delivery risk.&lt;/li>
+&lt;li>A core developer or tester on the team leaves, creating a risk to the project plan.&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;p>Besides the items above, there is another category of new ideas and adjustment items during the continuous evolution of the software itself. These also cannot be considered Bugs, but having them at product release is the icing on the cake. These items fall into two cases: &lt;code>optimization&lt;/code> and &lt;code>enhancement&lt;/code>.&lt;/p>
+&lt;h2 id="improvement">Improvement
+&lt;/h2>&lt;p>&lt;code>Improvement&lt;/code> is &lt;strong>an enhancement to an existing feature or process that does not involve new features or Bug fixes&lt;/strong>, such as improving performance, maintainability, or user experience.&lt;/p>
+&lt;p>The emphasis is on improvement on top of the original basis. It is not necessarily limited to the product&amp;rsquo;s own features; development processes and tool usage can also be included.&lt;/p>
+&lt;h4 id="case-7">Case
+&lt;/h4>&lt;ol>
+&lt;li>Actively introduce an automated testing framework to improve regression testing efficiency.&lt;/li>
+&lt;li>Optimize the page UI design of the current system to achieve better visual effects.&lt;/li>
+&lt;/ol>
+&lt;h2 id="enhancement">Enhancement
+&lt;/h2>&lt;p>&lt;code>Enhancement&lt;/code> is &lt;strong>adding a new feature to the software or extending the capability of an existing feature&lt;/strong>. It is usually driven by user or business needs.&lt;/p>
+&lt;p>An enhancement is an expansion and sublimation of the original requirements by adding new features.&lt;/p>
+&lt;p>In testing, whether an issue is a defect, an optimization, or an enhancement is often a point where disputes easily arise.&lt;/p>
+&lt;p>Actually the difference in nature between a defect and an enhancement is:&lt;/p>
+&lt;ul>
+&lt;li>The fix of a &lt;code>defect&lt;/code> is corrective, intended to make the software &amp;ldquo;correct&amp;rdquo; and reduce quality risk&lt;/li>
+&lt;li>The implementation of an &lt;code>enhancement&lt;/code> is evolutionary, intended to make the software &amp;ldquo;better&amp;rdquo; and increase its value&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-1_hu_85b6becb084937cb.webp"
+width="1024"
+height="236"
+srcset="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-1_hu_19fcdbc818814734.webp 480w, https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-1_hu_85b6becb084937cb.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="434"
+data-flex-basis="1043px"
+>
+&lt;/p>
+&lt;h4 id="case-8">Case
+&lt;/h4>&lt;ol>
+&lt;li>An e-commerce system increases user stickiness by adding a social sharing feature.&lt;/li>
+&lt;li>An enterprise management system adds a reporting feature that provides sales data analysis to support decision-making.&lt;/li>
+&lt;/ol>
+&lt;h2 id="conclusion">Conclusion
+&lt;/h2>&lt;p>By analyzing the nine core concepts related to Bugs - &lt;strong>fault, defect, issue, error, exception, failure, risk, improvement, and enhancement&lt;/strong> -&lt;/p>
+&lt;p>we can describe problems more accurately, communicate with developers more effectively, and understand more clearly the role of our output in the quality system.&lt;/p></description></item><item><title>Analysis of Workflow Cases in Testing</title><link>https://chengxiaqiucao.github.io/en/post/077-%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%A1%88%E4%BE%8B/</link><pubDate>Fri, 11 Jul 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/077-%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%A1%88%E4%BE%8B/</guid><description>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/077-%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%A1%88%E4%BE%8B/Pasted-20250708_hu_8d715e7662b2cab2.webp"
+width="1024"
+height="616"
+srcset="https://chengxiaqiucao.github.io/post/077-%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%A1%88%E4%BE%8B/Pasted-20250708_hu_23d6edd36d3299c7.webp 480w, https://chengxiaqiucao.github.io/post/077-%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%A1%88%E4%BE%8B/Pasted-20250708_hu_8d715e7662b2cab2.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="166"
+data-flex-basis="398px"
+>
+&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/077-%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%A1%88%E4%BE%8B/Pasted-20250708-1_hu_200261cc54303755.webp"
+width="1024"
+height="562"
+srcset="https://chengxiaqiucao.github.io/post/077-%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%A1%88%E4%BE%8B/Pasted-20250708-1_hu_45dc7dc1069ec07b.webp 480w, https://chengxiaqiucao.github.io/post/077-%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%A1%88%E4%BE%8B/Pasted-20250708-1_hu_200261cc54303755.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="182"
+data-flex-basis="437px"
+>
+&lt;/p>
+&lt;h1 id="real-world-case-analysis-of-bug-handling-disputes-in-testing-part-1">Real-World Case Analysis of Bug-Handling Disputes in Testing (Part 1)
+&lt;/h1>&lt;p>In the software development process, testing and development are two roles that are both loving and combative with each other: one tries its best to avoid bugs, while the other strives to find bugs. Therefore, disputes and conflicts around the handling of bugs at work are extremely common.&lt;/p>
+&lt;p>In this series, we will analyze the handling principles when bug disputes arise by looking at some real dispute cases&lt;/p>
+&lt;h2 id="case-1---the-bug-assignment-dispute">Case 1 - The Bug Assignment Dispute
+&lt;/h2>&lt;blockquote>
+&lt;p>Test engineer Xiao Zhao found during testing that refreshing an information bar on the software interface always prompted an error, so he submitted a Bug to front-end developer Xiao Li. But shortly after, Xiao Zhao received a notification that the Bug had been rejected. The reason for the rejection was that Xiao Li believed the error message for this information refresh was returned to him by a back-end module, and that his normal display had no problem. In this situation, should Xiao Zhao accept the Bug rejection?&lt;/p>&lt;/blockquote>
+&lt;h3 id="analysis">Analysis
+&lt;/h3>&lt;p>This case is a classic scenario of a bug dispute between testing and development in software testing.&lt;/p>
+&lt;p>We should first clarify the responsibilities of the two roles with respect to bugs:&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>The responsibility of the testing role is to &lt;strong>discover bugs in the product and complete verification after development fixes them&lt;/strong>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>The responsibility of the development role is to &lt;strong>analyze the bugs found by testing and complete the fixes&lt;/strong>.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>In this case, then, Xiao Zhao found a problem, judged it to be a bug, and submitted a bug ticket. Because the problem appeared on the front-end interface, he assigned it to the front-end developer Xiao Li. From a process standpoint, there is nothing wrong with this.&lt;/p>
+&lt;p>The dispute lies in the fact that, after Xiao Li analyzed the Bug, he believed the front end is only responsible for displaying the error message returned by the back end, so the error lies in the back-end module and there is no problem for him to solve, hence he chose to reject it.&lt;/p>
+&lt;p>From Xiao Li&amp;rsquo;s perspective, this seems understandable. But from a process standpoint, it is still a problem with how Xiao Li handled it.&lt;/p>
+&lt;p>Because although the bug analysis was done and it was acknowledged as a Bug, the fix was not completed, so rejection should not have been chosen.&lt;/p>
+&lt;p>&lt;strong>Rejecting a Bug should correspond to only two situations: a false-positive bug report, or a duplicate report of an existing Bug&lt;/strong>. After Xiao Li&amp;rsquo;s analysis, for this Bug we cannot consider the analysis to be complete; the status of the bug ticket is actually still in the analysis stage, except that after the front-end analysis, the problem still requires back-end developers to continue the analysis.&lt;/p>
+&lt;p>So from a process standpoint, the correct action would be for Xiao Li to reassign the bug to back-end development, rather than choosing to reject the bug back to testing.&lt;/p>
+&lt;h3 id="actual-handling">Actual Handling
+&lt;/h3>&lt;p>Back to Xiao Zhao: in this situation, the bug ticket has been rejected back, so how should this bug ticket be handled?&lt;/p>
+&lt;p>Because the problem has not been solved, this bug must certainly be resubmitted.&lt;/p>
+&lt;p>From a normal process standpoint, it is also acceptable to resubmit the problem directly to Xiao Li. But because at this point the front end has already partially completed the analysis and clearly identified the downstream module, when reopening this bug it is best to resubmit the bug directly to the back-end developers, the goal being to avoid pointless repeated communication and improve efficiency.&lt;/p>
+&lt;p>At the same time, regarding Xiao Li&amp;rsquo;s process-handling error, an explanatory note should be added when resubmitting the Bug, and the project management team should also be informed, rather than accepting this behavior of direct rejection.&lt;/p>
+&lt;h3 id="additional-reflections">Additional Reflections
+&lt;/h3>&lt;p>Here we have clarified the standard practice from a process standpoint. But should testers first make the assignment correctly in the first place?&lt;/p>
+&lt;p>In real work, given the complexity of software systems, it is normal for testers to find it difficult to accurately determine the specific module a problem belongs to and the developer actually responsible for analyzing it, and in many cases inaccurate assignment is unavoidable. However, from the perspective of delivering value, as testers we should still submit the issue ticket to the corresponding developer as accurately as possible, in order to improve the efficiency and speed of problem handling and resolution.&lt;/p>
+&lt;p>Returning to the example above, the back end returns an error message to the front end, and although it is displayed on the front end, if Xiao Zhao had traced the interface return information from the front-end page, it should not have been difficult to spot the anomaly in the interface response, and thereby judge that the problem likely lies in the back end, so as to assign it directly to the back end.&lt;/p>
+&lt;h3 id="conclusion">Conclusion
+&lt;/h3>&lt;p>To summarize, after a bug ticket is submitted, if there is a mismatch between the module and the first assigned handler, the handler has an obligation to reassign the Bug to the actual handler, rather than incorrectly rejecting the Bug.&lt;/p>
+&lt;p>At the same time, on the testing side, testers should also strengthen their understanding of the system and their familiarity with team members, so as to get the first assignment right as much as possible.&lt;/p>
+&lt;p>In addition, for relatively large development teams and complex products, if it is difficult to determine problem ownership, the development side usually sets up a default analysis engineer role, specifically to perform initial analysis of Bugs and uniformly carry out secondary assignment.&lt;/p>
+&lt;p>In short, &lt;strong>workflow goals prioritize efficiency and avoid any possible waste of extra communication and handling time&lt;/strong>.&lt;/p>
+&lt;hr>
+&lt;h1 id="case-analysis-of-bug-handling-disputes-in-testing-part-2">Case Analysis of Bug-Handling Disputes in Testing (Part 2)
+&lt;/h1>&lt;p>In the software development process, disputes between the development and testing roles over bugs are almost an everyday occurrence. In the previous article, we analyzed the handling principles for a bug assignment dispute case.&lt;/p>
+&lt;p>In this installment, we continue to analyze dispute scenarios and handling principles for bug handling in software development through case studies.&lt;/p>
+&lt;h2 id="case-2---handling-a-bug-that-cannot-be-reproduced">Case 2 - Handling a Bug That Cannot Be Reproduced
+&lt;/h2>&lt;blockquote>
+&lt;p>When test engineer Xiao Zhao was testing an App, after completing a certain operation, the App crashed. Since screen recording was enabled during testing, Xiao Zhao compiled the screen recording of the crash and the operation steps and submitted a Bug ticket to App developer Xiao Sun. The next day, Xiao Sun rejected the Bug ticket back, on the grounds that he could not reproduce the bug and could not identify a problem from the recording, the operation steps, and code analysis. And Xiao Zheng tested again himself, trying to reproduce the problem, also without success. In this situation, should the Bug rejection be accepted?&lt;/p>&lt;/blockquote>
+&lt;h3 id="analysis-1">Analysis
+&lt;/h3>&lt;p>This case is also a fairly typical Bug dispute scenario.&lt;/p>
+&lt;p>Many times, due to various factors in testing—such as environmental interference, incorrect data, and even misoperations by the testers themselves—testers do submit some issue tickets that are actually not Bugs. After analysis, these tickets are confirmed not to be problems and are rejected as &lt;strong>Not a Bug&lt;/strong>.&lt;/p>
+&lt;p>Among the reasons for rejecting an issue ticket, a rather special one is &lt;strong>the problem cannot be reproduced&lt;/strong>, which means the problem symptom cannot be produced again in either the test environment or the development environment, and the issue is therefore judged to be approximately non-existent and rejected.&lt;/p>
+&lt;p>However, rejecting a bug ticket because &amp;ldquo;the problem cannot be reproduced&amp;rdquo; should be a reason used with caution.&lt;/p>
+&lt;p>Because theoretically speaking, for any problem symptom—excluding false positives—if it truly exists but cannot be reproduced, it usually just means its trigger condition has not been found.&lt;/p>
+&lt;p>In this case, a crash is a problem symptom with relatively serious impact, and this symptom is clearly evidenced by a screen recording as truly existing, yet neither development nor testing can reproduce the problem. It may simply be that the actual condition triggering the problem has not been discovered (that is, &lt;code>after completing a certain operation, a crash occurs&lt;/code> as stated in the case description is not the root cause of the problem.)&lt;/p>
+&lt;p>There is a very important measure in quality management, &lt;strong>RCA (Root Cause Analysis)&lt;/strong>. From a quality-oriented perspective, for relatively clear problem symptoms that cannot be reproduced immediately, one should follow the RCA process to complete a root cause analysis, and then determine the subsequent handling of the Bug.&lt;/p>
+&lt;h3 id="actual-handling-1">Actual Handling
+&lt;/h3>&lt;p>For this case, because the problem symptom is clear and relatively serious, if the problem truly exists, its appearance on the user side will inevitably cause fairly adverse quality impact.&lt;/p>
+&lt;p>So for the handling of this problem, after Xiao Sun&amp;rsquo;s initial analysis, he actually did not find the root cause of the problem; at this point the correct approach should be the following process:&lt;/p>
+&lt;ol>
+&lt;li>First, the developer should deeply consider the possible causes of the problem and &lt;strong>collect further information&lt;/strong>.&lt;/li>
+&lt;/ol>
+&lt;p>According to my earlier introduction to the different Bug status transitions (see the previous article), at this point, after his analysis, Xiao Sun can still send the Bug back, but it should not be &lt;strong>Reject&lt;/strong>; rather it should be &lt;strong>Need More Info&lt;/strong>, collecting more information related to the problem for further in-depth analysis, such as:&lt;/p>
+&lt;ul>
+&lt;li>The model of the test device? The operating system version?&lt;/li>
+&lt;li>The device&amp;rsquo;s storage and memory status?&lt;/li>
+&lt;li>System resource usage when the problem occurs?&lt;/li>
+&lt;li>The network used? How stable is it?&lt;/li>
+&lt;li>The executed operation path; are there any abnormal paths?&lt;/li>
+&lt;/ul>
+&lt;ol start="2">
+&lt;li>
+&lt;p>Then complete &lt;strong>RCA&lt;/strong> based on the supplemented information, including reproduction paths, walkthroughs of potentially problematic code, and inviting other development experts to join a consultation. If the problem still cannot be reproduced, then because relatively sufficient argumentation and analysis have been done, it can actually be considered that the likelihood of the problem appearing on the user side is not very high, and the priority of the problem is actually quite low. At this point, the issue can be submitted to the project CCB (Change Control Board) to decide the subsequent handling strategy for the problem.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>The project CCB makes a decision on the problem&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>This usually in turn includes several different subsequent handlings:&lt;/p>
+&lt;ul>
+&lt;li>Judge that the problem has limited impact, consider it not a problem, and apply Bug &lt;strong>rejection&lt;/strong>&lt;/li>
+&lt;li>Although the problem is unlikely to appear, from a quality-first perspective we still want to find the cause of the problem. In this case the problem can be &lt;strong>deferred&lt;/strong>. That is, we still consider that a problem exists here, but it will not be resolved in the current version; we continue to observe, and developers continue to analyze, trying to resolve it in a subsequent version. If the cause truly cannot be located over a long period, then consider closing the issue.&lt;/li>
+&lt;li>Analyze workaround strategies for the problem, such as adding higher-level exception protection, or adjusting the version&amp;rsquo;s functional path to avoid the triggering action. Add relevant protective measures in the version to &lt;strong>avoid the problem path&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;p>In short, for unreproducible problems with relatively serious impact, they should be taken seriously and not simply dismissed with a rejection.&lt;/p>
+&lt;h3 id="additional-reflections-1">Additional Reflections
+&lt;/h3>&lt;p>For problems of this kind whose causes are hard to locate, is the final outcome necessarily that they just fizzle out with no resolution?&lt;/p>
+&lt;p>Let me re-emphasize the point above: &lt;strong>A problem that cannot be reproduced does not mean the problem does not exist; it means the real root cause or trigger condition has not been found.&lt;/strong>&lt;/p>
+&lt;p>Therefore, when the cause of a problem cannot be found, besides collecting more and fuller information as mentioned above, there is another important aspect that the product and development teams need to value and continuously improve, namely the product&amp;rsquo;s testability requirements or maintainability requirements.&lt;/p>
+&lt;p>That is, the product should include necessary and sufficient means for problem tracking, log collection, and fault diagnosis; from the product design and development stages, the synchronous development of relevant diagnostic tools should be considered, so as to avoid the awkward situation in subsequent system testing and even user usage scenarios where problems are difficult to analyze and locate.&lt;/p>
+&lt;h3 id="conclusion-1">Conclusion
+&lt;/h3>&lt;p>Finally, some people may still say that although the correct handling process described above is very reasonable, in real work, in most cases schedules are tight and people are already quite overwhelmed, so it is hard to really do in-depth analysis for this kind of problem, and under such circumstances the process is actually difficult to put into practice.&lt;/p>
+&lt;p>That is true, but the role of processes and standards is to tell everyone the correct norms of behavior, not necessarily to be executed rigidly; understanding the principles behind the processes and standards is more important.&lt;/p>
+&lt;p>The focus of this case is actually the final judgment of the impact of this problem. The product&amp;rsquo;s or project&amp;rsquo;s expectations for quality will also influence how the problem is handled.&lt;/p>
+&lt;p>The testing role, from the standpoint of assessing quality status, when the problem symptom is clear, should not simply accept that &lt;strong>the problem does not exist&lt;/strong>&lt;/p>
+&lt;hr>
+&lt;h1 id="case-analysis-of-bug-handling-disputes-in-testing-part-3">Case Analysis of Bug-Handling Disputes in Testing (Part 3)
+&lt;/h1>&lt;p>In the previous two articles of this series, we respectively analyzed two typical Bug dispute cases in the software development process:&lt;/p>
+&lt;ol>
+&lt;li>Dispute over the assignee&lt;/li>
+&lt;li>Dispute over handling an unreproducible Bug&lt;/li>
+&lt;/ol>
+&lt;p>In this article, we continue to bring the handling analysis of another dispute scenario&lt;/p>
+&lt;h2 id="case-3---bug-determination">Case 3 - Bug Determination
+&lt;/h2>&lt;blockquote>
+&lt;p>When Xiao Zhao was testing an App, he found that during a batch operation, if the volume of test data was large, the system would wait for a relatively long time and no other operations could be performed (more than 5 seconds). Xiao Zhao considered that this wait affected the user experience and submitted a usability bug. But this bug was rejected by back-end developer Xiao Wang, on the grounds that according to the requirements, &amp;ldquo;the system should support batch data operations, and after receiving a batch data request, it should complete data processing and update the data status one by one&amp;rdquo;, so the response time would inevitably increase as the volume of test data grows, and therefore a longer response time is a normal phenomenon. How should Xiao Zhao continue to handle this Bug here?&lt;/p>&lt;/blockquote>
+&lt;h3 id="analysis-2">Analysis
+&lt;/h3>&lt;p>First, from the user&amp;rsquo;s perspective, this problem symptom does indeed affect the user experience and causes confusion for users, so the test engineer would of course treat it as a discovered Bug.&lt;/p>
+&lt;p>But from the back-end developer&amp;rsquo;s perspective, the current implementation follows the requirements, and the appearance of this phenomenon is an inevitable result, so it cannot be considered a Bug&lt;/p>
+&lt;p>Here, thinking from the perspective of software quality, this problem symptom is of course a quality issue, so there is no problem in defining this issue as a Bug.&lt;/p>
+&lt;p>But the back-end development did indeed implement it according to the requirements, so we cannot say this Bug is a development problem either. Then the issue is actually very clear: this problem is not a development Bug, but a &lt;strong>requirements Bug&lt;/strong>.&lt;/p>
+&lt;p>That is, the requirement itself that was proposed, being vague and insufficiently considering scenarios, led to the above quality problem after being implemented as specified.&lt;/p>
+&lt;h3 id="actual-handling-2">Actual Handling
+&lt;/h3>&lt;p>So for the handling process of this problem, it is right for Xiao Zhao to raise the Bug from a quality perspective; here Xiao Wang, following the handling principle of our Case 1, should not reject a quality problem that does not belong to him, but should transfer it to the actual handler.&lt;/p>
+&lt;p>So here the correct action for Xiao Wang should be to reassign the Bug to the business analyst, have the business analyst re-clarify the requirements solution, and then reconsider the code implementation of this part.&lt;/p>
+&lt;h3 id="additional-reflections-2">Additional Reflections
+&lt;/h3>&lt;p>When a quality problem caused by a requirements issue is discovered at the system testing stage, fixing it often involves adjustments to the implementation solution, and in many cases the changes are substantial and may well lead to a delay in delivery.&lt;/p>
+&lt;p>Take this case as an example; possible adjustments to the implementation solution:&lt;/p>
+&lt;ul>
+&lt;li>Limit the volume of data processed in a batch?&lt;/li>
+&lt;li>The back end processes asynchronously, returning the processing status to the front end as soon as processing starts, and then pushing a completion notification to the front end once finished.&lt;/li>
+&lt;li>Front end and back end redefine the processing interface, with the page presenting processing-progress feedback?&lt;/li>
+&lt;/ul>
+&lt;p>These implementations may all have a significant impact on the original implementation solution.&lt;/p>
+&lt;p>Therefore, although the problem is categorized as a requirements Bug, discovering a requirements Bug at the system testing stage is actually something that should be avoided as much as possible. For this kind of problem, the best stage to raise it is the early requirements analysis stage or solution design stage, and this is precisely the significance of shift-left testing and of testers fully participating in early requirements discussions and solution reviews.&lt;/p>
+&lt;h3 id="conclusion-2">Conclusion
+&lt;/h3>&lt;p>Not all Bugs discovered during the software testing stage are the developers&amp;rsquo; Bugs; problems caused by inadequate consideration of requirements, unclear requirements, and similar reasons are also not uncommon.&lt;/p>
+&lt;p>But for Bugs caused by requirements, discovering and raising them only at the testing stage often means higher fix costs and greater harm to the product, so we should fully understand the requirements and clarify potential problems as early as possible before testing begins, rather than trying to mend the fold after the sheep are lost at the testing stage.&lt;/p>
+&lt;hr></description></item><item><title>On the Bug Lifecycle and the Principles of Bug Status Transitions</title><link>https://chengxiaqiucao.github.io/en/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/</link><pubDate>Wed, 07 May 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-1.webp" alt="Featured image of post On the Bug Lifecycle and the Principles of Bug Status Transitions" />&lt;h2 id="preface">Preface
+&lt;/h2>&lt;p>In software product development, a Bug is both the most important output of testing work, the direct input for developers to fix problems, and the main lever for improving product quality.&lt;/p>
+&lt;p>In the previous article, we analyzed, from the tester&amp;rsquo;s perspective, how to help the team carry out quality improvement more efficiently when submitting Bugs.&lt;/p>
+&lt;p>But beyond the Bug submission stage, in our work a Bug goes through a complete lifecycle from discovery to being fixed, and the issue tickets we submit present different states accordingly. The transitions of a Bug among these different states in fact reflect the team&amp;rsquo;s collaborative communication process around the Bug. In real work, disagreements arising from Bug determination or state setting are common; especially in teams that treat Bugs as important KPI data, heated arguments between testing and development over Bugs happen from time to time. For example:&lt;/p>
+&lt;ul>
+&lt;li>Development and testing disagree on Bug determination; testing thinks it is a Bug, development thinks it is not a problem—how should this be handled?&lt;/li>
+&lt;li>There is a disagreement over Bug ownership; is it a front-end problem or a back-end problem?&lt;/li>
+&lt;li>A Bug cannot be reproduced; should it be closed?&lt;/li>
+&lt;li>&amp;hellip;and so on&lt;/li>
+&lt;/ul>
+&lt;p>In this article, we will sort out in detail the complete lifecycle of a Bug, as well as the principles for handling its states at different stages.&lt;/p>
+&lt;h2 id="the-bug-lifecycle-and-its-different-states">The Bug Lifecycle and Its Different States
+&lt;/h2>&lt;p>A Bug does not appear out of nowhere; it is a quality problem exposed during the testing process. From being discovered to having the fix completed and confirmed correct, it goes through a process, and this process is the Bug lifecycle. In software development, the management of this lifecycle is usually handled by a Bug management system (common ones include Jira, ZenTao, Bugfree, HP QC, etc.) to track and synchronize the state of each Bug, and to serve as a collaboration bridge between developers and testers.&lt;/p>
+&lt;p>The main process of the Bug lifecycle is roughly as follows:&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513_hu_f68e27b587af4814.webp"
+width="1024"
+height="72"
+srcset="https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513_hu_a2008f0abd8fb770.webp 480w, https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513_hu_f68e27b587af4814.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="1428"
+data-flex-basis="3428px"
+>
+&lt;/p>
+&lt;h3 id="open">Open
+&lt;/h3>&lt;p>The &lt;strong>Open&lt;/strong> state is the initial state after a Bug is discovered. Usually the tester who found the Bug enters it into the Bug management system to create an issue ticket; at this point the Bug&amp;rsquo;s state is &lt;strong>Open&lt;/strong>, which also means the Bug is pending handling.&lt;/p>
+&lt;p>In addition, if there is a historically closed Bug that is later found not to have actually been resolved, the Bug can be reactivated, and at this point the Bug will also be in the &lt;strong>Open&lt;/strong> state.&lt;/p>
+&lt;p>In this state, the tester who submitted the Bug should designate a developer to handle the Bug for the next step, usually assigning it directly, based on the Bug&amp;rsquo;s symptoms, to the developer who can fix the Bug. However, Bug management systems generally also set a default handler; for Bugs in the &lt;strong>Open&lt;/strong> state, the default handler is usually set to the development lead, who will make a more accurate judgment for reassignment.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">Status&lt;/th>
+&lt;th style="text-align: center">Description&lt;/th>
+&lt;th style="text-align: center">Current Owner&lt;/th>
+&lt;th style="text-align: center">Hand-off Owner&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Open&lt;/td>
+&lt;td style="text-align: center">Initial state, pending handling&lt;/td>
+&lt;td style="text-align: center">Test Engineer&lt;/td>
+&lt;td style="text-align: center">Development lead or Bug owner&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="in-progress">In Progress
+&lt;/h3>&lt;p>After a developer is assigned a Bug, it enters the Bug analysis stage. At this point it is uncertain whether the Bug can be fixed, so it enters the &lt;strong>In Progress&lt;/strong> state; after analysis, the developer can either fix the Bug, or find that it is not a problem they can fix and reassign the Bug to the developer who should actually fix it.&lt;/p>
+&lt;p>If there is a hand-off of the Bug among developers here, the Bug state remains &lt;strong>In Progress&lt;/strong>, and only the current handler changes.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">Status&lt;/th>
+&lt;th style="text-align: center">Description&lt;/th>
+&lt;th style="text-align: center">Current Owner&lt;/th>
+&lt;th style="text-align: center">Hand-off Owner&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">In Progress&lt;/td>
+&lt;td style="text-align: center">Bug enters analysis, usually for relatively complex Bugs&lt;/td>
+&lt;td style="text-align: center">Assigned Developer&lt;/td>
+&lt;td style="text-align: center">Actual Bug fixer&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="resolved">Resolved
+&lt;/h3>&lt;p>After a Bug has been fixed by a developer, it is marked as &lt;strong>Resolved&lt;/strong>. This state actually means the tester can verify the Bug.&lt;/p>
+&lt;p>It is worth noting here that many developers have a misconception: that having modified the code or done self-testing means it is &lt;strong>Resolved&lt;/strong>. Actually it is not; the key point of the &lt;strong>Resolved&lt;/strong> state is the handler it is handed off to, that is, &lt;strong>the tester is able to perform verification&lt;/strong>.&lt;/p>
+&lt;p>Because in real work, when testers test a product, there is the concept of testing rounds, and testing cannot be done at any arbitrary time.
+So only when &lt;strong>the fixed code has entered the next round of test submission&lt;/strong> should the state be set to &lt;strong>Resolved&lt;/strong>. Otherwise, in the current test environment, the fixed code has not yet been deployed, and of course verification cannot actually be completed.&lt;/p>
+&lt;p>(&lt;em>A more complete Bug management system would add a &lt;strong>Pending Verification&lt;/strong> state; in that case Resolved would only mean the developer has finished the code fix, and Pending Verification would be the re-submission for testing. This article focuses on the commonly necessary states and will not expand further&lt;/em>)&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">Status&lt;/th>
+&lt;th style="text-align: center">Description&lt;/th>
+&lt;th style="text-align: center">Current Owner&lt;/th>
+&lt;th style="text-align: center">Hand-off Owner&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Resolved&lt;/td>
+&lt;td style="text-align: center">Bug fix completed, marked as resolved, i.e. pending verification&lt;/td>
+&lt;td style="text-align: center">Bug fixer&lt;/td>
+&lt;td style="text-align: center">Test Engineer&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="closed">Closed
+&lt;/h3>&lt;p>After verification confirms that the Bug has been fixed, the Bug can be set to the &lt;strong>Closed&lt;/strong> state. This state means the quality problem reflected by the Bug no longer exists in the current product version.&lt;/p>
+&lt;p>Closing a Bug should be a very serious matter; usually it should only be closed after confirmation by the Bug&amp;rsquo;s submitter. Of course, in special cases, the product&amp;rsquo;s decision-making team (CCB) may also decide whether a Bug can be closed.&lt;/p>
+&lt;p>In addition, situations where a closed Bug needs to be reactivated also occur from time to time—for example, when verification scenarios were not considered thoroughly enough, when environmental problems caused an erroneous close, or when, after a test-build version switch, an already-fixed Bug was broken again, or wrong code was merged back in, and so on; in these cases the Bug reopening (ReOpen) operation is involved.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">Status&lt;/th>
+&lt;th style="text-align: center">Description&lt;/th>
+&lt;th style="text-align: center">Current Owner&lt;/th>
+&lt;th style="text-align: center">Hand-off Owner&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Closed&lt;/td>
+&lt;td style="text-align: center">Bug confirmed fixed; the quality problem corresponding to the Bug no longer exists in the version&lt;/td>
+&lt;td style="text-align: center">Bug submitter&lt;/td>
+&lt;td style="text-align: center">None&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;hr>
+&lt;p>Besides the most important Bug lifecycle states above, in real work there are also some special cases, which likewise correspond to different Bug states&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-1_hu_6ff639b10b486296.webp"
+width="1024"
+height="348"
+srcset="https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-1_hu_964ead4c3f3f555b.webp 480w, https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-1_hu_6ff639b10b486296.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="294"
+data-flex-basis="707px"
+>
+&lt;/p>
+&lt;h3 id="rejected">Rejected
+&lt;/h3>&lt;p>During testing, when testers make a misjudgment or the environment is configured incorrectly, it is fairly common for a submitted Bug to turn out not to be a quality problem. After analysis, if the developer considers it not a bug, the Bug can be set to the &lt;strong>Rejected&lt;/strong> state. At this point the Bug returns to the tester for confirmation; if the false positive is accepted, the submitter can perform the close operation.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">Status&lt;/th>
+&lt;th style="text-align: center">Description&lt;/th>
+&lt;th style="text-align: center">Current Owner&lt;/th>
+&lt;th style="text-align: center">Hand-off Owner&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Rejected&lt;/td>
+&lt;td style="text-align: center">After analysis the Bug is a false positive and does not reflect a quality problem&lt;/td>
+&lt;td style="text-align: center">Bug analyst&lt;/td>
+&lt;td style="text-align: center">Bug submitter&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>But in practice, for rejected Bugs, many times the cause is a disagreement between testing and development over the requirements or over whether it is a quality problem. When the disagreement cannot be reconciled on its own, the normal operation should be:
+The tester resubmits the Bug, but the Bug should not be assigned to developers; instead it should be assigned to the product decision-making team CCB (mainly the BA or PO), which arbitrates and, based on the arbitration result, determines whether a fix or a close is needed.&lt;/p>
+&lt;h3 id="verified">Verified
+&lt;/h3>&lt;p>After a tester verifies a Bug and finds no problem, they can usually perform the close operation to set the state to &lt;strong>Closed&lt;/strong>, but a more complete lifecycle actually also has a &lt;strong>Verified&lt;/strong> state. The use of this state usually occurs when the tester who verifies the Bug and the submitter who filed the Bug are not the same person; after the verifier performs verification on the Bug, they cannot represent the submitter in confirming that the Bug can be closed.&lt;/p>
+&lt;p>Another case is the more rigorous large-scale software development process, where the testing phase may also include multiple stages. After a subsystem-level test team completes testing, there may still be system-level system testing or full acceptance at the larger-system level, and only after the subsystem-level testing moves into subsequent testing will the state be set to &lt;strong>Closed&lt;/strong>&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">Status&lt;/th>
+&lt;th style="text-align: center">Description&lt;/th>
+&lt;th style="text-align: center">Current Owner&lt;/th>
+&lt;th style="text-align: center">Hand-off Owner&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Verified&lt;/td>
+&lt;td style="text-align: center">Bug has been verified as fixed&lt;/td>
+&lt;td style="text-align: center">Bug verifier&lt;/td>
+&lt;td style="text-align: center">Bug submitter&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="need-more-info">Need More Info
+&lt;/h3>&lt;p>This state is for situations where the Bug information submitted by the tester is incomplete or insufficient to complete the analysis of the Bug, and the developer has difficulty understanding the specific Bug symptoms. In this case the handler sets the issue ticket to the &lt;strong>Need More Info&lt;/strong> state and returns it to the Bug submitter to supplement the relevant information.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">Status&lt;/th>
+&lt;th style="text-align: center">Description&lt;/th>
+&lt;th style="text-align: center">Current Owner&lt;/th>
+&lt;th style="text-align: center">Hand-off Owner&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Need More Info&lt;/td>
+&lt;td style="text-align: center">Bug ticket information is insufficient; more detailed information needs to be added&lt;/td>
+&lt;td style="text-align: center">Bug analyst&lt;/td>
+&lt;td style="text-align: center">Bug submitter&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="deferred">Deferred
+&lt;/h3>&lt;p>Deferral generally targets the following situations:&lt;/p>
+&lt;ol>
+&lt;li>The Bug is hard to reproduce, and it is difficult to analyze the cause&lt;/li>
+&lt;li>The Bug is difficult to modify, requiring substantial changes to the product, and a workaround exists&lt;/li>
+&lt;li>The Bug has low priority, does not affect main functions, and there are other more important problems to solve before the version release&lt;/li>
+&lt;/ol>
+&lt;p>For the above situations, after a decision by the product CCB team, the Bug can be deferred. At the same time, the Bug&amp;rsquo;s analysis owner still needs to continue analyzing the Bug or fix it later.&lt;/p>
+&lt;p>But it should be noted here that the &lt;strong>Deferred&lt;/strong> state does not mean the Bug is not a problem; in the test team&amp;rsquo;s quality analysis, Bugs in this state should still be treated as valid Bugs. That is, such Bugs will still affect the final quality assessment conclusion of the version.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">Status&lt;/th>
+&lt;th style="text-align: center">Description&lt;/th>
+&lt;th style="text-align: center">Current Owner&lt;/th>
+&lt;th style="text-align: center">Hand-off Owner&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Deferred&lt;/td>
+&lt;td style="text-align: center">Bug cannot be resolved in the current version for specific reasons; after approval by the project CCB team decision, the Bug can be kept in the version for later resolution&lt;/td>
+&lt;td style="text-align: center">CCB decision team&lt;/td>
+&lt;td style="text-align: center">Bug analyst&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;hr>
+&lt;p>The above is our introduction to the main state definitions that appear in the Bug lifecycle and the related handling principles. Besides the Bug states listed above, a more complete Bug lifecycle also includes:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Pending Verification:&lt;/strong> Fixed, waiting for the version to be submitted for testing&lt;/li>
+&lt;li>&lt;strong>Under Investigation:&lt;/strong> For relatively complex Bugs involving considerable research work such as technology selection and solution comparison, this state can be defined before handling the Bug&lt;/li>
+&lt;li>&lt;strong>Investigated:&lt;/strong> For Bugs on which solution research has been done as above, when the fix plan has not yet been determined, the Bug is in this state&lt;/li>
+&lt;li>&lt;strong>Verifying:&lt;/strong> For Bugs with relatively complex test scenarios that require a long verification, such as performance-related issues, the Bug can be placed in this state before verification is complete&lt;/li>
+&lt;/ul>
+&lt;p>Of course, processes are rigid; what matters most for good, efficient team collaboration is still mutual trust and mutual support among the different roles in the team.&lt;/p>
+&lt;p>Nevertheless, understanding the different stages in the correct process and the principles of correct handling also helps us reduce the internal friction of mutual arguing and wrangling when problems or disagreements arise.&lt;/p>
+&lt;h2 id="bug-status-transitions">Bug Status Transitions
+&lt;/h2>&lt;p>Based on the analysis of the different states above, a fairly complete Bug status transition diagram is shown below for reference.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-2_hu_b16928078ff38263.webp"
+width="1024"
+height="524"
+srcset="https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-2_hu_4b4363819269e23.webp 480w, https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-2_hu_b16928078ff38263.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="195"
+data-flex-basis="469px"
+>
+&lt;/p>
+&lt;p>If you need the complete full-size diagram above, reply with &lt;code>Bug Status&lt;/code> to get it.&lt;/p>
+&lt;p>Also reply with &lt;code>Outline&lt;/code> to view the detailed syllabus of the Qiucao Full-Stack Testing Skills Improvement Course. Reply with &lt;code>Join the Group&lt;/code> to enter the testing exchange group and share testing techniques and exchange information with fellow testers.&lt;/p></description></item><item><title>Musk's Weekly Report Mandate and What Weekly Reports Really Are</title><link>https://chengxiaqiucao.github.io/en/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/</link><pubDate>Fri, 28 Feb 2025 17:20:23 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228-1.webp" alt="Featured image of post Musk's Weekly Report Mandate and What Weekly Reports Really Are" />&lt;h2 id="introduction">Introduction
+&lt;/h2>&lt;p>One of the hottest topics online these past couple of days has to be Musk&amp;rsquo;s new DOGE policy — the now-famous &amp;ldquo;what did you do last week&amp;rdquo; email requiring every federal employee to send a weekly report listing the five things they did last week, cc&amp;rsquo;ing their supervisor! Miss it twice in a row and it&amp;rsquo;s treated as a resignation!&lt;/p>
+&lt;p>And by now more than 1 million U.S. civil servants have already sent this weekly report! 😂😂😂&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228-1_hu_15914d90a2dc9cb.webp"
+width="1024"
+height="445"
+srcset="https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228-1_hu_fb6c0b0c0841a906.webp 480w, https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228-1_hu_15914d90a2dc9cb.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="230"
+data-flex-basis="552px"
+>
+&lt;/p>
+&lt;p>As corporate wage slaves, we know this routine all too well — but come to think of it, &lt;strong>why do weekly reports even exist&lt;/strong>?&lt;/p>
+&lt;h2 id="what-is-the-essence-of-the-weekly-or-daily-report">What Is the Essence of the Weekly (or Daily) Report?
+&lt;/h2>&lt;p>For these U.S. civil servants, writing a weekly report may still be something of a novelty, but for a business-born boss like Musk, weekly reports are a long-standing favorite — he rolled out similar policies at Tesla and Twitter years ago.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228_hu_f10e1c34ec2f890f.webp"
+width="1024"
+height="821"
+srcset="https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228_hu_b5bb4f277c08c548.webp 480w, https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228_hu_f10e1c34ec2f890f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="124"
+data-flex-basis="299px"
+>
+&lt;/p>
+&lt;p>So why, from a company&amp;rsquo;s or a boss&amp;rsquo;s point of view, do they want to see employees&amp;rsquo; weekly reports?&lt;/p>
+&lt;p>Take a software testing department as an example; the value of a weekly report mainly shows up in the following areas:&lt;/p>
+&lt;ol>
+&lt;li>Risk control&lt;/li>
+&lt;/ol>
+&lt;p>This should be the part every Leader cares about most in a weekly report. Through weekly reports, you can know the overall progress of the whole project and get a grip on overall quality risks — such as testing delays or insufficient quality exposure. The weekly-report level, unlike a daily report, isn&amp;rsquo;t overly detailed, so it&amp;rsquo;s a good input for keeping a handle on the overall status.&lt;/p>
+&lt;ol start="2">
+&lt;li>Resource optimization&lt;/li>
+&lt;/ol>
+&lt;p>By aggregating and analyzing weekly-report data, a Leader can also grasp how much effort every member is putting in, making it easier to dynamically allocate testing resources.&lt;/p>
+&lt;p>And this is also the focus of all the attention on Musk&amp;rsquo;s new policy, because the result the weekly reports point to is that underworked federal employees may get fired 🤪🤪&lt;/p>
+&lt;ol start="3">
+&lt;li>Decision basis&lt;/li>
+&lt;/ol>
+&lt;p>A weekly report usually also contains some quantitative metrics, such as testing progress, defect data, coverage, escape rate, external support, and other quality data that can be captured or actively reported. These data quantify the current quality state and present it visually, serving as important support for decision-making.&lt;/p>
+&lt;h2 id="how-should-testers-write-a-weekly-report">How Should Testers Write a Weekly Report?
+&lt;/h2>&lt;p>So as a test engineer, if we&amp;rsquo;re going to send a weekly report, what should it usually contain?&lt;/p>
+&lt;p>Here is a weekly-report example from an employee working on IoT software (a smart band):&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">I&lt;/span>&lt;span class="o">.&lt;/span> &lt;span class="n">Weekly&lt;/span> &lt;span class="n">Work&lt;/span> &lt;span class="n">Summary&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Test&lt;/span> &lt;span class="n">execution&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">Completed&lt;/span> &lt;span class="n">iterative&lt;/span> &lt;span class="n">testing&lt;/span> &lt;span class="n">of&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">heart&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">rate&lt;/span> &lt;span class="n">monitoring&lt;/span> &lt;span class="n">module&lt;/span> &lt;span class="n">V2&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">covering&lt;/span> &lt;span class="mi">10&lt;/span> &lt;span class="n">exercise&lt;/span> &lt;span class="n">scenarios&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="ow">and&lt;/span> &lt;span class="n">found&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="n">critical&lt;/span> &lt;span class="n">defects&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span> &lt;span class="n">delay&lt;/span> &lt;span class="n">exceeding&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">threshold&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">monitoring&lt;/span> &lt;span class="n">failure&lt;/span> &lt;span class="n">at&lt;/span> &lt;span class="n">low&lt;/span> &lt;span class="n">battery&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">Ran&lt;/span> &lt;span class="n">compatibility&lt;/span> &lt;span class="n">testing&lt;/span> &lt;span class="n">on&lt;/span> &lt;span class="n">iOS&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Android&lt;/span> &lt;span class="n">APP&lt;/span> &lt;span class="n">sync&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="mi">3&lt;/span> &lt;span class="n">device&lt;/span> &lt;span class="n">models&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">including&lt;/span> &lt;span class="n">older&lt;/span> &lt;span class="n">ones&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">showed&lt;/span> &lt;span class="n">data&lt;/span> &lt;span class="n">loss&lt;/span> &lt;span class="n">issues&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">Regression&lt;/span> &lt;span class="n">test&lt;/span> &lt;span class="k">pass&lt;/span> &lt;span class="n">rate&lt;/span> &lt;span class="mi">95&lt;/span>&lt;span class="o">%&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">with&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">remaining&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="o">%&lt;/span> &lt;span class="n">being&lt;/span> &lt;span class="n">low&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">priority&lt;/span> &lt;span class="n">UI&lt;/span> &lt;span class="n">display&lt;/span> &lt;span class="n">issues&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Defect&lt;/span> &lt;span class="n">management&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">Added&lt;/span> &lt;span class="mi">15&lt;/span> &lt;span class="n">defects&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="n">urgent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span> &lt;span class="n">high&lt;/span> &lt;span class="n">priority&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">closed&lt;/span> &lt;span class="mi">8&lt;/span> &lt;span class="n">defects&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="mi">3&lt;/span> &lt;span class="n">of&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">remaining&lt;/span> &lt;span class="n">defects&lt;/span> &lt;span class="n">require&lt;/span> &lt;span class="n">joint&lt;/span> &lt;span class="n">fixes&lt;/span> &lt;span class="n">with&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">hardware&lt;/span> &lt;span class="n">team&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Special&lt;/span> &lt;span class="n">testing&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">Completed&lt;/span> &lt;span class="n">stress&lt;/span> &lt;span class="n">testing&lt;/span> &lt;span class="n">of&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">OTA&lt;/span> &lt;span class="n">upgrade&lt;/span> &lt;span class="n">process&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="n">firmware&lt;/span> &lt;span class="n">verification&lt;/span> &lt;span class="n">failure&lt;/span> &lt;span class="n">occurred&lt;/span> &lt;span class="n">after&lt;/span> &lt;span class="n">simulating&lt;/span> &lt;span class="mi">5&lt;/span> &lt;span class="n">consecutive&lt;/span> &lt;span class="n">upgrades&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">In&lt;/span> &lt;span class="n">power&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">consumption&lt;/span> &lt;span class="n">testing&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">standby&lt;/span> &lt;span class="n">power&lt;/span> &lt;span class="n">of&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">sleep&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">monitoring&lt;/span> &lt;span class="n">function&lt;/span> &lt;span class="n">exceeded&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">standard&lt;/span> &lt;span class="n">by&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="o">%.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">II&lt;/span>&lt;span class="o">.&lt;/span> &lt;span class="n">Core&lt;/span> &lt;span class="n">Issues&lt;/span> &lt;span class="ow">and&lt;/span> &lt;span class="n">Risks&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Blocking&lt;/span> &lt;span class="n">issues&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">The&lt;/span> &lt;span class="n">heart&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">rate&lt;/span> &lt;span class="n">monitoring&lt;/span> &lt;span class="n">data&lt;/span> &lt;span class="n">delay&lt;/span> &lt;span class="n">defect&lt;/span> &lt;span class="n">creates&lt;/span> &lt;span class="n">a&lt;/span> &lt;span class="n">risk&lt;/span> &lt;span class="n">of&lt;/span> &lt;span class="n">version&lt;/span> &lt;span class="n">release&lt;/span> &lt;span class="n">delay&lt;/span> &lt;span class="ow">and&lt;/span> &lt;span class="n">needs&lt;/span> &lt;span class="n">to&lt;/span> &lt;span class="n">be&lt;/span> &lt;span class="n">fixed&lt;/span> &lt;span class="ow">and&lt;/span> &lt;span class="n">verified&lt;/span> &lt;span class="n">by&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">development&lt;/span> &lt;span class="n">team&lt;/span> &lt;span class="n">within&lt;/span> &lt;span class="mi">48&lt;/span> &lt;span class="n">hours&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="ne">Resource&lt;/span> &lt;span class="n">dependencies&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">The&lt;/span> &lt;span class="n">hardware&lt;/span> &lt;span class="n">team&lt;/span>&lt;span class="s1">&amp;#39;s slow response to sensor issues may affect next week&amp;#39;&lt;/span>&lt;span class="n">s&lt;/span> &lt;span class="n">power&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">consumption&lt;/span> &lt;span class="n">test&lt;/span> &lt;span class="n">plan&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">III&lt;/span>&lt;span class="o">.&lt;/span> &lt;span class="n">Next&lt;/span> &lt;span class="n">Week&lt;/span>&lt;span class="s1">&amp;#39;s Plan&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">Execute&lt;/span> &lt;span class="n">V2&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mi">4&lt;/span> &lt;span class="n">feature&lt;/span> &lt;span class="n">testing&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">blood&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">oxygen&lt;/span> &lt;span class="n">monitoring&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">emergency&lt;/span> &lt;span class="n">call&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">Retest&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">remaining&lt;/span> &lt;span class="n">defects&lt;/span> &lt;span class="ow">and&lt;/span> &lt;span class="n">drive&lt;/span> &lt;span class="n">joint&lt;/span> &lt;span class="n">debugging&lt;/span> &lt;span class="n">with&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">hardware&lt;/span> &lt;span class="n">team&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="n">Launch&lt;/span> &lt;span class="n">user&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">scenario&lt;/span> &lt;span class="n">stress&lt;/span> &lt;span class="n">testing&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">simulating&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mi">000&lt;/span> &lt;span class="n">devices&lt;/span> &lt;span class="n">uploading&lt;/span> &lt;span class="n">data&lt;/span> &lt;span class="n">concurrently&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The weekly report above is summarized from two angles — the project and the testing department — and the value it reflects can be summed up in the table below:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Element&lt;/th>
+&lt;th>Value to the Project&lt;/th>
+&lt;th>Value to the Testing Department&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>Test execution progress&lt;/strong>&lt;/td>
+&lt;td>Clarifies version quality status and helps the PM assess whether release criteria are met.&lt;/td>
+&lt;td>Quantifies team output, making resource allocation and efficiency optimization easier (e.g., adjusting test case priorities).&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Defect distribution and trends&lt;/strong>&lt;/td>
+&lt;td>Exposes module risks and pushes development to focus on core issues (e.g., a high defect rate in the heart-rate module calls for refactoring).&lt;/td>
+&lt;td>Analyzes root causes of defects (code/design/environment) and drives test case library additions and process improvements (e.g., adding low-battery scenarios).&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Risks and dependencies&lt;/strong>&lt;/td>
+&lt;td>Warns of delay risks and promotes cross-department collaboration (e.g., involving the hardware team).&lt;/td>
+&lt;td>Wins support from upper management (e.g., requesting a longer test cycle or more device resources).&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Special test results&lt;/strong>&lt;/td>
+&lt;td>Validates non-functional requirements (e.g., power consumption, stability), avoiding hard hits to user experience.&lt;/td>
+&lt;td>Accumulates performance baseline data to provide a basis for comparison in later versions (e.g., a power-consumption metric library).&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Next week&amp;rsquo;s plan and goals&lt;/strong>&lt;/td>
+&lt;td>Aligns with project milestones, keeping testing in sync with development (e.g., the blood-oxygen feature test plan matches the iteration schedule).&lt;/td>
+&lt;td>Clarifies team division of labor, avoiding overlapping or missed tasks.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="summary">Summary
+&lt;/h2>&lt;p>So, as an employee, there&amp;rsquo;s really nothing to resist about weekly reports — it&amp;rsquo;s just a perfectly normal management practice.
+For testers, the weekly report is both a &amp;ldquo;dashboard&amp;rdquo; for testing work (reflecting quality status in real time) and a &amp;ldquo;bridge&amp;rdquo; for cross-department collaboration (driving problem resolution and resource coordination), while also providing data support for optimizing long-term testing strategy.&lt;/p>
+&lt;p>When it all comes down to it, the goal is still &lt;strong>status synchronization&lt;/strong>&lt;/p>
+&lt;p>Just like agile stand-ups, and the daily reports that traditional projects may also have, their purpose is actually the same; I&amp;rsquo;ve covered this in detail in earlier posts, so feel free to refer to those.&lt;/p>
+&lt;hr></description></item><item><title>Differences Between Testing Mobile and Desktop Applications</title><link>https://chengxiaqiucao.github.io/en/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/</link><pubDate>Fri, 13 Dec 2024 13:37:35 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/Pasted-20241213.webp" alt="Featured image of post Differences Between Testing Mobile and Desktop Applications" />&lt;p>There are in fact quite a few differences between the two. The main way to look at them is to start from the characteristics of the test object.&lt;/p>
+&lt;h2 id="differences-in-device-processing-performance">Differences in Device Processing Performance
+&lt;/h2>&lt;p>Although the hardware performance of mobile processors, memory, and the like has improved enormously, the gap in processing performance between some low-end phones and desktop computers is still fairly noticeable. Therefore, when testing, for software on the mobile side, loading efficiency, stuttering, and similar issues need particular attention.&lt;/p>
+&lt;h2 id="fragmentation-of-screen-resolutions-and-system-versions">Fragmentation of Screen Resolutions and System Versions
+&lt;/h2>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/Pasted-20241213-2_hu_d14a5bf1d179a716.webp"
+width="1024"
+height="1026"
+srcset="https://chengxiaqiucao.github.io/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/Pasted-20241213-2_hu_4f864fd5966690a5.webp 480w, https://chengxiaqiucao.github.io/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/Pasted-20241213-2_hu_d14a5bf1d179a716.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="99"
+data-flex-basis="239px"
+>
+&lt;/p>
+&lt;p>Because phones are portable, their screen resolutions are limited, and with so many manufacturers and models, fragmentation is very pronounced. Therefore, in testing mobile applications, accounting for the impact of different resolutions and manufacturer customizations, and verifying how the application is presented, is also a fairly clear difference from the desktop side.&lt;/p>
+&lt;h2 id="differences-in-interaction-methods">Differences in Interaction Methods
+&lt;/h2>&lt;p>On the desktop side the main interaction methods are the keyboard and mouse, while on the mobile side they are mainly touch, multi-touch, dragging, and so on. Text input and precise on-screen tapping are more difficult than on a desktop, so in application testing these too are points of difference.&lt;/p>
+&lt;h2 id="differences-in-usage-scenarios">Differences in Usage Scenarios
+&lt;/h2>&lt;p>For mobile applications, beyond the differences in usage scenarios from the desktop side, there are also some typical special scenarios:&lt;/p>
+&lt;h3 id="network-stability">Network Stability
+&lt;/h3>&lt;p>Since a phone is a mobile device, network switching and unstable connections while on the move are highly likely events, so the requirements on an application&amp;rsquo;s compatibility with sustained network stability are much higher than on the desktop side.&lt;/p>
+&lt;h3 id="power-consumption">Power Consumption
+&lt;/h3>&lt;p>Phones run on battery power, and in mobile scenarios power usage should be more restrained, so applications themselves face higher requirements for controlling power consumption.&lt;/p>
+&lt;h3 id="network-data-usage">Network Data Usage
+&lt;/h3>&lt;p>Although mobile data charges have dropped substantially, data still accounts for a very large share of phone bills, so controlling the factors that affect data usage — such as packet size and frequency in network interactions — is also a characteristic of mobile apps.&lt;/p>
+&lt;h3 id="application-security">Application Security
+&lt;/h3>&lt;p>Although application security issues exist on both desktop and mobile, a phone is a device carried everywhere and used very frequently in daily life, and features such as location, calls, and camera are closely tied to personal privacy. The challenges to information security are greater, so the security requirements and privacy protection for mobile applications themselves are generally stricter than on the desktop side.&lt;/p>
+&lt;h2 id="differences-in-testing-tools">Differences in Testing Tools
+&lt;/h2>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/Pasted-20241213-1_hu_6cd104adb2c7d82d.webp"
+width="1024"
+height="386"
+srcset="https://chengxiaqiucao.github.io/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/Pasted-20241213-1_hu_1825eb2121aedb6a.webp 480w, https://chengxiaqiucao.github.io/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/Pasted-20241213-1_hu_6cd104adb2c7d82d.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="265"
+data-flex-basis="636px"
+>
+Mobile and desktop applications differ markedly in operating systems and development tools, and correspondingly there are clear differences in testing tools as well.&lt;/p>
+&lt;p>Taking automation tools as an example, on the desktop side you might have selenium, robotframework, postman, and so on, whereas on the mobile side the corresponding tools are represented by ones like Appium and airtest.&lt;/p>
+&lt;hr>
+&lt;p>Looking broadly at the aspects above, we can see that the differences are still very pronounced and cannot be generalized.&lt;/p></description></item><item><title>How to Test Installation and Deployment</title><link>https://chengxiaqiucao.github.io/en/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/</link><pubDate>Sat, 16 Nov 2024 16:28:04 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-3.webp" alt="Featured image of post How to Test Installation and Deployment" />&lt;p>A question I came across on Zhihu:&lt;/p>
+&lt;blockquote>
+&lt;p>Could all you professional IT and testing experts tell me how environment deployment is done? Every time I just say &amp;ldquo;install the corresponding software according to the test documentation, set the environment variables, prepare the relevant materials!&amp;rdquo; I always feel my answer isn&amp;rsquo;t good enough. What is the correct answer?&lt;/p>&lt;/blockquote>
+&lt;p>As a professional tester, this answer isn&amp;rsquo;t so much bad as it is essentially equivalent to not knowing how to test.&lt;/p>
+&lt;p>Although this question directly asks how to do installation and deployment, it is really asking how installation and deployment should be tested. The reason it isn&amp;rsquo;t asked directly is that many beginners don&amp;rsquo;t realize that installation and deployment is actually an extremely important part of the scope of software functional testing—the person asking the question being a case in point.&lt;/p>
+&lt;p>The installation of a software system—especially a system delivered directly to users—can be said to be the storefront of the entire system. It is the first step in using the software, and how well it performs directly affects the user&amp;rsquo;s evaluation of the software.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116_hu_fead4db6b6bd4.webp"
+width="1024"
+height="377"
+srcset="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116_hu_7e34aa3471ce9d3b.webp 480w, https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116_hu_fead4db6b6bd4.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="271"
+data-flex-basis="651px"
+>
+&lt;/p>
+&lt;p>So what testing considerations should be covered for software installation and deployment testing? We can look at it from the following aspects:&lt;/p>
+&lt;h2 id="fresh-installation--full-installation">Fresh Installation / Full Installation
+&lt;/h2>&lt;p>&lt;strong>Fresh installation refers to deploying a piece of software for the first time, or redeploying it without retaining any previously installed information.&lt;/strong>&lt;/p>
+&lt;p>This is actually the main part of the testing, and the installation documentation mentioned by the asker also mainly addresses this part.&lt;/p>
+&lt;p>But there are still many test points to pay attention to when testing.&lt;/p>
+&lt;h3 id="1-installation-dependencies">1. Installation Dependencies
+&lt;/h3>&lt;p>Most installation programs or scripts actually have certain prerequisite dependencies:&lt;/p>
+&lt;ul>
+&lt;li>Required disk space?&lt;/li>
+&lt;li>Network connectivity status?&lt;/li>
+&lt;li>Any CPU / memory requirements?&lt;/li>
+&lt;li>The version of the operating system?&lt;/li>
+&lt;li>System user permissions (does installation require OS administrator privileges?)&lt;/li>
+&lt;li>&amp;hellip;.&lt;/li>
+&lt;/ul>
+&lt;p>Moreover, these dependencies are not only those of the installation program itself; they also include the conditions required for the software system to run properly after installation. All of these should be validated in advance by the installer at the time our program is installed. All of these are things that need to be considered and designed for during testing.&lt;/p>
+&lt;h3 id="2-functional-verification-of-the-installer--script">2. Functional Verification of the Installer / Script
+&lt;/h3>&lt;p>Whether there is an installer or the setup is done by executing a script, this part is the main body of installation and deployment, and also the part emphasized in the installation and deployment documentation. Most user-facing installers actually have a graphical interface.&lt;/p>
+&lt;p>The verification here is actually not very different from the functional testing of ordinary software.&lt;/p>
+&lt;ul>
+&lt;li>Is the descriptive information and text in the interface clear?&lt;/li>
+&lt;li>Are the prompts for various operations explicit?&lt;/li>
+&lt;li>For parts involving user interaction, verify the branches of different user choices&lt;/li>
+&lt;li>Compatibility under different screen resolutions&lt;/li>
+&lt;li>Is step backtracking provided? Can you return to the previous step after a misoperation? &amp;hellip;.&lt;/li>
+&lt;/ul>
+&lt;p>When designing this part of the verification, it is best to work with a flowchart and map out the various different paths to confirm them one by one.&lt;/p>
+&lt;h3 id="3-installation-exception-handling">3. Installation Exception Handling
+&lt;/h3>&lt;p>This is an important part that tests a tester&amp;rsquo;s experience.&lt;/p>
+&lt;ul>
+&lt;li>Insufficient disk space?&lt;/li>
+&lt;li>Network interruption midway?&lt;/li>
+&lt;li>Local service port conflict?&lt;/li>
+&lt;li>Power loss midway? &amp;hellip;.&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-1_hu_f7a0d7f0dfe3dc80.webp"
+width="1024"
+height="550"
+srcset="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-1_hu_bf7331f1e9a80f0d.webp 480w, https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-1_hu_f7a0d7f0dfe3dc80.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="186"
+data-flex-basis="446px"
+>
+&lt;/p>
+&lt;h3 id="4-usability">4. Usability
+&lt;/h3>&lt;p>Regarding the usability of the installer, the main consideration is whether any thought has been given to optimizing the user experience during installation.&lt;/p>
+&lt;ul>
+&lt;li>For example, if you select a directory that already exists for installation, is there a prompt?&lt;/li>
+&lt;li>Is there a secondary confirmation for file overwriting?&lt;/li>
+&lt;li>During installation, is there a progress bar showing the installation progress?&lt;/li>
+&lt;li>When copying large files, does the interface show changing information so users don&amp;rsquo;t suspect the program has frozen?&lt;/li>
+&lt;li>When a conflict is detected, is the user offered suggested solutions? &amp;hellip;..&lt;/li>
+&lt;/ul>
+&lt;p>These all actually fall into the category of usability.&lt;/p>
+&lt;h3 id="5-installation-verification">5. Installation Verification
+&lt;/h3>&lt;p>When performing installation testing, we should also understand and confirm what changes occur in the system before and after installation, and whether these changes conform to the design requirements.&lt;/p>
+&lt;ul>
+&lt;li>Which program files will the installation directory contain after installation?&lt;/li>
+&lt;li>Are any files generated in the operating system&amp;rsquo;s system folders or outside the installation directory?&lt;/li>
+&lt;li>Are there any additions or modifications to the registry?&lt;/li>
+&lt;li>Are there any additions or modifications to system services?&lt;/li>
+&lt;li>Is a program group added to the Start menu?&lt;/li>
+&lt;li>Is a shortcut created on the desktop? &amp;hellip;..&lt;/li>
+&lt;/ul>
+&lt;p>Understanding these is not only a functional check; it also helps us understand what the installer itself actually does and whether any test scenarios have been missed.&lt;/p>
+&lt;h2 id="upgrade-installation--update">Upgrade Installation / Update
+&lt;/h2>&lt;p>Besides fresh installation, another important scenario is system upgrade and update—that is, a version of the system already exists and needs to be upgraded on top of the existing base to the version of the current installation package.&lt;/p>
+&lt;p>Upgrades in turn can be divided into full upgrades and incremental upgrades.&lt;/p>
+&lt;h3 id="full-upgrade">Full Upgrade
+&lt;/h3>&lt;p>A full upgrade completely replaces the original program files, but generally retains the existing configuration and data. The installation package usually contains all the files of the current version, so it tends to be fairly large.&lt;/p>
+&lt;h3 id="incremental-upgrade">Incremental Upgrade
+&lt;/h3>&lt;p>An incremental upgrade, based on the user&amp;rsquo;s current version, has an installation package containing only some incremental program files, including script files for upgrade operations. This kind of package is generally small and the installation process is usually faster. However, the package must strictly match the user&amp;rsquo;s current version. It is typically adopted when the full installation package is very large and distributing it to users is inefficient.&lt;/p>
+&lt;h3 id="version-span">Version Span
+&lt;/h3>&lt;p>Whether full or incremental, the verification points are basically similar to those of a fresh installation. But there is one scenario specific to upgrade verification that needs special consideration: the issue of version span.&lt;/p>
+&lt;p>If the software has gone through many iterations and version changes, upgrading from a very old historical version to the new version often brings many problems, including the impact of changes to configuration and data structures, as well as the choice of upgrade strategy—whether to go all the way in one step or upgrade through each intermediate version. All of these can affect the testing strategy.&lt;/p>
+&lt;h3 id="data-migration">Data Migration
+&lt;/h3>&lt;p>For version upgrades involving databases and changes to data structures, business data may require many data conversion operations. This is also a high-incidence area for bugs and needs to be a key focus in combination with post-upgrade business testing.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-2_hu_4b974fcfa09f2c7b.webp"
+width="1024"
+height="620"
+srcset="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-2_hu_3eb720d1fea78ac1.webp 480w, https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-2_hu_4b974fcfa09f2c7b.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="165"
+data-flex-basis="396px"
+>
+&lt;/p>
+&lt;h2 id="rollback">Rollback
+&lt;/h2>&lt;p>Rollback generally refers to whether, when a problem occurs during installation, the original state can be restored so as not to affect the existing business.&lt;/p>
+&lt;p>This is mainly considered from several aspects:&lt;/p>
+&lt;h3 id="normal-cancellation-of-installation--deployment">Normal Cancellation of Installation / Deployment
+&lt;/h3>&lt;p>Initiated voluntarily by the user, this counts as a normal rollback. In this case the installer should be able to clean up the installation files already completed, restore the original system configuration, and reset the state back to what it was before installation.&lt;/p>
+&lt;h3 id="rollback-on-exceptions">Rollback on Exceptions
+&lt;/h3>&lt;p>Besides normal rollback initiated by the user, if some unknown exception occurs during installation that prevents it from continuing, the user needs to be notified that installation failed, and a rollback process should also be triggered to restore the system to its pre-installation state.&lt;/p>
+&lt;p>This is part of the exception capture and handling of our installer itself.&lt;/p>
+&lt;p>And even for exceptions not captured by the installer itself—such as a forced interruption by pulling the power during installation—our software should still provide some cleanup scripts to restore the deployment state to its pre-installation state. This is also one of the important scenarios of installation testing.&lt;/p>
+&lt;h3 id="rollback-effectiveness">Rollback Effectiveness
+&lt;/h3>&lt;p>Beyond triggering the rollback, we also need to confirm the effect of the rollback—whether the cleanup and state restoration were indeed completed correctly.&lt;/p>
+&lt;p>In addition, if an exception occurs during the execution of the rollback itself (as opposed to a rollback triggered by an exception), is there a corresponding solution? For example, providing a cleanup tool.&lt;/p>
+&lt;h2 id="uninstallation">Uninstallation
+&lt;/h2>&lt;p>Of course, where there is installation there is uninstallation. Besides verifying the installer, we also need to verify the uninstaller or uninstall script, similar to the functional verification of the installer.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-3_hu_3ea1b57309e961a.webp"
+width="1024"
+height="677"
+srcset="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-3_hu_de120dc3307ad798.webp 480w, https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-3_hu_3ea1b57309e961a.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="151"
+data-flex-basis="362px"
+>
+&lt;/p>
+&lt;h3 id="uninstallation-entry-points">Uninstallation Entry Points
+&lt;/h3>&lt;p>Besides running the uninstaller directly, uninstalling through the operating system&amp;rsquo;s uninstall entry point is also a scenario that should be considered.&lt;/p>
+&lt;h3 id="uninstallation-leftovers">Uninstallation Leftovers
+&lt;/h3>&lt;p>After the software is uninstalled, which files and configurations are left behind in the operating system, and do they conform to the design requirements?&lt;/p>
+&lt;h3 id="destructive-uninstallation">Destructive Uninstallation
+&lt;/h3>&lt;p>Create some special scenarios—for example, physically deleting certain critical files or altering critical configurations—and confirm whether uninstallation can still proceed normally.&lt;/p>
+&lt;h3 id="exceptions-during-uninstallation">Exceptions During Uninstallation
+&lt;/h3>&lt;p>Various exceptional scenarios during uninstallation should likewise be considered.&lt;/p>
+&lt;ul>
+&lt;li>A file is in use?&lt;/li>
+&lt;li>Network interruption?&lt;/li>
+&lt;li>Power loss? &amp;hellip;&lt;/li>
+&lt;/ul>
+&lt;p>When an exception occurs, is there a corresponding means to handle the aftermath?&lt;/p>
+&lt;hr>
+&lt;p>Very often, questions that look simple turn out to be far from trivial when you dig into them. Testing is an art of exploring and discovering the unknown, with subtleties of its own.&lt;/p></description></item><item><title>What is the Real Purpose of Software Testing?</title><link>https://chengxiaqiucao.github.io/en/post/007-what-is-testing-goal/</link><pubDate>Fri, 30 Aug 2024 20:35:21 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/007-what-is-testing-goal/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/007-what-is-testing-goal/testing.webp" alt="Featured image of post What is the Real Purpose of Software Testing?" />&lt;h2 id="misconceptions-about-the-purpose-of-testing-work">Misconceptions About the Purpose of Testing Work
+&lt;/h2>&lt;p>In the IT industry, there has always been a somewhat inaccurate understanding of software testing and the purpose of testing work.&lt;/p>
+&lt;p>There are various explanations, with the following two being quite popular and accepted by many IT professionals, even testing practitioners:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Testing is for finding bugs&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>In the general concept, people often equate testing with finding bugs, meaning the purpose of software testing is to discover problems in the product.&lt;/p>&lt;/blockquote>
+&lt;ul>
+&lt;li>&lt;strong>Testing is for verifying that the product meets requirements&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Some also say from the test execution perspective that testing work is to prove the software product conforms to product requirement definitions, to verify whether requirements have been implemented.&lt;/p>&lt;/blockquote>
+&lt;p>Are these statements correct? We can say both yes and no.&lt;/p>
+&lt;p>Indeed, the main output of testing work is the various product bugs we discover, and verifying requirements is the main input and evaluation criteria for our testing work.&lt;/p>
+&lt;p>But are these the purposes of conducting testing work?&lt;/p>
+&lt;p>Looking at the purpose of testing work solely from the above perspectives is narrow.&lt;/p>
+&lt;h3 id="is-testing-for-finding-bugs">Is Testing for Finding Bugs?
+&lt;/h3>&lt;p>Is our testing work aimed at discovering bugs?&lt;/p>
+&lt;p>For a product, bugs represent cost, and bugs themselves do not generate value for the product. Only resolved bugs bring improvement in product quality, which then translates into product value. The reduction of bugs is what adds value to the product.&lt;/p>
+&lt;p>Therefore, simply making the discovery of more bugs the purpose of testing work is a misconception. This is also the main reason why many teams incorrectly use the number of bugs found as a measure of testing effectiveness. If finding more bugs means better testing work, shouldn&amp;rsquo;t testers avoid participating in early stages? Because issues prevented in the early stages would actually result in fewer bugs during the testing phase. If testing work aims to find more bugs, shouldn&amp;rsquo;t we hope that the product contains more bugs when it&amp;rsquo;s submitted for testing? This orientation clearly doesn&amp;rsquo;t align with the product&amp;rsquo;s interests.&lt;/p>
+&lt;p>Therefore, considering bug discovery as the purpose of testing work is a common and obvious misconception about testing work.&lt;/p>
+&lt;h3 id="is-testing-just-for-verifying-requirements">Is Testing Just for Verifying Requirements?
+&lt;/h3>&lt;p>The second misconception about the purpose of testing work is the belief that testing is just for verifying product requirements. This is actually another widely accepted misunderstanding. Even many of today&amp;rsquo;s widespread software engineering practices are built upon this misconception.&lt;/p>
+&lt;p>Testing guru James Bach has a famous paper discussing the difference between Testing and Checking.&lt;/p>
+&lt;p>Testing work is far more than just checking. Verifying requirements, this kind of checking, is only part of testing work. To delve into the product and discover potential deep-seated issues, testing needs more capabilities beyond checking, including exploration, experimentation, questioning, reasoning, and more.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/007-what-is-testing-goal/Pasted-20240830_hu_a757c2a846cec1de.webp"
+width="1024"
+height="715"
+srcset="https://chengxiaqiucao.github.io/post/007-what-is-testing-goal/Pasted-20240830_hu_b8f6a2455443d5a0.webp 480w, https://chengxiaqiucao.github.io/post/007-what-is-testing-goal/Pasted-20240830_hu_a757c2a846cec1de.webp 1024w"
+loading="lazy"
+alt="Testing vs Checking"
+class="gallery-image"
+data-flex-grow="143"
+data-flex-basis="343px"
+>
+&lt;/p>
+&lt;p>So, treating requirement verification as the purpose of testing work is insufficient. The approach of determining whether a product meets specifications according to strict procedures, like factory quality inspection, doesn&amp;rsquo;t match well with the creative nature of the software product industry. This is also why we say automated testing is more about improving execution efficiency and quickly getting feedback on verification results for covered scenarios, but automated testing itself cannot achieve the purpose of completing product testing.&lt;/p>
+&lt;p>Besides verifying explicitly stated functions in requirements, testing also needs to conduct deeper exploration of the delivered product to more fully discover quality issues in the product. This is also the main reason why exploratory testing has been increasingly mentioned in recent years.&lt;/p>
+&lt;h2 id="the-true-purpose-of-software-testing-work">The True Purpose of Software Testing Work
+&lt;/h2>&lt;p>Well, if the purpose of testing work is neither to find bugs nor to verify requirements, then what is the purpose?&lt;/p>
+&lt;blockquote>
+&lt;p>The true purpose of software testing: to &lt;strong>accurately&lt;/strong> and &lt;strong>timely&lt;/strong> &lt;strong>assess&lt;/strong> the &lt;strong>quality status&lt;/strong> of the test object.&lt;/p>&lt;/blockquote>
+&lt;p>The core here is &lt;strong>assessing quality status&lt;/strong>. Quality is a product attribute that can only be adjusted through changes to the product itself, so testing work cannot improve quality or guarantee quality. But through testing work, we can reflect the quality status of the product by exposing problems in the product. Our main role is to assess the current quality of the product. Then the product or project can improve quality based on this status.&lt;/p>
+&lt;p>So the contribution of testing work to quality is more reflected in whether the assessed quality status is timely and accurate.&lt;/p>
+&lt;h3 id="accurate-assessment">Accurate Assessment
+&lt;/h3>&lt;p>Testing cannot be exhaustive, and it&amp;rsquo;s impossible to discover all problems in a product within a limited time. But the responsibility of testing is to expose as many quality-affecting issues as possible within a limited time. Besides quantity, we also need to consider the impact of the problems. Combining these two points provides a more accurate reflection of quality.&lt;/p>
+&lt;h3 id="timely-assessment">Timely Assessment
+&lt;/h3>&lt;p>Products cannot undergo unlimited testing, and testing work itself is a cost expenditure. Therefore, the timeliness of obtaining the product quality status through testing work is also crucial for product quality improvement and cost control. The earlier problems are discovered, the lower the cost of fixing them; the shorter the time to obtain quality status assessment, the greater the space for targeted improvement of the product. So the purpose of testing work also includes improving testing efficiency, using automation, shift-left testing, and other means to complete product quality assessment as timely as possible.&lt;/p>
+&lt;p>So this is the true purpose of our software testing work - not to discover more bugs, nor merely to check requirement implementation, but through our professional capabilities, to timely and fully reflect the actual quality status of the current product within a limited time.&lt;/p>
+&lt;p>Above is the sharing about the purpose of software testing work. I am Chengxia Qiucao. &lt;strong>Qiucao Observatory, observing the testing industry&lt;/strong>&lt;/p>
+&lt;hr>
+&lt;p>Promoting my testing course, interested friends can learn more through the following link&lt;/p>
+&lt;p>❤️❤️❤️❤️ &lt;a class="link" href="https://coding.imooc.com/class/chapter/885.html#Anchor" target="_blank" rel="noopener"
+>Chengxia Qiucao&amp;rsquo;s Testing Career Advancement Course&lt;/a> ❤️❤️❤️❤️&lt;/p></description></item><item><title>The Art of Bug Reporting</title><link>https://chengxiaqiucao.github.io/en/post/005-the-bugs-report-art/</link><pubDate>Sat, 19 Aug 2023 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/005-the-bugs-report-art/</guid><description>&lt;h3 id="introduction">Introduction
+&lt;/h3>&lt;p>As the most important work output of a test engineer, Bug Reports (or defect reports, issue tickets) are the direct manifestation of a test engineer&amp;rsquo;s work results and the output that best demonstrates their value and capabilities. However, project stakeholders and even test engineers themselves often underestimate the importance of Bug Reports. The content of bug reports, their submission methods, and handling processes significantly impact project progress, operational efficiency, and even team morale.&lt;/p>
+&lt;p>There has been relatively little industry discussion and summary regarding Bug Reports. In this article, based on the author&amp;rsquo;s years of professional observations, we hope to provide some summaries and suggestions on the elements of Bug reports and how professional test engineers should handle them. We aim to spark discussion, and welcome corrections for any oversights.&lt;/p>
+&lt;p>Main contents include:&lt;/p>
+&lt;ul>
+&lt;li>What is a Bug, and what is a Bug Report&lt;/li>
+&lt;li>What information do development or project teams actually want to get from Bug reports&lt;/li>
+&lt;li>Common mistakes made by testing novices when submitting bugs&lt;/li>
+&lt;li>Bug reporting and storytelling&lt;/li>
+&lt;li>How professional test engineers submit high-quality bugs&lt;/li>
+&lt;/ul>
+&lt;h3 id="what-is-a-bug-the-history-of-bugs">What is a Bug? The History of Bugs
+&lt;/h3>&lt;p>The word &amp;ldquo;Bug&amp;rdquo; in English originally meant insect or beetle, and is now used in the IT industry to refer to defects in software. This history is quite interesting:&lt;/p>
+&lt;p>As early as 1878, the great inventor Edison used the word &amp;ldquo;bug&amp;rdquo; in a letter to a friend to refer to faults (or potential causes of faults) in electronic circuits. However, its true entry into computer industry history came on September 9, 1947.&lt;/p>
+&lt;p>At that time, the first programmers were developing the Mark II computer at Harvard University. [Grace Murray Hopper][1] found a moth near a relay contact while investigating a problem, killed it with her logbook, and marked it as &amp;ldquo;the first actual case of finding a bug.&amp;rdquo; Since then, the word &amp;ldquo;bug&amp;rdquo; has been used to refer to defects or faults in computers. Correspondingly, &amp;ldquo;debug&amp;rdquo; is used to refer to the act of removing faults.&lt;/p>
+&lt;p>The image below is the first actual bug preserved in the Smithsonian Museum:
+&lt;img src="https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134227_hu_1aaef69260d697fa.webp"
+width="1024"
+height="826"
+srcset="https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134227_hu_3fcbf2ba2238afc1.webp 480w, https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134227_hu_1aaef69260d697fa.webp 1024w"
+loading="lazy"
+alt="first bug"
+class="gallery-image"
+data-flex-grow="124"
+data-flex-basis="297px"
+>
+&lt;/p>
+&lt;p>Among the first programmers in history, the only woman was the &amp;ldquo;mother of the bug&amp;rdquo;:
+&lt;img src="https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134247_hu_79b65c03098cc27a.webp"
+width="1024"
+height="678"
+srcset="https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134247_hu_7b57b3f473be9de6.webp 480w, https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134247_hu_79b65c03098cc27a.webp 1024w"
+loading="lazy"
+alt="bug mother"
+class="gallery-image"
+data-flex-grow="151"
+data-flex-basis="362px"
+>
+&lt;/p>
+&lt;p>In any case, the word &amp;ldquo;Bug&amp;rdquo; now refers to defects or faults in software or programs. However, for project teams, it&amp;rsquo;s recommended not to simply define Bug as a &lt;code>fault&lt;/code>, as the word &lt;code>fault&lt;/code> has a negative connotation. Viewing Bugs as &lt;code>defects&lt;/code> or &lt;code>issues&lt;/code>, emphasizing &lt;strong>room for improvement&lt;/strong> has a more positive guiding effect on project teams.&lt;/p>
+&lt;h3 id="what-is-a-bug-report">What is a Bug Report?
+&lt;/h3>&lt;p>The word &amp;ldquo;report&amp;rdquo; in English can be both a verb and a noun. So &lt;code>Bug report&lt;/code> can refer to both the action of finding and reporting a problem, and the report content submitted after finding a problem. Here we generally view it as a problem report (noun), i.e., an &lt;code>issue ticket&lt;/code>, so what exactly is an &lt;code>issue ticket&lt;/code>?&lt;/p>
+&lt;p>Testing guru Cem Kaner once pointed out:&lt;/p>
+&lt;blockquote>
+&lt;p>The purpose of testing is not to find bugs. The purpose is to get bugs fixed.&lt;/p>&lt;/blockquote>
+&lt;p>This view actually points out a misconception many testers have - thinking that testing work is just about finding as many bugs as possible. In fact, for the team, no matter how many bugs are found, they ultimately need to be resolved to demonstrate the value of finding these bugs.&lt;/p>
+&lt;p>From discovery to resolution, the &lt;code>issue ticket&lt;/code> is the main medium, being both the output of testers&amp;rsquo; work and the input for developers to solve problems, its importance is self-evident.&lt;/p>
+&lt;p>Additionally, while there are various ways to inform developers of discovered problems - verbal notification, actual demonstration, email, IM chat, etc., can all serve the purpose of notification. However, in modern software development processes, there are usually dedicated systems for defect tracking, such as JIRA, Zentao, Bugfree, QC (HP Quality Center), etc., which can handle defect submission and tracking. Through these specialized systems, not only can they serve the purpose of recording and feedback, but they can also better reflect the overall quality status and development progress of the project through statistics and analysis.&lt;/p>
+&lt;p>Therefore:&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>An &lt;code>issue ticket&lt;/code> is the output after testers discover defects during testing activities&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>An &lt;code>issue ticket&lt;/code> is the input for developers to resolve defects&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>An &lt;code>issue ticket&lt;/code> is the communication medium between testers and developers regarding bugs&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>An &lt;code>issue ticket&lt;/code> is also an indicator for project teams to evaluate current development status and product maturity.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="the-role-and-importance-of-issue-tickets">The Role and Importance of Issue Tickets
+&lt;/h3>&lt;p>Many test engineers have probably experienced the following feedback or complaints after submitting issue tickets:&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>What exactly are you trying to say with this issue ticket?&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>I can&amp;rsquo;t reproduce this problem on my end&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Why do you consider this a defect?&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Normal people don&amp;rsquo;t use software the way described in the issue ticket, only someone with mental issues would use it that way&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>This is indeed a problem, but the cost of fixing it is too high, and there are alternative ways to work around it&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>You might think this is a problem, but actual users won&amp;rsquo;t find it problematic&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>While what you submitted is indeed an issue, it has minimal impact on users. Why don&amp;rsquo;t we see many issue tickets for those parts that have a greater impact on users?&lt;/p>
+&lt;p>&amp;hellip;&amp;hellip;&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>Testers certainly don&amp;rsquo;t want to receive such feedback. But these issues also indirectly reflect that when it comes to bugs, developers or project teams actually focus more on how to resolve bugs (including judging whether they &lt;strong>need&lt;/strong> to be resolved), and they hope to get the following information from &lt;code>issue tickets&lt;/code>:&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>What problem was discovered?&lt;/p>
+&lt;ul>
+&lt;li>What is the problem phenomenon?&lt;/li>
+&lt;li>Does it always occur?&lt;/li>
+&lt;li>What was the background and context when discovering this problem?&lt;/li>
+&lt;li>Besides the visible phenomenon, what else happened in the system?&lt;/li>
+&lt;li>Are there screenshots, logs, screen recordings?&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>Why is it a problem?&lt;/p>
+&lt;ul>
+&lt;li>What impact does this problem have?&lt;/li>
+&lt;li>What happens if it&amp;rsquo;s not resolved?&lt;/li>
+&lt;li>What&amp;rsquo;s the probability of occurrence?&lt;/li>
+&lt;li>Is it duplicated with other issues?&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>What operations were performed that exposed this problem?&lt;/p>
+&lt;ul>
+&lt;li>What was the input?&lt;/li>
+&lt;li>What test path and test data were used?&lt;/li>
+&lt;li>What about the test environment and software version?&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>Therefore, as testers, we shouldn&amp;rsquo;t view &lt;code>issue tickets&lt;/code> as simple problem records. They are important communication media between testing and development. Good issue tickets can greatly reduce communication costs between both parties, both greatly reducing developers&amp;rsquo; workload in solving problems and reducing testers&amp;rsquo; workload in clarifying and re-verifying. For the project, the quality of &lt;code>issue ticket&lt;/code> submission affects the team&amp;rsquo;s productivity and delivery speed, which cannot be underestimated.&lt;/p>
+&lt;h3 id="elements-of-issue-tickets">Elements of Issue Tickets
+&lt;/h3>&lt;p>Understanding the role of &lt;code>issue tickets&lt;/code>, the elements that should be included in them become quite clear, generally including the following aspects:&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>Title for preliminary judgment&lt;/strong>&lt;/p>
+&lt;p>The title should clearly summarize the problem and the module where it occurs, making it convenient for developers to make an initial judgment&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Context and necessary related information&lt;/strong>&lt;/p>
+&lt;p>The contextual background when the problem occurs, related information such as software version, test environment, configuration status, resource status, etc.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Accurate and reasonable detailed description&lt;/strong>&lt;/p>
+&lt;p>Detailed description of the steps to discover the problem, operation expectations, actual conditions that occurred. Problem occurrence frequency, test inputs, data, files used, etc.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Supplementary information to help resolve the problem&lt;/strong>&lt;/p>
+&lt;p>Supplementary information that can help developers speed up problem resolution, such as screenshots, screen recordings, operation logs, system logs, etc.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Auxiliary information for project decision-making&lt;/strong>&lt;/p>
+&lt;p>As the first judge of bugs, testers should provide suggestions on the severity of the problem and resolution priority. Initially assign developers to resolve the problem, and provide related information identifiers for statistics and tracking.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="common-mistakes-by-testing-novices">Common Mistakes by Testing Novices
+&lt;/h3>&lt;p>Combining the elements of &lt;code>issue tickets&lt;/code>, we can initially summarize some common mistakes made by testing novices or non-professional testers when submitting bugs:&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>Unclear titles&lt;/p>
+&lt;p>Titles that are too simple make it difficult to make preliminary judgments about the problem. For example, simply writing &amp;ldquo;system crash&amp;rdquo; is too vague, and overly simple titles can easily become similar, causing inconvenience for focused review and evaluation of issues.&lt;/p>
+&lt;p>Or titles that are too complex. Long titles can lead to reading fatigue and lack focus. For example, there&amp;rsquo;s no need to write detailed operation steps in the title.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Unrealistic, deviating from requirement scenarios&lt;/p>
+&lt;p>Sometimes testing novices make assumptions based on personal preferences and raise issues. &amp;ldquo;I think&amp;rdquo; and &amp;ldquo;it feels not good&amp;rdquo; are high-frequency words in such novice issues.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Not actually problems&lt;/p>
+&lt;p>Testing novices often submit issue tickets that aren&amp;rsquo;t actually bugs due to misunderstandings of system implementation principles or lack of skill level.&lt;/p>
+&lt;p>Also, problems caused by incorrect testing methods or environment configuration by testing novices themselves.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Insufficient description information&lt;/p>
+&lt;p>Typically, through the description information in the issue ticket, developers cannot confirm the problem phenomenon or reproduce it themselves. Testing novices often think their job is done once they find a problem, without providing sufficient information to developers, such as screenshots and logs.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Too much irrelevant information, messy formatting&lt;/p>
+&lt;p>Sometimes novice issue tickets contain too much redundant noisy information, making it difficult to see the key points. For example, pasting tens of thousands of lines of logs into the issue ticket indiscriminately.&lt;/p>
+&lt;p>Or completely lacking formatting, with a lot of information mixed together messily, making it extremely difficult to read.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Too many issues&lt;/p>
+&lt;p>Issue tickets should be focused, but sometimes testing novices include many different issues in the same ticket. This is very unfavorable for issue tracking and focusing.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Only looking at phenomena without considering essence&lt;/p>
+&lt;p>Sometimes simple problem phenomena are often manifestations or clues of serious problems. Novices often overlook important risks, ignoring problems hidden beneath seemingly minor traces, easily missing bugs lurking beneath phenomena. For example, some unexpected prompt messages are often manifestations of backend calculation and statistical accuracy bugs.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="bug-reporting-and-storytelling">Bug Reporting and Storytelling
+&lt;/h3>&lt;p>Coming back to the act of &lt;code>submitting bugs&lt;/code>, essentially, this is a communication process. The &lt;code>issue ticket&lt;/code> carries the role of this communication medium. Through the &lt;code>issue ticket&lt;/code>, testers describe the problems they see and discover during testing, and developers understand the corresponding information by reading the &lt;code>issue ticket&lt;/code> and resolve the problems accordingly.&lt;/p>
+&lt;p>So &lt;code>submitting bugs&lt;/code> is actually like writing a short article or telling a story, where testers are the authors and developers are the readers.&lt;/p>
+&lt;p>When we submit &lt;code>issue tickets&lt;/code>, it&amp;rsquo;s actually a form of writing. The &lt;strong>5W&lt;/strong> requirements for writing also apply:&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>What - What exactly is the problem?&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Why - Why raise this issue? Why is it a problem?&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Who - Who is the subject of the problem? Who are the related parties?&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Where - Where did the problem occur?&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>When - When and at what frequency does it occur?&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>When submitting bugs, thinking about these &lt;strong>5W&lt;/strong>s, combined with the issue ticket elements mentioned above, generally helps avoid many mistakes that testing novices commonly make when submitting issue tickets.&lt;/p>
+&lt;h3 id="the-art-of-bug-reporting">The Art of Bug Reporting
+&lt;/h3>&lt;p>Above we discussed the elements of issue tickets and some details to note when submitting bugs, but why do we say that submitting bugs is actually an artistic work?&lt;/p>
+&lt;p>Let&amp;rsquo;s look at some examples of issue tickets:&lt;/p>
+&lt;p>Suppose there&amp;rsquo;s a product management system where users experience a crash when adding new products under a specific product category (fruits)&lt;/p>
+&lt;p>&lt;strong>Issue Ticket Example 1:&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">User adds product, crash occurs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">As shown in the image (crash screen screenshot)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>This issue ticket basically describes the problem phenomenon through the provided screenshot. However, for developers, there&amp;rsquo;s too little information, and they likely won&amp;rsquo;t be able to reproduce the problem immediately (fruits category). The information contained in the issue ticket is too simple, making it an extremely poor issue ticket example.&lt;/p>
+&lt;p>&lt;strong>Issue Ticket Example 2:&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">User experiences crash when adding product
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Operation steps:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1. Open App
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2. User logs into system, enters correct username and password and logs in
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">3. Enter product management page
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">4. Select category: fruits
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">5. Click new product button
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">6. Enter product information: *********
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">7. Click submit button
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Expected result: Product created successfully
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Actual result: Crash occurs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Device model used: Xiaomi 8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Operating system version: Android 8.0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Software version V1.1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Attachment: Crash screenshot
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>This issue ticket is a common submission format by many testing novices, containing very detailed operation steps and related auxiliary information. But this is also a very poor issue ticket.
+First, such step descriptions are unnecessary - developers don&amp;rsquo;t need to be told about basic operations like opening the app, logging in, and submitting in the issue ticket.
+Second, while there&amp;rsquo;s a lot of auxiliary information, it&amp;rsquo;s mostly irrelevant to the problem cause and doesn&amp;rsquo;t help developers locate the issue, instead introducing some distracting information.
+Such issue tickets fail to demonstrate the professional value of testers and don&amp;rsquo;t help with quick problem resolution.&lt;/p>
+&lt;p>&lt;strong>Issue Ticket Example 3:&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">User experiences crash when adding product under fruits category
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Operation steps:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1. Select fruits category, create product, crash occurs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2. Select non-fruit category, create product, product created successfully
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Verified on models: Xiaomi 8, Huawei Mate 7 etc. show consistent phenomenon, should be unrelated to model, operating system, version
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Attachments: Error screenshot, system crash logcat logs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Impact: Users cannot add products in fruits category, directly affects user experience. Needs high priority resolution
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>This issue ticket can be considered a relatively qualified one. It clearly indicates the scenario where the problem occurs and has preliminarily eliminated some irrelevant information. Developers can focus on product creation under the fruits category for problem analysis.
+It also points out the problem&amp;rsquo;s impact on the software and resolution priority suggestions, making the project team clearly aware of the problem&amp;rsquo;s impact.&lt;/p>
+&lt;p>&lt;strong>Issue Ticket Example 4:&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">User experiences null pointer crash when adding product under fruits category
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Operation steps:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1. Select fruits category, create product, crash occurs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2. Select non-fruit category, create product, product created successfully
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">3. Edit existing products under fruits category, edit successful
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Backend database insert operation fails due to missing field for fruits category, update operation normal.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Verified on models: Xiaomi 8, Huawei Mate 7 etc. show consistent phenomenon, should be unrelated to model, operating system, version
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Attachments: Error screenshot, system crash logcat logs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Impact: Users cannot add products in fruits category, directly affects user experience. Needs high priority resolution
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>This issue ticket goes further than the previous one, preliminarily analyzing the problem cause - during new operations, a key field information is missing, causing the crash. Developers can now very clearly proceed with fixing the problem.&lt;/p>
+&lt;p>&lt;strong>Issue Ticket Example 5:&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">User experiences null pointer crash when adding product under fruits category. Product import operation with old template has the same issue.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Operation steps:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1. Select fruits category, create product, crash occurs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2. Select non-fruit category, create product, product created successfully
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">3. Edit existing products under fruits category, edit successful
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Backend database insert operation fails due to missing field for fruits category, update operation normal.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">In the product management import function, new template fruit product import successful, using old template (missing new field) to import fruit data also fails. Needs to be fixed together.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Verified on models: Xiaomi 8, Huawei Mate 7 etc. show consistent phenomenon, should be unrelated to model, operating system, version
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Attachments: Error screenshot, system crash logcat logs, new and old template import logs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Impact: Users cannot add products in fruits category, directly affects user experience. Needs high priority resolution
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>This issue ticket, building on the previous example, demonstrates the tester&amp;rsquo;s professional capability by reasoning and verifying that the import function with similar logic might have the same issue based on their experience.&lt;/p>
+&lt;p>Through this simple case above, we can see that different ways of submitting issue tickets can have very different effects on problem resolution.&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>Too little information makes it difficult for developers to determine the root cause of the bug, multiplying the debugging workload.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Too much information causes developers to spend extra effort analyzing redundant information, even interfering with debugging and resolution direction, similarly causing significant waste of work effort.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>The more clearly and accurately the root cause of the problem is reflected, the more efficiently developers can solve the problem.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>The tester&amp;rsquo;s experience and judgment reasoning ability can be well demonstrated through issue tickets.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>So why do we say submitting bugs is an artistic work? Issue tickets should neither be too simple nor too complex, and should be able to convey information as accurately and comprehensively as possible to developers - this is truly an artistic endeavor.&lt;/p>
+&lt;h3 id="conclusion">Conclusion
+&lt;/h3>&lt;p>In summary, submitting bugs is a very important activity in the software development process, and the quality of &lt;code>issue tickets&lt;/code> directly affects team efficiency and output. As professional testers, mastering the art of submitting bugs means that &lt;code>issue tickets&lt;/code> are not simple problem records, but rather communication bridges between testing and development, supporting developers in efficiently fixing bugs.&lt;/p>
+&lt;p>Welcome to follow and comment, you can also follow the WeChat public account: &lt;strong>秋草说测试&lt;/strong>&lt;/p></description></item></channel></rss>

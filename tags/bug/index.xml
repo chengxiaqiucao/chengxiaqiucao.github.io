@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Bug on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/bug/</link><description>Recent content in Bug on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Sat, 13 Sep 2025 21:44:06 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/bug/index.xml" rel="self" type="application/rss+xml"/><item><title>趣谈Bug——the Norway Problem</title><link>https://chengxiaqiucao.github.io/post/126-fun_bugs_2/</link><pubDate>Sat, 13 Sep 2025 21:44:06 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/126-fun_bugs_2/</guid><description>&lt;p>在之前的系列，我们分享过&lt;strong>Bug的由来&lt;/strong>，和&lt;strong>Bug相似的一些近亲概念&lt;/strong>，还分享过一个&lt;strong>有意思的经典Bug&lt;/strong>，本篇再分享一个也很典型，同时也是笔者亲身经历过的典型Bug。&lt;/p>
+&lt;h2 id="奇怪的页面崩溃">奇怪的页面崩溃
+&lt;/h2>&lt;blockquote>
+&lt;p>笔者曾经测试过一个有关进出口贸易Web应用，有一个页面是显示贸易对象信息，类似下图&lt;/p>&lt;/blockquote>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/126-fun_bugs_2/Pasted-20250913_hu_20a2972d542a7a6f.webp"
+width="1024"
+height="810"
+srcset="https://chengxiaqiucao.github.io/post/126-fun_bugs_2/Pasted-20250913_hu_76a9194ef486d3df.webp 480w, https://chengxiaqiucao.github.io/post/126-fun_bugs_2/Pasted-20250913_hu_20a2972d542a7a6f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="126"
+data-flex-basis="303px"
+>
+&lt;/p>
+&lt;p>然后有一个辅助功能，是可以根据对方的贸易国不同将交易信息导出为符合对应国别要求的标准格式文档（当然大部分国家的格式其实是一样的）。&lt;/p>
+&lt;p>这个功能在测试阶段未发现问题。&lt;/p>
+&lt;p>但是在交付给用户使用后，在某个用户那里，一旦触发这个导出操作，则间或会出现页面崩溃的严重问题。&lt;/p>
+&lt;h2 id="问题定位">问题定位
+&lt;/h2>&lt;p>在收到数次这个反馈后，发现这个用户在出现崩溃的情况时，无一例外，都是对方的交易国家是&lt;strong>挪威&lt;/strong>， 而对应这个国家其实导出的文档也是标准文档。所以并不是导出的文档格式问题&lt;/p>
+&lt;p>在分析这个功能的实现逻辑后，终于发现了问题的症结所在。&lt;/p>
+&lt;p>这个导出功能，对于文档格式的匹配是定义在一个YAML配置文件中的，而国别的识别，在YAML中是通过国家码来进行配置的。而挪威的国家码对应的是&lt;strong>NO&lt;/strong>&lt;/p>
+&lt;p>类似：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-YAML" data-lang="YAML">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">config&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">filetype&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">pdf&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">profile&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">standard&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">country&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">NO&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>根据&lt;code>YAML V1.1&lt;/code>标准配置中的定义（&lt;code>https://yaml.org/type/bool.html&lt;/code>）：&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/126-fun_bugs_2/Pasted-20250913-1_hu_b9931117f1ee9c7e.webp"
+width="1024"
+height="144"
+srcset="https://chengxiaqiucao.github.io/post/126-fun_bugs_2/Pasted-20250913-1_hu_f37f9eb5c35cb85a.webp 480w, https://chengxiaqiucao.github.io/post/126-fun_bugs_2/Pasted-20250913-1_hu_b9931117f1ee9c7e.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="711"
+data-flex-basis="1707px"
+>
+&lt;/p>
+&lt;p>&lt;code>NO&lt;/code>在经过代码转义后，会被处理为bool型值&lt;code>False&lt;/code>，而程序在这里缺乏配置校验和处理异常保护，导致在读取国家码时出现异常，引发页面崩溃。&lt;/p>
+&lt;p>所以原因总结起来包括：&lt;/p>
+&lt;ol>
+&lt;li>YAML配置文件：国家码配置，默认当作字符型处理，未考虑到&lt;code>NO&lt;/code>这种特殊情况，没有添加字符引号标记。&lt;/li>
+&lt;li>程序处理，缺乏对YAML配置值正确性的校验&lt;/li>
+&lt;li>异常保护不足，发生异常时直接导致页面崩溃&lt;/li>
+&lt;/ol>
+&lt;h2 id="问题修正">问题修正
+&lt;/h2>&lt;p>找到原因，那么修复其实很简单，对于国家码，强制转换为字符型后在处理，并添加有效性校验和异常保护代码即可。当然对于容易引起歧义的YAML配置，也增加了字符串引号引用。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-YAML" data-lang="YAML">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">config&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">filetype&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">pdf&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">profile&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">standard&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">country&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;NO&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="思考">思考
+&lt;/h2>&lt;p>其实不止国家码，在字符类型的字段中，如果使用其他一些有特殊含义的字符，比如“Yes”, &amp;ldquo;null&amp;quot;等，也同样会造成类似问题。&lt;/p>
+&lt;p>因此，对于我们测试来说，测试时的数据处理验证，特别是类似的特殊字符处理，一定要考虑到相关场景，否则就很容易造成类似严重问题的遗漏。&lt;/p>
+&lt;hr>
+&lt;h1 id="趣谈bug---500英里邮件">趣谈Bug - 500英里邮件
+&lt;/h1>&lt;p>继续和大家分享历史上的经典Bug。&lt;/p>
+&lt;p>这个Bug也比较离奇：&lt;/p>
+&lt;blockquote>
+&lt;p>故事发生在2002年，这天，麻省理工（MIT）统计系的主任找到校园邮件系统的负责人Trey Harris，跟他抱怨一个比较离奇的问题：&amp;ldquo;咱们的邮件发不到500英里以外的地方，其实，是520英里更准确点&amp;rdquo;。
+管理员内心：^&amp;amp;^(&lt;em>&amp;amp;………&lt;/em>&amp;amp;))(&amp;amp;^%
+但不管怎么不相信，但还是亲自用自己的邮箱进行了测试。结果居然是真的！确实如报告一样，邮件只能发送到520英里以内的地方，范围之外的邮件一律发送失败。&lt;/p>&lt;/blockquote>
+&lt;p>经过一番排查，终于搞清了原委。&lt;/p>
+&lt;p>原来不久之前，邮件服务器的操作系统刚刚进行了版本更新（当年还是SunOS），而当时的操作系统发行版，通常会附带一些附件软件，但这些软件的版本往往比较旧（好比更新Linux，自带的Python版本一般都不是最新的）。因此更新完系统后，他们使用的邮件软件 &lt;code>SendMail&lt;/code> 版本被降级了（&lt;strong>SendMail 8 -&amp;gt; SendMail 5&lt;/strong>）&lt;/p>
+&lt;p>而更新系统，还同时保留了SendMail的配置文件&lt;code>sendmail.cfg&lt;/code>， 因此就出现了下面的情况：SendMail 5 会解析SendMail 8 的配置文件。&lt;/p>
+&lt;p>因为 &lt;code>sendmail.cfg&lt;/code>中存在一个 &lt;code>SendMail 5&lt;/code>不支持的配置项 &lt;code>timeout to connect to the remote SMTP server&lt;/code>，即&lt;code>连接远端SMTP Server的超时时间&lt;/code>, 对于这个不支持的配置，在 &lt;code>SendMail 5&lt;/code> 中被直接忽略，并按默认值0处理。而后来经过试验，0秒的timeout会导致Sendmail在&lt;strong>3毫秒&lt;/strong>后中断连接。&lt;/p>
+&lt;p>所以为什么是 500 英里呢？&lt;/p>
+&lt;p>当年，MIT的校园网络中还没有那么多路由，因此网络延时很少，也就是连接一个远端主机的时间，大概接近光速。于是，3毫秒就意味着：&lt;/p>
+&lt;p>0.003 * 3 * 10 ^ 8 * 0.001 * 0.621 = 558.9&lt;/p>
+&lt;p>考虑到很少的网络延迟，因此就出现了这个 500 英里的问题。&lt;/p></description></item></channel></rss>

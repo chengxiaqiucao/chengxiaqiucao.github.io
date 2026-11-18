@@ -1,0 +1,1371 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>测试规范 on 秋 草 观 “测” 台</title><link>https://chengxiaqiucao.github.io/tags/%E6%B5%8B%E8%AF%95%E8%A7%84%E8%8C%83/</link><description>Recent content in 测试规范 on 秋 草 观 “测” 台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号： 秋草说测试）</copyright><lastBuildDate>Sun, 10 Aug 2025 21:29:57 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E6%B5%8B%E8%AF%95%E8%A7%84%E8%8C%83/index.xml" rel="self" type="application/rss+xml"/><item><title>谈谈Bug和它的九大近亲</title><link>https://chengxiaqiucao.github.io/post/118-bug_and_others/</link><pubDate>Sun, 10 Aug 2025 21:29:57 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/118-bug_and_others/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-2.webp" alt="Featured image of post 谈谈Bug和它的九大近亲" />&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-2_hu_ca59889505746387.webp"
+width="1024"
+height="574"
+srcset="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-2_hu_34b32afcccc63c1f.webp 480w, https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-2_hu_ca59889505746387.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="178"
+data-flex-basis="427px"
+>
+&lt;/p>
+&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>测试工作中，发现Bug， 报告Bug是工作日常，也免不了和开发因为某个问题是否Bug产生争论。&lt;/p>
+&lt;p>虽然在Bug认定上，不同的人因视角不同，产生分歧也正常。&lt;/p>
+&lt;p>但在对一个产品的测试过程中，确实也不能把所有发现和遇到的问题都看作Bug，&lt;code>Bug&lt;/code> 其实是一个比较笼统的叫法，有的公司还会把 &lt;code>Bug report&lt;/code> 称为 &lt;code>故障单&lt;/code> 或者 &lt;code>问题单&lt;/code> ，其实严格说来也不准确。 因为从概念上，Bug 还有不少和它作用和含义相近但实际又有区别的&lt;strong>近亲&lt;/strong>们，本文我们就来梳理澄清一下 Bug 和它的这些近亲们的不同概念，以及和我们工作的关系。&lt;/p>
+&lt;h2 id="故障fault">故障（Fault）
+&lt;/h2>&lt;p>&lt;code>故障&lt;/code> 在日常工作中，常常被等同于 Bug，但严格来说，&lt;strong>故障&lt;/strong>指的是&lt;strong>软件代码或设计中的静态缺陷&lt;/strong>，比如不正确的步骤、处理过程或是数据定义。&lt;/p>
+&lt;p>也就是说，它更多是软件的 “内在” 问题，通常是开发者的人为错误在软件中的体现。&lt;/p>
+&lt;p>因为它更多是静态的，所以故障的发现，通常是在&lt;strong>代码审查或静态分析&lt;/strong>时暴露。&lt;/p>
+&lt;h4 id="案例">案例
+&lt;/h4>&lt;p>比如下面这段 java 代码，边界值处理时，&lt;code>i&amp;gt;=0&lt;/code> 写成了 &lt;code>i&amp;gt;0&lt;/code>， 会导致遍历时，第一个元素的遗漏。这就属于一个故障。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">arr&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">length&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">0&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">arr&lt;/span>&lt;span class="o">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">==&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>又或者，对于用户年龄的计算，未考虑闰年2月29日的情况，会导致结果计算错误，这也属于故障。&lt;/p>
+&lt;h2 id="错误error">错误（Error）
+&lt;/h2>&lt;p>&lt;code>错误&lt;/code>是指在软件开发过程中，由&lt;strong>开发者或其他参与者（如需求分析师、设计师）所犯的人为失误、判断失误或决策偏差&lt;/strong>。错误通常是后续其他问题的根源，它的发生，主要是人为因素导致的，如需求理解偏差、逻辑失误或是代码笔误造成的。&lt;/p>
+&lt;h4 id="案例-1">案例
+&lt;/h4>&lt;p>虽然&lt;strong>错误&lt;/strong>是“人为”的，但发生错误的类型，通常还是可以总结为有限的几种，对于测试人员早期参与来说，也能更好帮助产品识别风险。比如：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>逻辑错误：&lt;/strong> 开发人员在编写代码时，算法或业务逻辑的实现与预期不符。比如算法公式的错误应用。&lt;/li>
+&lt;li>&lt;strong>语法错误：&lt;/strong> 代码不符合编程语言的语法规则。虽然目前现代IDE都可以捕获大部分语法错误，但有时一些运行时才出现的语法或配置错误还是可能发生。&lt;/li>
+&lt;li>&lt;strong>需求理解错误：&lt;/strong> 对需求的理解与真实需求存在偏差，导致实现的功能并非用户真正所需。例如，“按订单大小排序”这个需求，开发实现的是按订单金额排序，但用户实际希望按订单商品数量排序。&lt;/li>
+&lt;li>&lt;strong>并发错误：&lt;/strong> 比如在多线程或分布式系统中，对共享资源的处理未正确同步，导致数据不一致或死锁。&lt;/li>
+&lt;/ul>
+&lt;h2 id="缺陷defect">缺陷（Defect）
+&lt;/h2>&lt;p>&lt;code>缺陷&lt;/code>指的是&lt;strong>软件产品偏离需求或预期行为的任何瑕疵或不完善之处&lt;/strong>。&lt;/p>
+&lt;p>它是一个广义的术语，通常指在软件中发现的任何不符合预期的行为或结果。通常情况下， 我们说的&lt;code>Bug&lt;/code> 其实指的就是&lt;code>缺陷&lt;/code>&lt;/p>
+&lt;p>缺陷也可以理解为&lt;code>故障&lt;/code>在外部行为上的体现。&lt;/p>
+&lt;h4 id="案例-2">案例
+&lt;/h4>&lt;ol>
+&lt;li>用户正确输入账号密码，但登录失败或未正确跳转。&lt;/li>
+&lt;li>登录页面未作安全防护，导致可以无限重试暴力破解账号密码&lt;/li>
+&lt;li>登录错误信息过于详细，泄露敏感信息&lt;/li>
+&lt;/ol>
+&lt;p>以上这些都属于典型的功能或安全缺陷&lt;/p>
+&lt;h2 id="失效failure">失效（Failure）
+&lt;/h2>&lt;p>&lt;code>失效&lt;/code> 指&lt;strong>软件系统或组件无法执行其应具备的功能，运行时表现出与预期不符的外部行为，是用户可直接观测到的功能偏差&lt;/strong>。&lt;/p>
+&lt;p>它和&lt;code>缺陷&lt;/code>的区别在于，并非所有的缺陷或故障都会导致失效，只有在缺陷被&amp;quot;激活&amp;quot;时，才会表现为&lt;strong>失效&lt;/strong>&lt;/p>
+&lt;h5 id="案例-3">案例
+&lt;/h5>&lt;ol>
+&lt;li>用户在进行特定操作（如上传大文件）时，应用程序突然退出或服务器无响应。这可能是由于内存泄漏这样的缺陷，在长时间运行或高负载下导致资源耗尽，最终引发系统失效。&lt;/li>
+&lt;li>用户成功提交表单后，数据未能正确保存到数据库，导致部分数据丢失。这可能是由于数据库操作逻辑缺陷导致的失效。&lt;/li>
+&lt;/ol>
+&lt;h3 id="因果链">因果链
+&lt;/h3>&lt;p>以上四种不同的问题，其实形成一个如下因果链&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250812_hu_a5a4c9cfa251bd6f.webp"
+width="1024"
+height="194"
+srcset="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250812_hu_1d584a7b171d56f.webp 480w, https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250812_hu_a5a4c9cfa251bd6f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="527"
+data-flex-basis="1265px"
+>
+&lt;/p>
+&lt;p>可总结为下表：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>概念&lt;/th>
+&lt;th>定义&lt;/th>
+&lt;th>性质&lt;/th>
+&lt;th>发生阶段&lt;/th>
+&lt;th>示例&lt;/th>
+&lt;th>关联&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>错误 (Error)&lt;/strong>&lt;/td>
+&lt;td>开发过程中人为失误、判断失误或决策偏差&lt;/td>
+&lt;td>人为行为&lt;/td>
+&lt;td>需求、设计、编码阶段&lt;/td>
+&lt;td>错误的算法；对需求理解偏差；笔误&lt;/td>
+&lt;td>&lt;strong>导致&lt;/strong>故障&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>故障 (Fault)&lt;/strong>&lt;/td>
+&lt;td>由错误引入的、存在于代码或文档中的不正确步骤、过程或数据定义&lt;/td>
+&lt;td>静态代码问题&lt;/td>
+&lt;td>编码、测试阶段&lt;/td>
+&lt;td>闰年计算年龄的错误逻辑；未处理的空指针&lt;/td>
+&lt;td>&lt;strong>被激活后导致&lt;/strong>失效&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>缺陷 (Defect)&lt;/strong>&lt;/td>
+&lt;td>软件系统偏离其规格说明、需求或预期行为的任何瑕疵&lt;/td>
+&lt;td>行为偏差&lt;/td>
+&lt;td>测试、生产阶段&lt;/td>
+&lt;td>登录功能无法使用；报表数据不准确&lt;/td>
+&lt;td>&lt;strong>是故障的外部体现，被发现后需修复&lt;/strong>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>失效 (Failure)&lt;/strong>&lt;/td>
+&lt;td>软件系统或组件无法执行其所需功能，或表现出可观察到的不正确行为&lt;/td>
+&lt;td>可观察后果&lt;/td>
+&lt;td>生产阶段（或测试阶段中发现）&lt;/td>
+&lt;td>系统崩溃；数据丢失；关键业务流程中断&lt;/td>
+&lt;td>&lt;strong>是缺陷/故障被激活的最终结果&lt;/strong>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="异常exception">异常（Exception）
+&lt;/h2>&lt;p>&lt;code>异常&lt;/code>是&lt;strong>程序运行时打断正常指令流的特殊事件&lt;/strong>。通常由代码逻辑错误、外部输入错误或系统资源问题引发。&lt;/p>
+&lt;p>&lt;code>异常&lt;/code> 并不一定会导致&lt;code>故障&lt;/code>, 因为异常是可以利用 &lt;code>try ... catch...&lt;/code> 在代码中进行捕获并处理的。是软件在面对各种非常规场景时的正常处理组成部分。&lt;/p>
+&lt;h4 id="案例-4">案例
+&lt;/h4>&lt;p>如下代码，是python语言处理网络连接异常的示例，对于网络连接状态、超时等情况在代码中进行捕获并通过重试机制进行保护。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">try&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">response&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">requests&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">url&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">timeout&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">5&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1"># 设置超时时间&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">raise_for_status&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="c1"># 检查HTTP状态码(非2xx会抛出HTTPError)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">text&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">except&lt;/span> &lt;span class="ne">ConnectionError&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;连接错误: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> (尝试 &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">attempt&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">/&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">max_retries&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">)&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">except&lt;/span> &lt;span class="n">Timeout&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;请求超时: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> (尝试 &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">attempt&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">/&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">max_retries&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">)&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">except&lt;/span> &lt;span class="n">HTTPError&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;HTTP错误: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> (状态码: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">response&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">status_code&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">)&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="kc">None&lt;/span> &lt;span class="c1"># HTTP错误通常不需要重试&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">except&lt;/span> &lt;span class="n">RequestException&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;请求异常: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> (尝试 &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">attempt&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">/&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">max_retries&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">)&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="问题issue">问题（Issue）
+&lt;/h2>&lt;p>用过&lt;code>Jira&lt;/code>或经常逛&lt;code>github&lt;/code> 应该都熟悉 &lt;code>Issue&lt;/code>， Issue其实是一个通用术语，它其实指的是&lt;strong>任何需要关注、讨论、跟踪解决的事项或障碍&lt;/strong>。&lt;/p>
+&lt;p>很多时候，Issue其实是作为 &lt;strong>工作项(workItem)&lt;/strong> 来使用的。所以这里的&lt;code>问题&lt;/code>，其含义远远超过了狭义的&lt;code>缺陷&lt;/code>或&lt;code>错误&lt;/code>等，问题并不是Bug，它是要跟踪并持续关注的事项。&lt;/p>
+&lt;h4 id="案例-5">案例
+&lt;/h4>&lt;ol>
+&lt;li>在性能测试中，我们发现随着用户量的增加，系统响应时间明显变长，并较多触发了用户的重连机制。这种现象，对用户体验有所影响，但表现其实在系统设计预期内，所以不能认为是缺陷，更适合记录为一个Issue，后续继续跟踪、观察。&lt;/li>
+&lt;li>需求评审时，对于有的需求，存在理解的二义性。比如一个报表统计需求，“统计一个月内的订单数量”。这里的时间表述其实就不够明确，一个月内的订单，是按订单创建时间统计还是按订单完成时间统计？这种待澄清的事项，其实也是&lt;code>问题&lt;/code> 而不是&lt;code>缺陷&lt;/code>.&lt;/li>
+&lt;/ol>
+&lt;h2 id="风险risk">风险（Risk）
+&lt;/h2>&lt;p>&lt;code>风险&lt;/code> 是&lt;strong>可能发生并对项目目标（如质量、成本、进度、范围）产生负面影响的不确定事件&lt;/strong>。&lt;/p>
+&lt;p>相对前述各项主要面向产品而言，&lt;strong>风险&lt;/strong>则更多面向项目。&lt;/p>
+&lt;p>它主要包括两个维度：&lt;strong>风险的发生可能性（概率）+ 风险的影响（严重程度）&lt;/strong>&lt;/p>
+&lt;p>除了产品本身的&lt;strong>质量风险&lt;/strong>外，也包括项目运作的&lt;strong>管理风险&lt;/strong>。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813_hu_7516f214108e165e.webp"
+width="1024"
+height="654"
+srcset="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813_hu_bc22cf932c67c15c.webp 480w, https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813_hu_7516f214108e165e.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="156"
+data-flex-basis="375px"
+>
+&lt;/p>
+&lt;h4 id="案例-6">案例
+&lt;/h4>&lt;ol>
+&lt;li>产品运行依赖第三方模块的集成，但在进入集成测试时，第三方模块尚未完成开发，因此造成本产品的进度风险&lt;/li>
+&lt;li>产品开发过程中，需求或设计方案发生重大调整，导致交付风险&lt;/li>
+&lt;li>开发或测试核心骨干离职，项目计划的风险&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;p>而除了上述的这些事项，还有一类针对软件本身持续演进过程中的一些新的idea和调整事项。这些也不能认为是Bug，但在产品发布时具备这些调整却是锦上添花。这些事项又分为两种情况，也就是&lt;code>优化&lt;/code> 和 &lt;code>改进&lt;/code>&lt;/p>
+&lt;h2 id="优化improvement">优化（Improvement）
+&lt;/h2>&lt;p>&lt;code>优化&lt;/code> 是&lt;strong>对现有功能或流程进行的提升，不涉及新功能或Bug修复&lt;/strong>。如提升性能、可维护性、用户体验等。&lt;/p>
+&lt;p>重点是在原有基础上的提升。也不一定局限在产品本身功能上，包括研发流程、工具应用都可以纳入进来&lt;/p>
+&lt;h4 id="案例-7">案例
+&lt;/h4>&lt;ol>
+&lt;li>积极引入自动化测试框架，提升回归测试效率。&lt;/li>
+&lt;li>优化当前系统的页面UI设计，实现视觉效果的提升&lt;/li>
+&lt;/ol>
+&lt;h2 id="改进enhancement">改进（Enhancement）
+&lt;/h2>&lt;p>&lt;code>改进&lt;/code>则是&lt;strong>为软件增加新功能或扩展现有功能的能力&lt;/strong>。通常由用户或业务需求驱动&lt;/p>
+&lt;p>改进是通过补充新的功能，是对原有需求的拓展和升华。&lt;/p>
+&lt;p>在测试中，对于一个问题是缺陷还是优化或改进，是经常容易产生争论的地方。&lt;/p>
+&lt;p>其实区分缺陷和改进的性质区别：&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>缺陷&lt;/code>的修复是纠正性的，意在使软件“正确”，降低质量风险&lt;/li>
+&lt;li>&lt;code>改进&lt;/code>的实现是演进性的，意在使软件“变好”，提升软件价值&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-1_hu_85b6becb084937cb.webp"
+width="1024"
+height="236"
+srcset="https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-1_hu_19fcdbc818814734.webp 480w, https://chengxiaqiucao.github.io/post/118-bug_and_others/Pasted-20250813-1_hu_85b6becb084937cb.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="434"
+data-flex-basis="1043px"
+>
+&lt;/p>
+&lt;h4 id="案例-8">案例
+&lt;/h4>&lt;ol>
+&lt;li>一个电商系统，通过增加社交分享功能，提升用户粘性。&lt;/li>
+&lt;li>企业管理系统，增加报表功能，提供销售数据分析，辅助决策&lt;/li>
+&lt;/ol>
+&lt;h2 id="总结">总结
+&lt;/h2>&lt;p>通过对&lt;strong>故障、缺陷、问题、错误、异常、失效、风险、优化和改进&lt;/strong>这九个和Bug有所关联的核心概念剖析。&lt;/p>
+&lt;p>能帮助我们更准确地描述问题、更有效地与开发人员沟通、更清晰自己的工作产出在质量体系中的作用。&lt;/p></description></item><item><title>测试工作中的流程案例解析</title><link>https://chengxiaqiucao.github.io/post/077-%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%A1%88%E4%BE%8B/</link><pubDate>Fri, 11 Jul 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/077-%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%A1%88%E4%BE%8B/</guid><description>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/077-%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%A1%88%E4%BE%8B/Pasted-20250708_hu_8d715e7662b2cab2.webp"
+width="1024"
+height="616"
+srcset="https://chengxiaqiucao.github.io/post/077-%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%A1%88%E4%BE%8B/Pasted-20250708_hu_23d6edd36d3299c7.webp 480w, https://chengxiaqiucao.github.io/post/077-%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%A1%88%E4%BE%8B/Pasted-20250708_hu_8d715e7662b2cab2.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="166"
+data-flex-basis="398px"
+>
+&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/077-%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%A1%88%E4%BE%8B/Pasted-20250708-1_hu_200261cc54303755.webp"
+width="1024"
+height="562"
+srcset="https://chengxiaqiucao.github.io/post/077-%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%A1%88%E4%BE%8B/Pasted-20250708-1_hu_45dc7dc1069ec07b.webp 480w, https://chengxiaqiucao.github.io/post/077-%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E6%A1%88%E4%BE%8B/Pasted-20250708-1_hu_200261cc54303755.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="182"
+data-flex-basis="437px"
+>
+&lt;/p>
+&lt;h1 id="测试工作中的bug处理争议场景实际案例分析一">测试工作中的Bug处理争议场景实际案例分析（一）
+&lt;/h1>&lt;p>在软件研发过程中，测试和开发，作为两个相爱相杀的岗位，一个要尽力避免出现Bug，一个要努力找出Bug，因此工作中围绕Bug的处理，发生争议冲突是极为常见的情况。&lt;/p>
+&lt;p>本系列我们将结合一些实际的争议案例来分析出现Bug争议时的处理原则&lt;/p>
+&lt;h2 id="案例一bug指派争议">案例一：Bug指派争议
+&lt;/h2>&lt;blockquote>
+&lt;p>测试工程师小赵在测试中发现，软件界面上有个信息栏的刷新总是会提示报错，于是提交了一个Bug给前端开发工程师小李。但是不一会，小赵就收到了Bug被拒绝的提醒，拒绝理由是小李认为这个信息刷新的报错信息是后端模块返回给他的，他正常显示没有问题。这种情况下，小赵应该接受Bug拒绝吗？&lt;/p>&lt;/blockquote>
+&lt;h3 id="分析">分析：
+&lt;/h3>&lt;p>这个案例，是软件测试中测试和开发关于bug争议的经典场景。&lt;/p>
+&lt;p>我们首先应该明确两个岗位针对bug的职责：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>测试岗位的职责是&lt;strong>发现产品中的bug，并在开发修复后完成验证&lt;/strong>。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>开发岗位的职责是&lt;strong>分析测试发现的bug并完成修复&lt;/strong>。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>那么在这个案例中，小赵发现了问题，判断是bug并提交bug单，因为问题是前端界面上出现的，所以分配给到前端开发小李。从流程上来说是没有问题的。&lt;/p>
+&lt;p>争议点在于Bug经过小李分析后，认为前端只负责显示后端返回的错误信息，因此错误是出在后端模块，在小李这里没有需要解决的问题，所以选择拒绝。&lt;/p>
+&lt;p>站在小李角度来说，似乎也无可厚非。但从流程上其实还是小李处理的问题。&lt;/p>
+&lt;p>因为这里bug分析虽然做了，认可是Bug，但并没有完成修复，所以不应该选择拒绝。&lt;/p>
+&lt;p>&lt;strong>拒绝Bug对应的应该是Bug误报、或者是和已有Bug重复上报这两种情况&lt;/strong>。在经过小李分析后，对于Bug来说，并不能认为分析已经完成了，Bug单的状态其实还是处于分析阶段，只是经过前端分析，问题还需要后端开发人员继续完成分析。&lt;/p>
+&lt;p>所以流程上，正确的做法应该是小李将bug重新指派给后端开发，而不是选择将bug拒绝回测试。&lt;/p>
+&lt;h3 id="实际处理">实际处理：
+&lt;/h3>&lt;p>回到小赵这里，这种情况下，Bug单已经被拒绝回来，要如何处理这个Bug单呢？&lt;/p>
+&lt;p>因为问题没有解决，所以肯定需要重新提交这个bug。&lt;/p>
+&lt;p>从正常流程上，问题直接重提给小李也是可以的。但因为此时前端已经部分完成了分析，明确指出了后续模块，所以重开这个bug时，最好还是直接将bug重新提交给后端开发人员，目的就是避免无谓的重复沟通，提高效率。&lt;/p>
+&lt;p>同时，针对小李的流程处理错误，也应该在重提Bug时附加说明，同时知会到项目管理团队，而不是认可这种直接拒绝的行为。&lt;/p>
+&lt;h3 id="补充思考">补充思考：
+&lt;/h3>&lt;p>这里我们虽然从流程上澄清了标准做法。但测试人员是否应该首先正确进行指派？&lt;/p>
+&lt;p>实际工作中，因为软件系统的复杂性，对于测试人员来说，难以准确判断出问题具体所属模块以及实际需要负责分析的开发人员属于正常情况，很多情况下不能准确指派在所难免。但是我们从提供价值的角度，作为测试，还是应该尽可能准确地去将问题单提交给对应的开发人员来分析，以提高问题处理效率和解决速度。&lt;/p>
+&lt;p>回到上面这个例子，后端给前端返回错误信息，虽然是从前端显示出来的，但是如果小赵能从前端页面跟踪一下接口返回信息，应是不难发现接口返回的异常，进而判断出问题可能出在后端，从而直接指派给后端。&lt;/p>
+&lt;h3 id="结论">结论：
+&lt;/h3>&lt;p>总结来说，Bug单提交后，如果存在模块和首接处理人不匹配的情况，处理人有义务将Bug重新指派给实际处理人，而非错误地将Bug进行拒绝处理。&lt;/p>
+&lt;p>同时从测试人员这边，也应该加强对系统的理解和对团队成员的熟悉，尽可能做到首次指派正确。&lt;/p>
+&lt;p>另外，对于比较大型的研发团队和复杂产品，如果较难确定问题归属，开发侧 通常还会设置一个默认的分析工程师角色，专门对Bug进行初步分析并统一进行二次指派。&lt;/p>
+&lt;p>总之，&lt;strong>工作流程目标以效率为先，避免任何可能的额外沟通和处理时间的浪费&lt;/strong>。&lt;/p>
+&lt;hr>
+&lt;h1 id="测试工作中的bug处理争议场景案例分析二">测试工作中的Bug处理争议场景案例分析（二）
+&lt;/h1>&lt;p>软件研发过程中，开发和测试两个岗位，因为Bug产生争议，几乎是家常便饭。上一篇 文章【】中，我们分析了一个Bug指派争议案例的处理原则。&lt;/p>
+&lt;p>本讲我们继续结合案例分析软件研发中Bug处理时的争议场景和处理原则。&lt;/p>
+&lt;h2 id="案例二未能复现bug的处理">案例二：未能复现Bug的处理
+&lt;/h2>&lt;blockquote>
+&lt;p>测试工程师小赵在测试一款App的时候，在完成某一个操作后，App出现了闪退的情况。由于测试时同步开启了录屏，小赵便将闪退的录屏和操作过程汇总提交了一个Bug单给App开发小孙。到了第二天，小孙将Bug单按拒绝进行打回，理由是这个bug他没法复现，根据录屏和操作过程，结合代码分析不出问题。而小郑自己再次测试，尝试复现问题也未果。这种情况下应该接受Bug的拒绝吗？&lt;/p>&lt;/blockquote>
+&lt;h3 id="分析-1">分析：
+&lt;/h3>&lt;p>这个案例，也是比较典型的Bug争议场景。&lt;/p>
+&lt;p>很多时候，测试因为多种因素的原因，比如环境干扰、数据不正确、包括测试人员本身的误操作，确实会提交一些实际并非Bug的问题单。这些问题单经分析后，确认不是问题，按 &lt;strong>非Bug&lt;/strong> 进行拒绝处理。&lt;/p>
+&lt;p>而在拒绝问题单的理由中，比较特殊的一种情况就是&lt;strong>问题无法复现&lt;/strong>，它代表问题现象无论在测试环境还是开发环境都无法再次产生，而因此判断问题近似于不存在，进行拒绝。&lt;/p>
+&lt;p>但是，因为“问题无法复现”拒绝Bug单，应该是一个慎用的理由。&lt;/p>
+&lt;p>因为理论上说，任何问题现象，排除误报的情况，如果确实存在，不能复现，通常只是没有找到它的触发条件。&lt;/p>
+&lt;p>从本例来说，闪退是一个影响比较严重的问题现象，这个现象有明确的录频记录证明确实存在，但无论开发和测试均无法重现问题。可能只是没有发现触发这个问题的实际条件（也就是案例描述中说的&lt;code>完成某一个操作后，出现闪退&lt;/code> 并不是问题的根本原因。）&lt;/p>
+&lt;p>质量管理中有一个很重要的措施 &lt;strong>RCA(根因分析)&lt;/strong>， 从面向质量的角度，对于比较明确的问题现象，不能立即复现的问题，应该参照 RCA 的流程完成根因分析，再确定 Bug 的后续处理。&lt;/p>
+&lt;h3 id="实际处理-1">实际处理：
+&lt;/h3>&lt;p>对于这个案例，因为问题现象明确且比较严重，如果问题确实存在，到用户侧出现必然引起较恶劣的质量影响。&lt;/p>
+&lt;p>所以对该问题的处理，小孙经过初步分析后，其实是没有发现导致问题的根因，这时正确的做法应该是如下这样的流程：&lt;/p>
+&lt;ol>
+&lt;li>首先开发者应深入考虑问题的可能原因，并&lt;strong>进一步收集信息&lt;/strong>。&lt;/li>
+&lt;/ol>
+&lt;p>根据我之前对于 Bug 不同状态迁移的介绍 （参考【】），这时小孙经分析后，还是可以将Bug打回，但不应该是&lt;strong>拒绝(Reject)&lt;/strong> Bug，而是 &lt;strong>收集更多信息（Need More Info）&lt;/strong>，收集更多的问题相关信息以便更进一步深入分析，比如：&lt;/p>
+&lt;ul>
+&lt;li>测试设备的型号？操作系统版本？&lt;/li>
+&lt;li>设备的存储、内存情况？&lt;/li>
+&lt;li>问题出现时的系统资源占用情况？&lt;/li>
+&lt;li>使用的网络？稳定性如何？&lt;/li>
+&lt;li>执行的操作路径，是否存在某些非正常路径？&lt;/li>
+&lt;/ul>
+&lt;ol start="2">
+&lt;li>
+&lt;p>再根据补充的信息完成 &lt;strong>RCA&lt;/strong>，包括复现路径、可能的问题代码走查，请其他开发专家参与会诊等动作后，如果依然还是无法复现，其实这里因为经过比较充分的论证和分析，其实可以认为问题在用户侧出现的可能性也不太高，问题的优先级级实际比较低。这时，可以提交项目CCB（变更控制委员会）决定该问题的后续处理策略。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>项目CCB对该问题进行决策&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>这里通常又包含几种不同的后续处理：&lt;/p>
+&lt;ul>
+&lt;li>判定问题影响有限，认为不是问题，按Bug &lt;strong>拒绝处理&lt;/strong>&lt;/li>
+&lt;li>问题虽然大概率不会出现，但从质量至上角度，还是希望找出问题原因。这时可以将问题按&lt;strong>延期处理&lt;/strong>。也就是还是认为这里存在问题，但当前版本不再解决，继续观察，开发人员也继续分析，尝试在后续版本解决。实在长期无法定位原因，再考虑关闭问题。&lt;/li>
+&lt;li>分析问题的规避策略，比如增加更上层的异常保护，调整版本的功能路径规避触发动作。在版本中增加相关保护措施，&lt;strong>规避问题路径&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;p>总之，对于问题影响比较严重的未能复现问题，应该严肃对待，不可简单地拒绝了之。&lt;/p>
+&lt;h3 id="补充思考-1">补充思考：
+&lt;/h3>&lt;p>对于这类很难定位到原因的问题，最终的结局是否就肯定是不了了之？&lt;/p>
+&lt;p>还是强调以下上面的观点：&lt;strong>问题无法复现，不是问题不存在，而是没有找到正在的根本原因或触发条件。&lt;/strong>&lt;/p>
+&lt;p>因此，找不到问题原因，除了上面说到的收集更多更充分的信息之外，还有一个重要的方面，是需要产品和开发团队重视和持续提升的，就是产品的可测试性需求或者维护需求。&lt;/p>
+&lt;p>也就是产品应该包含必要且充分的问题跟踪、日志采集、故障诊断手段，从产品设计、开发阶段，就应该考虑相关的诊断工具的同步开发，避免在后续系统测试乃至用户使用场景下，问题难以分析定位的尴尬情况。&lt;/p>
+&lt;h3 id="结论-1">结论：
+&lt;/h3>&lt;p>最后，有的同学可能还会说，以上所说的正确处理流程虽然很合理，但实际工作中，大多情况下，进度紧张，本来就挺焦头烂额，很难真的针对这类问题做深入分析，这种情况下流程实际很难落地。&lt;/p>
+&lt;p>确实如此，但流程、规范的作用，是告诉大家正确的行为准则，而非一定是僵化地执行，了解流程、规范背后的原则更重要。&lt;/p>
+&lt;p>本例的重点，其实是对这个问题影响的最终判断。产品或项目对质量的预期也会左右问题的处理结果。&lt;/p>
+&lt;p>测试岗位，站在评估质量状态的角度，在问题现象明确的情况下，是不应该简单地认可&lt;strong>问题不存在&lt;/strong>的&lt;/p>
+&lt;hr>
+&lt;h1 id="测试工作中bug处理争议场景的案例分析三">测试工作中Bug处理争议场景的案例分析（三）
+&lt;/h1>&lt;p>本系列之前两篇，我们分别分析了在软件研发过程中，两个典型的Bug争议案例：&lt;/p>
+&lt;ol>
+&lt;li>指派对象争议&lt;/li>
+&lt;li>不可复现Bug的处理争议&lt;/li>
+&lt;/ol>
+&lt;p>本篇我们继续带来另一个争议场景的处理分析&lt;/p>
+&lt;h2 id="案例三bug认定">案例三：Bug认定
+&lt;/h2>&lt;blockquote>
+&lt;p>小赵在进行App测试时，发现在进行一个批量操作的时候，如果测试数据量比较大，系统会有较长时间的等待且无法进行其他操作(超过5秒)。小赵认为这个等待影响用户体验，提交了一个易用性bug。但该bug被后端开发工程师小王拒绝，理由是按照需求， ”系统应该支持批量数据操作，在接收到批量数据请求后，依次完成数据处理并更新数据状态“，那么响应时间必然随着测试数据量的增多而增加，因此响应时间较长属于正常现象。这里小赵应该如何继续处理这个Bug呢？&lt;/p>&lt;/blockquote>
+&lt;h3 id="分析-2">分析：
+&lt;/h3>&lt;p>首先测试工程师站在用户视角，这个问题现象确实会影响用户体验，让用户产生困扰。所以当然会按照发现Bug来对待。&lt;/p>
+&lt;p>但站在后端开发者的角度，目前的实现方案是按照需求进行处理的，出现这种现象是必然结果，因此不能算是Bug&lt;/p>
+&lt;p>这里，我们从软件质量角度来思考，该问题现象当然是一个质量问题，因此把这个问题定性为一个Bug没有问题。&lt;/p>
+&lt;p>但后端开发在实现上又确实是按照需求来进行实现的，因此也不能说这个Bug是开发的问题。那么问题其实就很明确了，就是这个问题它不是开发Bug，而是一个 &lt;strong>需求Bug&lt;/strong>。&lt;/p>
+&lt;p>也就是提出的需求本身，因为需求笼统和场景考虑不足，导致按需求实现后，出现了以上质量问题。&lt;/p>
+&lt;h3 id="实际处理-2">实际处理：
+&lt;/h3>&lt;p>那么对于这个问题的处理流程，小赵站在质量视角提出Bug是应该的，小王这里参照我们案例一的处理原则，对于非归属自己的质量问题，不应该进行拒绝处理，而应该转交给实际处理人。&lt;/p>
+&lt;p>所以这里小王的正确做法应该是重新指派该Bug给业务分析师，由业务分析师重新明确需求方案，再重新考虑这部分的代码实现。&lt;/p>
+&lt;h3 id="补充思考-2">补充思考：
+&lt;/h3>&lt;p>到系统测试阶段，发现这种因为需求问题导致的质量问题，如果要修复，往往牵涉到实现方案的调整，很多时候动作较大，很可能导致交付的滞后。&lt;/p>
+&lt;p>比如这个案例，可能的调整实现方案：&lt;/p>
+&lt;ul>
+&lt;li>限制批量处理的数据量？&lt;/li>
+&lt;li>后端异步处理，开始处理后就返回处理状态给到前端，完成后再向前端推送完成通知。&lt;/li>
+&lt;li>前后端重新定义处理接口，页面呈现处理进度反馈？&lt;/li>
+&lt;/ul>
+&lt;p>这些实现可能都会对原有实现方案造成较大影响。&lt;/p>
+&lt;p>所以，虽然问题归属为需求Bug，但在系统测试阶段，发现需求Bug其实是应该尽量避免的。这种问题，最佳的提出阶段应该是在早期的需求分析阶段或方案设计阶段，这也是测试左移和测试人员充分参与前期需求讨论和方案评审的意义所在。&lt;/p>
+&lt;h3 id="结论-2">结论：
+&lt;/h3>&lt;p>软件测试阶段发现的Bug并非全都是开发人员的Bug，因需求考虑不周、需求不明确等原因导致问题也不鲜见。&lt;/p>
+&lt;p>但需求导致的Bug，在测试阶段才被发现和提出，往往修复成本和对产品的伤害也更高，所以应尽可能在测试开始前，就充分理解需求、就可能出现的问题尽早完成需求的澄清，而非到测试阶段再亡羊补牢。&lt;/p>
+&lt;hr></description></item><item><title>谈谈Bug的生命周期和Bug状态变更原则</title><link>https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/</link><pubDate>Wed, 07 May 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-1.webp" alt="Featured image of post 谈谈Bug的生命周期和Bug状态变更原则" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>在软件产品研发中，Bug既是测试工作最为重要的产出，也是开发人员修复问题的直接输入，更是产品质量改进的主要抓手。&lt;/p>
+&lt;p>在前文【】中，我们从测试人员的角度，分析了在提交Bug时应如何帮助团队更高效地去进行质量改进。&lt;/p>
+&lt;p>但除了Bug提交环节，在我们工作中，Bug从发现到被修复，会经历一个完整的生命周期，对应到我们提交的问题单，会呈现不同的状态。而Bug在这些不同状态间的迁移，其实反映了团队围绕Bug的协作沟通过程。实际工作中，因为Bug认定或状态设定上产生的分歧屡见不鲜，特别是在很多将Bug作为重要KPI数据的团队，测试和开发之间因为Bug产生激烈争论，时有发生。比如：&lt;/p>
+&lt;ul>
+&lt;li>开发和测试对Bug认定有分歧，测试觉得是Bug，开发觉得不是问题，怎么处理？&lt;/li>
+&lt;li>Bug归属产生分歧，是前端问题还是后端问题？&lt;/li>
+&lt;li>Bug无法复现，应不应该关闭？&lt;/li>
+&lt;li>&amp;hellip;..等等&lt;/li>
+&lt;/ul>
+&lt;p>本文，我们就来详细梳理一下，Bug的完整生命周期，以及它在不同阶段的状态处理原则。&lt;/p>
+&lt;h2 id="bug的生命周期及不同状态">Bug的生命周期及不同状态
+&lt;/h2>&lt;p>Bug并不是凭空产生，是在测试过程中暴露出来的质量问题，从被发现到完成修复并确认无误，会经历一个过程，这个过程就是Bug的生命周期。在软件研发过程中，针对这个生命周期的管理，通常会由Bug管理系统（常用的比如Jira、禅道、Bugfree、HP QC等）来跟踪和同步每个Bug的状态，并在开发和测试人员之间起到协作桥梁的作用。&lt;/p>
+&lt;p>Bug生命周期的主要过程大致如下：&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513_hu_f68e27b587af4814.webp"
+width="1024"
+height="72"
+srcset="https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513_hu_a2008f0abd8fb770.webp 480w, https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513_hu_f68e27b587af4814.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="1428"
+data-flex-basis="3428px"
+>
+&lt;/p>
+&lt;h3 id="已提交open">已提交（Open）
+&lt;/h3>&lt;p>&lt;strong>Open&lt;/strong> 状态，是Bug被发现以后的初始状态。通常由发现Bug的测试人员录入Bug管理系统，形成问题单，此时Bug的状态处于 &lt;strong>Open&lt;/strong> 状态，也表示该Bug待处理。&lt;/p>
+&lt;p>另外，如果有已关闭的历史Bug，后来发现其实并未解决，也可以重新将Bug激活，此时Bug也会处于 &lt;strong>Open&lt;/strong> 状态。&lt;/p>
+&lt;p>在该状态下，提交Bug的测试人员应该指定处理Bug的开发人员进行下一步处理，通常会根据Bug的现象，直接指定到能修复Bug的开发这里。不过一般Bug管理系统，也会设置默认处理人，对于&lt;strong>Open&lt;/strong> 状态的Bug，默认处理人通常会设置为开发负责人，会做进一步更准确的判断以便重新指派。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">状态&lt;/th>
+&lt;th style="text-align: center">说明&lt;/th>
+&lt;th style="text-align: center">当前负责人&lt;/th>
+&lt;th style="text-align: center">移交处理人&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Open&lt;/td>
+&lt;td style="text-align: center">初始状态，待处理&lt;/td>
+&lt;td style="text-align: center">测试人员&lt;/td>
+&lt;td style="text-align: center">开发负责人或Bug归属人&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="处理中in-progress">处理中（In Progress）
+&lt;/h3>&lt;p>开发人员被指派Bug后，会进入Bug的分析阶段，此时Bug不能确定是否能被修复，所以会进入&lt;strong>处理中&lt;/strong>状态，经过分析后，可以对Bug进行修复操作，或发现并不是自己可以完成修复的问题，再将bug重新指派给实际应该修复bug的开发人员。&lt;/p>
+&lt;p>这里如果存在Bug在开发人员间的移交，Bug状态会保持在 &lt;strong>In Progress&lt;/strong>, 仅仅当前处理人会发生变化。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">状态&lt;/th>
+&lt;th style="text-align: center">说明&lt;/th>
+&lt;th style="text-align: center">当前负责人&lt;/th>
+&lt;th style="text-align: center">移交处理人&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">In Progress&lt;/td>
+&lt;td style="text-align: center">Bug进入分析，通常针对较复杂Bug&lt;/td>
+&lt;td style="text-align: center">被指派开发人员&lt;/td>
+&lt;td style="text-align: center">实际Bug修复人&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="已解决resolved">已解决（Resolved）
+&lt;/h3>&lt;p>Bug在经过开发人员的修复后，会标记为&lt;strong>已解决&lt;/strong>。该状态其实代表测试人员可以对Bug进行验证。&lt;/p>
+&lt;p>这里需要注意，很多开发人员会有的一个误区，就是我把代码进行修改或者做过自测，就是&lt;strong>Resolved&lt;/strong>。其实并不是，&lt;strong>Resolved&lt;/strong> 状态的重点是被移交的处理人，也就是&lt;strong>测试人员是可以进行验证&lt;/strong>的。&lt;/p>
+&lt;p>因为实际工作中，测试人员对产品进行测试，会有测试轮次的概念，并不是随时都可以测试。
+所以只有当&lt;strong>修复的代码已经进入下一轮的提交测试&lt;/strong>，才应该将状态置为 &lt;strong>Resolved&lt;/strong>。否则当前测试环境中，被修复的代码尚未部署，当然实际并无法完成验证。&lt;/p>
+&lt;p>（&lt;em>当然更完善的Bug管理系统，会再增加一个&lt;strong>待验证&lt;/strong>的状态，这时已解决就只代表开发完成了代码的修复，而待验证才是重新提测。本文重在说明常用必要状态，不再过多扩展&lt;/em>）&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">状态&lt;/th>
+&lt;th style="text-align: center">说明&lt;/th>
+&lt;th style="text-align: center">当前负责人&lt;/th>
+&lt;th style="text-align: center">移交处理人&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Resolved&lt;/td>
+&lt;td style="text-align: center">Bug已经完成修复，标记为已解决，即待验证&lt;/td>
+&lt;td style="text-align: center">Bug修复人&lt;/td>
+&lt;td style="text-align: center">测试人员&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="已关闭closed">已关闭（Closed）
+&lt;/h3>&lt;p>经过验证，确认Bug已被修复后，Bug可以置为 &lt;strong>已关闭&lt;/strong> 状态。该状态代表Bug所反映的质量问题在当前产品版本中已不复存在。&lt;/p>
+&lt;p>关闭Bug应该是一个很严肃的事情，通常应该由Bug的提交人进行确认后才可关闭。当然特殊情况下，产品的决策团队（CCB）也可决定Bug是否可以进行关闭。&lt;/p>
+&lt;p>另外，关闭的Bug需要重新激活的情况也时有发生，比如验证时场景考虑不够完整，环境问题导致误关或者是提测版本切换后，已修复的Bug又被重新改错，或是错误代码又被重新合入等等，这时就会牵涉Bug重开（ReOpen）操作&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">状态&lt;/th>
+&lt;th style="text-align: center">说明&lt;/th>
+&lt;th style="text-align: center">当前负责人&lt;/th>
+&lt;th style="text-align: center">移交处理人&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Closed&lt;/td>
+&lt;td style="text-align: center">Bug已确认修复，版本中已不存在Bug对应的质量问题&lt;/td>
+&lt;td style="text-align: center">Bug提交人&lt;/td>
+&lt;td style="text-align: center">无&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;hr>
+&lt;p>除了上面几个最主要的Bug生命周期状态外，实际工作中，还会存在一些特殊情况，也会对应到不同的Bug状态&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-1_hu_6ff639b10b486296.webp"
+width="1024"
+height="348"
+srcset="https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-1_hu_964ead4c3f3f555b.webp 480w, https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-1_hu_6ff639b10b486296.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="294"
+data-flex-basis="707px"
+>
+&lt;/p>
+&lt;h3 id="已拒绝rejected">已拒绝（Rejected）
+&lt;/h3>&lt;p>测试过程中，测试人员出现误判，或者环境配置有误时，还是比较容易出现测试提交的Bug实际并不是质量问题的情况，开发人员在经过分析后，认为不是bug，此时就可以将Bug置为 &lt;strong>已拒绝&lt;/strong> 状态。这时Bug会回到测试人员手中，进行确认，若认可误报，可由提交人进行关闭操作。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">状态&lt;/th>
+&lt;th style="text-align: center">说明&lt;/th>
+&lt;th style="text-align: center">当前负责人&lt;/th>
+&lt;th style="text-align: center">移交处理人&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Rejected&lt;/td>
+&lt;td style="text-align: center">经分析Bug属于误报，不反映质量问题&lt;/td>
+&lt;td style="text-align: center">Bug分析人&lt;/td>
+&lt;td style="text-align: center">Bug提交者&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>但实际中，针对被拒绝Bug，很多时候是测试和开发人员对需求或是否质量问题的分歧导致，在分歧无法自行弥合的情况下，正常的操作应该是：
+测试人员重新提交Bug，但Bug不在指派到开发人员，而是指派到产品决策团队CCB（其实主要是BA或PO），由CCB进行仲裁，根据仲裁结果来判断是否需要进行修复或关闭。&lt;/p>
+&lt;h3 id="已验证verified">已验证（Verified）
+&lt;/h3>&lt;p>测试人员验证Bug无误后，通常可以进行关闭操作将状态置为&lt;strong>Closed&lt;/strong>，但更完整的生命周期，其实还又一个&lt;strong>已验证&lt;/strong>的状态。这个状态的使用，通常出现在验证Bug的测试人员和提交Bug的提交人并不一致，验证人对Bug实施验证后，不能代表提交人，确认Bug可关闭。&lt;/p>
+&lt;p>另外一种情况，就是更严谨的大型软件研发流程，测试环节可能也包括多个。子系统级别的测试团队测试完成后，还会有大系统级别的系统测试或全面验收，在子系统级别的测试进入后续测试后才会将状态置为&lt;strong>Closed&lt;/strong>&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">状态&lt;/th>
+&lt;th style="text-align: center">说明&lt;/th>
+&lt;th style="text-align: center">当前负责人&lt;/th>
+&lt;th style="text-align: center">移交处理人&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Verified&lt;/td>
+&lt;td style="text-align: center">Bug经过验证已被修复&lt;/td>
+&lt;td style="text-align: center">Bug验证人&lt;/td>
+&lt;td style="text-align: center">Bug提交者&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="待补充信息need-more-info">待补充信息（Need More Info）
+&lt;/h3>&lt;p>这个状态是针对测试人员提交的Bug信息不完整或不足以对Bug完成分析，开发人员难以理解具体的Bug现象等情况。这时处理人将问题单置为 &lt;strong>Need More Info&lt;/strong> 状态，返回给Bug提交人补充相关信息。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">状态&lt;/th>
+&lt;th style="text-align: center">说明&lt;/th>
+&lt;th style="text-align: center">当前负责人&lt;/th>
+&lt;th style="text-align: center">移交处理人&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Need More Info&lt;/td>
+&lt;td style="text-align: center">Bug单信息不充分，需要补充更详细的信息&lt;/td>
+&lt;td style="text-align: center">Bug分析人&lt;/td>
+&lt;td style="text-align: center">Bug提交者&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="已延期deferred">已延期（Deferred）
+&lt;/h3>&lt;p>延期一般针对下面几种情况：&lt;/p>
+&lt;ol>
+&lt;li>Bug难以复现，较难分析出产生原因&lt;/li>
+&lt;li>Bug修改难度大，需要对产品进行较大改动，且存在规避方案&lt;/li>
+&lt;li>Bug优先级较低，不影响主要功能，在版本发布前还有其他更重要问题需要解决&lt;/li>
+&lt;/ol>
+&lt;p>针对以上情况，经过产品CCB团队决策，可以将Bug延期处理。同时Bug的负责分析人，还是需要继续针对Bug做分析或后续进行修复。&lt;/p>
+&lt;p>但这里需要注意，&lt;strong>Deferred&lt;/strong> 状态不代表Bug不是问题，在测试团队的质量分析时，还是应该将该状态的Bug视作有效Bug看待。也就是这类Bug还是会影响到版本最终的质量评估结论。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">状态&lt;/th>
+&lt;th style="text-align: center">说明&lt;/th>
+&lt;th style="text-align: center">当前负责人&lt;/th>
+&lt;th style="text-align: center">移交处理人&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Deferred&lt;/td>
+&lt;td style="text-align: center">Bug因特定原因无法在当前版本解决，经项目CCB团队决策认可后，可将Bug保留在版本中，留待后续解决&lt;/td>
+&lt;td style="text-align: center">CCB决策团队&lt;/td>
+&lt;td style="text-align: center">Bug分析人&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;hr>
+&lt;p>以上就是我们针对Bug生命周期中会出现的主要的一些状态定义及相关处理原则的介绍。除了上面列出的这些Bug状态外，更完整的Bug生命周期还包括有：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>待验证：&lt;/strong> 已修复，等待版本提测&lt;/li>
+&lt;li>&lt;strong>调研中：&lt;/strong> 针对比较复杂的Bug，牵涉技术选型、方案对照等较多研究工作时，可在处理Bug前定义该状态&lt;/li>
+&lt;li>&lt;strong>已调研：&lt;/strong> 针对上面进行了方案研究的Bug，但尚未确定修复方案时，Bug处于该状态&lt;/li>
+&lt;li>&lt;strong>验证中：&lt;/strong> 对于测试场景比较复杂的Bug，需要进行较长时间的验证，比如性能类的问题，在完成验证前，可将Bug置于该状态&lt;/li>
+&lt;/ul>
+&lt;p>当然，流程是死的，良好、高效的团队协作最重要的还是团队中不同角色的互信互助。&lt;/p>
+&lt;p>不过我们理解正确流程中的不同环节和正确处理的原则，也有助于我们在出现问题或分歧时，减少互相争论、扯皮的内耗。&lt;/p>
+&lt;h2 id="bug状态迁移">Bug状态迁移
+&lt;/h2>&lt;p>基于上述不同状态的分析，一个比较完整Bug状态迁移图如下，供参考。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-2_hu_b16928078ff38263.webp"
+width="1024"
+height="524"
+srcset="https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-2_hu_4b4363819269e23.webp 480w, https://chengxiaqiucao.github.io/post/090-bug%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/snap_20250513-2_hu_b16928078ff38263.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="195"
+data-flex-basis="469px"
+>
+&lt;/p>
+&lt;p>如需以上完整大图，可回复 &lt;code>Bug状态&lt;/code> 获取。&lt;/p>
+&lt;p>另回复&lt;code>大纲&lt;/code> 可查看秋草测试技能全栈提升课详细目录。回复 &lt;code>进群&lt;/code>可进入测试交流群和小伙伴们分享测试技术、交换资讯。&lt;/p></description></item><item><title>马斯克新政“what did you do last week”和发周报</title><link>https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/</link><pubDate>Fri, 28 Feb 2025 17:20:23 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228-1.webp" alt="Featured image of post 马斯克新政“what did you do last week”和发周报" />&lt;h2 id="引子">引子
+&lt;/h2>&lt;p>这两天外网极其热门的一个话题应该是马斯克DOGE新政，要求所有联邦雇员发周报，并列出自己上周做的5项工作，并抄送主管！连续两次不发视同辞职！&lt;/p>
+&lt;p>然后目前已经有超100万美国公务员发送了这个周报！ 😂😂😂&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228-1_hu_15914d90a2dc9cb.webp"
+width="1024"
+height="445"
+srcset="https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228-1_hu_fb6c0b0c0841a906.webp 480w, https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228-1_hu_15914d90a2dc9cb.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="230"
+data-flex-basis="552px"
+>
+&lt;/p>
+&lt;p>而作为公司牛马，我们对这档事实在再熟悉不过了，但话说回来，&lt;strong>为什么会有周报这个事呢&lt;/strong>？&lt;/p>
+&lt;h2 id="周报日报的本质是什么">周报（日报）的本质是什么？
+&lt;/h2>&lt;p>对于美国的这些公务员大爷们，写周报可能还比较新鲜，但碰上马斯克这个企业出身的大佬，对周报可是情有独钟，早在特斯拉和推特都执行过类似政策。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228_hu_f10e1c34ec2f890f.webp"
+width="1024"
+height="821"
+srcset="https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228_hu_b5bb4f277c08c548.webp 480w, https://chengxiaqiucao.github.io/post/062-%E9%A9%AC%E6%96%AF%E5%85%8B%E6%96%B0%E6%94%BF%E7%9C%8B%E5%91%A8%E6%8A%A5/Pasted-20250228_hu_f10e1c34ec2f890f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="124"
+data-flex-basis="299px"
+>
+&lt;/p>
+&lt;p>那么对企业或Boss来说，为什么期望看到员工的周报？&lt;/p>
+&lt;p>拿软件测试部门举例，周报的作用主要体现再以下几方面：&lt;/p>
+&lt;ol>
+&lt;li>风险掌控&lt;/li>
+&lt;/ol>
+&lt;p>这应该是所有 Leader 关心周报中最核心的部分。通过周报，可以知道整个项目总体的进度，便于掌握整体的质量风险，比如测试延期、质量暴露不足等等风险，通过周报可以有一个毕竟清晰的掌握。而周报这个维度，也不会像日报这样过于细节，是一个掌控总体状态的较好输入。&lt;/p>
+&lt;ol start="2">
+&lt;li>资源优化&lt;/li>
+&lt;/ol>
+&lt;p>通过周报数据的汇总分析，也便于Leader能掌握所有成员的工作投入情况，便于测试资源的动态调配。&lt;/p>
+&lt;p>而这也是这次马斯克新政广受关注的焦点，因为周报的结果指向就是工作不饱和的联邦雇员可能会遭到解雇🤪🤪&lt;/p>
+&lt;ol start="3">
+&lt;li>决策依据&lt;/li>
+&lt;/ol>
+&lt;p>周报中，通常会还会包含一些量化的指标，比如测试进展、故障数据、覆盖率、逃逸率、外部支持等等包含可抓取或主动上报的一些质量数据，这些数据是量化当前质量状态并可视化呈现，作为决策依据的重要支撑&lt;/p>
+&lt;h2 id="测试人员周报怎么发">测试人员周报怎么发？
+&lt;/h2>&lt;p>那么作为一个测试工程师，如果我们要发周报的话，通常应该包含什么内容呢？&lt;/p>
+&lt;p>下面给出一个物联网软件（智能手环）员工的周报案例：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">一、本周工作概述
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 测试执行情况
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> - 完成心率监测模块V2.3迭代测试，覆盖10种运动场景，发现2个关键缺陷（数据延迟超阈值、低电量下监测失效）。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> - 针对iOS/Android端APP同步功能进行兼容性测试，3款机型（含旧型号）出现数据丢失问题。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> - 回归测试通过率95%，剩余5%为低优先级UI显示问题。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 缺陷管理
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> - 新增缺陷15个（紧急2个、高优先级5个），关闭缺陷8个，遗留缺陷中3个需硬件团队协同修复。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 专项测试
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> - 完成OTA升级流程压力测试，模拟5次连续升级后出现1次固件校验失败。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> - 功耗测试中，睡眠监测功能待机功耗超标20%。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">二、核心问题与风险
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 阻塞性问题
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 心率监测数据延迟缺陷导致版本发布延期风险，需开发团队48小时内修复验证。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 资源依赖
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 硬件团队对传感器问题的响应延迟，可能影响下周功耗测试计划。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">三、下周计划
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> - 执行V2.4版本功能测试（血氧监测、紧急呼叫）。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> - 针对遗留缺陷进行复测，推动硬件团队联合调试。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> - 启动用户场景压力测试（模拟1000台设备并发数据上传）。
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>以上这个周报，我们从对项目和对测试部门两方面来总结的，体现出的价值可以总结为下表：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>要素&lt;/th>
+&lt;th>对项目的价值&lt;/th>
+&lt;th>对测试部门的价值&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>测试执行进展&lt;/strong>&lt;/td>
+&lt;td>明确版本质量状态，帮助PM评估是否达到发布标准。&lt;/td>
+&lt;td>量化团队产出，便于资源调配与效率优化（如调整测试用例优先级）。&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>缺陷分布与趋势&lt;/strong>&lt;/td>
+&lt;td>暴露模块风险，推动开发聚焦核心问题（如心率模块缺陷率高需重构）。&lt;/td>
+&lt;td>分析缺陷根源（代码/设计/环境），推动测试用例库补充和流程改进（如增加低电量场景）。&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>风险与依赖项&lt;/strong>&lt;/td>
+&lt;td>预警延期风险，促进跨部门协作（如协调硬件团队介入）。&lt;/td>
+&lt;td>向上级争取支持（如申请延长测试周期或增加设备资源）。&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>专项测试结果&lt;/strong>&lt;/td>
+&lt;td>验证非功能需求（如功耗、稳定性），避免用户体验硬伤。&lt;/td>
+&lt;td>积累性能基线数据，为后续版本对比提供依据（如功耗指标库）。&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>下周计划与目标&lt;/strong>&lt;/td>
+&lt;td>对齐项目里程碑，确保测试与开发节奏同步（如血氧功能测试计划匹配迭代排期）。&lt;/td>
+&lt;td>明确团队分工，避免任务重叠或遗漏。&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="总结">总结
+&lt;/h2>&lt;p>所以，作为一个企业员工，其实对于周报，没什么值得抗拒的，它是一个再正常不过的管理行为罢了。
+对测试人来说，周报既是测试工作的“仪表盘”（实时反映质量状态），也是跨部门协作的“桥梁”（推动问题解决与资源协调），同时也可以为长期测试策略优化提供数据支撑。&lt;/p>
+&lt;p>说到底，目的还是为了 &lt;strong>状态同步&lt;/strong>&lt;/p>
+&lt;p>和敏捷站会、传统项目可能还有日报，他们的目的其实都是一样的，相关内容在我之前的文章中也有专门阐述，可参考。&lt;/p>
+&lt;hr></description></item><item><title>手机应用和电脑端应用测试的不同</title><link>https://chengxiaqiucao.github.io/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/</link><pubDate>Fri, 13 Dec 2024 13:37:35 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/Pasted-20241213.webp" alt="Featured image of post 手机应用和电脑端应用测试的不同" />&lt;p>这二者不同的地方还是挺多的。主要还是从测试对象的特点出发来看&lt;/p>
+&lt;h2 id="设备处理性能上的区别">设备处理性能上的区别
+&lt;/h2>&lt;p>虽然现在手机处理器、内存等硬件性能上已经有了非常大的提升，但一些低端手机和电脑端相比，处理性能上的差距还是比较明显的。因此在测试时，针对手机端的软件，加载效率、卡顿等就需要重点关注&lt;/p>
+&lt;h2 id="屏幕分辨率和系统版本碎片化">屏幕分辨率和系统版本碎片化
+&lt;/h2>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/Pasted-20241213-2_hu_d14a5bf1d179a716.webp"
+width="1024"
+height="1026"
+srcset="https://chengxiaqiucao.github.io/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/Pasted-20241213-2_hu_4f864fd5966690a5.webp 480w, https://chengxiaqiucao.github.io/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/Pasted-20241213-2_hu_d14a5bf1d179a716.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="99"
+data-flex-basis="239px"
+>
+&lt;/p>
+&lt;p>手机因为便携，屏幕分辨率有限，再加上厂商、型号众多，所以碎片化情况非常突出。因此针对手机应用测试，考虑不同分辨率和厂商定制的影响，对应用呈现效果的验证也是和电脑端比较明显的不同。&lt;/p>
+&lt;h2 id="交互方式差异">交互方式差异
+&lt;/h2>&lt;p>电脑端主要的交互方式是键盘鼠标，手机端则主要是触屏、多点触控，拖拽等等。文字输入和页面精准触控比电脑端困难，所以针对应用的测试上，这些也是区别所在&lt;/p>
+&lt;h2 id="使用场景差异">使用场景差异
+&lt;/h2>&lt;p>手机端应用，使用场景和电脑端的区别，还有一些典型的特殊场景：&lt;/p>
+&lt;h3 id="网络稳定性">网络稳定性
+&lt;/h3>&lt;p>手机因为是移动设备，移动过程中，出现网络切换、网络不稳定的情况是大概率事件，所以应用对网络持续稳定的兼容性要求比电脑端要高得多&lt;/p>
+&lt;h3 id="耗电量">耗电量
+&lt;/h3>&lt;p>手机依靠电池供电，移动场景下对电量的使用应更为节制，所以应用本身对耗电控制的要求更高&lt;/p>
+&lt;h3 id="网络流量">网络流量
+&lt;/h3>&lt;p>虽然现在手机流量资费已经大幅下调，但流量依然在手机费用中占据极大比重，所以应用在网络交互中对数据包大小、频率等影响流量的控制也是手机App的特点。&lt;/p>
+&lt;h3 id="应用安全">应用安全
+&lt;/h3>&lt;p>虽然电脑端和手机端都存在应用安全问题，但手机作为随身携带且日常使用频率很好的设备，包括定位、通话、摄像等功能也都和个人隐私紧密相关，信息安全上的挑战更大，所以手机应用本身的安全要求和隐私防护上，一般也比电脑端要求更严格。&lt;/p>
+&lt;h2 id="测试工具上的不同">测试工具上的不同
+&lt;/h2>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/Pasted-20241213-1_hu_6cd104adb2c7d82d.webp"
+width="1024"
+height="386"
+srcset="https://chengxiaqiucao.github.io/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/Pasted-20241213-1_hu_1825eb2121aedb6a.webp 480w, https://chengxiaqiucao.github.io/post/049-%E6%89%8B%E6%9C%BA%E5%BA%94%E7%94%A8%E5%92%8C%E7%94%B5%E8%84%91%E7%AB%AF%E5%BA%94%E7%94%A8%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%8D%E5%90%8C/Pasted-20241213-1_hu_6cd104adb2c7d82d.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="265"
+data-flex-basis="636px"
+>
+手机端应用和电脑端应用，在操作系统、开发工具方面有明显差异，对应到测试工具上也有明显区别。&lt;/p>
+&lt;p>以自动化工具为例，电脑端可能有selenium、robotframework、postman等，但对应到手机端，相应的工具则是以Appium、airtest这样的一些工具为代表。&lt;/p>
+&lt;hr>
+&lt;p>大致从以上这些方面来看，可以看到，区别还是非常明显的，不可一概而论。&lt;/p></description></item><item><title>安装部署测试怎么做</title><link>https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/</link><pubDate>Sat, 16 Nov 2024 16:28:04 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-3.webp" alt="Featured image of post 安装部署测试怎么做" />&lt;p>知乎上看到的问题：&lt;/p>
+&lt;blockquote>
+&lt;p>各位专业的IT或是测试大牛能告诉我环境部署怎么做吗？每次我都是说根据测试文档安装相应软件，环境变量设置！准备相关材料！总觉得回答不够好！求解正确答案？&lt;/p>&lt;/blockquote>
+&lt;p>作为一个专业的测试人员，这个回答不能说不好，而是基本等同于不会测试。&lt;/p>
+&lt;p>这个问题虽然是直接问的如何做安装部署，但其实是问你对于安装部署需要怎么测试？ 不直接问是因为很多小白都意识不到安装部署其实是软件功能测试范围中极为重要的一块，比如题主。&lt;/p>
+&lt;p>一个软件系统的安装，特别是直接交付给用户的系统，这部分可以说就是整个系统的门面，是使用这个软件的第一步，表现好坏直接影响用户对这个软件的评价。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116_hu_fead4db6b6bd4.webp"
+width="1024"
+height="377"
+srcset="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116_hu_7e34aa3471ce9d3b.webp 480w, https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116_hu_fead4db6b6bd4.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="271"
+data-flex-basis="651px"
+>
+&lt;/p>
+&lt;p>那么软件的安装部署测试要做哪些测试方面的考虑呢？可以从以下几个方面来看：&lt;/p>
+&lt;h2 id="全新安装全量安装">全新安装/全量安装
+&lt;/h2>&lt;p>&lt;strong>全新安装，指一个软件首次部署或者是在不保留原先已安装信息的情况下重新部署。&lt;/strong>&lt;/p>
+&lt;p>这部分其实是测试的主要部分，题主所说的安装文档其实也主要会针对这一部分说明。&lt;/p>
+&lt;p>但测试时还是有很多需要注意的测试要点&lt;/p>
+&lt;h3 id="1-安装的依赖">1. 安装的依赖
+&lt;/h3>&lt;p>大部分的安装程序或脚本，它其实都是有一定的条件依赖的：&lt;/p>
+&lt;ul>
+&lt;li>需要的磁盘空间？&lt;/li>
+&lt;li>网络的连接状态？&lt;/li>
+&lt;li>CPU/内存有没有要求？&lt;/li>
+&lt;li>操作系统的版本？&lt;/li>
+&lt;li>系统用户的权限（是不是需要操作系统的管理员权限来安装？）&lt;/li>
+&lt;li>&amp;hellip;.&lt;/li>
+&lt;/ul>
+&lt;p>而且这些依赖也不单纯只是安装程序本身的依赖，也包括安装完成后，软件系统要正常运行需要的依赖条件，这些在我们程序安装的时候，都应该由安装程序提前进行验证。所有这些都是测试时需要考虑和进行设计的。&lt;/p>
+&lt;h3 id="2-安装程序脚本的功能验证">2. 安装程序/脚本的功能验证
+&lt;/h3>&lt;p>不管是有安装程序还是通过执行脚本，这部分是安装部署的主体，也是安装部署文档中重点描述的部分，大部分面向用户的安装程序其实都是有界面的。&lt;/p>
+&lt;p>那这里的验证其实和普通软件的功能测试没太大区别。&lt;/p>
+&lt;ul>
+&lt;li>界面中描述性信息、文字是否清晰&lt;/li>
+&lt;li>一些操作的提示信息是否明确&lt;/li>
+&lt;li>有用户交互部分，用户不同选择的分支验证&lt;/li>
+&lt;li>不同的屏幕分辨率下的兼容性&lt;/li>
+&lt;li>是否提供步骤回溯？误操作时能否返回上一步&amp;hellip;.&lt;/li>
+&lt;/ul>
+&lt;p>在设计这部分验证时，最好结合流程图，梳理出各种不同路径逐一确认。&lt;/p>
+&lt;h3 id="3-安装异常处理">3. 安装异常处理
+&lt;/h3>&lt;p>这个是考验测试人员经验的重要环节。&lt;/p>
+&lt;ul>
+&lt;li>磁盘空间不足？&lt;/li>
+&lt;li>中途断网？&lt;/li>
+&lt;li>本地服务端口冲突？&lt;/li>
+&lt;li>中途断电？&amp;hellip;.&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-1_hu_f7a0d7f0dfe3dc80.webp"
+width="1024"
+height="550"
+srcset="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-1_hu_bf7331f1e9a80f0d.webp 480w, https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-1_hu_f7a0d7f0dfe3dc80.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="186"
+data-flex-basis="446px"
+>
+&lt;/p>
+&lt;h3 id="4-易用性">4. 易用性
+&lt;/h3>&lt;p>关于安装程序的易用性，主要考虑安装过程中有没有对用户体验优化的一些考虑。&lt;/p>
+&lt;ul>
+&lt;li>比如安装选择一个已经存在的目录，是否有提示？&lt;/li>
+&lt;li>文件的覆盖会不会有二次确认？&lt;/li>
+&lt;li>安装过程中，有没有进度条显示安装进度?&lt;/li>
+&lt;li>在比较大的文件拷贝时，界面有没有一些信息变化提示，避免用户怀疑程序卡死？&lt;/li>
+&lt;li>检测到冲突，有没有给用户提供解决方案建议？&amp;hellip;..&lt;/li>
+&lt;/ul>
+&lt;p>这些其实都是属于易用性的范畴&lt;/p>
+&lt;h3 id="5-安装校验">5. 安装校验
+&lt;/h3>&lt;p>在执行安装测试时，我们还应该了解并确认安装前后系统有哪些变化，这些变化是否是符合设计要求。&lt;/p>
+&lt;ul>
+&lt;li>安装后安装目录下会包含哪些程序文件？&lt;/li>
+&lt;li>操作系统的系统文件夹或非安装目录下有没有生成什么文件？&lt;/li>
+&lt;li>注册表有无增加和修改？&lt;/li>
+&lt;li>系统服务有没有增加和修改？&lt;/li>
+&lt;li>开始菜单中有没有添加程序组？&lt;/li>
+&lt;li>桌面上有没有创建快捷方式？&amp;hellip;..&lt;/li>
+&lt;/ul>
+&lt;p>掌握这些不仅是功能的检查，也是我们理解安装程序本身做了哪些事情，有没有测试场景的遗漏。&lt;/p>
+&lt;h2 id="升级安装更新">升级安装/更新
+&lt;/h2>&lt;p>除了全新安装外，另一个重要的场景是系统的升级，更新。也就是系统已经存在了一个版本，需要在原有基础上升级到当前安装包的版本。&lt;/p>
+&lt;p>而升级又可以分为全量升级和增量升级&lt;/p>
+&lt;h3 id="全量升级">全量升级
+&lt;/h3>&lt;p>全量的升级会完整替换原先的程序文件，但一般会保留原有的配置和数据，安装包通常会包含当前版本的所有文件，安装包通常比较大&lt;/p>
+&lt;h3 id="增量升级">增量升级
+&lt;/h3>&lt;p>增量升级则是根据用户的当前版本，安装包只包含增量的一些程序文件，包括一些升级操作的脚本文件。这种安装包一般比较小，安装过程也通常更加快速。但安装包要和用户的当前版本严格匹配。一般会在全量安装包非常庞大，分发给用户效率不高的时候采用&lt;/p>
+&lt;h3 id="版本跨度">版本跨度
+&lt;/h3>&lt;p>不管是全量还是增量，验证时和全新安装的要点基本类似。但有一个升级验证特定的场景需要重点考虑，就是版本的跨度问题&lt;/p>
+&lt;p>如果软件迭代，版本变更次数非常多，那么从历史古早版本升级到新版本往往会带来很多问题，包括配置、数据结构的变化造成的影响，以及升级策略的选择，是一次到位还是逐个中间版本升级？对测试策略可能都有影响。&lt;/p>
+&lt;h3 id="数据转换">数据转换
+&lt;/h3>&lt;p>对于牵涉到数据库，数据结构变化的版本升级，业务数据可能会需要进行很多数据转换的操作，这里也是Bug的高发地带，需要结合升级后的业务测试重点关注。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-2_hu_4b974fcfa09f2c7b.webp"
+width="1024"
+height="620"
+srcset="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-2_hu_3eb720d1fea78ac1.webp 480w, https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-2_hu_4b974fcfa09f2c7b.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="165"
+data-flex-basis="396px"
+>
+&lt;/p>
+&lt;h2 id="回退">回退
+&lt;/h2>&lt;p>回退通常属于安装出现问题时，是否可以恢复原先状态，以不影响原来的业务。&lt;/p>
+&lt;p>这里主要从几个方面考虑：&lt;/p>
+&lt;h3 id="正常取消安装部署">正常取消安装/部署
+&lt;/h3>&lt;p>用户主动发起，属于正常回退，这时安装程序应该要能够清理掉已完成的安装文件，恢复原有的系统配置，将状态重置到安装前的状态&lt;/p>
+&lt;h3 id="异常回退">异常回退
+&lt;/h3>&lt;p>除了用户主动发起的正常回退外，如果安装过程中出现了一些未知的异常导致安装无法继续，这时需要提示用户安装失败，同时也应该触发回退流程，将系统恢复到安装前。&lt;/p>
+&lt;p>这种属于我们安装程序本身的异常捕捉和处理的一部分。&lt;/p>
+&lt;p>而即便不是安装程序本身捕捉的异常，比如安装过程中拔电源强制中断这样，我们的软件也应该提供一些清理脚本来将部署状态恢复到安装前。 这也是安装测试的重要场景之一。&lt;/p>
+&lt;h3 id="回退有效性">回退有效性
+&lt;/h3>&lt;p>除了回退的触发，就是我们还要对回退的效果进行确认。是否确实正确完成了清理和状态恢复。&lt;/p>
+&lt;p>另外，在回退执行过程中，如果出现异常（和因为异常触发回退不同），是否有对应的解决方案？比如提供清理工具&lt;/p>
+&lt;h2 id="卸载">卸载
+&lt;/h2>&lt;p>当然，有安装就有卸载。除了安装程序的验证，我们还要验证卸载程序或脚本。类似安装程序的功能验证&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-3_hu_3ea1b57309e961a.webp"
+width="1024"
+height="677"
+srcset="https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-3_hu_de120dc3307ad798.webp 480w, https://chengxiaqiucao.github.io/post/047-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%B5%8B%E8%AF%95%E6%80%8E%E4%B9%88%E5%81%9A/Pasted-20241116-3_hu_3ea1b57309e961a.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="151"
+data-flex-basis="362px"
+>
+&lt;/p>
+&lt;h3 id="卸载入口">卸载入口
+&lt;/h3>&lt;p>除了直接执行卸载程序，还有通过操作系统的卸载入口进行卸载，都是应该考虑的场景&lt;/p>
+&lt;h3 id="卸载遗留">卸载遗留
+&lt;/h3>&lt;p>软件卸载以后，有哪些文件、配置会遗留在操作系统中，是否符合设计要求？&lt;/p>
+&lt;h3 id="破坏性卸载">破坏性卸载
+&lt;/h3>&lt;p>制造一些特殊场景，比如一些关键文件物理删除，关键的配置被变更，确认卸载还是否能正常进行？&lt;/p>
+&lt;h3 id="卸载中的异常">卸载中的异常
+&lt;/h3>&lt;p>同样也要考虑卸载中的各种异常场景&lt;/p>
+&lt;ul>
+&lt;li>文件正在使用？&lt;/li>
+&lt;li>断网？&lt;/li>
+&lt;li>断电？&amp;hellip;&lt;/li>
+&lt;/ul>
+&lt;p>异常出现时，有没有对应的手段可以善后&lt;/p>
+&lt;hr>
+&lt;p>很多时候，看上去简单的问题，深究的话门道可并不小。 测试是一门关于探索和发现未知的艺术，自有奥妙​。&lt;/p></description></item><item><title>软件测试的目的到底是什么？</title><link>https://chengxiaqiucao.github.io/post/007-what-is-testing-goal/</link><pubDate>Fri, 30 Aug 2024 20:35:21 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/007-what-is-testing-goal/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/007-what-is-testing-goal/testing.webp" alt="Featured image of post 软件测试的目的到底是什么？" />&lt;h2 id="对测试工作目的的认识误区">对测试工作目的的认识误区
+&lt;/h2>&lt;p>在IT行业，其实一直对软件测试，测试这个工作的目的，一直有着不太准确的认识。&lt;/p>
+&lt;p>各种说法都有，比较流行，被很多IT工作甚至测试从业者认可的有下面两种：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>测试是为了发现Bug&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>大家一般概念中通常都会把做测试和找Bug等同起来，也就是说软件测试的目的是为了发现产品中的问题。&lt;/p>&lt;/blockquote>
+&lt;ul>
+&lt;li>&lt;strong>测试是为了验证产品满足需求&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>也有从测试执行的角度来说，测试工作是为了证明软件产品是符合产品需求定义，是为了验证需求是否实现的。&lt;/p>&lt;/blockquote>
+&lt;p>那这些说法对不对呢？ 可以说对，也可以说不对&lt;/p>
+&lt;p>确实，测试工作的主要产出就是我们发现的各种产品bug，而要验证需求则是我们测试工作的主要输入和评估标准。&lt;/p>
+&lt;p>但这些就是我们要进行测试工作的目的吗？&lt;/p>
+&lt;p>单纯把测试工作的目的从上面几点来看就狭隘了。&lt;/p>
+&lt;h3 id="测试是为了找bug吗">测试是为了找Bug吗？
+&lt;/h3>&lt;p>我们做测试工作是为了发现bug吗？&lt;/p>
+&lt;p>bug对于产品来说，意味着成本，bug本身对产品来说是不会产生价值的。被解决掉的Bug才会带来产品质量的提升，进而体现到产品的价值中去。bug的减少，对产品才有价值。&lt;/p>
+&lt;p>所以，单纯地把发现更多bug作为测试工作目的是一个误区，这也是很多团队错误地把发现bug的数量作为测试工作成效依据的主要原因。如果bug发现得越多代表测试工作越好，测试人员是不是就不应该再早期阶段去参与？因为在前期就规避掉的问题其实会导致到测试阶段bug变少，如果测试工作是希望发现更多bug，是不是就应该希望产品提测的时候包含更多bug呢？ 这个导向显然是不符合产品利益的。&lt;/p>
+&lt;p>因此把发现bug作为测试工作的目的是一个常见的，明显的对测试工作的认识误区&lt;/p>
+&lt;h3 id="测试就是为了验证需求吗">测试就是为了验证需求吗？
+&lt;/h3>&lt;p>第二个对测试工作目的的认识误区，就是认为测试工作就是为了验证产品的需求。这其实是另一个被广泛接受的错误认识。甚至我们当今流传广泛的很多软件工程实践，都是建立在这个错误认识之上的。&lt;/p>
+&lt;p>测试大牛James Bach有篇著名的论文，探讨了Testing跟Checking的区别。&lt;/p>
+&lt;p>也就是测试工作远远不止是checking。而验证需求，这样的checking只是测试工作的一部分。测试要深入产品、发现潜在的深层问题，还需要除了checking之外的更多其他能力支撑，包括探索、试验、设问、推理等等&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/007-what-is-testing-goal/Pasted-20240830_hu_a757c2a846cec1de.webp"
+width="1024"
+height="715"
+srcset="https://chengxiaqiucao.github.io/post/007-what-is-testing-goal/Pasted-20240830_hu_b8f6a2455443d5a0.webp 480w, https://chengxiaqiucao.github.io/post/007-what-is-testing-goal/Pasted-20240830_hu_a757c2a846cec1de.webp 1024w"
+loading="lazy"
+alt="Testing vs Checking"
+class="gallery-image"
+data-flex-grow="143"
+data-flex-basis="343px"
+>
+&lt;/p>
+&lt;p>所以，把验证需求，当作测试工作的目的，是不够的。像工厂质检那样依据严格的规程来确定产品是否合格，和软件产品这种偏创造性的行业也并不匹配。这也是我们说自动化测试更多是为了提升执行效率和快速得到已覆盖场景的验证结果反馈，但自动化测试本身并不能达到完成产品测试的目的。&lt;/p>
+&lt;p>测试除了验证需求中明确的功能外，还需要针对交付产品进行更深度的探索，才更可能充分发现产品中的质量问题。这也是近年探索式测试被更多提及的主要缘由。&lt;/p>
+&lt;h2 id="软件测试工作的真正目的">软件测试工作的真正目的
+&lt;/h2>&lt;p>好，那既然测试工作的目的既不是为了找Bug，也不是为了验证需求，那目的究竟是什么呢？&lt;/p>
+&lt;blockquote>
+&lt;p>软件测试的真正目的： &lt;strong>准确&lt;/strong>、&lt;strong>及时&lt;/strong>地&lt;strong>评估&lt;/strong>出被测对象的&lt;strong>质量状态&lt;/strong>&lt;/p>&lt;/blockquote>
+&lt;p>这里的核心是&lt;strong>评估质量状态&lt;/strong>。质量是产品属性，只能通过产品本身的变更来调整，所以测试工作无法提高质量，也无法保证质量。但通过测试工作，我们可以通过暴露产品中的问题，反映出产品的质量状态。我们的主要作用是对当前产品的质量进行评估。再由产品或项目针对这个状态来对质量进行改进。&lt;/p>
+&lt;p>所以测试工作对于质量的贡献更多体现在这个评估出的质量状态是否及时和准确两方面。&lt;/p>
+&lt;h3 id="准确评估">准确评估
+&lt;/h3>&lt;p>测试无法穷尽，在有限的时间内发现产品的所有问题也是不可能的。但测试的职责是需要在有限的时间内，尽可能多地将影响产品质量的问题暴露出来。这里除了数量外，我们还要看问题的影响，综合这两点，才是更准确地反映质量。&lt;/p>
+&lt;h3 id="及时评估">及时评估
+&lt;/h3>&lt;p>产品是无法进行无限测试的，而且测试工作其实本身是成本支出。所以通过测试工作得出产品质量状态的时效对于产品的质量改进和成本控制也尤为关键。问题发现得越早，修复成本就越低；得出质量状态评估的时间越短，产品进行针对性改进的空间就越大。所以测试工作的目的，还包括提高测试效率，通过自动化、测试左移等手段来尽可能及时地完成产品质量评估。&lt;/p>
+&lt;p>所以这才是我们进行软件测试工作的真正目的，不是为了发现更多的bug，也不是仅仅是对需求实现的检查，而是通过我们的专业能力，在有限的时间内，及时、充分地反映出当前产品实际的质量状态。&lt;/p>
+&lt;p>以上就是关于软件测试工作目的 的分享，我是城下秋草。 &lt;strong>秋草观测台，观察测试业&lt;/strong>&lt;/p>
+&lt;hr>
+&lt;p>推广下我的测试课程，感兴趣的小伙伴可以通过以下链接了解下哦&lt;/p>
+&lt;p>❤️❤️❤️❤️ &lt;a class="link" href="https://coding.imooc.com/class/chapter/885.html#Anchor" target="_blank" rel="noopener"
+>城下秋草的测试职业进阶提升课&lt;/a> ❤️❤️❤️❤️&lt;/p></description></item><item><title>提 Bug 的艺术</title><link>https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/</link><pubDate>Sat, 19 Aug 2023 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/</guid><description>&lt;h3 id="前言">前言
+&lt;/h3>&lt;p>作为测试工程师最重要的工作产出，Bug Report（或者故障单、问题单）是测试工程师工作成果的直接体现，也是最能呈现测试工程师价值和能力的输出物。但项目干系人甚至测试工程师本身对Bug Report的重要性往往认识不足，Bug 单的内容及其提交方式、处理流程对项目推进、运作效率甚至团队士气都有重要影响。&lt;/p>
+&lt;p>行业针对 Bug Report 的讨论和总结还比较少，本篇我们希望以笔者多年的从业观察出发，对 Bug report 的要素及专业测试工程师的处理方式给出一些总结和建议，意在抛砖引玉，错漏之处还请多多指正。&lt;/p>
+&lt;p>主要包含以下内容：&lt;/p>
+&lt;ul>
+&lt;li>Bug 是什么，Bug 报告单是什么&lt;/li>
+&lt;li>开发或项目团队看到 Bug 实际希望获取的信息是什么&lt;/li>
+&lt;li>测试小白在提 Bug 时的常见错误做法&lt;/li>
+&lt;li>提 Bug 与说故事&lt;/li>
+&lt;li>专业测试工程师如何高质量地提交 Bug&lt;/li>
+&lt;/ul>
+&lt;h3 id="何为bug-bug的历史">何为Bug？ Bug的历史
+&lt;/h3>&lt;p>Bug 一词在英文中本是虫子，臭虫之意，现在 IT 行业用它来代指软件中存在的缺陷，其实这个历史还比较有意思：&lt;/p>
+&lt;p>早在 1878 年，大发明家爱迪生就在给朋友的信中就用 bug 一词代指过电子电路中的故障（或可能导致故障的原因），但是真正在计算机行业载入史册还要到 1947 年 9 月 9 日。&lt;/p>
+&lt;p>这时第一批写程序的程序员们正在哈佛大学研发 markII 计算机，其中 [Grace Murray Hopper][1] 在查找一个问题时，在中继器触点旁发现了一个飞蛾，用日志本拍死了它，并标记它为“第一个找到 bug 的真实案例”。由此 bug 一词便被用来代指计算机中的缺陷或故障。相应地 debug 则被用来指代去除故障的调测行为。&lt;/p>
+&lt;p>下图即保存在美国管家博物馆的史上第一个 bug 实物：
+&lt;img src="https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134227_hu_1aaef69260d697fa.webp"
+width="1024"
+height="826"
+srcset="https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134227_hu_3fcbf2ba2238afc1.webp 480w, https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134227_hu_1aaef69260d697fa.webp 1024w"
+loading="lazy"
+alt="first bug"
+class="gallery-image"
+data-flex-grow="124"
+data-flex-basis="297px"
+>
+&lt;/p>
+&lt;p>史上第一批程序员，其中唯一的女性就是“虫”母：
+&lt;img src="https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134247_hu_79b65c03098cc27a.webp"
+width="1024"
+height="678"
+srcset="https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134247_hu_7b57b3f473be9de6.webp 480w, https://chengxiaqiucao.github.io/post/005-the-bugs-report-art/20240820134247_hu_79b65c03098cc27a.webp 1024w"
+loading="lazy"
+alt="bug mother"
+class="gallery-image"
+data-flex-grow="151"
+data-flex-basis="362px"
+>
+&lt;/p>
+&lt;p>总之，现在 Bug 一词可以代指软件或程序中存在的缺陷或者故障。但对于项目团队来说，建议不要简单地将 Bug 定义成&lt;code>故障&lt;/code>，因为&lt;code>故障&lt;/code>一词定性上有否定的意味，而将 Bug 视作&lt;code>缺陷&lt;/code>、或者&lt;code>问题&lt;/code>，强调&lt;strong>可改进空间&lt;/strong>对项目团队更加有积极的引导作用。&lt;/p>
+&lt;h3 id="bug-report-问题单是什么">Bug Report （问题单）是什么?
+&lt;/h3>&lt;p>report 这个词在英文中既可作动词也可作名词。所以 &lt;code>Bug report&lt;/code> 既可表示发现问题并报告的这个动作，也可以指问题发现后提交的报告内容。 这里我们一般还是将它看作是问题报告(名词)，即 &lt;code>问题单&lt;/code>，那么&lt;code>问题单&lt;/code>到底是什么呢？&lt;/p>
+&lt;p>测试大神 Cem Kaner 曾指出:&lt;/p>
+&lt;blockquote>
+&lt;p>The purpose of testing is not to find bugs. The purpose is to get bugs fixed.&lt;/p>
+&lt;p>测试的目的不是发现 Bug, 而是使 Bug 被修复。&lt;/p>&lt;/blockquote>
+&lt;p>这个观点其实指出了很多测试人员认识上的一个误区，就是觉得测试工作就是尽可能多地发现 Bug。 其实对团队来说，发现的 Bug 再多，最终还是要解决掉才能体现这些 Bug 被发现的价值。&lt;/p>
+&lt;p>而从发现到被解决， &lt;code>问题单&lt;/code> 是其中的主要媒介，既是测试人员测试工作的输出，又是开发人员解决问题的输入，重要性不言而喻。&lt;/p>
+&lt;p>另外，虽然将发现的问题知会给开发人员有各种形式：口头告知、实际演示、电子邮件、IM聊天等等都可以起到知会的作用。但在现代软件研发过程中，一般还会有专门的系统来进行缺陷追踪，如 JIRA、禅道、bugfree、QC（HP quality center） 等软件都能进行缺陷的提交和跟踪。通过这些专门的系统，不仅能够起到记录和反馈的作用，还能够通过统计和分析更好地反映出项目整体的质量状况和研发进展。&lt;/p>
+&lt;p>因此：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>问题单&lt;/code> 是测试人员测试活动中发现缺陷后的输出&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>问题单&lt;/code> 是开发人员解决缺陷的输入&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>问题单&lt;/code> 是测试人员和开发人员之间针对 Bug 的沟通媒介&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>问题单&lt;/code> 还是项目团队评估当前研发状态和产品成熟度的指示器。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="问题单的作用和重要性">问题单的作用和重要性
+&lt;/h3>&lt;p>相信很多测试工程师在提交问题单后，都有得到如下一些反馈或抱怨的经历：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>你这个问题单到底想说明啥？&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>在我这里运行没有这个问题&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>为什么你提交的这个算是缺陷？&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>一般人不会像问题单那样使用软件，脑子有问题的人才会那样用&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>这个确实是问题，但是修复成本太大，而且也可以换种操作方式来规避&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>你虽然认为这是个问题，但是实际用户不会觉得不好&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>你提交的虽然确实是问题，但是影响用户很小。那些影响用户更大的部分为什么看不到多少问题单？&lt;/p>
+&lt;p>&amp;hellip;&amp;hellip;&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>测试人员当然不希望得到这样的反馈。但这些问题也从侧面反映出在对待 Bug 这件事上，开发人员或项目团队更加注重的其实是 Bug 如何解决（包括是否&lt;strong>需要&lt;/strong>解决的判断），他们更希望从&lt;code>问题单&lt;/code>中获知的是如下的一些信息：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>所发现的什么问题？&lt;/p>
+&lt;ul>
+&lt;li>问题现象是什么？&lt;/li>
+&lt;li>总是会出现吗？&lt;/li>
+&lt;li>发现这个问题时的背景、上下文是什么？&lt;/li>
+&lt;li>除了看到的现象，系统同时还发生了什么？&lt;/li>
+&lt;li>有没有截图、日志、录屏？&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>为什么它是个问题？&lt;/p>
+&lt;ul>
+&lt;li>这个问题有什么影响？&lt;/li>
+&lt;li>不解决它会怎么样？&lt;/li>
+&lt;li>发生概率怎么样？&lt;/li>
+&lt;li>有没有和其他问题重复？&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>是做了什么操作，暴露出的这个问题？&lt;/p>
+&lt;ul>
+&lt;li>输入是什么？&lt;/li>
+&lt;li>用了什么测试路径？测试数据？&lt;/li>
+&lt;li>所在测试环境、软件版本如何？&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>所以，作为测试，不应把&lt;code>问题单&lt;/code>看作是一个简单的问题记录，它是测试和开发之间的重要沟通媒介，好的问题单可以极大减少双方的沟通成本，既极大减轻开发人员解决问题的工作量，同时也减少测试人员澄清、重复验证等的工作量。对项目来说，&lt;code>问题单&lt;/code>的提交质量，影响的就是团队的生产力以及交付速度，不容小觑。&lt;/p>
+&lt;h3 id="问题单的要素">问题单的要素
+&lt;/h3>&lt;p>了解了&lt;code>问题单&lt;/code>的作用，那么&lt;code>问题单&lt;/code>中应该包含的要素也就比较清楚了，一般有以下方面：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>方便初步判断的标题&lt;/strong>&lt;/p>
+&lt;p>标题应该能够比较清楚地概要说明问题，以及这个问题所处的模块。便于开发人员作一个初步的判断&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>上下文及必要的关联信息&lt;/strong>&lt;/p>
+&lt;p>发生问题时的上下文背景，关联的信息如软件版本、测试环境、配置情况、资源状态等&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>准确合理的详细描述信息&lt;/strong>&lt;/p>
+&lt;p>详细描述问题发现的步骤，操作预期，实际发生的状况。问题发生频率，所使用的测试输入、数据、文件等&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>帮助问题解决的补充信息&lt;/strong>&lt;/p>
+&lt;p>能够帮助开发人员加快解决问题进度的补充信息，比如截图、录屏、操作日志、系统日志等&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>帮助项目决策的辅助信息&lt;/strong>&lt;/p>
+&lt;p>测试人员作为 Bug 的第一判断者，应给出问题的严重程度、解决优先级建议。初步指派解决问题的开发人员，以及便于统计、追踪的关联信息标识。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="测试小白的错误做法">测试小白的错误做法
+&lt;/h3>&lt;p>那么结合&lt;code>问题单&lt;/code>的要素，我们可以初步总结一些测试小白或者不专业测试在提交 Bug 时常见的一些错误做法：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>标题不够明确&lt;/p>
+&lt;p>标题非常简单，不便于初步判断问题。比如简单地写 “系统 crash”，太过笼统，而且过于简单的标题很容易产生雷同，对问题的集中回顾、评审都带来很多不便。&lt;/p>
+&lt;p>或者过于复杂。太长的标题，容易导致阅读疲劳，没有重点。比如标题中详细描写操作步骤就没什么必要&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>脱离实际，偏离需求场景。&lt;/p>
+&lt;p>有时候测试小白会从个人偏好角度出发，想当然地提出一些问题。“我觉得”、“感觉上不好” 是这类小白问题中出现的高频词汇。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>不是问题&lt;/p>
+&lt;p>测试小白，往往因为对系统实现原理理解上的错误或技能水平上的不足，提交出不是 bug 的问题单。&lt;/p>
+&lt;p>还有因为测试小白的测试方法或者环境配置本身就是不正确的，由此导致的问题&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>描述信息不足&lt;/p>
+&lt;p>典型的，通过问题单的描述信息，开发人员不足以确认问题现象或自行复现。测试小白往往觉得发现问题就完成工作，没有把充分的信息提供给开发人员，比如截图、日志等。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>无关信息过多、格式杂乱&lt;/p>
+&lt;p>有时小白的问题单中会包含太多冗余的嘈杂信息，很难看到重点。比如不分青红皂白把几万行的 log 贴到问题单中&lt;/p>
+&lt;p>或者完全不进行排版，一大堆信息杂乱地混杂在一起，阅读难度极高&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>问题过多&lt;/p>
+&lt;p>问题单应该聚焦，有时测试小白会在同一个问题单中包含很多个不同的问题。这对于问题追踪和聚焦都非常不利&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>只看现象不考虑本质&lt;/p>
+&lt;p>有时候简单的问题现象，往往是一些严重问题的体现或线索。小白往往会忽视重要的风险，对一些看似蛛丝马迹的问题视而不见，将潜藏在现象之下的 Bug 轻易漏过。比如有些预期外的提示信息，往往是后台计算、统计准确性等 Bug 的体现。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="提-bug-与说故事">提 Bug 与说故事
+&lt;/h3>&lt;p>再回到 &lt;code>提交 Bug&lt;/code> 这件事，本质上，这其实是一个沟通的过程，&lt;code>问题单&lt;/code> 承载了这个沟通媒介的作用，通过&lt;code>问题单&lt;/code>，测试人员将自己在测试过程中看到的、发现到的问题描述出来，开发人员通过阅读&lt;code>问题单&lt;/code>，掌握到对应信息并相应地去解决问题。&lt;/p>
+&lt;p>所以&lt;code>提 Bug&lt;/code> 其实和写一个小短文，说一个小故事一样，测试人员是作者，而开发人员是读者。&lt;/p>
+&lt;p>我们在提&lt;code>问题单&lt;/code>时，其实也是写作的一种。写作的 &lt;strong>5W&lt;/strong> 要求也一样适用：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>What 内容&amp;ndash;具体的问题是什么？&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Why 目的&amp;ndash;为什么要提出这个问题？为什么它是个问题？&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Who 主体-问题主体是谁？关联方有谁？？&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Where 地点&amp;ndash;问题发生在哪？&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>When 时间&amp;ndash;在什么时间和频率下发生？&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>提 Bug 时思考这 &lt;strong>5W&lt;/strong>，再结合上文提到问题单要素，一般就不会犯很多测试新手在提问题单时常犯的错误了。&lt;/p>
+&lt;h3 id="提-bug-的艺术">提 Bug 的艺术
+&lt;/h3>&lt;p>上文阐述问题单的要素以及 提Bug 时应注意的一些细节，但是为什么我们还要说提 Bug 其实是一件艺术性的工作？&lt;/p>
+&lt;p>我们来举几个问题单的例子：&lt;/p>
+&lt;p>假设有一个商品管理系统，用户在某个特定商品分类下（水果）新增商品时会发生crash&lt;/p>
+&lt;p>&lt;strong>问题单 例一：&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">用户新增商品，发生Crash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">如图所示（crash界面截图）
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这个问题单通过提供截图其实基本描述了问题现象。但是对开发人员来说，信息量太少，而且很有可能并不能第一时间复现问题（水果分类）。问题单中包含的信息太过于简单，可以说是非常糟糕的问题单案例。&lt;/p>
+&lt;p>&lt;strong>问题单 例二：&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">用户在新增商品时，会发生Crash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">操作步骤：
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1. 打开App
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2. 用户登录系统，输入正确的用户名、密码并登录
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">3. 进入商品管理页面
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">4. 选择分类：水果
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">5. 点击新建商品按钮
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">6. 输入商品信息：*********
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">7. 点击提交按钮
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">预期结果：商品创建成功App
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">实际结果：发生 crash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">使用的设备机型：xiaomi 8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">操作系统版本：android 8.0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">软件版本 V1.1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">附件：crash截图
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这个问题单，是很多测试小白常见的提单形式，包含了非常详细的操作步骤和相关辅助信息。但是这也是一个非常糟糕的问题单。
+首先，这样的步骤描述毫无必要，开发人员不会连打开app、登录、提交这样的操作也不了解需要在问题单中交代
+其次，辅助信息虽多，但是基本和问题原因无关，并不利于开发人员定位，反而引入了一些干扰信息。
+这样的问题单，无法体现测试人员的专业价值，对问题的快速解决也没有好处&lt;/p>
+&lt;p>&lt;strong>问题单 例三：&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">用户在水果分类下进行新增商品操作时，会发生Crash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">操作步骤：
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1. 选择水果分类，创建商品，发生crash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2. 选择非水果分类，创建商品，商品创建成功
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">已验证机型：xiaomi 8，huawei mate 7 等现象一致，应和机型、操作系统、版本无关
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">附件：错误截图、系统 crash 时的 logcat 日志
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">影响：用户无法新增水果分类商品，直接影戏用户使用。需高优先级解决
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>此问题单已经可以算比较合格的问题单了，比较明确地指明了问题发生的场景，并将一些无关信息进行了初步排除。开发人员可以聚焦在水果这个类别下的商品创建进行问题分析。
+同时指出了问题对软件的影响和解决优先级建议，使项目团队明确知道这个问题的影响所在&lt;/p>
+&lt;p>&lt;strong>问题单 例四：&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">用户在水果分类下进行新增商品操作时，会发生空指针Crash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">操作步骤：
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1. 选择水果分类，创建商品，发生crash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2. 选择非水果分类，创建商品，商品创建成功
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">3. 对已有水果分类下的商品进行编辑操作，可以编辑成功
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">后台数据库对水果分类因字段缺失insert操作出错，update操作正常。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">已验证机型：xiaomi 8，huawei mate 7 等现象一致，应和机型、操作系统、版本无关
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">附件：错误截图、系统 crash 时的 logcat 日志
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">影响：用户无法新增水果分类商品，直接影戏用户使用。需高优先级解决
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这个问题单，则在上一个问题单基础上更进一步，初步分析出了问题原因，新增操作时，有一个关键字段信息未包含，所以导致的crash。开发人员已经可以很明确地对问题进行修复了&lt;/p>
+&lt;p>&lt;strong>问题单 例五：&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">用户在水果分类下进行新增商品操作时，会发生空指针Crash。导入商品操作旧模板也同样存在问题。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">操作步骤：
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1. 选择水果分类，创建商品，发生crash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2. 选择非水果分类，创建商品，商品创建成功
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">3. 对已有水果分类下的商品进行编辑操作，可以编辑成功
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">后台数据库对水果分类因字段缺失insert操作出错，update操作正常。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">在商品管理导入商品功能中，新模板水果商品导入成功，使用旧模板（未包含新增字段）导入水果数据，也会发生失败。需一并修复。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">已验证机型：xiaomi 8，huawei mate 7 等现象一致，应和机型、操作系统、版本无关
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">附件：错误截图、系统 crash 时的 logcat 日志、新旧模板导入日志
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">影响：用户无法新增水果分类商品，直接影戏用户使用。需高优先级解决
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这个问题单，则在上一个例子的基础上，根据测试人员的经验，推理出有类似逻辑的导入功能，可能存在同样问题并进行了验证。很好体现了测试人员专业能力。&lt;/p>
+&lt;p>通过以上这个简单的案例，我们可以看到，不同的问题单提法，对问题解决效果却有很大差距。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>包含的信息太少，开发人员难以确定产生 Bug 的根本原因，Debug 的工作量成倍上升。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>包含的信息过多，开发人员又会耗费额外的精力去分析那些冗余的信息，甚至干扰调试、解决的方向，同样造成很大的工作量浪费&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>越是能清晰、明确地反映问题的根本原因，开发人员解决问题就越是高效。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>测试人员的经验和判断推理能力，通过问题单能够很好地得到体现&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>所以为什么说提 Bug 是个艺术性的工作？问题单既不能太过简单，也不应太过冗杂，还要能够将信息尽可能准确、全面地传递给开发，这真的是一件非常艺术性的事情。&lt;/p>
+&lt;h3 id="结语">结语
+&lt;/h3>&lt;p>总而言之，提 Bug 在软件研发过程中，是一件相当重要的活动，&lt;code>问题单&lt;/code>的质量直接影响团队的效率和产出。作为专业的测试人员，掌握提 Bug 的艺术，&lt;code>问题单&lt;/code>不在是个简单的问题记录，更是测试和开发间的沟通桥梁，是帮助开发高效修复 Bug 的支撑。&lt;/p>
+&lt;p>欢迎大家关注评论，也可关注公众号： &lt;strong>秋草说测试&lt;/strong>&lt;/p></description></item></channel></rss>

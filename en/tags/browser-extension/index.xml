@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Browser Extension on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/browser-extension/</link><description>Recent content in Browser Extension on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Wed, 28 Oct 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/browser-extension/index.xml" rel="self" type="application/rss+xml"/><item><title>Automated Testing for Browser Extensions - From Install to Popup to Version Migration</title><link>https://chengxiaqiucao.github.io/en/post/142-browser-extension-testing/</link><pubDate>Wed, 28 Oct 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/142-browser-extension-testing/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/142-browser-extension-testing/cover.webp" alt="Featured image of post Automated Testing for Browser Extensions - From Install to Popup to Version Migration" />&lt;p>Testing a browser extension is not the same thing as testing a web page. Besides page rendering, you may also need to prepare the extension&amp;rsquo;s own stored data, open its popup, options page or side panel, trigger browser-level events, and verify that old data migrates correctly on version upgrade. The official extension guide gives you a starting point: launch the browser with the extension loaded, wait for its service worker, get the extension ID. But the test logic that really concerns the extension still needs a set of fixtures and helpers behind it.&lt;/p>
+&lt;p>This article uses one concrete extension as a sample and covers three of the most common and most easily missed scenarios: install behaviour, popup interaction, and data migration on version upgrade.&lt;/p>
+&lt;h2 id="the-sample-a-to-do-list-extension">The Sample: A To-Do List Extension
+&lt;/h2>&lt;p>The sample extension is a simple to-do list. After opening the popup the user sees a task list, can add entries and can delete completed entries:&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig1_hu_5765199b59c0be45.webp"
+width="1024"
+height="676"
+srcset="https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig1_hu_9a3473616f69f579.webp 480w, https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig1_hu_5765199b59c0be45.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="151"
+data-flex-basis="363px"
+>
+&lt;/p>
+&lt;p>An example of the to-do list in the popup; task data lives in chrome.storage.local&lt;/p>
+&lt;p>Tasks are stored in &lt;code>chrome.storage.local&lt;/code>, and the popup reads the saved list and renders it each time it opens. This structure is typical: a background script (background / service worker) handles the logic on install and upgrade, a popup page handles interaction, and storage carries the state between them. What testing needs to cover is exactly the linkage among these three.&lt;/p>
+&lt;h2 id="environment-setup">Environment Setup
+&lt;/h2>&lt;p>Install the dependencies first:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">npm install -D @playwright/test playwright-webext
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npx playwright install chromium
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Then build the extension into the &lt;code>dist&lt;/code> directory and point the Playwright config at the build output:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// playwright.config.ts
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">defineConfig&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@playwright/test&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="kr">type&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">WebextOptions&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;playwright-webext&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="nx">defineConfig&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">WebextOptions&lt;/span>&lt;span class="p">&amp;gt;({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">testDir&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;./test&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">use&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">extensionPath&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;./dist&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Here is the first value point: once the extension path moves into the config, the test cases themselves no longer need to care about &amp;ldquo;how to get the extension into the browser&amp;rdquo;. The parts the official approach leaves to you &amp;ndash; launching the browser with a persistent context, waiting for the service worker to be ready, resolving the extension ID &amp;ndash; are converged into the fixture.&lt;/p>
+&lt;p>One reminder: extensions can only be loaded in a persistent context, which is the premise of the official Playwright extension approach. When using headless mode in CI, first confirm that the headless mode you use supports loading extensions, otherwise you get false green where the extension is not installed yet the assertions still &amp;ldquo;pass&amp;rdquo;.&lt;/p>
+&lt;h2 id="case-one-install-behaviour">Case One: Install Behaviour
+&lt;/h2>&lt;p>The most basic class of scenario is the side effect at install time. The sample extension writes the current date into storage on install, for statistics:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// background.js
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">chrome&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">runtime&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">onInstalled&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">addListener&lt;/span>&lt;span class="p">(({&lt;/span> &lt;span class="nx">reason&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">reason&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s1">&amp;#39;install&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">chrome&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">storage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">set&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">installationDate&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nb">Date&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="nx">toISOString&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The corresponding test is a single assertion:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// test/install.spec.ts
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">test&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;playwright-webext&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;saves the installation date&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">extension&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">extension&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">storage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;installationDate&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">toMatch&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sr">/^\d{4}-\d{2}-\d{2}/&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The &lt;code>extension&lt;/code> fixture installs the extension automatically before each test; &lt;code>storage.local.expect()&lt;/code> waits for the install callback to write the value, then matches a timestamp starting with &lt;code>YYYY-MM-DD&lt;/code>. That &amp;ldquo;wait&amp;rdquo; is crucial &amp;ndash; the install callback fires asynchronously, so reading storage directly will almost certainly read an empty value, which is also the most common source of false failures when writing extension tests by hand.&lt;/p>
+&lt;p>Run it:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">npx playwright &lt;span class="nb">test&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Chromium runs in headless mode by default and results print straight to the terminal. To watch execution in a real browser, add &lt;code>--headed&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">npx playwright &lt;span class="nb">test&lt;/span> --headed
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>If the extension does not write the installation date as expected, the test fails explicitly and points at the assertion content. Compared with &amp;ldquo;run it once and see whether anything errors&amp;rdquo;, this kind of assertion turns install timing into a regressible behaviour contract.&lt;/p>
+&lt;h2 id="case-two-popup-interaction">Case Two: Popup Interaction
+&lt;/h2>&lt;p>The second class of scenario is the popup. The approach is to prepare two tasks in storage first, open the popup and verify they get rendered, then delete the first one, and finally verify only the second remains in storage:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// test/popup.spec.ts
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">expect&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@playwright/test&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">test&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;playwright-webext&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;shows saved tasks in the popup&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">extension&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// prepare 2 tasks in storage
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">extension&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">storage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">set&lt;/span>&lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">todos&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;Buy groceries&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;Read a book&amp;#39;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// open the popup and check the tasks are visible
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">popup&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">extension&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">openPopup&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">popup&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByRole&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;listitem&amp;#39;&lt;/span>&lt;span class="p">)).&lt;/span>&lt;span class="nx">toContainText&lt;/span>&lt;span class="p">([&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;Buy groceries&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;Read a book&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// delete the task
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">popup&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByRole&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;button&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Delete Buy groceries&amp;#39;&lt;/span> &lt;span class="p">}).&lt;/span>&lt;span class="nx">click&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// check the storage for remaining task
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">extension&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">storage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;todos&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">toEqual&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="s1">&amp;#39;Read a book&amp;#39;&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>extension.openPopup()&lt;/code> returns an ordinary Playwright &lt;code>Page&lt;/code> instance, so inside the popup you can keep using the locators and assertions you know. &lt;code>toContainText&lt;/code> waits automatically for the tasks to appear in the popup, and it allows extra entries in the list while requiring these two to appear in the given order.&lt;/p>
+&lt;p>This case also establishes a cross-interface verification chain: write storage → render UI → interact → write back to storage. Asserting only on the UI misses the &amp;ldquo;data was not saved&amp;rdquo; defect, asserting only on storage misses the &amp;ldquo;rendering is broken&amp;rdquo; defect, and only both together are complete.&lt;/p>
+&lt;p>After the run you can open the HTML report, walk back through each step with the trace viewer, and look at the page screenshot of every step:&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig2_hu_5e8efc642e6b6411.webp"
+width="1024"
+height="677"
+srcset="https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig2_hu_ad46e3f2cd0b6d92.webp 480w, https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig2_hu_5e8efc642e6b6411.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="151"
+data-flex-basis="363px"
+>
+&lt;/p>
+&lt;p>Popup screenshots in the trace viewer, replaying each test step&lt;/p>
+&lt;p>One implementation detail worth knowing: the popup opens as an ordinary tab, not as a native browser popup bubble. That is a workaround for a Playwright limitation &amp;ndash; the Page API it supports cannot expose the native popup for interaction. In the vast majority of cases an ordinary tab is perfectly acceptable, and it actually lets popup content be tested with the full locator capability.&lt;/p>
+&lt;h2 id="case-three-version-upgrade-and-data-migration">Case Three: Version Upgrade and Data Migration
+&lt;/h2>&lt;p>The third class of scenario is more advanced and is also a hotspot for production incidents: releasing v2 changes the storage format.&lt;/p>
+&lt;p>In v1 tasks are saved as an array of strings:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="nt">&amp;#34;todos&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;Buy groceries&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Read a book&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>In v2 they become an array of objects:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="nt">&amp;#34;todos&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[{&lt;/span> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Buy groceries&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;done&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">false&lt;/span> &lt;span class="p">},&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Read a book&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;done&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">false&lt;/span> &lt;span class="p">}]&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The migration logic lives in the upgrade callback, and the test can be written like this:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// test/migration.spec.ts
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">test&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;playwright-webext&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">test&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">use&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">extensionAutoInstall&lt;/span>: &lt;span class="kt">false&lt;/span> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;migrates todos from v1 to v2&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">extension&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// install the old version
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">extension&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">install&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;./test/dist-v1&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// populate the storage
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">extension&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">storage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">set&lt;/span>&lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">todos&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;Buy groceries&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;Read a book&amp;#39;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// upgrade to the new version
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">extension&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">upgrade&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// check the migrated data
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">extension&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">storage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;todos&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">toEqual&lt;/span>&lt;span class="p">([&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Buy groceries&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">done&lt;/span>: &lt;span class="kt">false&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Read a book&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">done&lt;/span>: &lt;span class="kt">false&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Two key points: put the v1 build output in a separate directory (such as &lt;code>test/dist-v1&lt;/code>) while v2 stays in the configured &lt;code>dist&lt;/code>; and use &lt;code>test.use({ extensionAutoInstall: false })&lt;/code> to turn off automatic install so the test can install the old version manually first. &lt;code>extension.upgrade()&lt;/code> keeps the data already stored by the extension and triggers the upgrade callback, v2 converts the strings into objects in that callback, and the storage assertion waits for the result to appear.&lt;/p>
+&lt;p>What this case guarantees is that &amp;ldquo;existing users still have their tasks after upgrading&amp;rdquo;. If this class of defect reaches production it affects every existing user, and it is usually not rollbackable &amp;ndash; the data has already been rewritten by the new version.&lt;/p>
+&lt;p>Running the three tests together produces the standard HTML report, containing results, screenshots and a trace per test:&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig3_hu_98f1bcca895cc787.webp"
+width="1024"
+height="650"
+srcset="https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig3_hu_f0f67c91d64e76a7.webp 480w, https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig3_hu_98f1bcca895cc787.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="157"
+data-flex-basis="377px"
+>
+&lt;/p>
+&lt;p>The HTML report after all three tests pass&lt;/p>
+&lt;h2 id="four-hard-parts-of-extension-testing-and-how-to-handle-each">Four Hard Parts of Extension Testing, and How to Handle Each
+&lt;/h2>&lt;p>Abstracting the three scenarios above, extension testing differs from ordinary web testing mainly in four hard parts, each with a corresponding treatment.&lt;/p>
+&lt;p>&lt;strong>State lives on the browser side, not in the page.&lt;/strong> Extension data sits in &lt;code>chrome.storage&lt;/code>, &lt;code>IndexedDB&lt;/code> or the &lt;code>chrome.runtime&lt;/code> context, page refresh does not reset it, and test cases easily pollute each other. The treatment is to turn &amp;ldquo;prepare storage data&amp;rdquo; into an explicit test step (such as &lt;code>storage.local.set&lt;/code> above) and to have the fixture reinstall the extension before each test, guaranteeing a clean starting point.&lt;/p>
+&lt;p>&lt;strong>Async callbacks have no observable completion signal.&lt;/strong> There is no hint in the UI when the install or upgrade callback has finished. The treatment is to use storage assertions with waiting semantics (&lt;code>expect(...).toMatch(...)&lt;/code> polls until it matches or times out) rather than one-shot read assertions.&lt;/p>
+&lt;p>&lt;strong>Native interfaces cannot be interacted with directly.&lt;/strong> Popups, side panels and options pages each have their own way of opening, and the native popup cannot be operated with the standard Page API at all. The treatment is to use the wrapped open methods and accept the compromise that &amp;ldquo;the popup opens as a tab&amp;rdquo;; at the same time, shift the weight of assertions to the data side and verify only key rendering results on the UI side.&lt;/p>
+&lt;p>&lt;strong>Version migration lacks historical data.&lt;/strong> Migration logic only runs when old data exists, so a fresh-install test can never cover it. The treatment is to keep the old version build output in the repository as a test asset (such as &lt;code>test/dist-v1&lt;/code>), and in the case install the old version, seed the data, then upgrade.&lt;/p>
+&lt;h2 id="division-of-labour-with-the-official-extension-guide">Division of Labour With the Official Extension Guide
+&lt;/h2>&lt;p>The official guide solves one thing &amp;ndash; &amp;ldquo;getting the extension into the browser&amp;rdquo; &amp;ndash; in three concrete steps: launch Chromium with a persistent context, wait for the extension&amp;rsquo;s service worker to be ready, resolve the extension ID generated by this installation (which may differ each time). None of these three can be skipped, and they are exactly where hand-written extension tests get stuck first.&lt;/p>
+&lt;p>What the wrapper library does is sink those three steps into the fixture and then add the capabilities extension scenarios really lack: read/write of &lt;code>chrome.storage&lt;/code> with waiting assertions, methods for opening native interfaces such as the popup, and the version migration flow of installing an old version and then upgrading. The division of labour can be judged like this &amp;ndash; if you only need a few cases on an ordinary page with the extension loaded, the official approach plus a little glue code is enough; as soon as storage assertions, popup interaction or version migration are involved, the amount of glue code quickly exceeds the business assertions themselves, and that is when you should use a wrapper.&lt;/p>
+&lt;p>Conversely, do not expect a wrapper to solve everything. Cross-browser support is limited by extension loading capability itself (Chromium-based browsers work, other engines need verification first); native popup bubbles, browser toolbar buttons and context menus are outside the coverage of the Page API and still rely on indirect assertions or manual verification. Writing these boundaries into the test strategy is far cheaper than hitting the pit later and reworking.&lt;/p>
+&lt;h2 id="what-to-automate-and-what-not-to">What to Automate and What Not To
+&lt;/h2>&lt;p>Investment in extension testing should concentrate on three high-leverage scenarios: data side effects at install and upgrade (a defect affects all users and cannot be rolled back), consistency between storage and UI (a broken link on either the write or the render side is a serious defect), and cross-version migration (a hotspot for production incidents). All three share the traits of &amp;ldquo;happens repeatedly + expensive to fail + deterministically assertable&amp;rdquo;.&lt;/p>
+&lt;p>Conversely, visual details of the popup, animation transitions, one-off configuration verification, and flows that need a real account system or third-party login have a low return on automation and are better kept in the manual regression checklist. The criterion is direct: when this case fails, can you say clearly what broke without opening a browser? If you cannot, do not automate it yet.&lt;/p>
+&lt;h2 id="a-few-things-to-watch-when-putting-this-into-ci">A Few Things to Watch When Putting This into CI
+&lt;/h2>&lt;p>Build output must be generated before the tests, and its path must be declared explicitly in the config, to avoid &amp;ldquo;testing the previous version of the code&amp;rdquo;. Migration tests need build output for several versions at once, which makes the output directory grow, so name artifacts by version and keep only the necessary historical versions.&lt;/p>
+&lt;p>Verify first whether headless mode can load the extension; if not, switch to headed mode with a virtual display in CI. Tests must run serially or be strictly isolated, because they share the storage area of the same browser profile &amp;ndash; this runs counter to the intuition from ordinary Playwright tests that &amp;ldquo;each case gets an independent context&amp;rdquo;, and it is the easiest pit to fall into.&lt;/p>
+&lt;p>Keep traces and screenshots as failure artifacts. When an extension test fails there is often neither a UI error nor a console log, and the storage snapshot and page screenshot in the trace viewer are the only source of clues.&lt;/p>
+&lt;p>Finally, take the three cases &amp;ldquo;install - popup - migration&amp;rdquo; as the minimum baseline, then add business-specific scenarios. They cover the risks unique to the extension form, while business scenarios cover the product logic itself, and the two cannot substitute for each other.&lt;/p></description></item></channel></rss>

@@ -1,0 +1,1043 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Python on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/python/</link><description>Recent content in Python on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Tue, 22 Jul 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/python/index.xml" rel="self" type="application/rss+xml"/><item><title>Building and Publishing a Custom Pytest Plugin</title><link>https://chengxiaqiucao.github.io/en/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/</link><pubDate>Tue, 22 Jul 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250721-2.webp" alt="Featured image of post Building and Publishing a Custom Pytest Plugin" />&lt;h2 id="preface">Preface
+&lt;/h2>&lt;p>&lt;code>PyTest&lt;/code> is a testing framework that is very widely used in the field of test automation today. Automation based on Python scripts usually relies on this framework to manage test scripts and schedule their execution.&lt;/p>
+&lt;p>What makes Pytest powerful, besides the Fixture feature we introduced earlier, is another very important aspect: its strong ecosystem, namely its very powerful plugin support. The official plugin list alone already contains more than 1,600 plugins&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250720_hu_1a0257aa6a8b1e1b.webp"
+width="1024"
+height="531"
+srcset="https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250720_hu_c3a121eff720953c.webp 480w, https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250720_hu_1a0257aa6a8b1e1b.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="192"
+data-flex-basis="462px"
+>
+&lt;/p>
+&lt;p>In real-world work, besides enhancing capabilities through Pytest&amp;rsquo;s rich plugin ecosystem, it is actually very convenient for us to develop our own plugins to meet some of our individualized requirements; this, of course, is also the foundation of why Pytest&amp;rsquo;s plugin ecosystem can be so flourishing.&lt;/p>
+&lt;p>In this article, we will use a basic example to introduce how to develop a local Pytest plugin.&lt;/p>
+&lt;h2 id="how-pytest-plugins-work">How Pytest Plugins Work
+&lt;/h2>&lt;p>Pytest&amp;rsquo;s plugin mechanism is actually implemented mainly through the hook functions it provides and through command-line extensions.&lt;/p>
+&lt;h3 id="hook-functions">Hook Functions
+&lt;/h3>&lt;p>Hook functions are a class of special functions provided by Pytest that allow plugins to execute custom code when specific test events occur. Commonly used hook functions include:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>pytest_addoption&lt;/code>&lt;/strong>: Used to add command-line options.&lt;/li>
+&lt;li>&lt;strong>&lt;code>pytest_configure&lt;/code>&lt;/strong>: Performs configuration before the test run.&lt;/li>
+&lt;li>&lt;strong>&lt;code>pytest_runtest_setup&lt;/code>&lt;/strong>: Called before each test case is executed.&lt;/li>
+&lt;li>&lt;strong>&lt;code>pytest_runtest_teardown&lt;/code>&lt;/strong>: Called after each test case is executed.&lt;/li>
+&lt;li>&lt;strong>&lt;code>pytest_sessionfinish&lt;/code>&lt;/strong>: Called when the test session ends.&lt;/li>
+&lt;/ul>
+&lt;h3 id="command-line-options">Command-Line Options
+&lt;/h3>&lt;p>Through the &lt;code>pytest_addoption&lt;/code> hook, a plugin can define custom command-line options. This allows users to control the plugin&amp;rsquo;s behavior when running tests. For example, an option can be added to enable or disable certain features.&lt;/p>
+&lt;h3 id="the-configuration-object">The Configuration Object
+&lt;/h3>&lt;p>Within hook functions, a plugin can access Pytest&amp;rsquo;s configuration object (&lt;code>config&lt;/code>), which contains command-line options, the test context, and other configuration information. Through the configuration object, a plugin can obtain the options entered by the user and adjust its behavior accordingly.&lt;/p>
+&lt;h3 id="data-storage">Data Storage
+&lt;/h3>&lt;p>A plugin can use the configuration object within hook functions to store and manage data. For example, it can initialize a list in &lt;code>pytest_configure&lt;/code>, store data into this list after each test case is executed, and finally output the results in &lt;code>pytest_sessionfinish&lt;/code>.&lt;/p>
+&lt;h3 id="the-hookimpl-decorator">The hookimpl Decorator
+&lt;/h3>&lt;p>In Pytest, hook functions can use the &lt;code>@pytest.hookimpl&lt;/code> decorator to control the execution order and behavior of hooks. The main parameters include:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>tryfirst&lt;/code>&lt;/strong>: If set to &lt;code>True&lt;/code>, this hook will run before other hooks of the same kind. It is usually used when specific logic needs to be handled with priority.&lt;/li>
+&lt;li>&lt;strong>&lt;code>trylast&lt;/code>&lt;/strong>: The opposite of &lt;code>tryfirst&lt;/code>; if set to &lt;code>True&lt;/code>, this hook will run after other hooks of the same kind.&lt;/li>
+&lt;/ul>
+&lt;p>In this way, a plugin can precisely control the insertion of custom logic at various stages of the test execution process.&lt;/p>
+&lt;h2 id="a-hands-on-example">A Hands-On Example
+&lt;/h2>&lt;p>In this article, we will develop a local Pytest plugin that records the execution time of each test case and provides summary statistics after the test run ends.&lt;/p>
+&lt;h3 id="environment-setup">Environment Setup
+&lt;/h3>&lt;p>Create a new directory for your plugin:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">mkdir pytest_timing_plugin
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> pytest_timing_plugin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="plugin-implementation-code">Plugin Implementation Code
+&lt;/h3>&lt;p>In the plugin directory, create a file named &lt;code>pytest_timing_plugin.py&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># pytest_timing_plugin.py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pytest&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">time&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">pytest_addoption&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">parser&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">parser&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">addoption&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;--timing&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">action&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;store_true&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;Enable timing report&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.hookimpl&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">tryfirst&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">pytest_configure&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">getoption&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;timing&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_timing_data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_total_duration&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mf">0.0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.hookimpl&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">tryfirst&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">pytest_runtest_setup&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">getoption&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;timing&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">start_time&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">time&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.hookimpl&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">tryfirst&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">pytest_runtest_teardown&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">getoption&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;timing&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">duration&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">time&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">start_time&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_timing_data&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">append&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">nodeid&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">duration&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">item&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_total_duration&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="n">duration&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.hookimpl&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">tryfirst&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">pytest_sessionfinish&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">session&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">exitstatus&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">session&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">getoption&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;timing&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">Timing Report:&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">test_id&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">duration&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">session&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_timing_data&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">test_id&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">duration&lt;/span>&lt;span class="si">:&lt;/span>&lt;span class="s2">.4f&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> seconds&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Total Duration: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">session&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_total_duration&lt;/span>&lt;span class="si">:&lt;/span>&lt;span class="s2">.4f&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> seconds&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;code>pytest_addoption&lt;/code>: Adds the &lt;code>--timing&lt;/code> option to enable timing.&lt;/li>
+&lt;li>&lt;code>pytest_runtest_setup&lt;/code>: Records the start time when each test begins.&lt;/li>
+&lt;li>&lt;code>pytest_runtest_teardown&lt;/code>: Calculates and records the duration when each test ends, and accumulates it into the total duration.&lt;/li>
+&lt;li>&lt;code>pytest_sessionfinish&lt;/code>: Prints the execution time report for each test and the total execution time when the test session ends.&lt;/li>
+&lt;/ul>
+&lt;h3 id="preparing-the-test-file">Preparing the Test File
+&lt;/h3>&lt;p>In the same directory, create a test file &lt;code>test_sample.py&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># test_sample.py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">time&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_example_1&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">time&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="kc">True&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_example_2&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">time&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="kc">True&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_example_3&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">time&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mf">1.5&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="kc">True&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="packaging-the-plugin">Packaging the Plugin
+&lt;/h2>&lt;p>If we want to share the plugin with others, we can package it. Create a &lt;code>setup.py&lt;/code> file:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># setup.py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">setuptools&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">setup&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">setup&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;pytest-timing-plugin&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">version&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;0.1&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">description&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;A pytest plugin to measure and report test execution time&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">py_modules&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;pytest_timing_plugin&amp;#39;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">entry_points&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;pytest11&amp;#39;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;timing_plugin = pytest_timing_plugin&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>In the plugin directory, run:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">pip install .
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>This includes the plugin we just developed in the local Pytest environment.&lt;/p>
+&lt;h3 id="running-the-tests">Running the Tests
+&lt;/h3>&lt;p>Run the tests with the &lt;code>pytest&lt;/code> command, passing the custom option at the same time:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">pytest --timing
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The run result:&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250721_hu_a8fd5501d8d371f8.webp"
+width="1024"
+height="496"
+srcset="https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250721_hu_6c89cd1a64d7dabb.webp 480w, https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250721_hu_a8fd5501d8d371f8.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="206"
+data-flex-basis="495px"
+>
+&lt;/p>
+&lt;h2 id="publishing-the-plugin">Publishing the Plugin
+&lt;/h2>&lt;p>And if we want to publicly release the plugin we developed on a wider scale, we can publish it to &lt;code>PyPI&lt;/code> for broader dissemination and adoption.&lt;/p>
+&lt;h3 id="preparing-for-release">Preparing for Release
+&lt;/h3>&lt;p>Install the relevant publishing tools:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">pip install setuptools twine
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>&lt;code>setuptools&lt;/code>&lt;/strong>: Used to package Python projects&lt;/li>
+&lt;li>&lt;strong>&lt;code>twine&lt;/code>&lt;/strong>: Used to upload packages to PyPI&lt;/li>
+&lt;/ul>
+&lt;p>And upload the code to an open source platform such as &lt;code>Github&lt;/code>&lt;/p>
+&lt;h3 id="preparing-setuppy">Preparing &lt;code>setup.py&lt;/code>
+&lt;/h3>&lt;p>Add the following content, including the source code project:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># setup.py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">setuptools&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">setup&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">setup&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;pytest-timing-plugin&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">version&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;0.5&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1"># updated version number&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">description&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;A pytest plugin to measure and report test execution time&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">py_modules&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;pytest_timing_plugin&amp;#39;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">entry_points&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;pytest11&amp;#39;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;timing_plugin = pytest_timing_plugin&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">author&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;城下秋草&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">author_email&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;your.email@example.com&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">url&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;https://github.com/chengxiaqiucao/pytest-timing-plugin&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">classifiers&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;Programming Language :: Python :: 3&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;Framework :: Pytest&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;License :: OSI Approved :: MIT License&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="creating-readme">Creating &lt;code>README&lt;/code>
+&lt;/h3>&lt;p>Create a &lt;code>README.md&lt;/code> file describing the plugin&amp;rsquo;s features and usage.&lt;/p>
+&lt;h3 id="building-the-distribution-package">Building the Distribution Package
+&lt;/h3>&lt;p>In the plugin directory, run the following command to generate the distribution package:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">python setup.py sdist bdist_wheel
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>This generates &lt;code>.tar.gz&lt;/code> and &lt;code>.whl&lt;/code> files in the &lt;code>dist&lt;/code> directory.&lt;/p>
+&lt;h3 id="publishing-to-pypi">Publishing to PyPI
+&lt;/h3>&lt;p>Use &lt;code>twine&lt;/code> to upload the package to PyPI. First of all, of course, we need to have an account on &lt;a class="link" href="https://pypi.org/account/register/" target="_blank" rel="noopener"
+>PyPI&lt;/a>.&lt;/p>
+&lt;p>Then, run the following command:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">python -m twine upload dist/*
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Enter the PyPI API Token as prompted to complete the upload&lt;/p>
+&lt;p>Once complete, the plugin can be found on the PyPI official site&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250721-2_hu_b39c1e78608f2709.webp"
+width="1024"
+height="392"
+srcset="https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250721-2_hu_72c389865bd49a5f.webp 480w, https://chengxiaqiucao.github.io/post/022-pytest%E7%9A%84hook%E6%9C%BA%E5%88%B6%E5%8F%8A%E7%94%A8%E9%80%94/Pasted-20250721-2_hu_b39c1e78608f2709.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="261"
+data-flex-basis="626px"
+>
+&lt;/p>
+&lt;h3 id="verifying-the-installation">Verifying the Installation
+&lt;/h3>&lt;p>After a successful upload, you can install the plugin in other environments with the following command:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">pip install pytest-timing-plugin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="updating-the-plugin">Updating the Plugin
+&lt;/h3>&lt;p>If you need to update the plugin, simply update the version number in &lt;code>setup.py&lt;/code>, regenerate the distribution package, and then upload it again with &lt;code>twine&lt;/code>.&lt;/p>
+&lt;hr>
+&lt;p>The above is a practical example of Pytest plugin development&lt;/p></description></item><item><title>Still Debugging with print? Try PySnooper</title><link>https://chengxiaqiucao.github.io/en/post/055-debug%E5%B7%A5%E5%85%B7pysnooper/</link><pubDate>Sat, 15 Feb 2025 19:13:42 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/055-debug%E5%B7%A5%E5%85%B7pysnooper/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/055-debug%E5%B7%A5%E5%85%B7pysnooper/Pasted-20250215.webp" alt="Featured image of post Still Debugging with print? Try PySnooper" />&lt;h2 id="why-do-you-need-pysnooper">Why Do You Need PySnooper?
+&lt;/h2>&lt;p>During Python development, print debugging and breakpoint debugging are the most commonly used debugging methods. But when facing complex logic, traditional methods have clear shortcomings:&lt;/p>
+&lt;ul>
+&lt;li>print statements must be added and removed manually, cluttering the code&lt;/li>
+&lt;li>IDE breakpoint debugging is hard to use in remote-server scenarios&lt;/li>
+&lt;li>Debugging multithreaded/asynchronous scenarios is difficult&lt;/li>
+&lt;/ul>
+&lt;p>Through an intelligent logging mechanism, PySnooper enables &lt;strong>zero-intrusion debugging&lt;/strong>, offering another intuitive and convenient way to observe and debug.&lt;/p>
+&lt;h2 id="detailed-look-at-core-features">Detailed Look at Core Features
+&lt;/h2>&lt;h3 id="1-intelligent-context-tracking">1. Intelligent Context Tracking
+&lt;/h3>&lt;p>For example, let&amp;rsquo;s write a recursive function&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pysnooper&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pysnooper.snoop&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Sample output:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="p">(&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">venv&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">:&lt;/span>\&lt;span class="n">Chengxiaqiucao&lt;/span>\&lt;span class="n">AI&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">python&lt;/span> &lt;span class="n">ai_test&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Source&lt;/span> &lt;span class="n">path&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">...&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">:&lt;/span>\&lt;span class="n">Chengxiaqiucao&lt;/span>\&lt;span class="n">AI&lt;/span>\&lt;span class="n">ai_test&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Starting&lt;/span> &lt;span class="k">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">3&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.353061&lt;/span> &lt;span class="n">call&lt;/span> &lt;span class="mi">9&lt;/span> &lt;span class="k">def&lt;/span> &lt;span class="nf">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357038&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">10&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357103&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">13&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Starting&lt;/span> &lt;span class="k">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357159&lt;/span> &lt;span class="n">call&lt;/span> &lt;span class="mi">9&lt;/span> &lt;span class="k">def&lt;/span> &lt;span class="nf">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357220&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">10&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357291&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">13&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Starting&lt;/span> &lt;span class="k">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357348&lt;/span> &lt;span class="n">call&lt;/span> &lt;span class="mi">9&lt;/span> &lt;span class="k">def&lt;/span> &lt;span class="nf">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357421&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">10&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357460&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">11&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357501&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">11&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Return&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Elapsed&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">00.000248&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357716&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">13&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Return&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Elapsed&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">00.000649&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">50.357843&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">13&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">factorial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Return&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="mi">6&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Elapsed&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">00.005107&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>It automatically records the function call stack and code execution path, and supports tracing recursive functions&lt;/p>
+&lt;h3 id="2-variable-monitoring">2. Variable Monitoring
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pysnooper.snoop&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">watch&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;result&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;len(data)&amp;#39;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">process_data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">item&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">data&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">processed&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">item&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">result&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">processed&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nb">sum&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">result&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Monitoring features:&lt;/p>
+&lt;ul>
+&lt;li>Supports expression monitoring (e.g. &lt;code>len(data)&lt;/code>)&lt;/li>
+&lt;li>Displays variable types in real time&lt;/li>
+&lt;li>Highlights value changes&lt;/li>
+&lt;/ul>
+&lt;h3 id="3-context-manager-mode-and-output-to-a-file">3. Context Manager Mode and Output to a File
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Context manager mode&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">with&lt;/span> &lt;span class="n">pysnooper&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">snoop&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">output&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;/var/log/debug.log&amp;#39;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">critical_operation&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="4-specifying-prefixes-for-multiple-trace-points">4. Specifying Prefixes for Multiple Trace Points
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pysnooper.snoop&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">prefix&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;[add]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">a&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">a&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">b&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pysnooper.snoop&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">prefix&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;[main]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">7&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">result&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Final result: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">result&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The output displays the different prefixes you specified&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">29&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">01.818895&lt;/span> &lt;span class="n">call&lt;/span> &lt;span class="mi">17&lt;/span> &lt;span class="k">def&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">29&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">01.819578&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">18&lt;/span> &lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">7&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Source&lt;/span> &lt;span class="n">path&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">...&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">:&lt;/span>\&lt;span class="n">Chengxiaqiucao&lt;/span>\&lt;span class="n">AI&lt;/span>\&lt;span class="n">ai_test&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Starting&lt;/span> &lt;span class="k">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="n">a&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">5&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Starting&lt;/span> &lt;span class="k">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="n">b&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">7&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">29&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">01.819791&lt;/span> &lt;span class="n">call&lt;/span> &lt;span class="mi">13&lt;/span> &lt;span class="k">def&lt;/span> &lt;span class="nf">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">a&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">29&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">01.820558&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">14&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">a&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">b&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">29&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">01.820758&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">14&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">a&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">b&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Return&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="mi">12&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="n">Elapsed&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">00.001314&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="n">New&lt;/span> &lt;span class="k">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">.......&lt;/span> &lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">12&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">29&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">01.821253&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">19&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">result&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">29&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">01.821503&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">19&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">result&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="n">Return&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="mi">12&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="n">Elapsed&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">00.002834&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Final&lt;/span> &lt;span class="n">result&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">12&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="5-setting-the-trace-depth">5. Setting the Trace Depth
+&lt;/h3>&lt;p>If the code involves multiple levels of function calls, you can also specify the recording depth, which defaults to &lt;strong>1&lt;/strong>. Flexibly combining the &lt;code>depth&lt;/code> parameter helps us focus on the parts we care about&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pysnooper.snoop&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">depth&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">outer_function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">inner_function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pysnooper.snoop&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">depth&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">inner_function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">y&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">y&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">outer_function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Outer function result: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">result&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Output:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">Starting&lt;/span> &lt;span class="k">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="n">x&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">10&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">37&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">49.360851&lt;/span> &lt;span class="n">call&lt;/span> &lt;span class="mi">9&lt;/span> &lt;span class="k">def&lt;/span> &lt;span class="nf">outer_function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">37&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">49.361569&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">10&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">inner_function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Source&lt;/span> &lt;span class="n">path&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">...&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">:&lt;/span>\&lt;span class="n">Chengxiaqiucao&lt;/span>\&lt;span class="n">ai&lt;/span>\&lt;span class="n">ai_test&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Starting&lt;/span> &lt;span class="k">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="n">y&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">11&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">37&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">49.361734&lt;/span> &lt;span class="n">call&lt;/span> &lt;span class="mi">13&lt;/span> &lt;span class="k">def&lt;/span> &lt;span class="nf">inner_function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">y&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">37&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">49.362077&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="mi">14&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">y&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">37&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">49.362184&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">14&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">y&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Return&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="mi">22&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Elapsed&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">00.000589&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">37&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">49.362380&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">10&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">inner_function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Return&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">..&lt;/span> &lt;span class="mi">22&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Elapsed&lt;/span> &lt;span class="n">time&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">00.001683&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Outer&lt;/span> &lt;span class="n">function&lt;/span> &lt;span class="n">result&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">22&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="summary">Summary
+&lt;/h2>&lt;p>With this tool, when debugging, especially when testing code on servers, you can monitor runtime variables and execution flow with a single decorator line, leaving the hassle of print debugging behind!&lt;/p></description></item><item><title>Build Python Command-Line Applications Quickly with Typer</title><link>https://chengxiaqiucao.github.io/en/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/</link><pubDate>Thu, 19 Sep 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Typer.webp" alt="Featured image of post Build Python Command-Line Applications Quickly with Typer" />&lt;p>In Python, the most basic way to develop command-line programs is to use the Python standard library &lt;code>argparse&lt;/code> to define command-line arguments and various interactions. It is, however, relatively complex, and some common scenarios still need us to wrap them separately.&lt;/p>
+&lt;p>In this article we introduce another Python command-line tool library, &lt;code>typer&lt;/code>, which is both very powerful and very easy to get started with, and see how to use it to help us quickly implement a command-line application.&lt;/p>
+&lt;h2 id="installation-and-basic-usage">Installation and Basic Usage
+&lt;/h2>&lt;h3 id="installation">Installation
+&lt;/h3>&lt;p>&lt;code>typer&lt;/code> is a command-line implementation tool launched by the popular open source web API framework &lt;code>FastAPI&lt;/code>. Like other Python third-party libraries, it is very easy to install.&lt;/p>
+&lt;p>&lt;code>pip instal typer&lt;/code>&lt;/p>
+&lt;h3 id="basic-usage">Basic Usage
+&lt;/h3>&lt;h4 id="approach-one">Approach One
+&lt;/h4>&lt;p>Write the most basic &lt;code>hello world&lt;/code> program, user_typer.py&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;hello world!&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="vm">__name__&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;__main__&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Call it directly via the &lt;code>typer&lt;/code> command
+Run:&lt;/p>
+&lt;blockquote>
+&lt;p>Demo&amp;gt;typer use_typer.py run&lt;/p>
+&lt;p>hello world!&lt;/p>&lt;/blockquote>
+&lt;h4 id="approach-two">Approach Two
+&lt;/h4>&lt;p>You can also import typer in your code and then call it directly from within the program using its &lt;code>run&lt;/code> method&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">typer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;hello world!&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="vm">__name__&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;__main__&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Run:&lt;/p>
+&lt;blockquote>
+&lt;p>Demo&amp;gt;python use_typer.py&lt;/p>
+&lt;p>hello world!&lt;/p>&lt;/blockquote>
+&lt;h3 id="approach-three">Approach Three
+&lt;/h3>&lt;p>Or declare the program as an application and use annotations to specify each command the application supports&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">typer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">app&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Typer&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@app.command&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;hello world!&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="vm">__name__&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;__main__&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">app&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Run:&lt;/p>
+&lt;blockquote>
+&lt;p>Demo&amp;gt;python use_typer.py&lt;/p>
+&lt;p>hello world!&lt;/p>&lt;/blockquote>
+&lt;p>Moreover, running &lt;code>python user_typer.py --help&lt;/code> shows that the necessary help instructions have already been generated automatically.
+&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919_hu_c4b6fffb8f968a86.webp"
+width="1024"
+height="295"
+srcset="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919_hu_3027c901d049db47.webp 480w, https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919_hu_c4b6fffb8f968a86.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="346"
+data-flex-basis="831px"
+>
+&lt;/p>
+&lt;p>Here we added a parameter to the main function, and you can see that &lt;code>typer&lt;/code> in fact also automatically parses the parameters carried by the corresponding function into command parameters, with no need to redefine them.&lt;/p>
+&lt;h2 id="command-help-and-default-values">Command Help and Default Values
+&lt;/h2>&lt;p>Of course, as a command-line program, defining command help information is an important part.&lt;/p>
+&lt;p>&lt;code>typer&lt;/code> also provides a very convenient way to add help for commands and parameters.
+For example, let&amp;rsquo;s add another command&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;问候指定的小伙伴&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">hello&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">Annotated&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nb">str&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Argument&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;被问候的伙伴姓名&amp;#34;&lt;/span>&lt;span class="p">)]&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;城下秋草&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 这里也可以直接作为命令帮助，和command的help参数作用一样，
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 但优先级没有command注解高
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> &amp;#34;&amp;#34;&amp;#34;&lt;/span> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;你好，&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The help information for the command itself can be specified directly in the command annotation via the help parameter, or it can come from the function&amp;rsquo;s own docstring, which typer also parses as command help. But if it has already been specified in the command annotation, the help information specified in the command annotation takes precedence&lt;/p>
+&lt;p>For the specified parameter &lt;code>name&lt;/code>, here it is specified through Python&amp;rsquo;s type extension library and then through the &lt;code>type.Argument&lt;/code> help parameter, and at the same time the parameter&amp;rsquo;s default value can also be specified.
+&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-1_hu_b5ff21ac9965d169.webp"
+width="1024"
+height="343"
+srcset="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-1_hu_2b9d7f6ad5e7d941.webp 480w, https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-1_hu_b5ff21ac9965d169.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="298"
+data-flex-basis="716px"
+>
+&lt;/p>
+&lt;h2 id="optional-parameters-and-parameter-names">Optional Parameters and Parameter Names
+&lt;/h2>&lt;p>The parameter we specified here through &lt;code>type.Argument&lt;/code> is actually a required parameter. So what if we want a certain parameter to be optional? Here &lt;code>typer&lt;/code> distinguishes them using two different types. By definition,&lt;/p>
+&lt;ul>
+&lt;li>typer.Argument is required&lt;/li>
+&lt;li>typer.Option is optional&lt;/li>
+&lt;/ul>
+&lt;p>These correspond to the two different panels &lt;code>Arguments&lt;/code> and &lt;code>Options&lt;/code> in the help information. But whether it must actually be entered is determined by whether a default value has been specified for the corresponding parameter; if no default value is specified, it means this parameter must be entered.&lt;/p>
+&lt;p>Another difference between Option and Argument is that an Option needs an option name specified, that is, a marker carrying &lt;code>--&lt;/code> or the short parameter marker &lt;code>-&lt;/code>, such as &lt;code>--name&lt;/code>, &lt;code>--help&lt;/code>&lt;/p>
+&lt;p>By default &lt;code>typer.Option&lt;/code> directly converts the parameter name into a long marker, and you can also specify other aliases yourself. At the same time you can also specify a short marker&lt;/p>
+&lt;p>For example, we can add another parameter &lt;code>last_name&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;问候指定的小伙伴&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">hello&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">last_name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">Annotated&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nb">str&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Option&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;--last&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;-l&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;被问候的人员姓什么&amp;#34;&lt;/span>&lt;span class="p">)],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">Annotated&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nb">str&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Argument&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;被问候的伙伴名称&amp;#34;&lt;/span>&lt;span class="p">)]&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;城下秋草&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 这里也可以直接作为命令帮助，和command的help参数作用一样，
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 但优先级没有command注解高
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> &amp;#34;&amp;#34;&amp;#34;&lt;/span> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;你好，&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">last_name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-2_hu_96755425901133f.webp"
+width="1024"
+height="356"
+srcset="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-2_hu_e88a4f427237a784.webp 480w, https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-2_hu_96755425901133f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="287"
+data-flex-basis="690px"
+>
+&lt;/p>
+&lt;h2 id="richer-interface-enhancements">Richer Interface Enhancements
+&lt;/h2>&lt;p>Besides being flexible and simple in parameter definition, &lt;code>typer&lt;/code> also provides many enhancements for the interactive interface&lt;/p>
+&lt;h3 id="color-and-structured-data-display-support">Color and Structured Data Display Support
+&lt;/h3>&lt;p>For example, for the command line, to distinguish information with different colors, here it uses another third-party library, &lt;code>rich&lt;/code>; you can simply replace Python&amp;rsquo;s official plain print statement with the print method from the rich library to achieve richer color control and structured data display, and so on&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;显示结构数据:&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;不同颜色和emoji:&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;[bold red]警告！[/bold red] [green]数据data[/green] 不匹配！ :boom:&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="vm">__name__&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;__main__&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Execution effect
+&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-3_hu_8f961076e1a239db.webp"
+width="1024"
+height="402"
+srcset="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-3_hu_c0b0edb371cdfbaf.webp 480w, https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-3_hu_8f961076e1a239db.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="254"
+data-flex-basis="610px"
+>
+&lt;/p>
+&lt;h3 id="prompt-messages">Prompt Messages
+&lt;/h3>&lt;p>&lt;code>typer.Option&lt;/code> can be switched to prompt mode, that is, for required parameters it can prompt for input&lt;/p>
+&lt;p>For example, in the above example, adding &lt;code>prompt=True&lt;/code> will prompt for input when no parameter is entered&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;问候指定的小伙伴&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">hello&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">last_name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">Annotated&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nb">str&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Option&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;--last&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;-l&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;被问候的人员姓什么&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">prompt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Run:
+&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/prompt.gif"
+width="1322"
+height="223"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="592"
+data-flex-basis="1422px"
+>
+&lt;/p>
+&lt;h3 id="password-and-information-hiding">Password and Information Hiding
+&lt;/h3>&lt;p>For some password-type parameters, hiding and confirmation options are also supported. For example, let&amp;rsquo;s add a passwd parameter&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;问候指定的小伙伴&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">hello&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">last_name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">Annotated&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nb">str&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Option&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;--last&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;-l&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;被问候的人员姓什么&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">prompt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)]&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;黄&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">passwd&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">Annotated&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nb">str&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Option&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">prompt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">confirmation_prompt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">hide_input&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)]&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">None&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">Annotated&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nb">str&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Argument&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">help&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;被问候的伙伴名称&amp;#34;&lt;/span>&lt;span class="p">)]&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;城下秋草&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 这里也可以直接作为命令帮助，和command的help参数作用一样，
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 但优先级没有command注解高
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> &amp;#34;&amp;#34;&amp;#34;&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="n">passwd&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;123&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;你好，&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">last_name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;[bold red]密码输入错误，不能展示！[/bold red]&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-4_hu_9bbbf966d97e7814.webp"
+width="1024"
+height="511"
+srcset="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-4_hu_54658e3021488d74.webp 480w, https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-4_hu_9bbbf966d97e7814.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="200"
+data-flex-basis="481px"
+>
+&lt;/p>
+&lt;h3 id="progress-bar-implementation">Progress Bar Implementation
+&lt;/h3>&lt;p>typer also supports progress-bar-type information interaction quite conveniently, again using the progress enhancements in rich&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">rich.progress&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">track&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">running&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">total&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">value&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">track&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">100&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">description&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;正在执行中....&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Fake processing time &lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">time&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mf">0.01&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">total&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;已处理 &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">total&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> 任务&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="vm">__name__&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;__main__&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">running&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/progress.gif"
+width="1322"
+height="223"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="592"
+data-flex-basis="1422px"
+>
+&lt;/p>
+&lt;h2 id="multi-level-command-nesting">Multi-level Command Nesting
+&lt;/h2>&lt;p>For multi-level command nesting, &lt;code>typer&lt;/code> of course also provides good support. This is done by declaring different applications and then using the &lt;code>add_typer&lt;/code> method to complete the hierarchical association.&lt;/p>
+&lt;p>The official example demonstrates this very clearly&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">typer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">app&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Typer&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">items_app&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Typer&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">app&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_typer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">items_app&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;items&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">users_app&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">typer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Typer&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">app&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_typer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">users_app&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;users&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@items_app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;create&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">items_create&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Creating item: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@items_app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;delete&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">items_delete&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Deleting item: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@items_app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;sell&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">items_sell&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Selling item: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@users_app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;create&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">users_create&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user_name&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Creating user: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">user_name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@users_app.command&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;delete&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">users_delete&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user_name&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Deleting user: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">user_name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="vm">__name__&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;__main__&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">app&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Use &lt;code>--help&lt;/code> to see the effect of this arrangement
+&lt;img src="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-5_hu_23b726ed76449ad5.webp"
+width="1024"
+height="672"
+srcset="https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-5_hu_ef185cb07d8ca148.webp 480w, https://chengxiaqiucao.github.io/post/014-%E7%94%A8typer%E5%BF%AB%E9%80%9F%E5%BC%80%E5%8F%91python%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BA%94%E7%94%A8/Pasted-20240919-5_hu_23b726ed76449ad5.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="152"
+data-flex-basis="365px"
+>
+&lt;/p>
+&lt;hr>
+&lt;p>The above is a rundown of the usage of the command-line tool &lt;code>typer&lt;/code>.&lt;/p></description></item></channel></rss>

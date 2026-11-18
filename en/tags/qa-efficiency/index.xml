@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>QA Efficiency on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/qa-efficiency/</link><description>Recent content in QA Efficiency on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Thu, 05 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/qa-efficiency/index.xml" rel="self" type="application/rss+xml"/><item><title>After Development Got Faster, the Queue Stopped at QA - Naming the Cost That Moved</title><link>https://chengxiaqiucao.github.io/en/post/155-qa-bottleneck-after-ai/</link><pubDate>Thu, 05 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/155-qa-bottleneck-after-ai/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/cover.webp" alt="Featured image of post After Development Got Faster, the Queue Stopped at QA - Naming the Cost That Moved" />&lt;p>On a Thursday afternoon at the end of a sprint, the board of a team that has used an AI coding assistant for six months looks like this: &amp;ldquo;In Progress&amp;rdquo; is thinner than before, &amp;ldquo;Code Review&amp;rdquo; is moving, and the &amp;ldquo;To Test&amp;rdquo; column has barely moved in three sprints.&lt;/p>
+&lt;p>At the retrospective someone ventures carefully: testing &amp;ldquo;seems to have got slower&amp;rdquo;. The testers know what the honest answer is &amp;ndash; testing has not got slower, there is simply more coming in. But in a room where everyone else has got faster, that sounds like an excuse.&lt;/p>
+&lt;p>This is an old story in a new edition. When development runs late, testing gets compressed and QA absorbs a cost it did not create; when development speeds up, the same thing happens in the opposite direction. The cost is generated upstream and the bill is delivered to the last gate before production.&lt;/p>
+&lt;h2 id="one-the-speed-did-not-disappear-it-changed-position">One: The Speed Did Not Disappear, It Changed Position
+&lt;/h2>&lt;p>A 2024 study on DevOps delivery performance produced a counter-intuitive set of numbers: developers using AI did report improvements in personal efficiency, documentation and code quality, but at the delivery level the picture flipped &amp;ndash; for every 25% increase in AI adoption, delivery throughput was estimated to fall about 1.5% and delivery stability about 7.2%.&lt;/p>
+&lt;p>The researchers did not blame this on &amp;ldquo;AI writing poor code&amp;rdquo;. The most likely explanation is change batch size: with AI helping write code, individual changes get bigger, and bigger changes are harder to review, harder to test and more likely to cause failures in production.&lt;/p>
+&lt;p>Looked at from the &amp;ldquo;To Test&amp;rdquo; column, this conclusion is not abstract at all. &amp;ldquo;Bigger changes arriving more often&amp;rdquo; is the very definition of increased workload at the testing gate. Anyone who has looked at delivery through the lens of constraint theory knows the next step: speed up a stage that was never the constraint, and the constraint does not disappear, it moves. That Thursday afternoon board is what that movement looks like from the inside. Nobody decided to make QA the bottleneck; they just made coding faster, and the queue moved house by itself.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig1_hu_ca40dc9fc5869375.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig1_hu_11070783fb6862f5.webp 480w, https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig1_hu_ca40dc9fc5869375.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>Once the coding stage speeds up, change batches grow and the delivery constraint moves automatically to the verification gate before release&lt;/p>
+&lt;h2 id="two-giving-qa-the-same-tools-often-makes-the-queue-faster-not-safer">Two: Giving QA the Same Tools Often Makes the Queue Faster, Not Safer
+&lt;/h2>&lt;p>Almost every team&amp;rsquo;s first reaction is to give testers the same tools: let the model generate cases, dozens in minutes, most of them green on the first run. The column empties, the retrospective has good news, and the problem looks solved.&lt;/p>
+&lt;p>What changed is &amp;ldquo;how many tests exist&amp;rdquo;; what did not change is &amp;ldquo;where they look&amp;rdquo;. A model generating tests reads the code, so it tests what the code does. And in a large AI-assisted change the risk is often somewhere else: what assumptions the code makes about existing production data, the integration this ticket did not touch, the configuration items that differ between environments. Those assumptions are not in the diff, so they do not appear in tests generated from the diff.&lt;/p>
+&lt;p>The result is speed without a floor: the team gets faster at every step you can count, and nothing underneath the speed gets stronger. Once &amp;ldquo;how many tests did we write this sprint&amp;rdquo; becomes a watched metric, Goodhart&amp;rsquo;s law applies &amp;ndash; it stops measuring anything the moment it becomes the target. Change failure rate &amp;ndash; the metric for how often a deployment causes a production incident &amp;ndash; does not care how many tests exist at all; it only moves when tests look at where failures actually come from.&lt;/p>
+&lt;p>The study&amp;rsquo;s own conclusion points the same way: AI benefits appear in teams where &lt;strong>the fundamentals are already in place&lt;/strong> &amp;ndash; small change batches, reliable continuous integration, automated tests the team genuinely trusts. AI amplifies what already exists. In teams without that foundation, what gets amplified faster is the gap.&lt;/p>
+&lt;h2 id="three-hand-over-the-mechanical-part-keep-the-judgement">Three: Hand Over the Mechanical Part, Keep the Judgement
+&lt;/h2>&lt;p>This is not about keeping QA away from these tools. A test engineer who refuses the tools is still a bottleneck, just with less thinking time. The useful split is between mechanical work and judgement.&lt;/p>
+&lt;p>The mechanical part is large, and models are genuinely good at it:&lt;/p>
+&lt;ul>
+&lt;li>Generating test data for an entity with dozens of required fields&lt;/li>
+&lt;li>Writing boilerplate for a new page object or API client&lt;/li>
+&lt;li>Grouping this morning&amp;rsquo;s failed pipeline runs by likely cause&lt;/li>
+&lt;li>Reading a long diff and listing which modules, contracts and config files it actually touched&lt;/li>
+&lt;/ul>
+&lt;p>Work that used to be measured in hours is now measured in minutes.&lt;/p>
+&lt;p>The judgement part does not compress like that: which of the modules touched in this release really matter, which risk is worth a slow end-to-end run, which is covered well enough by contract tests, what can honestly go untested this round, and whether to sign off at all. Those judgements depend on knowing the business and where the system has broken in past quarters, which the model cannot obtain and cannot carry for you.&lt;/p>
+&lt;p>The two ways of using it therefore lead to completely different outcomes: the person who spends two minutes having the model summarize a big diff and the saved hour judging &amp;ldquo;where this change could break the system&amp;rdquo; is using AI to get out of the queue; the person who uses it to produce a few dozen more cases is making the queue flow faster.&lt;/p>
+&lt;h2 id="four-making-the-shift-into-numbers-you-can-put-on-the-table">Four: Making the &amp;ldquo;Shift&amp;rdquo; Into Numbers You Can Put on the Table
+&lt;/h2>&lt;p>Behind the &amp;ldquo;To Test&amp;rdquo; column sits a decision the team has made but nobody has said out loud: speed up code production without speeding up anything that verifies it. Treating this as a &amp;ldquo;testing speed problem&amp;rdquo; hides that decision and presses the cost onto the only role that took no part in making it.&lt;/p>
+&lt;p>The way out is to report on the queue in terms of what feeds it, not in terms of the queue itself:&lt;/p>
+&lt;ul>
+&lt;li>How much change entered testing this sprint, compared with three sprints ago?&lt;/li>
+&lt;li>How big is the average change, and how big is the largest?&lt;/li>
+&lt;li>How many tickets could have been split but arrived bundled together?&lt;/li>
+&lt;/ul>
+&lt;p>These numbers translate &amp;ldquo;testing is slow&amp;rdquo; into a conversation about change batch size, and batch size happens to be the lever upstream can actually pull. It also changes who should be at the table: a test engineer asking for more time sounds defensive; a test engineer showing &amp;ldquo;how much the average change entering testing has grown&amp;rdquo; is describing the system, and the system belongs to everyone on the team.&lt;/p>
+&lt;p>The lightest starting action is almost too small to mention: add a number to every card in that column, marking how many lines the change touches. Nobody will look at it for the first sprint. Then one afternoon, a developer will split a ticket in half before moving the card over.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig2_hu_e54bf4d2edd8d683.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig2_hu_d10b170e8436beda.webp 480w, https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig2_hu_e54bf4d2edd8d683.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>Mechanical work goes to the tool, judgement stays with the person; the time and information each side needs are completely different&lt;/p>
+&lt;h2 id="five-an-unresolved-question-of-distinction">Five: An Unresolved Question of Distinction
+&lt;/h2>&lt;p>One thing must be admitted as not thought through: from inside the role, &amp;ldquo;being a bottleneck because you held on to judgement&amp;rdquo; and &amp;ldquo;being a bottleneck because you never changed how you work&amp;rdquo; feel exactly the same. Both show up as a column of unmoving cards, and both produce the same awkward silence at the retrospective.&lt;/p>
+&lt;p>The closest thing to a usable self-check found so far is to take the last ticket that waited in that column and ask what it actually needed QA for. If the answer is a decision only testing can make, then the wait was the work itself; if the answer is a regression run nobody reads plus a checklist that would have passed anyway, then the wait was only habit, and that part should have been absorbed by tools. There is no metric yet that cleanly separates the two, and perhaps none exists.&lt;/p>
+&lt;p>That is exactly why it is more worthwhile to measure upstream than to measure yourself: once &amp;ldquo;change batch size&amp;rdquo; is out in the open, the discussion shifts from &amp;ldquo;is testing fast enough&amp;rdquo; to &amp;ldquo;how much are we choosing to deliver at once&amp;rdquo;. The former can only be answered by testers working overtime; the latter is a design choice the team can adjust together.&lt;/p>
+&lt;h2 id="six-closing-thoughts">Six: Closing Thoughts
+&lt;/h2>&lt;p>The queue stopping at QA is not the testing stage suddenly regressing; it is the bill left behind after speed was redistributed. Treat it as an efficiency problem and you end up with &amp;ldquo;let testing generate more too&amp;rdquo;; treat it as a system problem and you end up at the levers that can really move: batch size, review density and verification capability.&lt;/p>
+&lt;p>For testers, the most powerful move is often not to empty the column but to explain clearly why it is full, whose decision filled it, and what exactly the parts are that cannot be traded away for generation speed.&lt;/p></description></item></channel></rss>

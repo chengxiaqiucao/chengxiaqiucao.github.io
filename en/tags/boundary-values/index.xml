@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Boundary Values on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/boundary-values/</link><description>Recent content in Boundary Values on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Wed, 04 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/boundary-values/index.xml" rel="self" type="application/rss+xml"/><item><title>The Form Only Ever Saw 'John Smith' - Putting 246 Values That Break Things Into One Exploratory Session</title><link>https://chengxiaqiucao.github.io/en/post/151-naughty-input-catalog/</link><pubDate>Wed, 04 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/151-naughty-input-catalog/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/151-naughty-input-catalog/cover.webp" alt="Featured image of post The Form Only Ever Saw 'John Smith' - Putting 246 Values That Break Things Into One Exploratory Session" />&lt;p>A form is usually verified with values like these: an ordinary name, a date that really exists, a number that fits. Then it meets real data &amp;ndash; someone pastes a name with a trailing space, someone&amp;rsquo;s country code happens to be &lt;code>NO&lt;/code>, someone opens an exported table in a spreadsheet program. Defect reports then come back from users one by one, long after the code was written.&lt;/p>
+&lt;p>These values are neither secret nor clever; they are a short and stable list. The reason they go untested for so long is mundane: nobody remembers them all, and typing them in by hand is too much trouble. The way this has been engineered is well worth borrowing &amp;ndash; not another &amp;ldquo;list of bad strings&amp;rdquo;, but packaging &lt;strong>the value, what it usually breaks, and what correct behaviour should be&lt;/strong> into an executable catalog that can be sent into any input field in a fixed order with one keystroke.&lt;/p>
+&lt;h2 id="what-is-actually-in-the-catalog">What Is Actually in the Catalog
+&lt;/h2>&lt;p>A publicly available open-source catalog organises 246 values into 20 packs, and every value carries two explanatory fields: &lt;code>breaks&lt;/code> (what it usually breaks, and why) and &lt;code>expect&lt;/code> (what a correct implementation should do). A value missing the &lt;code>breaks&lt;/code> field is rejected outright during validation &amp;ndash; because the point of this catalog is explanation, not mere listing.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Category&lt;/th>
+&lt;th>The failure surface it targets&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Whitespace&lt;/td>
+&lt;td>Characters that occupy a position (or claim to) yet are completely invisible in the interface&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Unicode text&lt;/td>
+&lt;td>Looks harmless, yet breaks counting, comparison and display&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Length bombs&lt;/td>
+&lt;td>Built around common limits, and the gap between character count and byte count&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Magic values&lt;/td>
+&lt;td>Words humans read as text but parsers read as booleans, nulls or numbers&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Extreme numbers&lt;/td>
+&lt;td>Type boundaries, foreign numeral systems, the point where precision runs out&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Impossible dates&lt;/td>
+&lt;td>Dates that do not exist, are ambiguous, or are written differently from the field&amp;rsquo;s assumption&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Export breakers&lt;/td>
+&lt;td>Values that pass validation and only go wrong in the exported file&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Localized identifiers&lt;/td>
+&lt;td>Language-specific identifiers and formats that globally sold products cannot handle&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>File names and paths&lt;/td>
+&lt;td>Names that a file system, archive or server will reject, rewrite or misread&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Homoglyph pairs&lt;/td>
+&lt;td>Paired values that look identical on screen and differ in storage&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Complex emoji&lt;/td>
+&lt;td>Characters beyond the basic plane and combining sequences that break counting and truncation&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Encoding mojibake&lt;/td>
+&lt;td>Text that went through a wrong encoding and can never come back&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Pasted from documents&lt;/td>
+&lt;td>Characters attached when copying from a word processor or a web page&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Emails and URLs&lt;/td>
+&lt;td>Formally valid but extreme addresses, and addresses that only look valid&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Names and identity&lt;/td>
+&lt;td>Names that break the &amp;ldquo;normal name&amp;rdquo; assumption&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Time zones&lt;/td>
+&lt;td>Hours that do not exist, hours that appear twice, times with no time zone stated&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Currency and separators&lt;/td>
+&lt;td>How people and spreadsheets write amounts, and where precision ends&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Pseudo-localization&lt;/td>
+&lt;td>Common internationalization testing techniques compressed into paste-ready values&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>JSON payloads&lt;/td>
+&lt;td>Request bodies that parsers and databases read differently; field names can be adapted to your own API&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Injection checks&lt;/td>
+&lt;td>Classic escaping checks such as quotes, tags, template expressions and paths, flagged separately as sensitive&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Two design details are very practical. Overlong values are not stored as literal strings but as &amp;ldquo;recipes&amp;rdquo; expanded at send time, so one pack can hold a hundred-thousand-character length bomb in a few lines; time values that must stay ahead are also stored as rules, so the time zone pack always sends the next clock adjustment rather than a date already in the past.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/151-naughty-input-catalog/05-fig1_hu_8f042bfc9bbf35fd.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/151-naughty-input-catalog/05-fig1_hu_c4a8ad5f217b5612.webp 480w, https://chengxiaqiucao.github.io/post/151-naughty-input-catalog/05-fig1_hu_8f042bfc9bbf35fd.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>Twenty categories of values mapped to the failure surfaces they hit along the input → validation → storage → export chain&lt;/p>
+&lt;h2 id="try-these-eight-first-value-consequence-correct-behaviour">Try These Eight First: Value, Consequence, Correct Behaviour
+&lt;/h2>&lt;p>If you only have ten minutes, the eight values below cover the most common and most expensive class of omission. The left side is the value, the right side is where it usually lands and what a correct implementation should do.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Value&lt;/th>
+&lt;th>What it usually breaks / correct behaviour&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>Kowalski&lt;/code> with a trailing space&lt;/td>
+&lt;td>Browser and server compare differently, so the account is created but cannot be found; trim consistently at every step, or preserve consistently at every step &amp;ndash; never register with one rule and log in with another&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>=1+1&lt;/code>&lt;/td>
+&lt;td>The spreadsheet treats it as a formula and the exported file shows the computed result rather than the data; escape according to the target format on export&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>no&lt;/code>&lt;/td>
+&lt;td>YAML 1.1 and several config parsers read it as boolean &lt;code>false&lt;/code>, while &lt;code>NO&lt;/code> is also the country code for Norway; declare types explicitly and never guess&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>30.02.2026&lt;/code>&lt;/td>
+&lt;td>A naive parser rolls it over to March 2 instead of rejecting it; it should simply be judged an invalid date&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>A single zero-width space&lt;/td>
+&lt;td>The field looks empty but is not, so the required-field check is bypassed; normalize before validating&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>128 characters but 256 bytes&lt;/td>
+&lt;td>The interface lets it through by character count while storage rejects it by byte length, or the reverse; counting must use one basis end to end&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>007&lt;/code>&lt;/td>
+&lt;td>The spreadsheet treats the column as numeric and immediately drops the leading zeros; preserve the text type on export&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>65,535 characters&lt;/td>
+&lt;td>The limit of a common text column type; going over usually throws a raw database error; the server should validate explicitly and return a readable error&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>The most instructive of these are &lt;code>30.02.2026&lt;/code> and &lt;code>007&lt;/code>: they are not &amp;ldquo;malicious input&amp;rdquo; but completely normal real data that simply falls outside the implementer&amp;rsquo;s assumptions. Precisely for that reason, random fuzzing will not reliably hit them, whereas a catalog with explanations hits them faster.&lt;/p>
+&lt;h2 id="turning-it-into-a-ten-minute-manual-test">Turning It Into a Ten-Minute Manual Test
+&lt;/h2>&lt;p>The catalog&amp;rsquo;s interaction design revolves around one goal: never interrupt the tester&amp;rsquo;s attention.&lt;/p>
+&lt;ul>
+&lt;li>One key combination clears the current line and sends the next value of the current pack into the focused input; previous value and back-to-pack-start each have their own combination, all of them rebindable;&lt;/li>
+&lt;li>The display panel never takes focus, the caret stays in the field under test, and values never get typed into the panel itself;&lt;/li>
+&lt;li>Invisible characters are drawn in the panel as a visible marker (such as &lt;code>␣&lt;/code>), and counted four ways at once: grapheme clusters, code points, bytes, UTF-16 units;&lt;/li>
+&lt;li>The panel shows the next value and the current position within the pack, and a separate search window looks across all packs;&lt;/li>
+&lt;li>On finding a problem, one key combination copies a report block that pastes straight into a defect ticket: which value, from which pack version, in what form it was sent, how large it was, whether it arrived intact; the value is written in a form someone else can retype, not as the placeholder marker from the panel;&lt;/li>
+&lt;li>The GUI and the command line share the same engine, and the command line also supports a clipboard mode, putting the value on the clipboard for the tester to paste.&lt;/li>
+&lt;/ul>
+&lt;p>Every value carrying its own &lt;code>breaks&lt;/code> and &lt;code>expect&lt;/code> is the most essential difference between this flow and &amp;ldquo;a plain text list&amp;rdquo;: the tester never has to recall what a zero-width space does, because the panel, the command-line view and the report block all state it directly. Exploratory testing then shifts from &amp;ldquo;try whatever you remember&amp;rdquo; to &amp;ldquo;walk through in a fixed order&amp;rdquo;, which makes coverage reproducible and much easier to hand to a newcomer.&lt;/p>
+&lt;h2 id="wiring-it-into-automation-dont-copy-the-list-into-an-array">Wiring It Into Automation: Don&amp;rsquo;t Copy the List Into an Array
+&lt;/h2>&lt;p>The GUI suits exploration; automation needs a machine-readable outlet of the same data. The catalog tool can export any pack as JSON or CSV or one value per line, optionally escaped or raw, optionally base64; diagnostics go to standard error, so a redirected file contains only values and can be used directly as a test data file.&lt;/p>
+&lt;p>A typical integration exports the &amp;ldquo;magic values&amp;rdquo; pack to line-delimited text and feeds it to the same validation function through parameterized tests:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">json&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pytest&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">with&lt;/span> &lt;span class="nb">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;magic-values.json&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">encoding&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;utf-8&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">f&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">cases&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">json&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">load&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">f&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1"># each item has value / breaks / expect&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.mark.parametrize&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;case&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">cases&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ids&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">lambda&lt;/span> &lt;span class="n">c&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">c&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_identifier_roundtrip&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">case&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">stored&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">save_identifier&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">case&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">loaded&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">load_identifier&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stored&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">loaded&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="k">case&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="k">case&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;breaks&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Putting &lt;code>breaks&lt;/code> straight into the assertion failure message means the defect description almost never has to be rewritten; &lt;code>expect&lt;/code> is good material to settle into a team&amp;rsquo;s test case template fields. Compared with hard-coding a long list of strings in test files, upgrading the catalog means re-exporting once.&lt;/p>
+&lt;p>The command-line injection mode also demonstrates the restraint that boundary handling deserves: it gives the tester a few seconds to click the target field before executing; it does not type while Ctrl/Alt/Shift/Win is held, when the target window has higher privilege than itself, or when focus sits on a button, link or list item; pressing Escape stops it immediately; and all these cases return a dedicated exit code rather than &amp;ldquo;guessing&amp;rdquo;. Custom packs are described in TOML, with companion &lt;code>lint&lt;/code>, &lt;code>fmt&lt;/code> and &lt;code>new-pack&lt;/code> subcommands for validation, normalization and skeleton generation &amp;ndash; the validator currently covers 41 of 47 format rules, with the remaining few explicitly listing why.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/151-naughty-input-catalog/05-fig2_hu_ad9eeb4076b076b4.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/151-naughty-input-catalog/05-fig2_hu_cd767c4ac37dba3d.webp 480w, https://chengxiaqiucao.github.io/post/151-naughty-input-catalog/05-fig2_hu_ad9eeb4076b076b4.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>One value catalog driving manual exploration, parameterized tests and defect reports at the same time&lt;/p>
+&lt;h2 id="stating-the-boundaries-honestly">Stating the Boundaries Honestly
+&lt;/h2>&lt;p>A tool description that proactively lists its own limits is more trustworthy than one that only talks about capabilities. This approach has six boundaries, all of which must be counted when evaluating whether to adopt it:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>It does not judge outcomes.&lt;/strong> It only sends values into controls and does not read what the window displays; whether the value was handled well is for a human to judge. A result-marking feature is not yet available, and the report block is the only record.&lt;/li>
+&lt;li>&lt;strong>The system may rewrite input.&lt;/strong> On some operating systems, text replacement changes the sent value into another value; the tool warns when it detects the relevant setting is on and could affect the current value.&lt;/li>
+&lt;li>&lt;strong>Cross-platform capability is asymmetric.&lt;/strong> Sending keys to other windows requires system authorization: one platform needs accessibility permission, another under Wayland needs an input method daemon and cannot confirm whether focus really landed in the input field. When conditions are missing, the tool reports an explicit error and falls back to clipboard mode rather than silently degrading.&lt;/li>
+&lt;li>&lt;strong>Custom packs can currently be written but not loaded.&lt;/strong> Validation, formatting and skeleton generation all work, but reading your own pack directory into the panel and command line is not yet wired up; the pack format is also not frozen and may change in later versions.&lt;/li>
+&lt;li>&lt;strong>The 246 values are only a starting point.&lt;/strong> They are a curated selection of &amp;ldquo;the most expensive ones to miss&amp;rdquo;, not a complete list in any sense.&lt;/li>
+&lt;li>&lt;strong>It is not an attack tool.&lt;/strong> The vast majority of values come from real users and real data; the only pack containing classic escaping checks is flagged separately as sensitive, it contains no exploit code for known vulnerabilities, and any input must be actively triggered by a person. Its purpose is verifying systems you are responsible for.&lt;/li>
+&lt;/ul>
+&lt;h2 id="how-teams-can-land-this-locally">How Teams Can Land This Locally
+&lt;/h2>&lt;p>Copying the English packs directly would miss local scenarios. Adapt them into your own catalog like this:&lt;/p>
+&lt;ol>
+&lt;li>Map each of the 20 categories onto your system&amp;rsquo;s field inventory, and state clearly which page and which API is responsible for verifying each category, so you do not end up with a catalog nobody owns;&lt;/li>
+&lt;li>Prioritize covering cross-system boundaries: import and export, form to database, server to reports, open API to downstream. These are where counting bases and type assumptions most easily diverge;&lt;/li>
+&lt;li>Write the &lt;code>breaks&lt;/code> and &lt;code>expect&lt;/code> fields into the team&amp;rsquo;s test case template, so every boundary case must answer &amp;ldquo;what does it break&amp;rdquo; and &amp;ldquo;what is correct behaviour&amp;rdquo;;&lt;/li>
+&lt;li>Export packs as CSV or JSON and use that as the single data source for parameterized tests; re-export when the catalog updates rather than maintaining copies in several places;&lt;/li>
+&lt;li>Add local-language values: full-width spaces, name lengths and rare characters, nicknames containing emoji, leading zeros in phone and employee numbers, the trailing &lt;code>X&lt;/code> in ID numbers, thousands separators and full-width symbols in amounts, and scenarios involving local collation and case-insensitivity;&lt;/li>
+&lt;li>Contribute newly found values back to the team catalog in the form &amp;ldquo;value + what it breaks + where we saw it&amp;rdquo; &amp;ndash; an input that cost one person an afternoon is worth costing everyone only once.&lt;/li>
+&lt;/ol>
+&lt;p>What really needs to change is not the tool but the status of test data: it should not be a few &amp;ldquo;normal values plus one or two empties&amp;rdquo; improvised on the spot, but an asset with explanations, ordering, versioning, and the ability to drive both manual exploration and automated suites. Inputs the form has never seen, users will eventually send in for you.&lt;/p></description></item></channel></rss>

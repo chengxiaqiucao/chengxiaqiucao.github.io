@@ -1,0 +1,355 @@
+<!doctype html><html lang=en dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Introduction AI has been working its way ever more deeply into our day-to-day jobs. In the field of software testing, new AI-related testing tools and methods are emerging one after another. Previously we introduced a case of AI-driven testing combined with an mcp server; in this article we will introduce a domestically developed AI testing tool that has recently come to prominence, Midscene.js.\nIntroduction to Midscene.js MidScene.js is an open-source AI automation testing tool released by the web-infra team at ByteDance. Built on multimodal large models, it understands our natural-language instructions through intelligent visual parsing of the page and then carries out automated operations. It can significantly reduce the complexity of writing automated test scripts, adapt better to changes in page structure and elements, and greatly improve the stability of automated test scripts.\n"><title>A Review of the AI Automation Tool Midscene.js</title>
+<link rel=canonical href=https://chengxiaqiucao.github.io/en/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/><link rel=stylesheet href=/scss/style.min.1ff05243156c6b1fe33c54e504d4d763b1955737a95e17034967a679a1f192c8.css><meta property='og:title' content="A Review of the AI Automation Tool Midscene.js"><meta property='og:description' content="Introduction AI has been working its way ever more deeply into our day-to-day jobs. In the field of software testing, new AI-related testing tools and methods are emerging one after another. Previously we introduced a case of AI-driven testing combined with an mcp server; in this article we will introduce a domestically developed AI testing tool that has recently come to prominence, Midscene.js.\nIntroduction to Midscene.js MidScene.js is an open-source AI automation testing tool released by the web-infra team at ByteDance. Built on multimodal large models, it understands our natural-language instructions through intelligent visual parsing of the page and then carries out automated operations. It can significantly reduce the complexity of writing automated test scripts, adapt better to changes in page structure and elements, and greatly improve the stability of automated test scripts.\n"><meta property='og:url' content='https://chengxiaqiucao.github.io/en/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/'><meta property='og:site_name' content='Testing Observation'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='AI'><meta property='article:tag' content='AI Testing'><meta property='article:published_time' content='2025-06-01T00:00:00+00:00'><meta property='article:modified_time' content='2025-06-01T00:00:00+00:00'><meta property='og:image' content='https://chengxiaqiucao.github.io/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521.webp'><meta name=twitter:title content="A Review of the AI Automation Tool Midscene.js"><meta name=twitter:description content="Introduction AI has been working its way ever more deeply into our day-to-day jobs. In the field of software testing, new AI-related testing tools and methods are emerging one after another. Previously we introduced a case of AI-driven testing combined with an mcp server; in this article we will introduce a domestically developed AI testing tool that has recently come to prominence, Midscene.js.\nIntroduction to Midscene.js MidScene.js is an open-source AI automation testing tool released by the web-infra team at ByteDance. Built on multimodal large models, it understands our natural-language instructions through intelligent visual parsing of the page and then carries out automated operations. It can significantly reduce the complexity of writing automated test scripts, adapt better to changes in page structure and elements, and greatly improve the stability of automated test scripts.\n"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://chengxiaqiucao.github.io/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521.webp'><script async src="https://www.googletagmanager.com/gtag/js?id=G-0SZVJZGMHX"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-0SZVJZGMHX")}</script><meta name=google-adsense-account content="ca-pub-8076532964743402"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8076532964743402" crossorigin=anonymous></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/en/><img src=/img/automnGrass_hu_47f1e3d9e082e7bd.webp width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/en>Testing Observation</a></h1><h2 class=site-description>Testing is not just checking...</h2></div></header><ol class=menu-social><li><a href=https://github.com/chengxiaqiucao target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://space.bilibili.com/472272606 target=_blank title=Bilibili rel=me><!doctype html><svg t="1750732982440" class="icon" viewBox="0 0 1024 1024" p-id="4593" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632 444.330667 256h135.296l138.368-138.325333A42.666667 42.666667.0 01778.368 178.048L700.330667 256H789.333333A149.333333 149.333333.0 01938.666667 405.333333v341.333334A149.333333 149.333333.0 01789.333333 896H234.666667A149.333333 149.333333.0 0185.333333 746.666667V405.333333A149.333333 149.333333.0 01234.666667 256h88.96L245.632 177.962667a42.666667 42.666667.0 0160.373333-60.373334zm483.328 223.701333H234.666667a64 64 0 00-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0057.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0063.701334-57.856L853.333333 746.666667V405.333333a64 64 0 00-64-64zm-448 128A42.666667 42.666667.0 01384 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666666-42.666667zm341.333334.0A42.666667 42.666667.0 01725.333333 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666667-42.666667z" p-id="4594" fill="#8a8a8a"/></svg></a></li><li><a href=https://www.zhihu.com/people/qiucao target=_blank title=zhihu rel=me><!doctype html><svg t="1750733049138" class="icon" viewBox="0 0 1024 1024" p-id="5820" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M570.581333 806.272h61.952L652.928 876.117333 764.074667 806.272h130.986666V230.186667h-324.48V806.272zM636.501333 292.693333h192.64V743.68h-73.898666l-73.813334 46.378667L668.032 743.808l-31.530667-.128V292.736zM515.754667 493.738667H377.429333a2999.466667 2999.466667.0 005.802667-194.56h135.338667S523.776 239.445334 495.872 240.128H261.76c9.216-34.730667 20.821333-70.613333 34.688-107.690667.0.0-63.701333.0-85.333333 57.130667C202.112 213.12 176.128 303.786667 129.877333 396.416c15.573333-1.706667 67.114667-3.114667 97.450667-58.794667 5.589333-15.616 6.656-17.621333 13.568-38.485333h76.373333c0 27.776-3.157333 177.109333-4.437333 194.474667h-138.24c-31.104.0-41.173333 62.549333-41.173333 62.549333h173.482666C295.253333 688.256 232.789333 799.573333 119.466667 887.466667c54.186667 15.488 108.202667-2.432 134.912-26.197334.0.0 60.8-55.338667 94.122666-183.381333L491.264 849.834667s20.906667-71.168-3.285333-105.856c-20.053333-23.637333-74.24-87.552-97.322667-110.72l-38.698667 30.72c11.52-36.992 18.474667-72.96 20.821334-107.690667h163.072s-.213333-62.549333-20.053334-62.549333z" p-id="5821" fill="#8a8a8a"/></svg></a></li><li><a href=mailto:%20danmyw@qq.com target=_blank title=e-mail rel=me><!doctype html><svg t="1750733089669" class="icon" viewBox="0 0 1451 1024" p-id="6983" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759.0 97.881301C0 3.997201 71.046997.0 71.046997.0H474.477909 961.649408h399.992405s71.046998 3.997201 71.046998 97.881301L771.345323 681.472759S764.482731 685.154773 753.594283 688.65053V688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858V688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759zm53.281707 130.131124C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633.0 212.052267.0 212.052267V942.809523S0 1024 83.726336 1024H682.532949 753.579947h595.368192C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523V212.052267S893.138176 701.759633 817.019477 767.734955c-39.771477 34.470494-74.671786 43.295855-98.955861 43.868928z" fill="#8a8a8a" p-id="6984"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/en/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/en/page/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/en/page/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/en/page/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li><a href=/en/page/about/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>About..</span></a></li><li><a href=/en/page/releases/><svg class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M9.828 9.172a4 4 0 100 5.656A10 10 0 0012 12a10 10 0 012.172-2.828 4 4 0 110 5.656A10 10 0 0112 12 10 10 0 009.828 9.172"/></svg>
+<span>OpenSources</span></a></li><li class=menu-bottom-section><ol class=menu><li id=i18n-switch><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg>
+<select name=language title=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://chengxiaqiucao.github.io/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/>中文</option><option value=https://chengxiaqiucao.github.io/en/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/ selected>English</option></select></li><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#introduction>Introduction</a></li><li><a href=#introduction-to-midscenejs>Introduction to Midscene.js</a></li><li><a href=#how-midscene-works>How Midscene Works</a></li><li><a href=#choosing-a-large-model>Choosing a Large Model</a></li><li><a href=#using-the-chrome-extension>Using the Chrome Extension</a><ol><li><a href=#configuring-the-large-model>Configuring the Large Model</a></li><li><a href=#operating-the-browser>Operating the Browser</a></li></ol></li><li><a href=#script-integration>Script Integration</a><ol><li><a href=#installation>Installation</a></li><li><a href=#playwright-framework-configuration>Playwright Framework Configuration</a></li><li><a href=#test-scripts>Test Scripts</a></li><li><a href=#visual-result-report>Visual Result Report</a></li></ol></li><li><a href=#yaml-file-driven>YAML File-Driven</a></li><li><a href=#mcp-approach>MCP Approach</a></li><li><a href=#limitations-of-the-current-version>Limitations of the Current Version</a><ol><li><a href=#further-reading>Further Reading:</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/en/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/><img src=/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521_hu_8226d824b289bcf7.webp srcset="/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521_hu_8226d824b289bcf7.webp 800w, /post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521_hu_aebc042afbbe5750.webp 1600w" width=800 height=759 loading=lazy alt="Featured image of post A Review of the AI Automation Tool Midscene.js"></a></div><div class=article-details><header class=article-category><a href=/en/categories/ai/>AI</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/en/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/>A Review of the AI Automation Tool Midscene.js</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Jun 01, 2025</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>5 minute read</time></div></footer><footer class=article-translations><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg><div><a href=https://chengxiaqiucao.github.io/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/ class=link>中文</a></div></footer></div></header><section class=article-content><h2 id=introduction>Introduction</h2><p>AI has been working its way ever more deeply into our day-to-day jobs. In the field of software testing, new AI-related testing tools and methods are emerging one after another. Previously we introduced a case of AI-driven testing combined with an mcp server; in this article we will introduce a domestically developed AI testing tool that has recently come to prominence, <code>Midscene.js</code>.</p><p><img src=/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521_hu_4e0eed2c1d7f613e.webp width=1024 height=972 srcset="/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521_hu_ed4d15700d5e45f4.webp 480w, /post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521_hu_4e0eed2c1d7f613e.webp 1024w" loading=lazy class=gallery-image data-flex-grow=105 data-flex-basis=252px></p><h2 id=introduction-to-midscenejs>Introduction to Midscene.js</h2><p><code>MidScene.js</code> is an open-source AI automation testing tool released by the web-infra team at ByteDance. Built on multimodal large models, it understands our natural-language instructions through intelligent visual parsing of the page and then carries out automated operations. It can significantly reduce the complexity of writing automated test scripts, adapt better to changes in page structure and elements, and greatly improve the stability of automated test scripts.</p><p>Official website: <a class=link href=https://midscenejs.com/ target=_blank rel=noopener>https://midscenejs.com/</a></p><h2 id=how-midscene-works>How Midscene Works</h2><p>Unlike the mcp server we discussed earlier, which used a general-purpose large model to understand the page and extended capabilities by calling local tools, Midscene uses multimodal large models such as <code>ChatGPT-4o</code>, <code>qwen-vl</code>, and ByteDance&rsquo;s <code>UI-TARS</code>-that is, large models that support visual input-to understand the page, which is much closer to the way we actually perform functional testing.</p><p>MidScene first captures the current page screenshot along with detailed page structure information, then submits them together with the user instruction to the large model, which determines the location of the page control to be operated and decides the next action.</p><p>Take entering &ldquo;Today I will learn Playwright&rdquo; into the task box on a to-do page as an example:</p><p><img src=/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521-3_hu_1919dbe52d59b75c.webp width=1024 height=359 srcset="/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521-3_hu_96263881e447c2c5.webp 480w, /post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521-3_hu_1919dbe52d59b75c.webp 1024w" loading=lazy class=gallery-image data-flex-grow=285 data-flex-basis=684px></p><p>MidScene&rsquo;s internal operations are roughly as follows:</p><ol><li>Get the user instruction &ldquo;Enter Learning Playwright in the task box and press Enter&rdquo;</li><li>MidScene takes a screenshot and obtains the overall element structure of the page</li><li>Submit it to the large model to extract page features</li><li>Obtain the large model&rsquo;s analysis result and determine the next operation type (Tap) and the specific position (coordinates) of the control</li><li>Plan the next operation</li><li>Complete the execution</li></ol><h2 id=choosing-a-large-model>Choosing a Large Model</h2><p>From the analysis of Midscene&rsquo;s principles above, MidScene mainly relies on the following capabilities of multimodal large models</p><ol><li>The ability to understand screenshots and  <em>plan</em>  operation steps.</li><li>The ability to give the coordinate information of a specified element (Visual Grounding).</li></ol><p>The large models that support the above capabilities, as currently listed on the official site, include the following:</p><ul><li><strong>OPENAI GPT-4o</strong></li><li><strong>Alibaba Qwen-2.5-VL</strong></li><li><strong>ByteDance UI-TARS</strong></li><li><strong>ByteDance Volcano Engine Doubao-1.5-thinking-vision-pro</strong></li><li><strong>Google Gemini-2.5-Pro</strong></li></ul><p>In terms of how it works, information such as screenshots and page structure has to be supplied to the large model, so the token consumption is fairly considerable. According to the official assessment, each operation usually consumes at least several thousand tokens. Among them, the model with the best cost-performance ratio recommended by the official team is QWen-VL.</p><h2 id=using-the-chrome-extension>Using the Chrome Extension</h2><p>The no-code Chrome extension approach can help us quickly understand how MidScene is applied.</p><p>You can install it directly from the Chrome Web Store <a class=link href=https://chromewebstore.google.com/detail/midscenejs/gbldofcpkknbggpkmbdaefngejllnief target=_blank rel=noopener>Midscene Extension</a></p><p><img src=/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521-2_hu_f739d517918e3f2d.webp width=1024 height=319 srcset="/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521-2_hu_b7c9efe7ea7afa.webp 480w, /post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250521-2_hu_f739d517918e3f2d.webp 1024w" loading=lazy class=gallery-image data-flex-grow=320 data-flex-basis=770px></p><h3 id=configuring-the-large-model>Configuring the Large Model</h3><p>After enabling the extension, you need to configure the large model to use. Here we use the Alibaba Qwen multimodal model <code>qwen-vl-max-latest</code>, which consumes relatively few tokens; you can apply for the corresponding API Key through the Alibaba Cloud Bailian platform, and applications currently come with a free quota of 1 million tokens.</p><p><img src=/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520-2_hu_1e7b7a961f3d0cf4.webp width=1024 height=185 srcset="/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520-2_hu_6291bcebb25b5578.webp 480w, /post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520-2_hu_1e7b7a961f3d0cf4.webp 1024w" loading=lazy class=gallery-image data-flex-grow=552 data-flex-basis=1326px></p><p>After the application is complete, configure the corresponding large model parameters in the extension&rsquo;s model settings screen; the Qwen model requires the following four parameters</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>OPENAI_BASE_URL=&#34;https://dashscope.aliyuncs.com/compatible-mode/v1&#34; 
+</span></span><span class=line><span class=cl>OPENAI_API_KEY=&#34;sk- your API KEY&#34;
+</span></span><span class=line><span class=cl>MIDSCENE_MODEL_NAME=&#34;qwen-vl-max-latest&#34;
+</span></span><span class=line><span class=cl>MIDSCENE_USE_QWEN_VL=1 
+</span></span></code></pre></td></tr></table></div></div><h3 id=operating-the-browser>Operating the Browser</h3><p>Next you can experience Midscene&rsquo;s control of the browser in the extension interface. It mainly supports four behaviors:</p><ul><li><strong>Action</strong>: Corresponds to AI-planned operations; Midscene automatically plans the operation steps and executes them. It is smarter but slower, and the results depend on the quality of the large model.</li><li><strong>Query</strong>: Extracts data directly from the UI and, with the reasoning ability of multimodal AI, achieves intelligent extraction</li><li><strong>Assert</strong>: Describes an assertion condition in natural language and lets the AI judge whether the condition is true</li><li><strong>Tap</strong>: Corresponds to an immediate page-click operation; Midscene executes it directly, and the large model only handles low-level tasks such as element locating. It is more efficient and is suitable when the operation to perform is already determined</li></ul><p>We can enter prompt instructions using AI prompts close to natural language; for different behavior modes, the extension drives the browser to perform different operations and reports the results.</p><p><img src=/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520_hu_88f879538f9c0fc9.webp width=1024 height=482 srcset="/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520_hu_a705150c5ab15621.webp 480w, /post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520_hu_88f879538f9c0fc9.webp 1024w" loading=lazy class=gallery-image data-flex-grow=212 data-flex-basis=509px></p><p>The concrete execution process can also be seen in the video demo below.</p><h2 id=script-integration>Script Integration</h2><p>Besides calling Midscene through the browser extension, the more recommended approach is to integrate Midscene capabilities through test framework scripts.</p><p>With script integration, you also need to configure the relevant model call parameters, the same variable values configured in the extension, except that the relevant variables need to be set as <strong>system environment variables</strong></p><p>Because Midscene is a JS-based tool, integrating it with a test framework here also requires JS support. Here we take Playwright as an example</p><h3 id=installation>Installation</h3><p>First, of course, you need the Playwright framework; enter the project directory, initialize and install Playwright, then install Midscene</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>npm</span> <span class=n>init</span> <span class=n>playwright</span><span class=nv>@latest</span>
+</span></span><span class=line><span class=cl><span class=n>npm</span> <span class=n>install</span> <span class=nv>@midscene</span><span class=p>/</span><span class=n>web</span> <span class=p>-</span><span class=n>-save-dev</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=playwright-framework-configuration>Playwright Framework Configuration</h3><p>In the <code>playwright.config.ts</code> file, configure the framework&rsquo;s test discovery directory and test scripts, load environment variables, and set basic configurations such as browser type and execution strategy</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=kr>import</span> <span class=p>{</span> <span class=nx>defineConfig</span><span class=p>,</span> <span class=nx>devices</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;@playwright/test&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>import</span> <span class=nx>dotenv</span> <span class=kr>from</span> <span class=s2>&#34;dotenv&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cm>/* Load environment variables from the .env file via dotenv */</span>
+</span></span><span class=line><span class=cl><span class=nx>dotenv</span><span class=p>.</span><span class=nx>config</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>export</span> <span class=k>default</span> <span class=nx>defineConfig</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>testDir</span><span class=o>:</span> <span class=s2>&#34;./e2e&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>testMatch</span><span class=o>:</span> <span class=s2>&#34;**/*.spec.ts&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>timeout</span>: <span class=kt>10</span> <span class=o>*</span> <span class=mi>60</span> <span class=o>*</span> <span class=mi>1000</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=cm>/* Run tests in files in parallel */</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>fullyParallel</span>: <span class=kt>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=cm>/* Fail the build on CI if you accidentally left test.only in the source code. */</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>forbidOnly</span>: <span class=kt>Boolean</span><span class=p>(</span><span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>CI</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=cm>/* Retry on CI only */</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>retries</span>: <span class=kt>process.env.CI</span> <span class=o>?</span> <span class=nx>2</span> : <span class=kt>0</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=cm>/* Opt out of parallel tests on CI. */</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>workers</span>: <span class=kt>process.env.CI</span> <span class=o>?</span> <span class=nx>1</span> : <span class=kt>undefined</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=cm>/* Reporter to use. See https://playwright.dev/docs/test-reporters */</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>reporter</span><span class=o>:</span> <span class=p>[[</span><span class=s2>&#34;line&#34;</span><span class=p>],</span> <span class=p>[</span><span class=s2>&#34;@midscene/web/playwright-report&#34;</span><span class=p>]],</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=cm>/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>use</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=cm>/* Base URL to use in actions like `await page.goto(&#39;/&#39;)`. */</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// baseURL: &#39;http://127.0.0.1:3000&#39;,
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=cm>/* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>trace</span><span class=o>:</span> <span class=s2>&#34;on-first-retry&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=p>},</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=cm>/* Configure projects for major browsers */</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>projects</span><span class=o>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>      <span class=nx>name</span><span class=o>:</span> <span class=s2>&#34;chromium&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>      <span class=nx>use</span><span class=o>:</span> <span class=p>{</span> <span class=p>...</span><span class=nx>devices</span><span class=p>[</span><span class=s2>&#34;Desktop Chrome&#34;</span><span class=p>]</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=p>],</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=test-scripts>Test Scripts</h3><p>Import the Midscene library through a separate fixture script</p><p>fixture.ts</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=kr>import</span> <span class=p>{</span> <span class=nx>test</span> <span class=kr>as</span> <span class=nx>base</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@playwright/test&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>import</span> <span class=kr>type</span> <span class=p>{</span> <span class=nx>PlayWrightAiFixtureType</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@midscene/web/playwright&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>import</span> <span class=p>{</span> <span class=nx>PlaywrightAiFixture</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@midscene/web/playwright&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>export</span> <span class=kr>const</span> <span class=nx>test</span> <span class=o>=</span> <span class=nx>base</span><span class=p>.</span><span class=nx>extend</span><span class=p>&lt;</span><span class=nt>PlayWrightAiFixtureType</span><span class=p>&gt;(</span><span class=nx>PlaywrightAiFixture</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>waitForNetworkIdleTimeout</span>: <span class=kt>10000</span><span class=p>,</span> <span class=c1>// Optional, the timeout for waiting for network idle during interaction; default is 2000ms; set to 0 to disable the timeout
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=p>}));</span>
+</span></span></code></pre></td></tr></table></div></div><p>Write a script to test the <code>https://todomvc.com/</code> to-do list sample project, using API methods such as <code>.ai</code>, <code>.aiTap</code>, <code>.aiQuery</code>, and <code>.aiAssert</code>, corresponding to the four typical operations mentioned earlier.</p><p>todo_spec.ts</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=kr>import</span> <span class=p>{</span> <span class=nx>expect</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;@playwright/test&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>import</span> <span class=p>{</span> <span class=nx>test</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;./fixture&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>test</span><span class=p>.</span><span class=nx>beforeEach</span><span class=p>(</span><span class=kr>async</span> <span class=p>({</span> <span class=nx>page</span> <span class=p>})</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s2>&#34;https://todomvc.com/examples/react/dist/&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>test</span><span class=p>(</span><span class=s2>&#34;ai todo - Chinese Prompt&#34;</span><span class=p>,</span> <span class=kr>async</span> <span class=p>({</span> <span class=nx>ai</span><span class=p>,</span> <span class=nx>aiQuery</span><span class=p>,</span> <span class=nx>aiAssert</span><span class=p>,</span> <span class=nx>aiTap</span> <span class=p>})</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=c1>// .ai - Generic AI operation method
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl>  <span class=k>await</span> <span class=nx>ai</span><span class=p>(</span><span class=s2>&#34;在任务框 input 输入 今天学习 Playwright，按回车键&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>await</span> <span class=nx>ai</span><span class=p>(</span><span class=s2>&#34;在任务框 input 输入 明天学习 js脚本，按回车键&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>await</span> <span class=nx>ai</span><span class=p>(</span><span class=s2>&#34;在任务框 input 输入 后天学习 AI测试，按回车键&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>await</span> <span class=nx>ai</span><span class=p>(</span><span class=s2>&#34;将鼠标移动到任务列表中的第二项&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>await</span> <span class=nx>aiTap</span><span class=p>(</span><span class=s2>&#34;第二项任务右边的删除按钮&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=c1>// .aiTap - Specify the operation type
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl>  <span class=k>await</span> <span class=nx>aiTap</span><span class=p>(</span><span class=s2>&#34;第二条任务左边的勾选按钮&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>await</span> <span class=nx>aiTap</span><span class=p>(</span><span class=s2>&#34;任务列表下面的 completed 状态按钮&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl> <span class=c1>// .aiQuery - Page information extraction operation
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kr>const</span> <span class=nx>list</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>aiQuery</span><span class=p>(</span><span class=s2>&#34;string[], 完整的任务列表&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>expect</span><span class=p>(</span><span class=nx>list</span><span class=p>.</span><span class=nx>length</span><span class=p>).</span><span class=nx>toEqual</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=c1>// .aiAssert - Assertion operation
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl>  <span class=k>await</span> <span class=nx>aiAssert</span><span class=p>(</span><span class=s1>&#39;列表下方有一个区域显示有 &#34;1 item left&#34;&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><p>Run the script:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=n>npx</span> <span class=n>playwright</span> <span class=n>test</span> <span class=p>-</span><span class=n>-headed</span>
+</span></span></code></pre></td></tr></table></div></div><p>The execution process can be seen in the video I recorded</p><p>【】</p><h3 id=visual-result-report>Visual Result Report</h3><p>The report is one of Midscene&rsquo;s highlights. Through it you can replay the entire execution process, with detailed display of the AI&rsquo;s spatial judgment process and concrete operation details, making it easy to debug and optimize scripts.</p><p><img src=/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520-1_hu_fb7e8fb8ed9ae66b.webp width=1024 height=479 srcset="/post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520-1_hu_adf181060651d5e3.webp 480w, /post/098-midscene.js%E7%9A%84%E4%BD%BF%E7%94%A8/snap_20250520-1_hu_fb7e8fb8ed9ae66b.webp 1024w" loading=lazy class=gallery-image data-flex-grow=213 data-flex-basis=512px></p><h2 id=yaml-file-driven>YAML File-Driven</h2><p>Besides integration through test framework scripts, Midscene also supports writing test scripts directly with YAML files, enabling no-code script driving, similar to the keyword-driven approach of traditional automation.</p><p>In essence, this approach still converts the corresponding keywords into the relevant APIs supported by Midscene for driving.</p><p>A format like the following, operating a weather website:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-YAML data-lang=YAML><span class=line><span class=cl><span class=nt>web</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>url</span><span class=p>:</span><span class=w> </span><span class=l>https://www.bing.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>tasks</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>搜索天气</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>flow</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>ai</span><span class=p>:</span><span class=w> </span><span class=l>搜索 &#34;今日天气&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>sleep</span><span class=p>:</span><span class=w> </span><span class=m>3000</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>检查结果</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>flow</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>aiAssert</span><span class=p>:</span><span class=w> </span><span class=l>结果中展示了天气信息</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>To run YAML-format scripts, you need to install Midscene&rsquo;s command-line support</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=n>npm</span> <span class=n>install</span> <span class=nv>@midscene</span><span class=p>/</span><span class=nb>cli </span><span class=p>-</span><span class=n>-save-dev</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c># Run</span>
+</span></span><span class=line><span class=cl><span class=n>npx</span> <span class=n>midscene</span> <span class=p>./</span><span class=n>weather</span><span class=p>.</span><span class=py>yaml</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=mcp-approach>MCP Approach</h2><p>Beyond the methods above, Midscene also offers a way to act as a local MCP server. This approach essentially wraps MidScene&rsquo;s Chrome extension as a local capability inside MCP, then drives the browser by combining a large model with the mcp server.</p><p>For an introduction to and usage of mcp server, see my earlier related article 【】</p><p>mcp server configuration:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;mcpServers&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;mcp-midscene&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;command&#34;</span><span class=p>:</span> <span class=s2>&#34;npx&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;args&#34;</span><span class=p>:</span> <span class=p>[</span><span class=s2>&#34;-y&#34;</span><span class=p>,</span> <span class=s2>&#34;@midscene/mcp&#34;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;env&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;MIDSCENE_MODEL_NAME&#34;</span><span class=p>:</span> <span class=s2>&#34;REPLACE_WITH_YOUR_MODEL_NAME&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;OPENAI_API_KEY&#34;</span><span class=p>:</span> <span class=s2>&#34;REPLACE_WITH_YOUR_OPENAI_API_KEY&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;MCP_SERVER_REQUEST_TIMEOUT&#34;</span><span class=p>:</span> <span class=s2>&#34;800000&#34;</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=limitations-of-the-current-version>Limitations of the Current Version</h2><p>Although the Midsence tool has already shown considerable potential and is still being continuously updated and iterated, it still has quite a few shortcomings in practical use, mainly in the following areas:</p><ul><li><strong>Limited interaction types</strong>: Currently only click, drag (supported only in the UI-TARS model), input, keyboard, and scroll operations are supported.</li><li><strong>Stability risks</strong>: The return values of AI models cannot be guaranteed to be 100% accurate. Writing good prompts is demanding</li><li><strong>Element recognition</strong>: Some large models are not very good at recognizing elements, such as interactions with iframe and canvas elements. Moreover, Chrome&rsquo;s native controls like pop-up prompts and right-click menus are not yet supported.</li><li><strong>Higher cost</strong>: Being based on visual recognition, token consumption is considerable, and if a paid large model is used, the cost can be high.</li></ul><p>But these flaws do not overshadow the merits: Midscene has already taken a solid step forward in improving UI automation testing with AI capabilities! We will continue to follow its further development!</p><hr><h3 id=further-reading>Further Reading:</h3><p>【】
+【】</p><p>Join the group, outline</p></section><footer class=article-footer><section class=article-tags><a href=/en/tags/ai/>AI</a>
+<a href=/en/tags/ai-testing/>AI Testing</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/en/post/096-magenticui%E8%AF%84%E6%B5%8B/><div class=article-image><img src=/post/096-magenticui%E8%AF%84%E6%B5%8B/magentic_logo.a3066076e334f6cbd6921f825673b100_hu_52841f1a3a08b0d5.webp width=250 height=150 loading=lazy alt="Featured image of post Microsoft Releases Magentic UI, a Hands-On Review of the Interactive AI Agent Assistant" data-hash="md5-owZgduM09svWkh+CVnOxAA=="></div><div class=article-details><h2 class=article-title>Microsoft Releases Magentic UI, a Hands-On Review of the Interactive AI Agent Assistant</h2></div></a></article><article class=has-image><a href=/en/post/072-%E5%BE%AE%E8%BD%AF%E5%B7%B2%E5%8F%91%E5%B8%83playwright-mcp/><div class=article-image><img src=/post/072-%E5%BE%AE%E8%BD%AF%E5%B7%B2%E5%8F%91%E5%B8%83playwright-mcp/Pasted-20250402.4caae59d8115364eba923b597c89cacb_hu_93c9e139025e4f8b.webp width=250 height=150 loading=lazy alt="Featured image of post Microsoft Has Released Playwright MCP" data-hash="md5-TKrlnYEVNk66kjtZfInKyw=="></div><div class=article-details><h2 class=article-title>Microsoft Has Released Playwright MCP</h2></div></a></article><article><a href=/en/post/073-ai%E4%B8%8B%E4%B8%80%E7%AB%99-mcpserver/><div class=article-details><h2 class=article-title>The Next Stop for AI - MCP Server</h2></div></a></article><article><a href=/en/post/070-ai%E6%97%B6%E4%BB%A3%E7%9A%84%E6%B5%8B%E8%AF%95/><div class=article-details><h2 class=article-title>Software Testing in the AI Era - Assistant or Adversary?</h2></div></a></article><article><a href=/en/post/068-%E4%BB%A3%E7%A0%81%E4%B8%AD%E9%9B%86%E6%88%90deepseekapi%E6%89%A7%E8%A1%8C%E6%B5%8B%E8%AF%95/><div class=article-details><h2 class=article-title>Integrating the DeepSeek API into Code to Run Tests</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2023 -
+2026 |by Daniel Wei</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Git on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/git/</link><description>Recent content in Git on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Fri, 27 Sep 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/git/index.xml" rel="self" type="application/rss+xml"/><item><title>A Review of Software Branching Strategies and Integration Patterns</title><link>https://chengxiaqiucao.github.io/en/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/</link><pubDate>Fri, 27 Sep 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/branch.webp" alt="Featured image of post A Review of Software Branching Strategies and Integration Patterns" />&lt;h2 id="preface">Preface
+&lt;/h2>&lt;p>Software code is the core asset of any software development team. Branch management is the primary way a team coordinates code synchronization, integration, and conflict resolution among multiple people when collaborating.&lt;/p>
+&lt;p>This article is compiled from reading notes on the branching model by software guru Martin Fowler.&lt;/p>
+&lt;h2 id="base-patterns">Base Patterns
+&lt;/h2>&lt;h3 id="source-branch">Source Branch
+&lt;/h3>&lt;p>All changes are recorded on the same branch.&lt;/p>
+&lt;p>Definition of a branch:
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927_hu_d8b5e88b84ac2d3c.webp"
+width="1024"
+height="378"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927_hu_a40c392fd34ba722.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927_hu_d8b5e88b84ac2d3c.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="270"
+data-flex-basis="649px"
+>
+Creating a branch:
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-1_hu_1affd2780a28f9b7.webp"
+width="1024"
+height="660"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-1_hu_22fe98117b40be91.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-1_hu_1affd2780a28f9b7.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="155"
+data-flex-basis="372px"
+>
+&lt;/p>
+&lt;p>Two different developers pull their own development branches based on the main branch:
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-2_hu_90caf2e8d614e722.webp"
+width="1024"
+height="516"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-2_hu_f9e7625c703996cf.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-2_hu_90caf2e8d614e722.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="198"
+data-flex-basis="476px"
+>
+&lt;/p>
+&lt;p>Jonny LeRoy pointed out that when we draw branch lines, we actually overlook the increase in complexity that builds up over time.
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-3_hu_efb91214c0c8fd12.webp"
+width="1024"
+height="604"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-3_hu_97b6bb7afee0095c.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-3_hu_efb91214c0c8fd12.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="169"
+data-flex-basis="406px"
+>
+&lt;/p>
+&lt;h4 id="definition-of-the-mainline">Definition of the Mainline:
+&lt;/h4>&lt;p>&lt;strong>Master, Trunk&lt;/strong>&lt;/p>
+&lt;p>It is the single shared branch that reflects the current actual state of the product.&lt;/p>
+&lt;p>You can obtain the current product version state at any time and develop based on it.&lt;/p>
+&lt;h4 id="healthy-branch">Healthy Branch:
+&lt;/h4>&lt;p>Perform automated builds and tests for every commit to ensure no faults are introduced into the current branch (a working, fault-free branch).&lt;/p>
+&lt;p>Advantages:&lt;/p>
+&lt;ol>
+&lt;li>A healthy shared branch prevents new branches pulled from it from working on a faulty foundation.&lt;/li>
+&lt;li>A healthy branch is easier to release directly to production.&lt;/li>
+&lt;li>Keeping a healthy branch at all times greatly reduces the workload of integration and lowers potential risks.&lt;/li>
+&lt;li>It facilitates differential debugging. (You can remove the commit that failed debugging and keep only the healthy commits.)&lt;/li>
+&lt;li>If a problem occurs when integrating into the mainline, you can confirm with certainty that it is caused by a conflict rather than a code error.&lt;/li>
+&lt;/ol>
+&lt;p>It can be a shared branch or your own branch.
+Self-testing code is the core of a healthy branch; self-tests should produce results quickly (on the order of minutes).&lt;/p>
+&lt;h2 id="integration-patterns">Integration Patterns
+&lt;/h2>&lt;h3 id="mainline-integration">Mainline Integration
+&lt;/h3>&lt;p>Developers pull code from the mainline to develop, integrate, and push healthy changes back to the mainline.
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-4_hu_6bb89d745e9d69db.webp"
+width="1024"
+height="239"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-4_hu_3e8671dbaddc1b38.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-4_hu_6bb89d745e9d69db.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="429"
+data-flex-basis="1030px"
+>
+Pull a branch from the mainline to your local machine and develop on the local branch.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-5_hu_1f713f580af441c.webp"
+width="1024"
+height="292"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-5_hu_e70ca4ba7fc920d.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-5_hu_1f713f580af441c.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="350"
+data-flex-basis="840px"
+>
+During development, other developers have already committed changes to the mainline branch.
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-6_hu_59a9368c063be4e5.webp"
+width="1024"
+height="314"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-6_hu_80016afc9e12fb5b.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-6_hu_59a9368c063be4e5.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="326"
+data-flex-basis="782px"
+>
+At this point, if you want to commit to the mainline, you first need to merge in the other changes.
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-7_hu_3193f64b188ffe57.webp"
+width="1024"
+height="321"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-7_hu_f71d73658c5a0d67.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-7_hu_3193f64b188ffe57.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="319"
+data-flex-basis="766px"
+>
+Sometimes there are conflicts between local modifications and already-committed changes; in that case you need to resolve the conflicts first.
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-8_hu_a80baba1f29cb74e.webp"
+width="1024"
+height="313"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-8_hu_d4166dab78e3259e.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-8_hu_a80baba1f29cb74e.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="327"
+data-flex-basis="786px"
+>
+Then commit the modified, self-tested healthy code back to the mainline branch.&lt;/p>
+&lt;p>Using a mainline means we will practice the &lt;strong>mainline integration pattern&lt;/strong>.&lt;/p>
+&lt;h3 id="feature-branch">Feature Branch
+&lt;/h3>&lt;p>Pull an independent branch for each functional feature, and integrate it back into the mainline after the feature is complete.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-9_hu_9f7e8733e81d6f65.webp"
+width="1024"
+height="402"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-9_hu_6b17883de5fdc447.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-9_hu_9f7e8733e81d6f65.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="254"
+data-flex-basis="611px"
+>
+Pull different feature branches from the mainline and develop on each separately.
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927175324_hu_d80292dc70bee8fb.webp"
+width="1024"
+height="376"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927175324_hu_fcbb79ff2ec68351.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927175324_hu_d80292dc70bee8fb.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="272"
+data-flex-basis="652px"
+>
+During development, continuously pull the latest code from the mainline; if there are other feature changes, integrate and resolve conflicts in a timely manner (locally).&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-10_hu_20cf8308981ddb5f.webp"
+width="1024"
+height="417"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-10_hu_49eb3cc57dc4c0e5.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-10_hu_20cf8308981ddb5f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="245"
+data-flex-basis="590px"
+>
+After the feature is fully developed, integrate it back into the mainline. (The affected conflicts have already been resolved locally, so all other feature branches can pull the changes directly without any conflicts to resolve.)&lt;/p>
+&lt;h3 id="low-frequency-integration">Low-Frequency Integration
+&lt;/h3>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-11_hu_ae79931139304258.webp"
+width="1024"
+height="323"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-11_hu_bcd8517283a21da9.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-11_hu_ae79931139304258.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="317"
+data-flex-basis="761px"
+>
+&lt;/p>
+&lt;p>Several local commits have been made on each of two independent development branches, but they have not been pushed to the mainline.
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-12_hu_9376d73a3edc26b.webp"
+width="1024"
+height="336"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-12_hu_db6d314c6bd94534.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-12_hu_9376d73a3edc26b.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="304"
+data-flex-basis="731px"
+>
+Changes have been merged into the mainline.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-13_hu_b8fad3c7b92c0194.webp"
+width="1024"
+height="325"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-13_hu_112b45fc2d9aca57.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-13_hu_b8fad3c7b92c0194.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="314"
+data-flex-basis="755px"
+>
+The development branches need to pull the changes and merge them into their local branches (resolving conflicts).&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-14_hu_f7c9687c75c8d36c.webp"
+width="1024"
+height="328"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-14_hu_5c36ccbe245b5e7a.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-14_hu_f7c9687c75c8d36c.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="311"
+data-flex-basis="748px"
+>
+On branch A, commits 4 and 5 are completed and then pushed to the mainline.
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-15_hu_f25d3da8c16b3369.webp"
+width="1024"
+height="312"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-15_hu_19c71907aceb924b.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-15_hu_f25d3da8c16b3369.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="327"
+data-flex-basis="786px"
+>
+After commits 4, 5, and 6 are completed on branch B, it needs to locally merge in A&amp;rsquo;s commits from the mainline and, after integration, push to the mainline. (The size of the local merge represents the workload.)&lt;/p>
+&lt;h3 id="high-frequency-integration">High-Frequency Integration
+&lt;/h3>&lt;p>What if every commit is integrated and pushed to the mainline?
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-16_hu_562311a07a7b6b40.webp"
+width="1024"
+height="302"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-16_hu_649037a261210a4d.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-16_hu_562311a07a7b6b40.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="338"
+data-flex-basis="813px"
+>
+V pushes back to the mainline right after completing the first commit.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-17_hu_d68cd5e80147bac6.webp"
+width="1024"
+height="324"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-17_hu_3f6dc532a293d472.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-17_hu_d68cd5e80147bac6.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="316"
+data-flex-basis="759px"
+>
+S performs a local merge right after completing the first commit, and pushes back to the mainline.
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-18_hu_3019f22713065900.webp"
+width="1024"
+height="323"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-18_hu_c2949848b92be787.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-18_hu_3019f22713065900.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="316"
+data-flex-basis="760px"
+>
+For S&amp;rsquo;s second push, there are no changes on the mainline, so there is no local merge work.
+V completes the second commit and a local merge, then pushes.
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-19_hu_25a5ef17dbac7fec.webp"
+width="1024"
+height="308"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-19_hu_8c1fff3ee518f86b.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-19_hu_25a5ef17dbac7fec.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="332"
+data-flex-basis="798px"
+>
+S&amp;rsquo;s third commit requires a local merge and a push.
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-20_hu_887c26c3ca8b8055.webp"
+width="1024"
+height="328"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-20_hu_4f0d02178063516f.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-20_hu_887c26c3ca8b8055.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="312"
+data-flex-basis="749px"
+>
+In this way, every local commit is pushed to the mainline.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-21_hu_e3fa35717a3ce8e3.webp"
+width="1024"
+height="402"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-21_hu_c66a84e33833691d.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-21_hu_e3fa35717a3ce8e3.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="254"
+data-flex-basis="611px"
+>
+&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-22_hu_2061a37dbba6844d.webp"
+width="1024"
+height="417"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-22_hu_aab04b7c443cc9af.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-22_hu_2061a37dbba6844d.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="245"
+data-flex-basis="589px"
+>
+&lt;/p>
+&lt;p>Comparing the two, high-frequency integration involves more local integration work, but the workload of each of these integrations is much lower than that of low-frequency integration.
+At the same time, more important than the reduced workload is that doing so reduces risk. (Although in most cases a large merge can also be completed smoothly, sometimes there are serious conflict problems that are hard to resolve. In such cases, occasional huge problems are worse than routine small ones.)
+If each routine integration takes 10 minutes, but 50 integrations combined take 6 hours, it may seem that 6 hours is still less than 500 minutes, but this leads to &lt;em>integration fear&lt;/em> (if it hurt, do it more often).&lt;/p>
+&lt;p>Moreover, under the high-frequency integration model, conflicts between code can be discovered earlier, avoiding the situation where conflicting code is only discovered later, which in the meantime continuously produces a lot of additional conflicting code that should not have existed.&lt;/p>
+&lt;p>A source control system is actually more of a communication platform, allowing you to be aware of the work of other team members.&lt;/p>
+&lt;h3 id="continuous-integration">Continuous Integration
+&lt;/h3>&lt;p>As soon as a developer completes a healthy commit, they complete mainline integration as quickly as possible, generally within no more than one day.&lt;/p>
+&lt;p>(If high-frequency integration is more efficient and feasible, but using feature branches means changes are constrained to be no smaller than a feature, then does integration frequency become a problem?)&lt;/p>
+&lt;p>Continuous Integration - as long as development on a feature is making progress and is healthy, it can be integrated into the mainline. The only rule is that integration must happen every day (or even more frequently).&lt;/p>
+&lt;p>The development team needs to get used to having unfinished features on the mainline and consider how to avoid exposing these features in the product (by hiding entry points or using configuration control); sometimes we can also implement canary releases.&lt;/p>
+&lt;p>Under the continuous integration model, developers often do not need to create their own feature branches; they can simply work on the local mainline branch.&lt;/p>
+&lt;p>The difference between feature branches and continuous integration lies not in whether a feature branch exists, but in when integration into the mainline happens.&lt;/p>
+&lt;p>A comparison of the two:&lt;/p>
+&lt;p>The difference between the two patterns depends more on the size of the feature; if a feature is small enough (can be completed within one day), you can practice both feature branches and continuous integration at the same time.&lt;/p>
+&lt;p>The most obvious problem with feature branches is the workload and uncertainty of merging; however, the bigger problem is that they may prevent refactoring. Refactoring is the most effective way to optimize software, but refactoring creates conflicts, and when the workload of resolving conflicts is too large, refactoring often requires great courage.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Feature Branch&lt;/th>
+&lt;th>Continuous Integration&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>- All the code in a feature can be evaluated for quality as a single unit&lt;br>- Feature code is added to the product only after the feature is complete&lt;br>- Lower merge frequency&lt;/td>
+&lt;td>- Supports integration at a frequency higher than the feature length&lt;br>- Reduces the time to discover conflicts&lt;br>- Smaller merges&lt;br>- Encourages refactoring&lt;br>- Requires commitment to a healthy branch (and thus to self-testing code)&lt;br>- Scientific evidence shows it helps improve software delivery performance&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="feature-branches-and-open-source-software">Feature Branches and Open Source Software
+&lt;/h4>&lt;p>Feature branches on GitHub? The pull request model.
+Different contexts: distributed, irregular, team members unfamiliar with each other vs. full-time, familiar team members, reliable.&lt;/p>
+&lt;p>Review of commits&lt;/p>
+&lt;ul>
+&lt;li>Code review·&lt;/li>
+&lt;li>Integration is blocked&lt;/li>
+&lt;li>The importance of modularity&lt;/li>
+&lt;li>&lt;/li>
+&lt;/ul>
+&lt;h2 id="release-patterns">Release Patterns
+&lt;/h2>&lt;p>The mainline branch is the active branch, where code is continuously developed. If the mainline can be kept healthy, anyone can start their work from a stable foundation.
+And if it is healthy enough, the product can also be released directly from the mainline branch.&lt;/p>
+&lt;p>&lt;img src="https://i-blog.csdnimg.cn/blog_migrate/b1dee5579befaf2a2e007af2dbb2c29f.png#pic_center"
+loading="lazy"
+alt="Insert image description here"
+>
+For teams practicing CI/CD, a common practice is to track each released version by tagging. But teams that do not practice CD need other release patterns.&lt;/p>
+&lt;h3 id="release-branch">Release Branch
+&lt;/h3>&lt;p>A branch prepared for release that only accepts commits aimed at version stabilization and delivery (generally during the system testing phase).
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-23_hu_238993e0c8fe6c93.webp"
+width="1024"
+height="410"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-23_hu_31a4e34fabeec6ce.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-23_hu_238993e0c8fe6c93.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="249"
+data-flex-basis="598px"
+>
+&lt;/p>
+&lt;p>A release branch is pulled from the mainline branch and no longer accepts the merging of any new features. Development work on the release branch mainly consists of fixing discovered bugs or features that affect delivery. All changes eventually still need to be merged back into the mainline.
+&lt;img src="https://i-blog.csdnimg.cn/blog_migrate/4e7655a86c338d8ce135fc704ded3f97.png#pic_center"
+loading="lazy"
+alt="cherry-pick to the release branch"
+>
+Although the work on a release branch is often smaller in workload than developing new features, if development on it takes too long it can still make merging back into the mainline very difficult (the more commits on the mainline, the harder the merge).&lt;/p>
+&lt;p>In practice, because of the existence of the release branch, the operation of merging back into the mainline is often easily overlooked, especially when there are difficult conflicts to resolve and release pressure exists.&lt;/p>
+&lt;p>So some developers adopt another approach: continue developing on the mainline, and then use cherry-pick to merge only release-related commits into the release branch. The drawback of this approach is that cherry-pick is often also difficult in many cases (when there are dependencies on previous commits), and there is often some rework on the release branch before the actual release.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-24_hu_b32e1b23d19f188e.webp"
+width="1024"
+height="440"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-24_hu_71b8045f93007c06.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-24_hu_b32e1b23d19f188e.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="232"
+data-flex-basis="558px"
+>
+For a team with only one product version, using a single release branch is sufficient. But in many cases there is a need to support multiple product versions; for example, software deployed on a customer&amp;rsquo;s premises may run on a historical version for a long time, yet still needs ongoing bug fixes or some special requirements. In this case, multiple different release branches need to be maintained and kept in sync with the mainline periodically.&lt;/p>
+&lt;p>For the development team this clearly greatly increases the maintenance difficulty and workload, but this is more a cost brought about by product strategy. The only thing that can be done is to encourage customers to upgrade to the latest version in a more timely manner (keeping the product stable is critical; once product instability causes problems, it makes customers more inclined to stop upgrading).&lt;/p>
+&lt;p>Release branches are very necessary for teams that find it difficult to keep the mainline branch continuously healthy; the team can focus on feature validation for product release. But for teams with a single product, release branches are unnecessary; just use the mainline branch and keep it healthy (tag the released versions).
+In addition, for teams whose release process has many blockers, release branches are also necessary (for example, slow review processes, the launch time windows of app stores, and reviews for security, legal, compliance, etc.).&lt;/p>
+&lt;h3 id="maturity-branch">Maturity Branch
+&lt;/h3>&lt;p>The head of the branch is always marked as the mature code baseline of the most recent version.&lt;/p>
+&lt;p>Corresponding maturity branches are pulled out according to the team&amp;rsquo;s different definitions of product maturity. For example, a QA branch (submitted for testing), a Staging branch (pre-release), and a production branch (live).&lt;/p>
+&lt;p>But in many cases, a clearly defined tagging mechanism can replace the role of maturity branches. For example, &amp;ldquo;maturity level - internal build number&amp;rdquo;, &amp;ldquo;qa-233&amp;rdquo;, &amp;ldquo;prod-445&amp;rdquo;.
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-25_hu_eeeb7af1959b5c75.webp"
+width="1024"
+height="530"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-25_hu_a6a6f9d3124b9cff.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-25_hu_eeeb7af1959b5c75.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="193"
+data-flex-basis="463px"
+>
+&lt;/p>
+&lt;h3 id="long-lived-release-branch">Long-Lived Release Branch
+&lt;/h3>&lt;p>A release branch can generally be deleted after the product is released, but we can also maintain a long-lived release branch. Its role can be seen as a combination of a release branch and a maturity branch. Pre-release fixes are done on this branch and merged back into the mainline, and a release tag is added at the actual release, after which preparation for the next version&amp;rsquo;s release begins.
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-26_hu_ffc94a6d94cbe015.webp"
+width="1024"
+height="331"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-26_hu_394448864600d3c9.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-26_hu_ffc94a6d94cbe015.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="309"
+data-flex-basis="742px"
+>
+&lt;/p>
+&lt;h3 id="environment-branch">Environment Branch
+&lt;/h3>&lt;p>Configure the code&amp;rsquo;s runtime environment through different commits.
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-27_hu_fc4f32d1f8a986ef.webp"
+width="1024"
+height="580"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-27_hu_2f381ae9e4e6e3fe.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-27_hu_fc4f32d1f8a986ef.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="176"
+data-flex-basis="423px"
+>
+&lt;/p>
+&lt;p>Different product runtime environments often have different configuration code (test environment, development environment, performance verification, security verification environment, pre-release environment, production environment, etc.). Environment branches contain the change commits for these configurations and trigger the corresponding builds and deployments.&lt;/p>
+&lt;p>Environment branches are generally also used as maturity branches; for example, a QA maturity branch will contain the configuration changes for the QA environment.&lt;/p>
+&lt;p>However, environment branches are not good practice; having different compiled code for different environments introduces risk. If the product program behaves differently in different environments, it makes fixing and locating problems extremely difficult. So it is best to ensure that the executable code running in different environments is identical, and that environment configurations are all controlled through explicit configuration files or variables. Any changes caused by environment changes should not be included in the source control system.&lt;/p>
+&lt;p>Environment branches should only exist as an emergency mechanism for teams that lack such an environment-switching control mechanism.&lt;/p>
+&lt;h3 id="hotfix">Hotfix
+&lt;/h3>&lt;p>A branch used for urgent product failure fixes.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-28_hu_73151391cc0dbc8.webp"
+width="1024"
+height="350"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-28_hu_f27ef989bebf9c4c.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-28_hu_73151391cc0dbc8.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="292"
+data-flex-basis="702px"
+>
+Pull a hotfix branch from the release version corresponding to the mainline branch, and merge it back into the mainline after completion (if the release was a long time ago, the merge work may be considerable).
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-29_hu_436c56a5cd5f713.webp"
+width="1024"
+height="361"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-29_hu_e7d3440a59800572.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-29_hu_436c56a5cd5f713.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="283"
+data-flex-basis="680px"
+>
+For teams using release branches, a hotfix can also be done directly on the release branch, which is equivalent to turning the original release branch into a hotfix branch.
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-30_hu_b7c3c2ee0c562991.webp"
+width="1024"
+height="382"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-30_hu_64289921e01ae0c5.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-30_hu_b7c3c2ee0c562991.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="267"
+data-flex-basis="643px"
+>
+For teams practicing CD, a hotfix can even be completed directly on the mainline (a hotfix branch is still pulled, but from the latest commit), because such teams generally already have the ability to keep unreleased features hidden. Moreover, during the hotfix process, no new commits to the mainline are allowed. (Hotfix takes priority.)&lt;/p>
+&lt;p>How to define a hotfix? For teams that can release frequently, issues can generally be folded into the regular release cadence without needing a hotfix. It depends on the team&amp;rsquo;s release frequency and the actual impact on the business.&lt;/p>
+&lt;h3 id="release-train">Release Train
+&lt;/h3>&lt;p>Like a train departing on schedule, there are regular release intervals; after a feature is complete, you choose which release to put it into (this is not the same concept as SAFe&amp;rsquo;s Agile Release Train, which is more of an organizational-level practice).
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-31_hu_e16ea1a2a9440467.webp"
+width="1024"
+height="469"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-31_hu_d22964dba32a5f9e.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-31_hu_e16ea1a2a9440467.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="218"
+data-flex-basis="524px"
+>
+The team defines a regular release plan and determines the features on each release train, making commitments and arranging their respective work tasks accordingly. Once the train departs, the current branch turns into a release branch and will only accept bug fixes. Release trains are generally used together with feature branches. For teams with many blockers in the release process, the release train is very useful, because these blockers will not affect the development of subsequent features.
+But the fairly obvious drawback is that if a feature is completed very early, it still has to wait until the departure time to go live.&lt;/p>
+&lt;p>The release train can be seen as a way to improve a team&amp;rsquo;s release process. For teams that find it hard to release stably, implementing CD is often not realistic; in that case, the release train is a good choice.&lt;/p>
+&lt;h4 id="loading-future-trains">Loading Future Trains
+&lt;/h4>&lt;p>Instead of loading requirements onto a new train only after the old train has departed, a variant of this pattern can be used. If it is uncertain whether some features can be completed before the scheduled departure, two trains can be opened at the same time (with different expected departure times); development work completed on the March train is also committed to the April train, and after the March train departs, the remaining work continues on the April train.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-32_hu_5b1ed821e2543211.webp"
+width="1024"
+height="348"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-32_hu_70de331ad7526764.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-32_hu_5b1ed821e2543211.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="294"
+data-flex-basis="706px"
+>
+This pattern allows work on the April train to not affect the March train, but the drawback is that if changes on the April train affect the March features, it will make the subsequent merge work more complex.&lt;/p>
+&lt;h4 id="comparison-with-mainline-release">Comparison with Mainline Release
+&lt;/h4>&lt;p>The main benefit of the release train is having a regular product release calendar, but multiple branches still introduce complexity.
+In fact, the mainline pattern can work this way too: develop on the mainline, and once the release date arrives, simply add a corresponding release branch.
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-33_hu_e6978f95292af323.webp"
+width="1024"
+height="556"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-33_hu_734b11bb499a89c6.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-33_hu_e6978f95292af323.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="184"
+data-flex-basis="442px"
+>
+&lt;/p>
+&lt;h3 id="release-ready-mainline">Release-Ready Mainline
+&lt;/h3>&lt;p>Ensure the mainline is in an absolutely healthy state, and that the head of the mainline can always be released directly to the production environment. (Every commit is healthy enough to be released directly, but only the commits that are actually released need to be tagged.)
+&lt;img src="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-34_hu_b9aede915247b24c.webp"
+width="1024"
+height="341"
+srcset="https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-34_hu_c2d43eb77f451379.webp 480w, https://chengxiaqiucao.github.io/post/020-%E7%90%86%E8%A7%A3%E5%87%A0%E7%A7%8D%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86%E7%AD%96%E7%95%A5/Pasted-20240927-34_hu_b9aede915247b24c.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="300"
+data-flex-basis="720px"
+>
+&lt;/p>
+&lt;h2 id="other-release-patterns">Other Release Patterns
+&lt;/h2>&lt;h3 id="experimental-branch">Experimental Branch
+&lt;/h3>&lt;p>Collect work used for experiments on the codebase; these features will not be merged directly into the production environment.&lt;/p>
+&lt;p>Experimental ideas
+Different ways of implementing a feature&lt;/p>
+&lt;h3 id="future-branch">Future Branch
+&lt;/h3>&lt;p>A branch for changes that are too invasive to other branches.&lt;/p>
+&lt;p>A rarely used pattern that only pulls from the mainline and never merges back into other branches. Once used, it means there is an independent code enclave within the team. The lifetime of this branch should be kept as short as possible.&lt;/p>
+&lt;h3 id="collaboration-branch">Collaboration Branch
+&lt;/h3>&lt;p>Used for collaborative work between developers in situations where no formal integration is needed.&lt;/p>
+&lt;h3 id="team-integration-branch">Team Integration Branch
+&lt;/h3>&lt;p>Allow sub-teams to integrate with each other before integrating into the mainline. (Large projects.)&lt;/p>
+&lt;hr>
+&lt;p>Original reference: Martin&amp;rsquo;s blog &lt;a class="link" href="https://martinfowler.com/articles/branching-patterns.html" target="_blank" rel="noopener"
+>Branch Patterns&lt;/a>&lt;/p></description></item><item><title>How Git Works and Common Git Commands</title><link>https://chengxiaqiucao.github.io/en/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/</link><pubDate>Thu, 26 Sep 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/git.webp" alt="Featured image of post How Git Works and Common Git Commands" />&lt;h2 id="preface">Preface
+&lt;/h2>&lt;p>As an ambitious test engineer, with agile practices now in full swing, you need to work closely with developers. Tasks such as supporting unit testing and integration testing require you to confront the development code directly. Moreover, the test automation you build is itself code, so code management has in fact become an indispensable skill for testers today.&lt;/p>
+&lt;p>And in the course of this love-hate relationship with developers, diving straight into the code repository to see what shady dealings have been written that dare not face testing is also an advanced technique for in-depth testing.&lt;/p>
+&lt;p>But the first hurdle here is dealing with the code repository. So in this article we will take a look at today&amp;rsquo;s most mainstream code branch management tool, &lt;code>Git&lt;/code>, and how to operate a code repository in the right way.&lt;/p>
+&lt;h2 id="what-is-git">What Is Git?
+&lt;/h2>&lt;p>Git was created by the celebrated Linus Torvalds, universally known as the famous father of Linux.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-1_hu_ab2a241d34e87d88.webp"
+width="1024"
+height="572"
+srcset="https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-1_hu_2d9b181a8fc405fc.webp 480w, https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-1_hu_ab2a241d34e87d88.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="429px"
+>
+&lt;/p>
+&lt;p>Although Linux achieved tremendous success and attracted a large number of developers to the project, in the early days, as the manager of the Linux project, Linus still merged everyone&amp;rsquo;s code mainly by hand, without the help of any code management tool.&lt;/p>
+&lt;p>It was not that Linus liked this approach, but rather that he was extremely picky about code version management tools; commercial ones like clearcase and open source ones like CVS, SVN, and so on all failed to meet his expectations for code branch management.&lt;/p>
+&lt;p>It was not until 2002 that Linus settled on a commercial distributed version control system, BitKeeper; and given Linux&amp;rsquo;s enormous appeal, BitKeeper was willing to let the Linux community use it for free. But in 2005, a community developer reverse-engineered BitKeeper without permission and made use of its undisclosed interfaces, which led BitKeeper to revoke the community&amp;rsquo;s free usage rights.&lt;/p>
+&lt;p>Back to square one, Linus then decided to develop his own code version control system. The basic requirements for this system were:&lt;/p>
+&lt;ul>
+&lt;li>Speed&lt;/li>
+&lt;li>Simple design&lt;/li>
+&lt;li>Support for a large number of parallel development branches&lt;/li>
+&lt;li>Fully distributed&lt;/li>
+&lt;li>The ability to efficiently manage very large-scale projects like the Linux kernel&lt;/li>
+&lt;/ul>
+&lt;p>Then, with the efficiency of a true master, Linus took only 10 days to release the first version of Git. And he gave this version a slightly mocking name — Git (in English slang it means &amp;ldquo;an unpleasant person&amp;rdquo;).&lt;/p>
+&lt;blockquote>
+&lt;p>The name &amp;ldquo;git&amp;rdquo; was given by Linus Torvalds when he wrote the very first version. He described the tool as &amp;ldquo;the stupid content tracker&amp;rdquo; and the name as (depending on your way)&lt;/p>&lt;/blockquote>
+&lt;p>Of course, after Linus released the first version of Git, other interested members of the community (Junio Hamano) began to participate and gradually took over Git&amp;rsquo;s day-to-day maintenance, while Linus continued to devote most of his energy back to maintaining the Linux kernel.&lt;/p>
+&lt;h2 id="git-vs-svn">Git vs SVN
+&lt;/h2>&lt;p>Before Git, the most popular code version management tool was probably SVN.&lt;/p>
+&lt;p>It is not that SVN has major flaws, but the application scenarios of Git and SVN do differ considerably. Here is a table for comparison&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">Feature&lt;/th>
+&lt;th style="text-align: center">Git&lt;/th>
+&lt;th style="text-align: center">SVN&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>Branch&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Lightweight branches, fast to create&lt;/td>
+&lt;td style="text-align: center">A branch is a full copy of the repository&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>Branch merging&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Fast-forward merges, fast merging&lt;/td>
+&lt;td style="text-align: center">Manual merging of changes required&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>Distributed&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Yes, designed to be distributed&lt;/td>
+&lt;td style="text-align: center">No, no full distribution support&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>Snapshot&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Stores snapshots of changes&lt;/td>
+&lt;td style="text-align: center">Stores file differences&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>Speed&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Fast, distributed design&lt;/td>
+&lt;td style="text-align: center">Slow, centralized design&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>Access control&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Controlled via Git Hooks and Gitolite&lt;/td>
+&lt;td style="text-align: center">Controlled via hook scripts&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>Learning curve&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Steeper, requires understanding commands and concepts&lt;/td>
+&lt;td style="text-align: center">Gentler, easy to get started&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>Tags&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Lightweight tags, can be modified later&lt;/td>
+&lt;td style="text-align: center">Immutable static tags&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>History&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Retains full history&lt;/td>
+&lt;td style="text-align: center">Retains only recent history&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>Merge conflicts&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Require manual resolution&lt;/td>
+&lt;td style="text-align: center">Automatically attempts resolution, manual intervention when conflicts arise&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>Command-line tool&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Yes, a powerful and flexible Git CLI&lt;/td>
+&lt;td style="text-align: center">Relatively simple, mainly used to manage and operate the repository&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Overall, Git is now more popular and its surrounding ecosystem is more mature, so it has gradually become the most mainstream version control tool today&lt;/p>
+&lt;h2 id="how-git-works">How Git Works
+&lt;/h2>&lt;p>So how exactly does Git work?&lt;/p>
+&lt;p>Architecturally, Git is actually a three-layer architecture,&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>Working directory&lt;/strong>: This is the actual directory where the project files reside. Modifications made to files in the working directory are considered to be in an &amp;ldquo;untracked&amp;rdquo; state until an explicit commit operation is performed.&lt;/li>
+&lt;li>&lt;strong>Staging area&lt;/strong>: The staging area acts as a buffer zone between the working directory and the &lt;code>.git&lt;/code> directory. Files in the staging area are in a &amp;ldquo;staged&amp;rdquo; state so that they can be included in the next commit. It is the means that allows you to select and control changes.&lt;/li>
+&lt;li>&lt;strong>Local repository&lt;/strong>: That is, the &lt;code>.git&lt;/code> directory. It is the core container of the Git version control system, containing various metadata, the object database, and configuration information. The &lt;code>.git&lt;/code> directory stores the snapshots of commits, manages the project&amp;rsquo;s history, and accepts Git&amp;rsquo;s various operational commands.&lt;/li>
+&lt;/ol>
+&lt;p>In addition to these three layers of local code management, there is also the concept of a &lt;code>remote repository&lt;/code>, used for collaboration among different members on the same project code.&lt;/p>
+&lt;ol start="4">
+&lt;li>&lt;strong>Remote repository&lt;/strong>: A remote repository is a central repository for team collaboration, ensuring code synchronization and coordination through push, pull, merge, and other operations.&lt;/li>
+&lt;/ol>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/git-architechture.gif"
+width="1600"
+height="900"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+&lt;/p>
+&lt;p>Combining the architecture above with the main Git operation commands, let us understand how Git works:&lt;/p>
+&lt;ol>
+&lt;li>First, we use &lt;code>git init&lt;/code> or &lt;code>git clone&lt;/code> to set up a local Git repository, which will contain the &lt;code>.git&lt;/code> local repository directory.&lt;/li>
+&lt;li>Code newly added or modified locally is at this point actually in the &lt;code>untracked&lt;/code> state&lt;/li>
+&lt;li>Running the &lt;code>git add .&lt;/code> command causes the relevant changes to enter the &lt;code>staging area&lt;/code>, with the corresponding state being &lt;code>staged&lt;/code> or &lt;code>modified&lt;/code>&lt;/li>
+&lt;li>Then running the &lt;code>git commit&lt;/code> command submits the changes from the staging area into the local repository, with the corresponding state being &lt;code>committed&lt;/code>&lt;/li>
+&lt;li>&lt;code>git diff&lt;/code> is the command for viewing changes; as you can see, it actually compares the difference between the working directory and the staging area, while &lt;code>git diff HEAD&lt;/code> compares the local repository with the working directory&lt;/li>
+&lt;li>&lt;code>git push&lt;/code> submits the contents of the local repository to the remote repository&lt;/li>
+&lt;li>&lt;code>git fetch&lt;/code> is used to synchronize the remote repository to the local repository&lt;/li>
+&lt;li>The &lt;code>git pull&lt;/code> we commonly use directly pulls the remote repository down into the local working directory&lt;/li>
+&lt;/ol>
+&lt;h2 id="common-git-commands">Common Git Commands
+&lt;/h2>&lt;p>Here I borrow a Chinese-language Git cheatsheet for quick reference.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-2_hu_a2e9e1818a1144f5.webp"
+width="1024"
+height="723"
+srcset="https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-2_hu_85c9dc89a017affd.webp 480w, https://chengxiaqiucao.github.io/post/024-git%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/Pasted-20240926-2_hu_a2e9e1818a1144f5.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="141"
+data-flex-basis="339px"
+>
+&lt;/p>
+&lt;p>The detailed usage of the commands will not be listed here; the core commands are mainly just the few mentioned in the schematic diagram above.&lt;/p>
+&lt;p>For further study, you can also make use of online learning tools. Here is one I recommend:&lt;/p>
+&lt;p>&lt;a class="link" href="https://learngitbranching.js.org/" target="_blank" rel="noopener"
+>https://learngitbranching.js.org/&lt;/a>&lt;/p></description></item></channel></rss>

@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/linux/</link><description>Recent content in Linux on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Thu, 13 Mar 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>A Guide to sed, One of the Linux Text Processing Trio</title><link>https://chengxiaqiucao.github.io/en/post/061-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/</link><pubDate>Thu, 13 Mar 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/061-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/061-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/sed3.webp" alt="Featured image of post A Guide to sed, One of the Linux Text Processing Trio" />&lt;h1 id="preface">Preface
+&lt;/h1>&lt;p>In the previous article in this series 【】, we introduced the usage of the &lt;code>grep&lt;/code> command, one of the Linux Text Processing Trio. But in reality, among the trio, &lt;code>grep&lt;/code> is really just the little brother: enhanced by regular expressions, its role is mostly to perform pattern queries against text.
+The truly heavyweight commands in the trio are &lt;code>sed&lt;/code> and &lt;code>awk&lt;/code>. &lt;code>sed&lt;/code> is actually short for &lt;code>stream editor&lt;/code>, so the sed command can genuinely function as a text editor. In this article, we&amp;rsquo;ll introduce this &lt;strong>editor disguised as a Linux command&lt;/strong>: &lt;code>sed&lt;/code>&lt;/p>
+&lt;h1 id="overview-of-the-sed-command">Overview of the sed Command
+&lt;/h1>&lt;p>The syntax of the &lt;code>sed&lt;/code> command is as follows:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">sed -options &amp;#39;operations&amp;#39; file-or-piped-input
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>sed&lt;/code> is a line editor; the operation commands here process text line by line&lt;/p>
+&lt;h2 id="command-options">Command Options
+&lt;/h2>&lt;p>Its main command options are as follows:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">&lt;strong>Command Option&lt;/strong>&lt;/th>
+&lt;th style="text-align: center">&lt;strong>Meaning&lt;/strong>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>-n&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Suppress default output&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>-r&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Enable extended regular expressions&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>-i&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Edit the source file in place&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>-e&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Specify an operation command (enabled by default; multiple allowed)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>-f&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Read operation commands from a file&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="default-output">Default Output
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;/root/p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># It actually displays all lines in the passwd file, with the line containing the root user shown twice&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;/root/p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Adding the -n option suppresses sed&amp;#39;s own default output, so only the matching lines are shown via the p command&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="modifying-the-original-file">Modifying the Original File
+&lt;/h3>&lt;p>In real-world work, the &lt;code>-i&lt;/code> option is a fairly dangerous one, because it modifies the original file directly&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -i &lt;span class="s1">&amp;#39;/root/q&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># This operation leaves the passwd file containing only the root user line, because the q command exits immediately after a match&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># And sed&amp;#39;s output is then written directly back to the original file&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>A safer approach is to specify a backup file when using the &lt;code>-i&lt;/code> option, that is, to append a backup file suffix right after &lt;code>-i&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -i.bak &lt;span class="s1">&amp;#39;/root/q&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Although this still modifies the passwd file, it creates a .bak backup before the change for easy recovery&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="multiple-commands">Multiple Commands
+&lt;/h3>&lt;p>The &lt;code>sed&lt;/code> command can take multiple operation commands. When there are several, you need to specify an &lt;code>-e&lt;/code> option for each one; if you use only a single command, the &lt;code>-e&lt;/code> can be omitted&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -e &lt;span class="s1">&amp;#39;=&amp;#39;&lt;/span> -e &lt;span class="s1">&amp;#39;/root/q&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># The = command prints the line number of the current line being processed&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>If you want to avoid repeating &lt;code>-e&lt;/code>, you can also combine commands with &lt;code>;&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=;/root/q&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Same effect as specifying multiple -e options&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="operation-command-reference">Operation Command Reference
+&lt;/h2>&lt;p>In the option introduction above, we&amp;rsquo;ve actually already used commands such as &lt;code>p&lt;/code> and &lt;code>q&lt;/code>.&lt;/p>
+&lt;p>An operation command actually consists of two parts: the &lt;strong>address part&lt;/strong> and the &lt;strong>operation part&lt;/strong>:&lt;/p>
+&lt;ul>
+&lt;li>Address: &lt;code>sed&lt;/code> is a line-processing command, so addressing simply means specifying the lines to process&lt;/li>
+&lt;li>Operation: the action to perform on the lines that match the addressing rule&lt;/li>
+&lt;/ul>
+&lt;h3 id="addressing-rules">Addressing Rules
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">&lt;strong>Addressing Format&lt;/strong>&lt;/th>
+&lt;th style="text-align: center">&lt;strong>Meaning&lt;/strong>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>Number&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Match a specified line number&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>m~n&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Start at line m and match with step n&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>$&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Match the last line&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>/regex/&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Match by regular expression&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>m,n&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">From line m to line n&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>m,+n&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">From line m, then match n more lines&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;5p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Display the content of line 5&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;2~3p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Display lines starting from line 2 with a step of 3, i.e. lines 2, 5, 8, 11, 14, ...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;$p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Display the last line&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;/qiucao/p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Display lines containing qiucao&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;5,8p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Display the content from line 5 to line 8&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;5,+5p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Display the content of lines 5, 6, 7, 8, 9, 10&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="operation-commands">Operation Commands
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">&lt;strong>Operation Command&lt;/strong>&lt;/th>
+&lt;th style="text-align: center">&lt;strong>Meaning&lt;/strong>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>p&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">&lt;strong>Print&lt;/strong> matching lines&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>=&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Output the line number of matching lines&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>l&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Print matching lines and show &lt;strong>invisible characters&lt;/strong>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>s&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">&lt;strong>Regular expression&lt;/strong> match and replace&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>c&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">&lt;strong>Replace the entire&lt;/strong> matching line&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>a&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">&lt;strong>Append&lt;/strong> content &lt;strong>after&lt;/strong> the matching line&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>i&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">&lt;strong>Insert&lt;/strong> content &lt;strong>before&lt;/strong> the matching line&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>d&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">&lt;strong>Delete&lt;/strong> matching lines&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>r&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Append content after the matching line (from a file)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>w&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Write matching line content to a file&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>q&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Exit after a match, no further matching&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;=;5p&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Print all line numbers and display the content of line 5&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;=;5l&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Similar to the previous command, but the end-of-line marker ($) is also printed&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -r &lt;span class="s1">&amp;#39;=;s/^m\w*/test/g&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Replace all usernames starting with m with test; /g replaces all matches within a line, otherwise only the first is replaced&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=;5c\测试一下&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Replace line 5 with &amp;#34;测试一下&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=;5a\测试一下&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Append a line after line 5&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=;5i\测试一下&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Insert a line before line 5&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=;5d&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Delete line 5&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=;5r test.txt&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Read a line from test.txt and append it after line 5&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=;5w test.txt&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Write the content of line 5 to test.txt&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h1 id="pattern-space-and-hold-space">Pattern Space and Hold Space
+&lt;/h1>&lt;p>The operation commands introduced above are mainly for within-line operations. Since we say &lt;code>sed&lt;/code> is actually an editor, it certainly also supports multi-line text editing operations, such as copying, pasting, and cutting whole lines.&lt;/p>
+&lt;p>This brings us to the two memory spaces that &lt;code>sed&lt;/code> reserves during processing:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Pattern space&lt;/strong>: stores the content of the line currently being processed; after each line is handled, the processed content is placed in this space&lt;/li>
+&lt;li>&lt;strong>Hold space&lt;/strong>: used to temporarily store data; it can be thought of as a clipboard-like cache for exchanging content between lines. Initially it contains only a single &lt;code>\n&lt;/code> newline character by default&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">&lt;strong>Operation Command&lt;/strong>&lt;/th>
+&lt;th style="text-align: center">&lt;strong>Usage&lt;/strong>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>h&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Copy the pattern space content to the hold space, replacing the original content (\n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>H&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Append the pattern space content to the hold space&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>g&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Copy the hold space content to the pattern space, overwriting the original content&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>G&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Append the hold space content after the current pattern space content&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">&lt;strong>x&lt;/strong>&lt;/td>
+&lt;td style="text-align: center">Swap the pattern space and hold space content&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">n&lt;/td>
+&lt;td style="text-align: center">Immediately read the next line and copy it to the pattern space&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">N&lt;/td>
+&lt;td style="text-align: center">Immediately read the next line and append it to the current pattern space (often used to join lines)&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="example">Example
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=;2h;3H;5x;8G&amp;#39;&lt;/span> /etc/passwd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 2h copies line 2 to the hold space&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 3H copies line 3 and appends it to the existing hold space&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 5x swaps the current pattern space with the hold space, so the copied content replaces the original line 5&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 8G appends the hold space content (originally the pattern space content of line 5) after the current pattern space, i.e. after line 8&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/061-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/Pasted-20250313_hu_17064a38a141561a.webp"
+width="1024"
+height="842"
+srcset="https://chengxiaqiucao.github.io/post/061-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/Pasted-20250313_hu_3e354af1266cf6c7.webp 480w, https://chengxiaqiucao.github.io/post/061-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-sed/Pasted-20250313_hu_17064a38a141561a.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="121"
+data-flex-basis="291px"
+>
+&lt;/p>
+&lt;h1 id="common-practical-sed-examples">Common Practical sed Examples
+&lt;/h1>&lt;h2 id="1-delete-blank-lines">1. Delete Blank Lines
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -i &lt;span class="s1">&amp;#39;/^\s*$/d&amp;#39;&lt;/span> test.txt
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Match lines containing only whitespace characters with a regular expression and delete them&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="2-add-line-numbers-to-a-file">2. Add Line Numbers to a File
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed &lt;span class="s1">&amp;#39;=&amp;#39;&lt;/span> test.txt &lt;span class="p">|&lt;/span> sed &lt;span class="s1">&amp;#39;N;s/\n/\t/&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># First use sed to get the line numbers, added as a line before each line&amp;#39;s default output&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Pipe the result to a second sed command, use the N command to merge the two lines, and replace the newline with a tab&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="3-extract-all-image-links">3. Extract All Image Links
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -nr &lt;span class="s1">&amp;#39;s/.*src=&amp;#34;(.*\.png).*/\1/p&amp;#39;&lt;/span> source.html
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># A regular expression matches the image link; a capture group saves the path and replaces the entire original line&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="4-extract-error-lines-from-a-log">4. Extract Error Lines from a Log
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -n &lt;span class="s1">&amp;#39;/ERROR/{=;p}&amp;#39;&lt;/span> app.log
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Match lines in the log containing ERROR and print them along with their line numbers&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h1 id="conclusion">Conclusion
+&lt;/h1>&lt;p>The above is a systematic overview of the &lt;code>sed&lt;/code> command from the Linux Text Processing Trio. A summary of the &lt;code>awk&lt;/code> command will follow in a future article! For more extended testing skills, feel free to follow Qiucao&amp;rsquo;s systematic improvement course and reply with &lt;code>outline&lt;/code> to get the detailed catalog.&lt;/p></description></item><item><title>A Guide to grep, One of the Linux Text Processing Trio</title><link>https://chengxiaqiucao.github.io/en/post/060-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/</link><pubDate>Thu, 20 Feb 2025 14:02:28 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/060-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/060-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/Pasted-20250310.webp" alt="Featured image of post A Guide to grep, One of the Linux Text Processing Trio" />&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/060-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/Pasted-20250310_hu_76c8e40a9b25c995.webp"
+width="1024"
+height="433"
+srcset="https://chengxiaqiucao.github.io/post/060-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/Pasted-20250310_hu_9f4ed43d9718def7.webp 480w, https://chengxiaqiucao.github.io/post/060-linux%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E4%B8%89%E5%89%91%E5%AE%A2-grep/Pasted-20250310_hu_76c8e40a9b25c995.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="236"
+data-flex-basis="567px"
+>
+&lt;/p>
+&lt;h1 id="preface">Preface
+&lt;/h1>&lt;p>&lt;code>grep&lt;/code> is one of the Linux trio (&lt;code>grep&lt;/code>, &lt;code>sed&lt;/code>, &lt;code>awk&lt;/code>), used to search for specific text patterns in files. It is not only powerful but also very flexible, capable of handling a wide variety of text-search needs. Below we walk through the detailed usage of the &lt;code>grep&lt;/code> command and its advanced examples.&lt;/p>
+&lt;h1 id="basic-usage">Basic Usage
+&lt;/h1>&lt;h2 id="basic-search">Basic Search
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Used to search the &lt;code>filename&lt;/code> file for lines containing &lt;code>pattern&lt;/code> and print them out.&lt;/p>
+&lt;h2 id="ignoring-case">Ignoring Case
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -i &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Use the &lt;code>-i&lt;/code> option to ignore case.&lt;/p>
+&lt;h2 id="recursive-search">Recursive Search
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -r &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> directory
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Recursively search the contents of files containing &lt;code>pattern&lt;/code> in the &lt;code>directory&lt;/code> and its subdirectories.&lt;/p>
+&lt;h2 id="showing-line-numbers">Showing Line Numbers
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -n &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Use the &lt;code>-n&lt;/code> option to show the line numbers of matching lines.&lt;/p>
+&lt;h2 id="inverted-search-show-non-matching-lines">Inverted Search (Show Non-Matching Lines)
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -v &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Use the &lt;code>-v&lt;/code> option to show lines that do not contain &lt;code>pattern&lt;/code>.&lt;/p>
+&lt;h2 id="showing-file-names">Showing File Names
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> file1 file2 file3
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>When searching multiple files, the matching file names are shown by default. Use &lt;code>-H&lt;/code> to force showing file names, and use &lt;code>-h&lt;/code> to hide them.&lt;/p>
+&lt;h1 id="advanced-usage">Advanced Usage
+&lt;/h1>&lt;h2 id="using-regular-expressions">Using Regular Expressions
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -E &lt;span class="s2">&amp;#34;pattern1|pattern2&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Use the &lt;code>-E&lt;/code> option to support extended regular expressions, where &lt;code>|&lt;/code> means the OR operation.&lt;/p>
+&lt;h2 id="counting-matching-lines">Counting Matching Lines
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -c &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Use the &lt;code>-c&lt;/code> option to count the number of matching lines.&lt;/p>
+&lt;h2 id="showing-only-the-matched-part">Showing Only the Matched Part
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -o &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Use the &lt;code>-o&lt;/code> option to show only the matched part instead of the entire line.&lt;/p>
+&lt;h2 id="showing-lines-before-and-after">Showing Lines Before and After
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -A &lt;span class="m">3&lt;/span> &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename &lt;span class="c1"># Show the matching line and the 3 lines after it&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">grep -B &lt;span class="m">3&lt;/span> &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename &lt;span class="c1"># Show the matching line and the 3 lines before it&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">grep -C &lt;span class="m">3&lt;/span> &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> filename &lt;span class="c1"># Show the matching line and 3 lines before and after it&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The &lt;code>-A&lt;/code>, &lt;code>-B&lt;/code>, and &lt;code>-C&lt;/code> options are used to show a specified number of lines after, before, or both before and after the matching line, respectively.&lt;/p>
+&lt;h2 id="reading-data-from-standard-input">Reading Data from Standard Input
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;some text&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> grep &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>grep&lt;/code> can read data from standard input, which is very useful in pipeline operations.&lt;/p>
+&lt;h2 id="searching-with-fixed-strings-improving-performance">Searching with Fixed Strings (Improving Performance)
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -F &lt;span class="s2">&amp;#34;fixed_string&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Use the &lt;code>-F&lt;/code> option to treat &lt;code>pattern&lt;/code> as a fixed string rather than a regular expression, which can improve search performance.&lt;/p>
+&lt;h2 id="excluding-files">Excluding Files
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -r --exclude&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;*.log&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span> directory
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Use the &lt;code>--exclude&lt;/code> option to exclude files of a certain type.&lt;/p>
+&lt;h2 id="using-perl-compatible-regular-expressions">Using Perl-Compatible Regular Expressions
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -P &lt;span class="s2">&amp;#34;\d+&amp;#34;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Use the &lt;code>-P&lt;/code> option to enable Perl-compatible regular expressions, where &lt;code>\d+&lt;/code> means one or more digits.&lt;/p>
+&lt;h2 id="zero-width-assertions">Zero-Width Assertions
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -P &lt;span class="s1">&amp;#39;(?&amp;lt;=foo)bar&amp;#39;&lt;/span> filename
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Use Perl-compatible regular expressions to support zero-width assertions; for example, &lt;code>(?&amp;lt;=foo)bar&lt;/code> matches a &lt;code>bar&lt;/code> that is preceded by &lt;code>foo&lt;/code>.&lt;/p>
+&lt;h1 id="combined-usage-examples">Combined Usage Examples
+&lt;/h1>&lt;h2 id="finding-files-of-a-specific-type-in-a-specific-directory-and-searching-their-contents">Finding Files of a Specific Type in a Specific Directory and Searching Their Contents
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -r --include&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;*.py&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;import&amp;#34;&lt;/span> /path/to/directory
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Recursively search all &lt;code>.py&lt;/code> files in the &lt;code>/path/to/directory&lt;/code> directory for lines containing &lt;code>import&lt;/code>.&lt;/p>
+&lt;h2 id="finding-and-showing-matching-lines-with-two-lines-before-and-after">Finding and Showing Matching Lines with Two Lines Before and After
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -C &lt;span class="m">2&lt;/span> &lt;span class="s2">&amp;#34;error&amp;#34;&lt;/span> /var/log/syslog
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Find lines containing &lt;code>error&lt;/code> in the &lt;code>/var/log/syslog&lt;/code> file and show the two lines before and after them.&lt;/p>
+&lt;h2 id="counting-the-number-of-files-containing-a-specific-word">Counting the Number of Files Containing a Specific Word
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">grep -rl &lt;span class="s2">&amp;#34;word&amp;#34;&lt;/span> /path/to/directory &lt;span class="p">|&lt;/span> wc -l
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Recursively search the &lt;code>/path/to/directory&lt;/code> directory for files containing &lt;code>word&lt;/code>, and count the number of files.&lt;/p>
+&lt;h2 id="conclusion">Conclusion
+&lt;/h2>&lt;p>Through these examples, you can appreciate the power and flexibility of &lt;code>grep&lt;/code>, which also makes it one of the most practical text-processing tools in Linux.&lt;/p></description></item></channel></rss>
