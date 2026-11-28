@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>可观测性 on 秋草观测台</title><link>https://chengxiaqiucao.github.io/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/</link><description>Recent content in 可观测性 on 秋草观测台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号：秋草说测试）</copyright><lastBuildDate>Wed, 04 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/index.xml" rel="self" type="application/rss+xml"/><item><title>把变更点交给 Agent 盯：生产监控的精度与延迟可以不再二选一</title><link>https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/</link><pubDate>Wed, 04 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/cover.webp" alt="Featured image of post 把变更点交给 Agent 盯：生产监控的精度与延迟可以不再二选一" />&lt;p>运维领域流传很久的一个经验数字是：约 70% 的线上故障由对运行中系统的变更引起——二进制发布、配置推送、开关切换。既然如此，把监控资源集中投到这些变更点附近，理论上能以最小代价压住大部分回归的影响面。但这件事在工程上被公认为难啃：不是不会写告警，而是很难同时做到&amp;quot;看得准&amp;quot;和&amp;quot;发现得早&amp;quot;，更难让它在一个组织里自发运转起来。&lt;/p>
+&lt;p>大模型智能体正在改变这个等式。真正值得关注的不是&amp;quot;AI 运维&amp;quot;这类概念，而是一套具体的工程形态：让模型读代码、写监控规格，由确定性程序执行规格，再由模型调查被触发的监控项。这套结构在原型阶段就能在自己完全不熟悉的系统上发现回归，精度和延迟都优于一年前的做法。&lt;/p>
+&lt;h2 id="变更点监控为什么一直难以落地">变更点监控为什么一直难以落地
+&lt;/h2>&lt;p>先看清旧办法卡在哪。变更点监控不是技术问题，而是平台工程里的&amp;quot;起飞&amp;quot;问题，有三条典型困境。&lt;/p>
+&lt;p>第一条是&lt;strong>选错了第一批用户&lt;/strong>。最自然的做法是找运维基础最好、意愿最强的团队试点。但这些团队的发布本来就比较安全，平台并没有真正抬高整体的运维水位；能提供的价值主要是减少手工劳动（toil reduction），属于&amp;quot;有更好&amp;quot;，不是一阶的安全改进。更麻烦的是，这类团队精度容易做上去，于是新系统实际上是在和已有告警比召回率与延迟，胜算不大。&lt;/p>
+&lt;p>第二条是&lt;strong>铺得太宽就被噪声淹没&lt;/strong>。换成面向全部服务、只选一小组通用健康指标，覆盖面是够了，但这类指标本身带有不可消除的噪声，结果就是精度很差、告警疲劳，平台很快被关掉。&lt;/p>
+&lt;p>第三条是&lt;strong>精度与延迟的结构性权衡&lt;/strong>。在大模型介入之前，可用的信号大致排成一条谱系：结构化日志精确但慢，指标粗粒度但快，告警更粗、召回与精度都不理想，但&amp;quot;至少有个东西&amp;quot;。想在变更窗口内既快又准，只能靠人提前把指标打好标、把信号定义清楚——这依赖长期组织投入和资深工程师的经验，而这类经验恰恰需要多年一线运维才能养成。&lt;/p>
+&lt;p>还有一层背景值得计入：随着代码产出与发布量快速增长，任何单个运维人员对系统&amp;quot;读过的代码&amp;quot;所占的比例都在下降。系统越来越像被&amp;quot;养&amp;quot;出来的，而不是被完整设计出来的，人对内部状态的心智模型在持续变薄。这反而放大了自动调查的价值。&lt;/p>
+&lt;h2 id="有效的形态写规格的智能体--执行规格的确定性系统">有效的形态：写规格的智能体 + 执行规格的确定性系统
+&lt;/h2>&lt;p>智能体在这个场景里之所以有效，原因很朴素：它乐于发起大量查询，可以针对某一次具体变更临时写出查询，也不厌其烦地扫日志。过去为了省钱省人力而必须做的取舍——查多少、查多细、查多久——被大幅放宽，于是精度与召回可以同时拿到。&lt;/p>
+&lt;p>一个可运行的最小原型由三部分组成：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>计划生成器&lt;/strong>：读取服务代码（尤其是配置消费逻辑），针对本次变更提出一份监控计划，明确该盯哪些信号、窗口多长、什么条件算异常；&lt;/li>
+&lt;li>&lt;strong>执行脚手架&lt;/strong>：把计划编译成确定性的监控任务并按节奏运行，负责采集、比对与触发，不依赖模型持续在线；&lt;/li>
+&lt;li>&lt;strong>调查智能体&lt;/strong>：只在监控项被触发时介入，读代码、查指标与日志，给出解释，并保留一条升级到人的通道。&lt;/li>
+&lt;/ul>
+&lt;p>这里最关键的工程判断是：&lt;strong>纯智能体循环不是最优形状&lt;/strong>。让模型写一份&amp;quot;如何监控&amp;quot;的规格，再交给确定性系统去执行，比让模型自己循环查询效果更干净，token 消耗也低得多。原型里真正需要打磨的&amp;quot;秘方&amp;quot;并不在模型能力，而在三处很传统的工程活：降噪启发式、能让模型写出高质量规格的提示词，以及一套足够大的标注评测集，用来验证后续每次调整是否真的更好。&lt;/p>
+&lt;p>换句话说，监控智能体和编码智能体一样需要脚手架。软件开发生命周期为编码智能体做过的那轮适配，在监控领域还没有发生。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/03-fig1_hu_ea27462131ccf318.webp"
+width="1024"
+height="538"
+srcset="https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/03-fig1_hu_41834e95bea975d.webp 480w, https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/03-fig1_hu_ea27462131ccf318.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="190"
+data-flex-basis="456px"
+>
+&lt;/p>
+&lt;p>计划生成、确定性执行、触发后调查三段式结构，以及人工升级通道&lt;/p>
+&lt;h2 id="三个结构上的人类做不到或做不起的优势">三个结构上的人类做不到、或做不起的优势
+&lt;/h2>&lt;p>一旦接受&amp;quot;智能体可以比人更胜任监控&amp;quot;，以及&amp;quot;监控智能体需要脚手架&amp;quot;这两个前提，几项优势就会变得很具体。&lt;/p>
+&lt;p>&lt;strong>全时段、全量跟踪。&lt;/strong> 如果推理成本足够低，那么任何一个关心的指标出现回归、任何一行可疑日志，都可以被调查，而不必先越过&amp;quot;值得占用人类注意力&amp;quot;的那条切线。传统值班需要跨时区接力，智能体不需要。&lt;/p>
+&lt;p>&lt;strong>并行扇出调查。&lt;/strong> 事故分诊时可以同时派出多个调查线程，各查一条可能的原因链，再快速汇总。这已经是很多团队 Incident Triage 的实际用法——人手动起一批调查任务；完全可以把启动动作也交给智能体，让&amp;quot;事故响应者&amp;quot;这个角色按需弹性扩容。安全事件尤其如此：攻击侧已经在用智能体集群，防守侧自然需要对应能力。&lt;/p>
+&lt;p>&lt;strong>理解时间更短。&lt;/strong> 模型读代码、查询并消化指标与日志的速度都快于人。速度不总能直接换算成更短的检测时间——对系统理解极深的人仍可能更快凭直觉找到关键信号——但只要隐性知识被写下来并可被检索，智能体在&amp;quot;从零到理解&amp;quot;这件事上会稳定占优。对于运维经验不足、或没人真正熟悉的系统，这个差距会更明显。&lt;/p>
+&lt;h2 id="从只读走向行动一条可以分级放权的路径">从只读走向行动：一条可以分级放权的路径
+&lt;/h2>&lt;p>上面讨论的多是只读监控。真正的价值增量在写路径，但放权要分级，每一级都要有对应的护栏。&lt;/p>
+&lt;p>&lt;strong>第一级：更勤勉的观察。&lt;/strong> 过去不会付钱让一个全职工程师逐个翻服务的所有提交、挑出该监控的点、只为这些变更临时挂一批快触发告警。按当前推理成本，这件事变得可行。同理，模型可以盯性能数据、读 heap dump、栈轨迹与 CPU profile，从模式里提出优化建议；建议照常放进 A/B 实验，并像对待任何其他变更一样监控它。一个被记录过的例子是：几轮模型调查在一个已经被人工认真优化过的公共热点库上，又找到约 50% 的堆内存节省和 30% 的延迟下降。给足够强的模型一台虚拟机和一组基准，它在局部最优上&amp;quot;爬坡&amp;quot;的能力相当可观。&lt;/p>
+&lt;p>&lt;strong>第二级：确定性的处置动作。&lt;/strong> 扩缩容实例、轮换计算池、回滚某次配置或二进制——这些动作范围明确、可预期、易回滚，适合最先交给智能体。&lt;/p>
+&lt;p>&lt;strong>第三级：开放式修复。&lt;/strong> 定位缺陷、提出补丁、重新部署。风险随授权范围上升，但随着能力扩展，可被负责任下放的写路径工作会越来越多。自愈系统的吸引力正在于此，前提是每一级都有审计与回滚。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/03-fig2_hu_ed3dda194caa0a4b.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/03-fig2_hu_ce2d582339374e61.webp 480w, https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/03-fig2_hu_ed3dda194caa0a4b.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>从只读观察到开放式修复的三级放权，每一级对应不同的护栏与回滚要求&lt;/p>
+&lt;h2 id="成本不再是约束但评测集是">成本不再是约束，但评测集是
+&lt;/h2>&lt;p>以当前轻量模型的能力，盯图表、比对趋势这类工作已经足够。一家中等规模的技术公司，对整支服务机队做持续监控的量级大约落在每天百美元级别，创业公司规模的机队只是其中一小部分。相比人力值班，甚至相比可观测性基础设施本身的开销，这个数字并不构成决策障碍——有团队做过一轮优化就省下年化数百万美元的可观测性支出，而这还只是单个团队该项支出的一小部分。&lt;/p>
+&lt;p>成本下来了，瓶颈就转移到&amp;quot;怎么知道监控是不是变好了&amp;quot;。这也是标注评测集不能省的原因：没有它，改提示词、改降噪规则、换模型都只能凭感觉，而监控系统的失败模式恰恰是静默的——没报出来的问题不会有人发现。&lt;/p>
+&lt;p>由此还能形成一个正循环：编码智能体让团队能交付更多系统，监控智能体让团队能支撑更多系统，两者共同释放的人力又被投去建设更多东西。工程师的时间越来越多地花在&amp;quot;建工厂&amp;quot;和&amp;quot;照看花园&amp;quot;上，而不是盯着仪表盘。&lt;/p>
+&lt;h2 id="落地顺序">落地顺序
+&lt;/h2>&lt;p>如果打算试，建议按这个顺序推进，避免在第一步就把写权限交出去。&lt;/p>
+&lt;ol>
+&lt;li>挑一类高频变更点（发布或配置推送）作为唯一入口，先把变更事件、服务代码、遥测与日志三路数据接通；&lt;/li>
+&lt;li>让模型只做两件事：为每次变更生成监控规格、在触发后解释现象，全程只读，所有结论保留人工复核与升级通道；&lt;/li>
+&lt;li>把规格执行交给确定性程序，模型不参与常驻循环，顺手记录每次调用的 token 与耗时；&lt;/li>
+&lt;li>积累标注评测集：把已确认的真实回归、误报、无问题变更分别标好，用它来检验降噪启发式和提示词的每次改动；&lt;/li>
+&lt;li>评测稳定后再逐级放权，从确定性回滚动作开始，每级都配审计日志与一键回收；&lt;/li>
+&lt;li>用&amp;quot;发现时间&amp;quot;和&amp;quot;误报率&amp;quot;两个指标复盘，而不是用&amp;quot;调查了多少条日志&amp;quot;这类过程量。&lt;/li>
+&lt;/ol>
+&lt;p>需要提前说清的两个前提是：智能体确实能比人做得更好，以及它必须被脚手架约束。跳过第一个前提，会把它做成昂贵的聊天窗口；跳过第二个，就会得到一个持续烧钱、信号却越来越脏的循环。&lt;/p>
+&lt;p>在行业把这套做法变成标配之前，现在开始积累评测集和降噪经验的团队，拿到的会是一段真实的时间差。按当前趋势，不久之后&amp;quot;没有任何智能体在盯你的系统&amp;quot;本身就会被视为一种运维上的冒进。&lt;/p></description></item></channel></rss>

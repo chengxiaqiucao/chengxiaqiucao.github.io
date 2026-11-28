@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AI Risk on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/ai-risk/</link><description>Recent content in AI Risk on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Wed, 04 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/ai-risk/index.xml" rel="self" type="application/rss+xml"/><item><title>When Finding Vulnerabilities Outpaces Fixing Them - Four Lessons Quality Engineering Has to Add</title><link>https://chengxiaqiucao.github.io/en/post/150-qe-lessons-ai-exploits/</link><pubDate>Wed, 04 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/150-qe-lessons-ai-exploits/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/cover.webp" alt="Featured image of post When Finding Vulnerabilities Outpaces Fixing Them - Four Lessons Quality Engineering Has to Add" />&lt;p>In small and mid-sized teams, application security testing often lands on quality engineers; large companies have dedicated security teams to set and explain security requirements, but &amp;ldquo;making sure those requirements were actually tested&amp;rdquo; is still usually led by the testing role. Role boundaries can differ, but the responsibility cannot be avoided: as the quality gatekeeper, you must bring security into the verifiable scope.&lt;/p>
+&lt;p>A recent wave of public security incidents pushed this to the foreground &amp;ndash; from widely exploited scripting environment vulnerabilities and certificate validation implementation problems to data breaches at large service organisations. There is already plenty of technical post-mortem: how it happened, why it was possible, how to patch it. What quality teams should take away is &lt;strong>how to test the next round&lt;/strong>. The four points below are not trend predictions but checkpoints you can put straight into the iteration.&lt;/p>
+&lt;h2 id="one-still-compute-probability-but-it-is-no-longer-the-first-basis-for-ordering">One: Still Compute Probability, but It Is No Longer the First Basis for Ordering
+&lt;/h2>&lt;p>Classic risk-based testing has you build a matrix: business impact multiplied by likelihood, prioritised by the product. That method carries an implicit assumption: an old defect that has existed for a long time and has never been exploited has low probability and can be pushed back.&lt;/p>
+&lt;p>That assumption is failing. Automation compresses the time from &amp;ldquo;public information&amp;rdquo; to &amp;ldquo;a usable attack path&amp;rdquo; dramatically, and a years-old defect can suddenly become mass-exploitable in a very short window. One practitioner put it precisely: risk equals likelihood times impact, and the age of a defect does not change that equation &amp;ndash; what really changed this week is &lt;strong>likelihood&lt;/strong>.&lt;/p>
+&lt;p>The risk model itself has long been contested. Research on behavioural decision-making shows that human judgement generally carries subjectivity, variance and bias, and that kind of &amp;ldquo;noise&amp;rdquo; pollutes the decision process and puts systematic bias into everything downstream. Leaving the likelihood column to intuitive estimation was never stable enough.&lt;/p>
+&lt;p>A more practical approach keeps the business-importance ordering while adding a column for &lt;strong>exposure feasibility (or exploit maturity)&lt;/strong>, and grading by it:&lt;/p>
+&lt;ul>
+&lt;li>Components directly exposed to the public internet, reachable without preconditions;&lt;/li>
+&lt;li>Dependency issues that require some access and context to exploit;&lt;/li>
+&lt;li>Niche defects inside closed systems that only hold under very special conditions.&lt;/li>
+&lt;/ul>
+&lt;p>This column is easier to back with objective evidence than &amp;ldquo;probability&amp;rdquo;: is there an internet-facing entry point, is it in the bill of materials, is there public exploit code, has a patched version been released. When exposure feasibility is high enough, it should be prioritised into the verification queue even if the estimated probability is low &amp;ndash; because &amp;ldquo;probably nobody will attack it&amp;rdquo; is no longer an assumption you can rely on for long.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig1_hu_9dd60f54405b106d.webp"
+width="1024"
+height="783"
+srcset="https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig1_hu_5f8a39f462f69a18.webp 480w, https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig1_hu_9dd60f54405b106d.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="130"
+data-flex-basis="313px"
+>
+&lt;/p>
+&lt;p>Adding an &amp;ldquo;exposure feasibility&amp;rdquo; dimension alongside business impact, producing an ordering closer to the current threat tempo&lt;/p>
+&lt;h2 id="two-treat-security-hygiene-as-a-testable-product-requirement">Two: Treat Security Hygiene as a Testable Product Requirement
+&lt;/h2>&lt;p>If nobody in the organisation is leading basic hygiene, the quality team should take it over. It is not glamorous work, but the return on investment is extremely high and every item can be written as an acceptance condition.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Insisting on Definition of Ready and Definition of Done is not formality.&lt;/strong> Whether security constraints are written down before a requirement enters development, and whether they were checked before completion, are themselves auditable checkpoints.&lt;/li>
+&lt;li>&lt;strong>Strength and storage of passphrases, PINs and credentials.&lt;/strong> Not just &amp;ldquo;passwords must be complex&amp;rdquo;, but also verifying they are stored appropriately and that the reset flow does not bypass the strength requirement.&lt;/li>
+&lt;li>&lt;strong>Maintain a bill of materials (SBOM).&lt;/strong> Know clearly which framework and which version each site runs, and whether it is still supported. The cost of continuous small-step upgrades is far lower than jumping from one major version to a version years later &amp;ndash; that is no longer technical debt but a total loss of initiative.&lt;/li>
+&lt;li>&lt;strong>Enumerate risk with the CIA triad.&lt;/strong> Confidentiality: information does not flow to unauthorized people or systems; integrity: information is not tampered with, and changes are traceable and trustworthy; availability: the system is usable when needed, and recoverable when it is not. All three dimensions yield concrete test cases and concrete controls to build.&lt;/li>
+&lt;/ul>
+&lt;p>Communication is also quality work. One detail worth remembering: after a personal customer data breach at a regional telecom operator, the operator also notified business customers who were &lt;strong>not affected&lt;/strong>. The reason is realistic &amp;ndash; business customers have management, supervisory boards and auditors who will ask the CEO directly whether it is under control. Preparing a clear, evidence-based explanation in advance so that managers can answer that question is itself a deliverable.&lt;/p>
+&lt;h2 id="three-automate-security-requirements-testing-and-shift-compliance-left">Three: Automate Security Requirements Testing and Shift Compliance Left
+&lt;/h2>&lt;p>A company&amp;rsquo;s security policies and runbooks are a lot like backups: not rehearsed, not invoked, they may as well not exist. Assembling materials at the last minute before an audit is the most expensive and least rewarding option.&lt;/p>
+&lt;p>There are usually two options on the table: one concentrated week a year of disaster recovery drills with documentation the rest of the time, or writing security requirements as executable tests from the requirements stage. The latter is not far off &amp;ndash; the mechanisms needed to confirm security requirements are almost the same set as mature quality engineering practice: turn clauses into assertions, wire assertions into the pipeline, keep results as evidence. Compliance engineering (GRC engineering) is the next step that should be pushed forward after &amp;ldquo;shift testing left&amp;rdquo;.&lt;/p>
+&lt;p>Concretely, start at these points, none of which needs a new platform:&lt;/p>
+&lt;ul>
+&lt;li>Convert each decidable clause in the security policy into an automated check, for example session timeout, transport encryption, sensitive field masking, permission boundaries;&lt;/li>
+&lt;li>Compare dependency versions against the known vulnerability list on every build, rather than waiting for a quarterly scan;&lt;/li>
+&lt;li>Bring &amp;ldquo;recovery&amp;rdquo; into verification too: can backups be restored, can the plan be executed within the required time, can execution records be generated automatically;&lt;/li>
+&lt;li>Produce archivable results from every check, so that what you provide at audit time is run records rather than a collection of screenshots.&lt;/li>
+&lt;/ul>
+&lt;p>The key is to turn &amp;ldquo;we have a policy&amp;rdquo; into &amp;ldquo;we have a pipeline that can fail&amp;rdquo;. A policy is only really in force once it can trigger a red light.&lt;/p>
+&lt;h2 id="four-join-the-incident-response-team-and-treat-drills-as-formal-tests">Four: Join the Incident Response Team, and Treat Drills as Formal Tests
+&lt;/h2>&lt;p>The value of quality people in incident response is often underestimated. There is public practice of quality practitioners directly helping fix community sites and apply patches, and serving on response teams to monitor the effect of fixes and drive the relevant merge requests; quality leads have also been seen serving simultaneously as one of three on-call responders and as escalation manager. This is not overstepping but a natural extension of testing capability under pressure &amp;ndash; the person who best knows how to verify that a fix really works should be on the ground.&lt;/p>
+&lt;p>But &amp;ldquo;throwing people together temporarily&amp;rdquo; is not enough. Response needs runbooks and training against those runbooks, and the training must be run as a formal test: with a test plan, with cases, with a defect tracking record.&lt;/p>
+&lt;p>A counter-example is persuasive: a business continuity drill for a public-sector economic system gathered all key customer-facing staff and simulated total site unavailability, with complete process documentation and formally a proper test. The result was that participants could not execute the plan under &lt;strong>simulated pressure&lt;/strong>, and the drill had to be rerun, with management and key role holders required to be in the same room for the rerun. Most participants would rather have been doing something else at the time, but that discomfort is exactly what buys predictability when a real crisis arrives.&lt;/p>
+&lt;p>A drill never tests the system; it tests people, process and information channels: who knows first, who has authority to decide, whether the notification chain is complete, who issues the external statement. Write these as observable checkpoints and the drill will expose problems instead of becoming an attendance sheet.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig2_hu_7d966233c916fbb1.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig2_hu_7e4e277eaafc5fec.webp 480w, https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig2_hu_7d966233c916fbb1.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>The closed loop from policy clause to executable verification to incident response drill&lt;/p>
+&lt;h2 id="a-checklist-you-can-put-into-a-quarter">A Checklist You Can Put Into a Quarter
+&lt;/h2>&lt;p>Compressing the four points into deliverable actions, this can be done within one quarter:&lt;/p>
+&lt;ol>
+&lt;li>Add an &amp;ldquo;exposure feasibility&amp;rdquo; column to the risk register, reorder internet-reachable components once, and prioritize verifying the items with solid evidence but low estimated probability;&lt;/li>
+&lt;li>Produce or update the bill of materials, confirm framework and dependency versions, and list exceptions that cannot be upgraded soon along with compensating monitoring;&lt;/li>
+&lt;li>Add one group of test cases for each CIA dimension, covering at minimum unauthorized access, tampered data, and recovery when the service is unavailable;&lt;/li>
+&lt;li>Pick the three most common security policy clauses, automate them, wire them into the main pipeline and require a failure to block;&lt;/li>
+&lt;li>Organize one business continuity drill with a test plan and defect records, and make the quality role&amp;rsquo;s responsibilities in the response explicit;&lt;/li>
+&lt;li>Assemble drill results and pipeline run records into an evidence package that can be submitted to management and auditors.&lt;/li>
+&lt;/ol>
+&lt;p>None of these actions depends on a new tool, and none requires a quality engineer to become a security expert. They only require turning &amp;ldquo;security&amp;rdquo; from a checklist maintained by someone else into tests in your own suite that can fail, get fixed and leave records. As the outside world keeps finding vulnerabilities faster, what closes the gap is not more alerts but those few assertions that come earlier and can be verified.&lt;/p></description></item></channel></rss>

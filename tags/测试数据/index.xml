@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>测试数据 on 秋草观测台</title><link>https://chengxiaqiucao.github.io/tags/%E6%B5%8B%E8%AF%95%E6%95%B0%E6%8D%AE/</link><description>Recent content in 测试数据 on 秋草观测台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号：秋草说测试）</copyright><lastBuildDate>Thu, 12 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E6%B5%8B%E8%AF%95%E6%95%B0%E6%8D%AE/index.xml" rel="self" type="application/rss+xml"/><item><title>让Agent执行测试，可以开始了</title><link>https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/</link><pubDate>Thu, 12 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/cover.webp" alt="Featured image of post 让Agent执行测试，可以开始了" />&lt;p>很多团队已经在用编码代理写自动化测试，却很少让代理真的去测应用。二者不是一回事：前者产出的是脚本，后者是在功能还没定型时跑一轮探索，把反馈交回到开发手里。&lt;/p>
+&lt;p>这篇要说的就是这条分界线，以及为什么值得在现有自动化体系旁边加一层自主质量检查。&lt;/p>
+&lt;h2 id="两种循环差别在下一步谁定">两种循环，差别在下一步谁定
+&lt;/h2>&lt;p>脚本自动化的形状很熟悉：动作、动作、断言。路径是我们事先知道的，用例只负责按这条路径走完并核对结果。&lt;/p>
+&lt;p>代理测试不需要这条路径。它检查应用当前的状态，据此决定下一步做什么，然后在一个循环里不断行动、评估，直到达成目标：动作、调用模型并对照目标评估当前状态、下一个动作。&lt;/p>
+&lt;p>灵活是它的长处，短处也同源：它永远不会像预定义脚本那样快、那样可复现、那样准确。所以正确用法不是替换，是分层——脚本留在 &lt;code>CI&lt;/code> 里做快速可靠的回归，代理放在开发和探索环节补脚本覆盖不到的地方。&lt;/p>
+&lt;h2 id="最值钱的位置是开发过程中">最值钱的位置是开发过程中
+&lt;/h2>&lt;p>在 20 多场关于智能体的工作坊里，一个反复出现的现象是：不少人想开始但不知道从哪下手；很多团队用 AI 写自动化用例，真正用智能体做测试的很少。原因之一在于价值落点不直观。&lt;/p>
+&lt;p>其实落点很明确：新功能还在开发时。代理可以探索一个尚未定型的特性、对它看到的东西作出反应、自己造出所需的测试数据、去查那些事先根本没被写进脚本的场景。它比一条脚本用例慢，但比等功能做完再安排人工检查快得多。&lt;/p>
+&lt;p>这就是 &lt;code>shift-left&lt;/code> 一直想要而很难做到的部分：不用等特性完成，实现到一半就能让代理验一遍，在建 PR 之前以很小代价跑很多轮检查。功能测试之外，还可以让它看键盘导航、无障碍行为、校验状态、错误处理这些平时容易分不到时间的维度。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/08-fig1_hu_7f9b88b65e82a739.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/08-fig1_hu_92c682efc8a6a948.webp 480w, https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/08-fig1_hu_7f9b88b65e82a739.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 1｜开发阶段由代理覆盖未知路径，合并与 CI 阶段由脚本守住已知的回归路径&lt;/p>
+&lt;h2 id="测试变成可对话的事">测试变成可对话的事
+&lt;/h2>&lt;p>开发一个用户故事时，可以让代理先测当前已实现的部分。它通常从主路径开始，回报发现了什么；看完结果，再要求它多探几个边界、聚焦某个特定场景，或者追一下刚才看着可疑的地方。&lt;/p>
+&lt;p>这个反馈回路把探索性测试的成本压下来了。过去时间有限，只能在&lt;code>测哪些、跳过哪些&lt;/code>之间取舍；有了自主代理，多跑很多场景变成现实。这不意味着测试必须由开发独占：在更传统的流程里，功能进了测试环境之后，测试人员同样可以用这套方式——让代理负责执行与探索，人负责指挥和判断证据。&lt;/p>
+&lt;h2 id="信任来自证据不是来自结论">信任来自证据，不是来自结论
+&lt;/h2>&lt;p>代理会出错、会补全空白、会不严格遵循指令。那凭什么信它给出的测试结果？&lt;/p>
+&lt;p>答案是别信结论，看证据。需要看到它执行了哪些场景、走了哪些路径、观察到什么、以及凭什么判定行为正确。有了这些，人才能自己决定给这份结果多大信任。另一个好处是它更难抄捷径：不能只声称某场景通过，得展示实际做了什么。&lt;/p>
+&lt;p>角色因此发生变化：从&lt;code>每条测试自己执行&lt;/code>变成审阅检查是否充分、证据是否支撑结论。检查不够，就让它再探几个边界、专门测某个用例，或者补上下文重跑一轮。&lt;/p>
+&lt;p>这一点和前面那篇实验的结论正好对上：一份工整的调查日志只证明流程，不证明覆盖。让代理交证据，本质是让人保留对&lt;code>什么算查够了&lt;/code>的判断权。&lt;/p>
+&lt;h2 id="一个可落地的最小实现">一个可落地的最小实现
+&lt;/h2>&lt;p>一套能直接照搬的做法长这样：一个 &lt;code>test-user-story&lt;/code> 技能，输入是用户故事或功能描述，由它完成探索性测试，并能复用现有 E2E 体系里的测试数据、账号和环境地址。流程大致五步：&lt;/p>
+&lt;ul>
+&lt;li>接收用户故事或功能描述&lt;/li>
+&lt;li>推导出一组相关测试用例&lt;/li>
+&lt;li>询问本次要执行哪些用例、针对哪个环境、需要保留什么类型的证据&lt;/li>
+&lt;li>用 &lt;code>playwright-cli&lt;/code> 执行选中的场景&lt;/li>
+&lt;li>生成格式一致的测试报告，附结果与支撑证据&lt;/li>
+&lt;/ul>
+&lt;p>报告模板只是一个 HTML 文件加一小段脚本，用运行结果把模板填满；每次需要出报告时，代理调用这个脚本即可。好处不是好看，而是输出稳定、便于扫读，更重要的是留下了一份说明&lt;code>代理实际测了什么&lt;/code>的产物，而不只是最终结论。&lt;/p>
+&lt;p>这套东西搬到自己团队时，最小起点可以很低：选一个正在开发的用户故事、把环境和可用测试数据列清楚、规定报告里必须有哪些字段、跑一轮并人工复核证据。先验证&lt;code>证据是否够判断&lt;/code>，再谈扩场景。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/08-fig2_hu_3de37f7f26600ffb.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/08-fig2_hu_4f437f44cffc8a06.webp 480w, https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/08-fig2_hu_3de37f7f26600ffb.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 2｜从故事到用例、执行、留证、人工复核，结论只是链条末端的一小段&lt;/p>
+&lt;h2 id="四条可以带走的判断">四条可以带走的判断
+&lt;/h2>&lt;ul>
+&lt;li>代理测试不替代脚本自动化，二者互补；快速可靠的回归检查仍归 &lt;code>CI&lt;/code> 里的脚本&lt;/li>
+&lt;li>它的增量价值在探索新功能、覆盖边界场景、把反馈提前到开发阶段，现代测试策略应当两者都有&lt;/li>
+&lt;li>关键不是盲信代理，而是审它交出的证据；报告要能回答测了什么、看到什么、凭什么这么判&lt;/li>
+&lt;li>在更传统的流程里，测试人员同样可以用它，把执行与探索交给代理，把指挥和判定留在人这边&lt;/li>
+&lt;/ul>
+&lt;p>没有量化数据可引，价值在于把落点说清楚了：脚本守住已知，代理去走未知，而人守住最后那道&lt;code>这些检查够不够&lt;/code>的判断。&lt;/p></description></item><item><title>表单只测过 "John Smith"：把 246 个会闯祸的取值排进一轮探索性测试</title><link>https://chengxiaqiucao.github.io/post/151-naughty-input-catalog/</link><pubDate>Wed, 04 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/151-naughty-input-catalog/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/151-naughty-input-catalog/cover.webp" alt="Featured image of post 表单只测过 "John Smith"：把 246 个会闯祸的取值排进一轮探索性测试" />&lt;p>一个表单通常用这样的值验过：一个普通姓名、一个真实存在的日期、一个放得下的数字。然后它遇到真实数据——有人粘贴的名字末尾带空格，有人所在国家的两位代码恰好是 &lt;code>NO&lt;/code>，有人把导出的表格用电子表格软件打开。缺陷报告于是从用户那里一条一条地回来，时间远在代码写完之后。&lt;/p>
+&lt;p>这些取值既不秘密也不 clever，它们是一张短而稳定的清单。之所以长期没被测到，原因很 mundane：没人记得全，手工敲进去又太麻烦。把这件事工程化的思路很值得借鉴——不是再写一份&amp;quot;坏字符串列表&amp;quot;，而是把&lt;strong>取值、它通常破坏什么、正确行为应该是什么&lt;/strong>打包成一个可执行的目录，并让它能在任意输入框里按固定顺序一键送入。&lt;/p>
+&lt;h2 id="目录里到底有什么">目录里到底有什么
+&lt;/h2>&lt;p>一套已公开的开源目录把 246 个取值组织成 20 个包，每个值都带两个说明字段：&lt;code>breaks&lt;/code>（通常破坏什么、为什么）和 &lt;code>expect&lt;/code>（正确实现应该怎么做）。缺了 &lt;code>breaks&lt;/code> 字段的值在校验时会被直接拒绝——因为这张目录存在的意义正是解释，而不只是罗列。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>类别&lt;/th>
+&lt;th>它针对的失效面&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>空白字符&lt;/td>
+&lt;td>占位置（或声称占位置）却在界面上完全看不见的字符&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Unicode 文本&lt;/td>
+&lt;td>看起来无害，却破坏计数、比较与显示&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>长度炸弹&lt;/td>
+&lt;td>按常见上限构造，以及字符数与字节数之间的落差&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>魔法值&lt;/td>
+&lt;td>人读成文本、解析器读成布尔值／空值／数字的词&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>极端数字&lt;/td>
+&lt;td>类型边界、外来记数法、精度耗尽的点&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>不可能日期&lt;/td>
+&lt;td>不存在的、有歧义的、写法与字段假设不同的日期&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>导出破坏者&lt;/td>
+&lt;td>通过校验、只在导出文件里出问题的值&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>本地化标识&lt;/td>
+&lt;td>全球商用产品处理不了的特定语言标识符与格式&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>文件名与路径&lt;/td>
+&lt;td>文件系统、压缩包或服务端会拒绝、改写、误读的名字&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>同形对&lt;/td>
+&lt;td>屏幕上相同、存储里不同的成对取值&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>复杂 emoji&lt;/td>
+&lt;td>基本平面之外的字符与组合序列，破坏计数与截断&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>编码乱码&lt;/td>
+&lt;td>经历过错误编码且再也回不来的文本&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>从文档粘贴&lt;/td>
+&lt;td>从字处理软件或网页复制时附带的字符&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>邮箱与 URL&lt;/td>
+&lt;td>形式上合法但极端的地址，以及只是看起来合法的地址&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>姓名与身份&lt;/td>
+&lt;td>打破&amp;quot;正常姓名&amp;quot;假设的名字&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>时区&lt;/td>
+&lt;td>不存在的小时、出现两次的小时、没写时区的时刻&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>货币与分隔符&lt;/td>
+&lt;td>人与电子表格书写金额的方式，以及精度终点&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>伪本地化&lt;/td>
+&lt;td>把国际化测试常用技术压缩成可直接粘贴的取值&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>JSON 载荷&lt;/td>
+&lt;td>解析器与数据库读法不一致的请求体，可改字段名套用到自己的 API&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>注入检查&lt;/td>
+&lt;td>引号、标签、模板表达式、路径等经典转义检查，被单独标记为敏感&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>有两个设计细节很实用。过长的值不直接存成字符串，而以&amp;quot;配方&amp;quot;形式保存、发送时才展开，因此一个包能用几行容纳十万字符的长度炸弹；必须保持领先的时间值同样以规则保存，所以时区类始终送入下一次时钟调整，而不是一个已经过去的日期。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/151-naughty-input-catalog/05-fig1_hu_8f042bfc9bbf35fd.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/151-naughty-input-catalog/05-fig1_hu_c4a8ad5f217b5612.webp 480w, https://chengxiaqiucao.github.io/post/151-naughty-input-catalog/05-fig1_hu_8f042bfc9bbf35fd.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>二十类取值按&amp;quot;输入 → 校验 → 存储 → 导出&amp;quot;链路分别命中的失效面&lt;/p>
+&lt;h2 id="先试这八个取值后果与正确行为">先试这八个：取值、后果与正确行为
+&lt;/h2>&lt;p>如果只能抽十分钟，下面八个取值覆盖了最常见、代价也最高的一类遗漏。左侧是取值，右侧是它通常打中的地方，以及正确实现应有的行为。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>取值&lt;/th>
+&lt;th>通常破坏什么 / 正确行为&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>Kowalski&lt;/code> 加一个尾随空格&lt;/td>
+&lt;td>浏览器与服务端的比较口径不一致，账号建成了却查不到；应在所有环节统一裁剪，或所有环节统一保留，不能注册一套、登录一套&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>=1+1&lt;/code>&lt;/td>
+&lt;td>电子表格把它当公式，导出文件显示计算结果而不是数据；导出时必须按目标格式转义&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>no&lt;/code>&lt;/td>
+&lt;td>YAML 1.1 与若干配置解析器读成布尔 &lt;code>false&lt;/code>，而 &lt;code>NO&lt;/code> 同时是挪威的国家代码；类型必须显式声明，不能靠猜&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>30.02.2026&lt;/code>&lt;/td>
+&lt;td>朴素解析器把它滚到 3 月 2 日而不是拒绝；应直接判为非法日期&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>单个零宽空格&lt;/td>
+&lt;td>字段看起来是空的、实际非空，必填校验被绕过；应在校验前做归一化&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>128 个字符但占 256 字节&lt;/td>
+&lt;td>界面按字符数放行，存储按字节限长拒绝，或反过来；前后必须统一计数口径&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>007&lt;/code>&lt;/td>
+&lt;td>电子表格把该列当数值后立刻丢掉前导零；导出时应保留文本类型&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>65 535 个字符&lt;/td>
+&lt;td>常见文本列类型的上限，越界通常直接抛原始数据库错误；服务端应显式校验并给出可读的错误&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>这里最能说明问题的是 &lt;code>30.02.2026&lt;/code> 和 &lt;code>007&lt;/code>：它们不是&amp;quot;恶意输入&amp;quot;，而是完全正常的真实数据，只是恰好落在实现者的假设之外。也正因为如此，靠&amp;quot;随机 fuzz&amp;quot;未必能稳定命中，靠一张有解释的目录反而更快。&lt;/p>
+&lt;h2 id="让它变成一轮十分钟的手工测试">让它变成一轮十分钟的手工测试
+&lt;/h2>&lt;p>目录的交互设计围绕一个目标：不打断测试者的注意力。&lt;/p>
+&lt;ul>
+&lt;li>一个组合键清空当前行、把当前包的下一个值送进焦点所在的输入框；上一个值、回到包首各有对应组合键，全部可改；&lt;/li>
+&lt;li>显示面板不抢焦点，光标始终留在被测字段里，值不会被打进面板自己；&lt;/li>
+&lt;li>不可见字符在面板里画成一个可见标记（如 &lt;code>␣&lt;/code>），同时按四种口径计数：字素簇、码点、字节、UTF-16 单元；&lt;/li>
+&lt;li>面板显示下一个值以及当前在包里的进度，另有一个检索窗口可跨全部包查找；&lt;/li>
+&lt;li>发现问题时，一个组合键复制一段可直接粘进缺陷单的报告块：哪个值、来自哪个包版本、以什么形式送入、多大、是否完整到达；值以&amp;quot;别人能重新敲出来&amp;quot;的形式写出，而不是面板上那个占位标记；&lt;/li>
+&lt;li>图形界面与命令行共用同一套引擎，命令行同样支持剪贴板模式，把值放到剪贴板由测试者自己粘贴。&lt;/li>
+&lt;/ul>
+&lt;p>每个值自带 &lt;code>breaks&lt;/code> 与 &lt;code>expect&lt;/code>，是这套流程和&amp;quot;一份纯文本清单&amp;quot;最本质的差别：测试者不必先回想&amp;quot;零宽空格会怎样&amp;quot;，面板、命令行查看、报告块三处都会直接说明。于是探索性测试从&amp;quot;记得什么就试什么&amp;quot;变成&amp;quot;按固定顺序走一遍&amp;quot;，覆盖可复现，也更容易交给新人。&lt;/p>
+&lt;h2 id="接进自动化别把清单拷进数组">接进自动化：别把清单拷进数组
+&lt;/h2>&lt;p>图形界面适合探索，自动化需要的是同一份数据的机器可读出口。目录工具提供把任意包导出为 JSON、CSV、每行一个值的能力，可选转义或原始形式、可选 base64；诊断信息写到标准错误，因此重定向出来的文件只有值，可以直接当测试数据文件用。&lt;/p>
+&lt;p>一个典型接法是把&amp;quot;魔法值&amp;quot;包导出成逐行文本，再用参数化测试把它们喂给同一个校验函数：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">json&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pytest&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">with&lt;/span> &lt;span class="nb">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;magic-values.json&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">encoding&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;utf-8&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">f&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">cases&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">json&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">load&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">f&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1"># 每项含 value / breaks / expect&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@pytest.mark.parametrize&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;case&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">cases&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ids&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">lambda&lt;/span> &lt;span class="n">c&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">c&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">test_identifier_roundtrip&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">case&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">stored&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">save_identifier&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">case&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">loaded&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">load_identifier&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stored&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">assert&lt;/span> &lt;span class="n">loaded&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="k">case&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="k">case&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;breaks&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>把 &lt;code>breaks&lt;/code> 直接放进断言失败消息里，缺陷单的描述几乎不用重写；&lt;code>expect&lt;/code> 则适合沉淀成团队的用例模板字段。相比在测试文件里硬编码一长串字符串，目录升级时只需重新导出一次。&lt;/p>
+&lt;p>命令行送入模式还演示了边界处理应有的克制：执行前给几秒让测试者点中目标字段；按住 Ctrl/Alt/Shift/Win 时不输入，目标窗口权限高于自身时不输入，焦点落在按钮、链接、列表项上时不输入，按下 Escape 立即停止，这些情况统一返回一个专门的退出码而不是&amp;quot;猜一下&amp;quot;。自定义包用 TOML 描述，配套的 &lt;code>lint&lt;/code>、&lt;code>fmt&lt;/code>、&lt;code>new-pack&lt;/code> 子命令负责校验格式、规范化与生成骨架——其中校验器目前覆盖 47 条格式规则中的 41 条，剩余几条会明确列出原因。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/151-naughty-input-catalog/05-fig2_hu_ad9eeb4076b076b4.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/151-naughty-input-catalog/05-fig2_hu_cd767c4ac37dba3d.webp 480w, https://chengxiaqiucao.github.io/post/151-naughty-input-catalog/05-fig2_hu_ad9eeb4076b076b4.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>同一份取值目录同时驱动手工探索、参数化测试与缺陷报告&lt;/p>
+&lt;h2 id="诚实地说明边界">诚实地说明边界
+&lt;/h2>&lt;p>一份会主动列出自身限制的工具说明，比一份只讲能力的更值得信。这套做法的边界有六条，评估是否引入时都要算进去：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>它不判断结果。&lt;/strong> 只把值送进控件，不读取窗口显示了什么，是否处理得当由人判断；结果标记功能尚未提供，报告块就是唯一的记录。&lt;/li>
+&lt;li>&lt;strong>系统可能改写输入。&lt;/strong> 某些操作系统的文本替换会把送入的值改成另一个值，工具在检测到相关设置开启且可能影响当前值时会给出提示。&lt;/li>
+&lt;li>&lt;strong>跨平台能力不对称。&lt;/strong> 向其他窗口送键需要系统授权：某平台需要无障碍权限，另一平台在 Wayland 下需要输入法守护进程且无法确认焦点是否真的落在输入框；缺少条件时，工具明确报错并退回剪贴板模式，而不是静默降级。&lt;/li>
+&lt;li>&lt;strong>自定义包目前可写不可加载。&lt;/strong> 校验、格式化、生成骨架都可用，但把自己的包目录读进面板与命令行尚未接通；包格式也还没冻结，后续版本可能变更。&lt;/li>
+&lt;li>&lt;strong>246 个值只是一个起点。&lt;/strong> 它精选的是&amp;quot;漏掉代价最高&amp;quot;的那批，不是任何意义上的完备清单。&lt;/li>
+&lt;li>&lt;strong>它不是攻击工具。&lt;/strong> 绝大多数取值来自真实用户与真实数据；唯一包含经典转义检查的包被单独标记为敏感，其中没有针对已知漏洞的利用代码，且任何输入都必须由人主动触发。用途是验证自己负责的系统。&lt;/li>
+&lt;/ul>
+&lt;h2 id="国内团队可以这样落地">国内团队可以这样落地
+&lt;/h2>&lt;p>直接照搬英文包会漏掉本地场景，建议按下面的方式改造成自己的目录：&lt;/p>
+&lt;ol>
+&lt;li>把 20 个类别逐一映射到本系统的字段清单，明确每类由哪个页面、哪个接口负责验证，避免&amp;quot;目录有了但没人认领&amp;quot;；&lt;/li>
+&lt;li>优先覆盖跨系统边界：导入导出、表单到数据库、服务端到报表、开放 API 到下游，这几处是计数口径与类型假设最容易分叉的地方；&lt;/li>
+&lt;li>把 &lt;code>breaks&lt;/code> / &lt;code>expect&lt;/code> 两个字段写进团队用例模板，让每条边界用例都必须回答&amp;quot;破坏什么&amp;quot;和&amp;quot;正确行为是什么&amp;quot;；&lt;/li>
+&lt;li>把包导出为 CSV 或 JSON，作为参数化测试的唯一数据源，目录更新时重新导出，不在多处维护副本；&lt;/li>
+&lt;li>补充中文本地化取值：全角空格、姓名长度与生僻字、含 emoji 的昵称、手机号与工号的前导零、证件号末位的 &lt;code>X&lt;/code>、金额的千分位与全角符号、以及中文排序与大小写无关场景；&lt;/li>
+&lt;li>把发现的新取值按&amp;quot;值 + 破坏什么 + 在哪见过&amp;quot;的格式贡献回团队目录——一个让某人损失过一下午的输入，值得让所有人只损失一次。&lt;/li>
+&lt;/ol>
+&lt;p>真正需要改变的不是工具，而是测试数据的地位：它不该是随手编的几个&amp;quot;正常值 + 一两个空值&amp;quot;，而应当是一份有解释、有顺序、有版本、能同时驱动手工探索和自动化套件的资产。表单没见过的输入，用户迟早会替你送进去。&lt;/p></description></item></channel></rss>

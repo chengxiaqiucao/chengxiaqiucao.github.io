@@ -1,0 +1,497 @@
+<!doctype html><html lang=en dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Google's Puppeteer is a rising force in test automation and is widely seen as promising."><title>An Introduction to Puppeteer for Test Automation</title>
+<link rel=canonical href=https://chengxiaqiucao.github.io/en/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/><link rel=stylesheet href=/scss/style.min.1ff05243156c6b1fe33c54e504d4d763b1955737a95e17034967a679a1f192c8.css><meta property='og:title' content="An Introduction to Puppeteer for Test Automation"><meta property='og:description' content="Google's Puppeteer is a rising force in test automation and is widely seen as promising."><meta property='og:url' content='https://chengxiaqiucao.github.io/en/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/'><meta property='og:site_name' content='Testing Observation'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Test Automation'><meta property='article:tag' content='Puppeteer'><meta property='article:published_time' content='2024-09-30T00:00:00+00:00'><meta property='article:modified_time' content='2024-09-30T00:00:00+00:00'><meta property='og:image' content='https://chengxiaqiucao.github.io/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/puppeteer.webp'><meta name=twitter:title content="An Introduction to Puppeteer for Test Automation"><meta name=twitter:description content="Google's Puppeteer is a rising force in test automation and is widely seen as promising."><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://chengxiaqiucao.github.io/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/puppeteer.webp'><script async src="https://www.googletagmanager.com/gtag/js?id=G-0SZVJZGMHX"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-0SZVJZGMHX")}</script><meta name=google-adsense-account content="ca-pub-8076532964743402"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8076532964743402" crossorigin=anonymous></script><script type=application/ld+json>{"@context":"https://schema.org","@graph":[{"@id":"https://chengxiaqiucao.github.io/#website","@type":"WebSite","alternateName":["秋草观测台","城下秋草","秋草说测试","秋草"],"inLanguage":"en","name":"Testing Observation","url":"https://chengxiaqiucao.github.io/"},{"@id":"https://chengxiaqiucao.github.io/#person","@type":"Person","alternateName":["城下秋草","秋草","秋草说测试","Daniel Wei"],"name":"城下秋草","sameAs":["https://github.com/chengxiaqiucao","https://www.zhihu.com/people/qiucao","https://space.bilibili.com/472272606"],"url":"https://chengxiaqiucao.github.io/page/about/"}]}</script><meta name=author content="城下秋草"></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/en/><img src=/img/automnGrass_hu_47f1e3d9e082e7bd.webp width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/en>Testing Observation</a></h1><h2 class=site-description>Testing is not just checking...</h2></div></header><ol class=menu-social><li><a href=https://github.com/chengxiaqiucao target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://space.bilibili.com/472272606 target=_blank title=Bilibili rel=me><!doctype html><svg t="1750732982440" class="icon" viewBox="0 0 1024 1024" p-id="4593" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632 444.330667 256h135.296l138.368-138.325333A42.666667 42.666667.0 01778.368 178.048L700.330667 256H789.333333A149.333333 149.333333.0 01938.666667 405.333333v341.333334A149.333333 149.333333.0 01789.333333 896H234.666667A149.333333 149.333333.0 0185.333333 746.666667V405.333333A149.333333 149.333333.0 01234.666667 256h88.96L245.632 177.962667a42.666667 42.666667.0 0160.373333-60.373334zm483.328 223.701333H234.666667a64 64 0 00-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0057.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0063.701334-57.856L853.333333 746.666667V405.333333a64 64 0 00-64-64zm-448 128A42.666667 42.666667.0 01384 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666666-42.666667zm341.333334.0A42.666667 42.666667.0 01725.333333 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666667-42.666667z" p-id="4594" fill="#8a8a8a"/></svg></a></li><li><a href=https://www.zhihu.com/people/qiucao target=_blank title=zhihu rel=me><!doctype html><svg t="1750733049138" class="icon" viewBox="0 0 1024 1024" p-id="5820" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M570.581333 806.272h61.952L652.928 876.117333 764.074667 806.272h130.986666V230.186667h-324.48V806.272zM636.501333 292.693333h192.64V743.68h-73.898666l-73.813334 46.378667L668.032 743.808l-31.530667-.128V292.736zM515.754667 493.738667H377.429333a2999.466667 2999.466667.0 005.802667-194.56h135.338667S523.776 239.445334 495.872 240.128H261.76c9.216-34.730667 20.821333-70.613333 34.688-107.690667.0.0-63.701333.0-85.333333 57.130667C202.112 213.12 176.128 303.786667 129.877333 396.416c15.573333-1.706667 67.114667-3.114667 97.450667-58.794667 5.589333-15.616 6.656-17.621333 13.568-38.485333h76.373333c0 27.776-3.157333 177.109333-4.437333 194.474667h-138.24c-31.104.0-41.173333 62.549333-41.173333 62.549333h173.482666C295.253333 688.256 232.789333 799.573333 119.466667 887.466667c54.186667 15.488 108.202667-2.432 134.912-26.197334.0.0 60.8-55.338667 94.122666-183.381333L491.264 849.834667s20.906667-71.168-3.285333-105.856c-20.053333-23.637333-74.24-87.552-97.322667-110.72l-38.698667 30.72c11.52-36.992 18.474667-72.96 20.821334-107.690667h163.072s-.213333-62.549333-20.053334-62.549333z" p-id="5821" fill="#8a8a8a"/></svg></a></li><li><a href=mailto:%20danmyw@qq.com target=_blank title=e-mail rel=me><!doctype html><svg t="1750733089669" class="icon" viewBox="0 0 1451 1024" p-id="6983" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759.0 97.881301C0 3.997201 71.046997.0 71.046997.0H474.477909 961.649408h399.992405s71.046998 3.997201 71.046998 97.881301L771.345323 681.472759S764.482731 685.154773 753.594283 688.65053V688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858V688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759zm53.281707 130.131124C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633.0 212.052267.0 212.052267V942.809523S0 1024 83.726336 1024H682.532949 753.579947h595.368192C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523V212.052267S893.138176 701.759633 817.019477 767.734955c-39.771477 34.470494-74.671786 43.295855-98.955861 43.868928z" fill="#8a8a8a" p-id="6984"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/en/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/en/page/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/en/page/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/en/page/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li><a href=/en/page/about/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>About..</span></a></li><li><a href=/en/page/releases/><svg class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M9.828 9.172a4 4 0 100 5.656A10 10 0 0012 12a10 10 0 012.172-2.828 4 4 0 110 5.656A10 10 0 0112 12 10 10 0 009.828 9.172"/></svg>
+<span>OpenSources</span></a></li><li><a href=/en/page/privacy/><!doctype html><svg t="1750733089669" class="icon" viewBox="0 0 1451 1024" p-id="6983" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759.0 97.881301C0 3.997201 71.046997.0 71.046997.0H474.477909 961.649408h399.992405s71.046998 3.997201 71.046998 97.881301L771.345323 681.472759S764.482731 685.154773 753.594283 688.65053V688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858V688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759zm53.281707 130.131124C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633.0 212.052267.0 212.052267V942.809523S0 1024 83.726336 1024H682.532949 753.579947h595.368192C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523V212.052267S893.138176 701.759633 817.019477 767.734955c-39.771477 34.470494-74.671786 43.295855-98.955861 43.868928z" fill="#8a8a8a" p-id="6984"/></svg>
+<span>Privacy Policy</span></a></li><li class=menu-bottom-section><ol class=menu><li id=i18n-switch><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg>
+<select name=language title=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://chengxiaqiucao.github.io/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/>中文</option><option value=https://chengxiaqiucao.github.io/en/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/ selected>English</option></select></li><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#preface>Preface</a></li><li><a href=#a-brief-introduction-to-puppeteer>A Brief Introduction to Puppeteer</a></li><li><a href=#puppeteer-architecture>Puppeteer Architecture</a></li><li><a href=#installing-puppeteer>Installing Puppeteer</a></li><li><a href=#hello-world>Hello World</a></li><li><a href=#key-features-of-puppeteer>Key Features of Puppeteer</a><ol><li><a href=#configuring-browser-launch-parameters>Configuring Browser Launch Parameters</a></li><li><a href=#emulating-device-displays>Emulating Device Displays</a></li><li><a href=#locating-elements>Locating Elements</a></li><li><a href=#page-operations-and-keyboard-input>Page Operations and Keyboard Input</a></li><li><a href=#getting-element-attributes>Getting Element Attributes</a></li><li><a href=#screenshots>Screenshots</a></li><li><a href=#saving-as-pdf>Saving as PDF</a></li><li><a href=#intercepting-network-requests>Intercepting Network Requests</a></li><li><a href=#recording-performance-metrics>Recording Performance Metrics</a></li></ol></li><li><a href=#a-test-automation-example-combining-puppeteer-and-jest>A Test Automation Example Combining Puppeteer and Jest</a></li><li><a href=#conclusion>Conclusion</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/en/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/><img src=/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/puppeteer_hu_42e122011d8990ab.webp srcset="/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/puppeteer_hu_42e122011d8990ab.webp 800w, /post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/puppeteer_hu_56244b30e6e876a0.webp 1600w" width=800 height=372 loading=lazy alt="Featured image of post An Introduction to Puppeteer for Test Automation"></a></div><div class=article-details><header class=article-category><a href=/en/categories/testing-tools/>Testing Tools</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/en/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/>An Introduction to Puppeteer for Test Automation</a></h2><h3 class=article-subtitle>Google's Puppeteer is a rising force in test automation and is widely seen as promising.</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Sep 30, 2024</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>7 minute read</time></div></footer><footer class=article-translations><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg><div><a href=https://chengxiaqiucao.github.io/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/ class=link>中文</a></div></footer></div></header><section class=article-content><h2 id=preface>Preface</h2><p>Test automation has evolved to the point where all kinds of test automation tools keep emerging one after another. Selenium is undoubtedly the standout among them: from 2016 to the present, it has consistently held the top spot as the most popular tool in global rankings of test automation tools. Built on the WebDriver protocol, Selenium is free, open source, powerful, and highly extensible, and thanks to the strong backing of its creator, the well-known consulting firm ThoughtWorks, it has seen widespread adoption across the industry.</p><p>However, in the Technology Radar (a guide to analyzing global technology trends) published by ThoughtWorks several years ago, the E2E (end-to-end testing) section pointed out a number of rising stars of the post-Selenium era, with Puppeteer singled out for particular attention.</p><blockquote><p>We keep receiving positive feedback on &ldquo;post-Selenium&rdquo; web UI testing tools such as Cypress, TestCafe and Puppeteer.</p><p>&mldr;</p><p>We have good experience using &ldquo;post-Selenium&rdquo; web UI testing tools such as Cypress, TestCafe and Puppeteer.</p><p>&mldr;</p></blockquote><p>Although Selenium is ThoughtWorks&rsquo; own product, as front-end technologies have advanced, Selenium has also shown drawbacks such as a heavy dependence on the browser, limited control over single-page applications, and the low communication efficiency of the WebDriver protocol, so a new generation of testing tools has gradually come into the industry&rsquo;s view. In this article, let&rsquo;s take a look at the first of these three tools: <strong>Puppeteer</strong></p><h2 id=a-brief-introduction-to-puppeteer>A Brief Introduction to Puppeteer</h2><p>Before introducing Puppeteer, let&rsquo;s first cover some background: headless, that is, a headless browser. Long ago, the need for headless browsers already existed in the fields of front-end testing and web scraping — that is, driving the browser engine purely through code, without a browser interface. It is especially useful in UI test automation and in scenarios where browsing operations need to be completed silently. At the time, the most popular open source headless tool was PhantomJS, but after Google open-sourced Puppeteer, PhantomJS has now been discontinued, and it is fair to say that Puppeteer is the most widely used headless solution today.</p><p>So is Puppeteer itself a headless browser? The official project gives Puppeteer a concise definition:</p><blockquote><p>Puppeteer is a Node library which provides a high-level API to control Chrome or Chromium over the DevTools Protocol. Puppeteer runs headless by default, but can be configured to run full (non-headless) Chrome or Chromium.</p></blockquote><p>As we can see, Puppeteer is in fact a Node.js library built on the CDP protocol for controlling Chrome or Chromium. It is generally used in headless mode, but it can also work in standard mode.</p><ul><li>Puppeteer is a Node.js library, so the code must run in a Node environment</li><li>It is based on the Chrome DevTools Protocol</li><li>It can control only Chrome or Chromium</li><li>The running mode is configurable</li></ul><h2 id=puppeteer-architecture>Puppeteer Architecture</h2><p>The official Puppeteer architecture is shown below:</p><p><img src=/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240929_hu_21512d3d12f6831b.webp width=1024 height=917 srcset="/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240929_hu_a0a3eb572f93c0fc.webp 480w, /post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240929_hu_21512d3d12f6831b.webp 1024w" loading=lazy class=gallery-image data-flex-grow=111 data-flex-basis=267px></p><p>Notes:</p><ul><li>Puppeteer communicates with the Browser via the DevTools Protocol.</li><li>A Browser instance can contain multiple browser contexts (BrowserContext).</li><li>BrowserContext is used to hold browser sessions, and a single browser context can contain multiple pages.</li><li>Page: at the very least, a Page contains one frame, the main frame; other frames may also exist, and these frames can be created with [iframe].</li><li>Frame: at the very least, a Frame has one JavaScript execution context, namely the default execution context. A Frame may also have additional attached execution contexts.</li><li>Worker: a Worker has a single execution context and can interoperate with WebWorkers.</li></ul><h2 id=installing-puppeteer>Installing Puppeteer</h2><p>Since Puppeteer is actually a Node library, installation is very simple:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>&gt; npm install puppeteer
+</span></span></code></pre></td></tr></table></div></div><p>During installation, Chromium is downloaded as well, but for well-known reasons this download fails from within China. It is therefore recommended to install via a domestic mirror:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>&gt; npm install -g cnpm --registry<span class=o>=</span>https://registry.npm.taobao.org
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>&gt; cnpm install puppeteer
+</span></span></code></pre></td></tr></table></div></div><p>After installation, you can use the following command to check the installed version and confirm the installation is correct:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>&gt; npm ls puppeteer
+</span></span></code></pre></td></tr></table></div></div><h2 id=hello-world>Hello World</h2><p>Let&rsquo;s look at the basic usage of Puppeteer through a simple example.</p><p>Because Puppeteer controls the browser directly over the CDP protocol, it can perform many direct operations at the browser level. For example, in the code below we drive the browser (in normal mode) to pop up a dialog when visiting my blog:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>puppeteer</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;puppeteer&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>HelloWorld</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>async</span> <span class=kd>function</span> <span class=nx>HelloWorld</span><span class=p>(){</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>browser</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>puppeteer</span><span class=p>.</span><span class=nx>launch</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=nx>headless</span><span class=o>:</span><span class=kc>false</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>page</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>newPage</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s1>&#39;https://chengxiaqiucao.github.io/&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>evaluate</span><span class=p>(()=&gt;</span><span class=nx>alert</span><span class=p>(</span><span class=s1>&#39;hello world!&#39;</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>close</span><span class=p>();</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>The specifics of JavaScript syntax, such as the use of <code>async</code>, <code>await</code>, and arrow functions, won&rsquo;t be covered in detail here; you can consult the relevant JavaScript documentation first.</p><p>Run this JavaScript file with Node.js to execute it.</p><p><code>node pupp_sample.js</code></p><p>Execution result:</p><p><img src=/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930_hu_cc3f9f2e716fe244.webp width=1024 height=881 srcset="/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930_hu_cdfe9269ea43e855.webp 480w, /post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930_hu_cc3f9f2e716fe244.webp 1024w" loading=lazy class=gallery-image data-flex-grow=116 data-flex-basis=278px></p><h2 id=key-features-of-puppeteer>Key Features of Puppeteer</h2><p>The above is a simple Puppeteer example from which we can see its basic usage. In fact, as a powerful headless tool, Puppeteer offers many capabilities; the main ones are summarized below:</p><h3 id=configuring-browser-launch-parameters>Configuring Browser Launch Parameters</h3><p>In the method that launches the browser, we configure it by setting various parameters. The commonly used ones are:</p><ul><li><p>headless: true/false — whether to launch in headless mode</p></li><li><p>devtools: true/false — whether to launch DevTools at the same time</p></li><li><p>slowMo: a value in milliseconds. When running in slow mode, the interval between each operation step</p></li><li><p>timeout: a value in milliseconds that sets the launch timeout; the default is 30000, i.e. 30 seconds</p></li><li><p>executablePath: lets you replace the default Chromium browser with an already installed Chrome browser; set the browser executable path here</p></li><li><p>args: sets configuration parameters supported by the Chrome browser.
+For the full list of supported parameters, see: <a class=link href=https://peter.sh/experiments/chromium-command-line-switches/ target=_blank rel=noopener>Chrome Browser Parameters</a>.
+For example, <code>args: ["--start-maximized"]</code> makes the browser launch maximized by default.</p></li></ul><p>Reusing the code above, let&rsquo;s modify it slightly:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>browser</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>puppeteer</span><span class=p>.</span><span class=nx>launch</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=nx>headless</span><span class=o>:</span><span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>devtools</span><span class=o>:</span><span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>slowMo</span><span class=o>:</span><span class=mi>1000</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>args</span><span class=o>:</span><span class=p>[</span><span class=s2>&#34;--start-maximized&#34;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>page</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>newPage</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s1>&#39;https://chengxiaqiucao.github.io/&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>close</span><span class=p>();</span>
+</span></span></code></pre></td></tr></table></div></div><p>When executed, it runs in slow mode, with DevTools open by default and the window automatically maximized.</p><h3 id=emulating-device-displays>Emulating Device Displays</h3><p>Puppeteer also supports emulating mobile device displays. The <code>page.emulate()</code> method can emulate the interfaces of several mainstream mobile devices. For the full list of supported devices, see <a class=link href=https://pptr.dev/api/puppeteer.knowndevices/ target=_blank rel=noopener>the official list</a></p><p>The usage is as follows:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>import</span> <span class=nx>puppeteer</span> <span class=nx>from</span> <span class=s1>&#39;puppeteer&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kr>import</span> <span class=p>{</span><span class=nx>KnownDevices</span><span class=p>}</span> <span class=nx>from</span> <span class=s1>&#39;puppeteer&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> 
+</span></span><span class=line><span class=cl><span class=nx>iphone15</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>async</span> <span class=kd>function</span> <span class=nx>iphone15</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=kr>const</span> <span class=nx>iPhone</span> <span class=o>=</span> <span class=nx>KnownDevices</span><span class=p>[</span><span class=s1>&#39;iPhone 15 Pro&#39;</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>browser</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>puppeteer</span><span class=p>.</span><span class=nx>launch</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=nx>headless</span><span class=o>:</span><span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>devtools</span><span class=o>:</span><span class=kc>true</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>pages</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>pages</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>page</span> <span class=o>=</span> <span class=nx>pages</span><span class=p>[</span><span class=mi>0</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>emulate</span><span class=p>(</span><span class=nx>iPhone</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s1>&#39;https://chengxiaqiucao.github.io/&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>Execution result:</p><p><img src=/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-1_hu_c25abf45061bbed2.webp width=1024 height=744 srcset="/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-1_hu_62b1ab8209e476ab.webp 480w, /post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-1_hu_c25abf45061bbed2.webp 1024w" loading=lazy class=gallery-image data-flex-grow=137 data-flex-basis=330px></p><p>Besides the method for emulating terminal devices, you can also set the resolution with <code>Page.setViewport</code>. For example, the following statement sets the page to a 1920 * 1080 resolution:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>setViewport</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>  <span class=nx>width</span><span class=o>:</span> <span class=mi>1920</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>height</span><span class=o>:</span> <span class=mi>1080</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=locating-elements>Locating Elements</h3><p>As a tool for test automation, Puppeteer naturally needs to be able to identify the relevant elements on a page. In Puppeteer, elements can be obtained with <code>page.$(selector)</code> and <code>page.$$(selector)</code>. The selector parameter uses CSS Selector syntax to locate elements. For CSS selector syntax, see: <a class=link href=https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors target=_blank rel=noopener>CSS selectors</a>. For example, to locate the archive section on the blog page:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>$</span><span class=p>(</span><span class=s1>&#39;#main-menu &gt; li:nth-child(2) &gt; a&#39;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>Generally, to obtain the corresponding selector description for an element in Chrome, you can open Chrome DevTools, locate the element, and simply right-click to copy it.</p><p>Besides using a selector, elements can also be identified via an XPath path: <code>page.$x(expression)</code>. For example:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>$x</span><span class=p>(</span><span class=s1>&#39;//*[@id=&#34;main-menu&#34;]/li[2]/a&#39;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=page-operations-and-keyboard-input>Page Operations and Keyboard Input</h3><p>The most common operations in test automation are, naturally, driving the page to perform the relevant actions. In Puppeteer, you can use the corresponding ready-made methods to accomplish them.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// Get focus
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>focus</span><span class=p>(</span><span class=nx>selector</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// Click an element
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>click</span><span class=p>(</span><span class=nx>selector</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>tap</span><span class=p>(</span><span class=nx>selector</span><span class=p>)</span> <span class=c1>// On mobile
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=c1>// Enter content
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>type</span><span class=p>(</span><span class=nx>selector</span><span class=p>,</span> <span class=s1>&#39;输入内容&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// Type directly via the keyboard
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>keyboard</span><span class=p>.</span><span class=nx>type</span><span class=p>(</span><span class=s1>&#39;输入内容&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>keyboard</span><span class=p>.</span><span class=nx>press</span><span class=p>(</span><span class=s1>&#39;KeyA&#39;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=getting-element-attributes>Getting Element Attributes</h3><p>Sometimes we need to retrieve the attributes of an element on the page for subsequent operations. This can be done with <code>page.$eval(selector, pageFunction)</code>, for example:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// Get the link URL
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=nx>preloadHref</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>$eval</span><span class=p>(</span><span class=s1>&#39;link[rel=preload]&#39;</span><span class=p>,</span> <span class=nx>el</span> <span class=p>=&gt;</span> <span class=nx>el</span><span class=p>.</span><span class=nx>href</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=screenshots>Screenshots</h3><p>Puppeteer can take page screenshots via the <code>page.screenshot()</code> method, which has a number of very useful parameters:</p><ul><li><p>path: specifies the file path where the screenshot is saved</p></li><li><p>type: specifies the file type to save, jpg or png</p></li><li><p>quality: image quality, 0-100</p></li><li><p>fullpage: whether to save the complete page</p></li><li><p>clip: specifies the screenshot area {x, y, width, height}</p></li><li><p>omitBackground: removes the white background</p></li><li><p>encoding: image encoding, base64 or binary</p></li></ul><p>Code example:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>browser</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>puppeteer</span><span class=p>.</span><span class=nx>launch</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=nx>headless</span><span class=o>:</span><span class=kc>false</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>pages</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>pages</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>page</span> <span class=o>=</span> <span class=nx>pages</span><span class=p>[</span><span class=mi>0</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s1>&#39;https://chengxiaqiucao.github.io/&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>screenshot</span><span class=p>({</span><span class=nx>path</span><span class=o>:</span> <span class=s1>&#39;screenshot.png&#39;</span><span class=p>,</span><span class=nx>fullpage</span><span class=o>:</span><span class=kc>true</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>close</span><span class=p>();</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=saving-as-pdf>Saving as PDF</h3><p>Another Puppeteer feature is the ability to save a page directly as a PDF file:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>browser</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>puppeteer</span><span class=p>.</span><span class=nx>launch</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=nx>headless</span><span class=o>:</span><span class=kc>false</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>pages</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>pages</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>page</span> <span class=o>=</span> <span class=nx>pages</span><span class=p>[</span><span class=mi>0</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s1>&#39;https://chengxiaqiucao.github.io/&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>pdf</span><span class=p>({</span><span class=nx>path</span><span class=o>:</span> <span class=s1>&#39;blogList.pdf&#39;</span><span class=p>,</span> <span class=nx>format</span><span class=o>:</span> <span class=s1>&#39;A4&#39;</span><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>close</span><span class=p>();</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=intercepting-network-requests>Intercepting Network Requests</h3><p>Puppeteer can intercept and handle a page&rsquo;s network requests. The following example blocks the loading of the avatar image on the blog site:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>browser</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>puppeteer</span><span class=p>.</span><span class=nx>launch</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=nx>headless</span><span class=o>:</span><span class=kc>false</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>pages</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>pages</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>page</span> <span class=o>=</span> <span class=nx>pages</span><span class=p>[</span><span class=mi>0</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>setRequestInterception</span><span class=p>(</span><span class=kc>true</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nx>page</span><span class=p>.</span><span class=nx>on</span><span class=p>(</span><span class=s1>&#39;request&#39;</span><span class=p>,</span> <span class=nx>request</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span><span class=p>(</span><span class=nx>request</span><span class=p>.</span><span class=nx>url</span><span class=p>().</span><span class=nx>includes</span><span class=p>(</span><span class=s1>&#39;automnGrass&#39;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>            <span class=nx>request</span><span class=p>.</span><span class=nx>abort</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span>
+</span></span><span class=line><span class=cl>            <span class=nx>request</span><span class=p>.</span><span class=k>continue</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s1>&#39;https://chengxiaqiucao.github.io/&#39;</span><span class=p>,{</span><span class=nx>timeout</span><span class=o>:</span><span class=mi>100000</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>close</span><span class=p>();</span>
+</span></span></code></pre></td></tr></table></div></div><p>The result is shown below:
+<img src=/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-2_hu_1d6b798bb51094f0.webp width=1024 height=890 srcset="/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-2_hu_19076745ee2db8ed.webp 480w, /post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-2_hu_1d6b798bb51094f0.webp 1024w" loading=lazy class=gallery-image data-flex-grow=115 data-flex-basis=276px></p><h3 id=recording-performance-metrics>Recording Performance Metrics</h3><p>Another very useful Puppeteer feature is the ability to record performance tracing metrics so that they can be shared for performance analysis.</p><p>It is very simple to use: simply mark the operations around which you want to record performance metrics with <code>page.tracing.start()</code> and <code>page.tracing.stop()</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>browser</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>puppeteer</span><span class=p>.</span><span class=nx>launch</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=nx>headless</span><span class=o>:</span><span class=kc>false</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>pages</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>pages</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>page</span> <span class=o>=</span> <span class=nx>pages</span><span class=p>[</span><span class=mi>0</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>tracing</span><span class=p>.</span><span class=nx>start</span><span class=p>({</span><span class=nx>path</span><span class=o>:</span> <span class=s1>&#39;trace.json&#39;</span><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s1>&#39;https://chengxiaqiucao.github.io/&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>tracing</span><span class=p>.</span><span class=nx>stop</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>close</span><span class=p>();</span>
+</span></span></code></pre></td></tr></table></div></div><p>Upload the saved trace.json file to the Performance panel in Chrome DevTools to carry out the corresponding performance analysis, as shown below:
+<img src=/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-3_hu_d15b7e35ad9d4fe1.webp width=1024 height=537 srcset="/post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-3_hu_4d6a288e9d597135.webp 480w, /post/028-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7puppeteer%E7%AE%80%E4%BB%8B/Pasted-20240930-3_hu_d15b7e35ad9d4fe1.webp 1024w" loading=lazy class=gallery-image data-flex-grow=190 data-flex-basis=457px></p><h2 id=a-test-automation-example-combining-puppeteer-and-jest>A Test Automation Example Combining Puppeteer and Jest</h2><p>Now let&rsquo;s look at Puppeteer in action through a concrete UI test automation case.</p><p>The test requirements are as follows:</p><blockquote><p>Case 1:</p><ul><li>Open the Qiucao Observation Station</li><li>Confirm the site loads correctly</li></ul><p>Case2:</p><ul><li>Locate the archive page</li><li>Enter the archive section</li></ul><p>Case3:</p><ul><li>Retrieve the article list on the current page and output it to the console</li></ul></blockquote><p>Puppeteer is a Node headless-browser control library and does not itself include any test framework functionality, so we generally rely on another test framework to handle test scheduling, execution, and assertions. Here we take Jest, a framework commonly used in front-end testing, as an example to see how Puppeteer can fulfill the automation requirements above.</p><p>Installing Jest and its basic usage are not the focus of this article, so I won&rsquo;t go into detail here; feel free to search and learn about them on your own. A brief note follows;</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>&gt; npm install jest
+</span></span></code></pre></td></tr></table></div></div><p>To use Jest, you need to configure package.json in the project directory with the following:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=s2>&#34;scripts&#34;</span><span class=err>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;test&#34;</span><span class=p>:</span> <span class=s2>&#34;jest&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>By default, scripts ending in <code>.test.js</code> are automatically recognized as test scripts. Just drive execution with <code>npm run test</code>.</p><p>The specific implementation code is below; comments have been added at the key points, so no further explanation is needed.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>puppeteer</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;puppeteer&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nx>browser</span><span class=p>,</span> <span class=nx>pages</span><span class=p>,</span> <span class=nx>page</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// Jest&#39;s default timeout is 5s, too short. Change it to 60s
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>jest</span><span class=p>.</span><span class=nx>setTimeout</span><span class=p>(</span><span class=mi>60000</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// Test Setup, overall preparation
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>beforeAll</span><span class=p>(</span><span class=kr>async</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// Disable headless mode and run in slow mode
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// Set the default viewport for each page to 1024 * 768
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>browser</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>puppeteer</span><span class=p>.</span><span class=nx>launch</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>        <span class=nx>headless</span><span class=o>:</span><span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>slowMo</span><span class=o>:</span><span class=mi>100</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>defaultViewport</span><span class=o>:</span><span class=p>{</span><span class=nx>width</span><span class=o>:</span> <span class=mi>1024</span><span class=p>,</span> <span class=nx>height</span><span class=o>:</span> <span class=mi>768</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// Open a new page
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>page</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>newPage</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// Set the default page timeout to 60s
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>setDefaultTimeout</span><span class=p>(</span><span class=mi>60000</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// Test Teardown, overall cleanup
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>afterAll</span><span class=p>(</span><span class=kr>async</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>browser</span><span class=p>.</span><span class=nx>close</span><span class=p>();</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=c1>// Setup preparation for each test case
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>beforeEach</span><span class=p>(</span><span class=kr>async</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>//todo
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// Teardown cleanup for each test case
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>afterEach</span><span class=p>(()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>//todo
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>});</span>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=nx>test</span><span class=p>(</span><span class=s1>&#39;Case1：进入博客主页&#39;</span><span class=p>,</span><span class=kr>async</span> <span class=p>()=&gt;{</span>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=s1>&#39;https://chengxiaqiucao.github.io/&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// Verify that the page loads correctly
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kd>let</span> <span class=nx>title</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>title</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=nx>expect</span><span class=p>(</span><span class=nx>title</span><span class=p>).</span><span class=nx>toBe</span><span class=p>(</span><span class=s1>&#39;秋 草 观 “测” 台&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>test</span><span class=p>(</span><span class=s1>&#39;Case2：访问归档栏目&#39;</span><span class=p>,</span> <span class=kr>async</span> <span class=p>()=&gt;{</span>
+</span></span><span class=line><span class=cl>	<span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>waitForSelector</span><span class=p>(</span><span class=s1>&#39;#main-menu &gt; li:nth-child(2) &gt; a&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>click</span><span class=p>(</span><span class=s1>&#39;#main-menu &gt; li:nth-child(2) &gt; a&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// Wait for loading to finish
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>waitForFunction</span><span class=p>(()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=nb>document</span><span class=p>.</span><span class=nx>readyState</span> <span class=o>===</span> <span class=s1>&#39;complete&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=p>});</span>
+</span></span><span class=line><span class=cl><span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>test</span><span class=p>(</span><span class=s1>&#39;Case3：获取文章清单&#39;</span><span class=p>,</span> <span class=kr>async</span> <span class=p>()=&gt;{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// Use a CSS selector to locate the Testing section and open it
+</span></span></span><span class=line><span class=cl><span class=c1></span>   <span class=kr>const</span> <span class=nx>ArticleTitles</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>$$eval</span><span class=p>(</span><span class=s1>&#39;h2.article-title&#39;</span><span class=p>,</span> <span class=nx>els</span> <span class=p>=&gt;</span> <span class=nb>Array</span><span class=p>.</span><span class=nx>from</span><span class=p>(</span><span class=nx>els</span><span class=p>).</span><span class=nx>map</span><span class=p>(</span><span class=nx>el</span> <span class=p>=&gt;</span> <span class=nx>el</span><span class=p>.</span><span class=nx>textContent</span><span class=p>));</span> 
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>ArticleTitles</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>})</span>
+</span></span></code></pre></td></tr></table></div></div><p>Execution output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>PS C:<span class=se>\&gt;</span> npm run <span class=nb>test</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>&gt; <span class=nb>test</span>
+</span></span><span class=line><span class=cl>&gt; jest
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  console.log
+</span></span><span class=line><span class=cl>    <span class=o>[</span>
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;大话Https协议&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;软件分支策略和集成模式梳理&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Git工作原理和常用指令&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Pytest中自动指定可引用fixture&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;用SeleniumBase制作产品Demo&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;适合用来自动化测试练手的项目&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;用Typer快速开发python命令行应用&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;PostmanV11更新便览&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Selenium Manager用法详解&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;理解敏捷宣言背后的文化逻辑&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;如何及时掌握各种常用框架的最新变化？&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;软件测试的目的到底是什么？&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Pytest中fixture的范围&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Pytest使用Fixture进行参数化及中文乱码问题&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Win11操作小技巧二则&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Hugo+Github搭建博客小记&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;AI测试之TestGPT&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;提 Bug 的艺术&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Postman高级篇&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Postman自动化篇&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Postman进阶篇&#39;</span>,
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Postman基础篇&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=o>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>      at Object.log <span class=o>(</span>pupp.test.js:60:13<span class=o>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> PASS  ./pupp.test.js <span class=o>(</span>14.525 s<span class=o>)</span>
+</span></span><span class=line><span class=cl>  √ Case1：进入博客主页 <span class=o>(</span><span class=m>5420</span> ms<span class=o>)</span>
+</span></span><span class=line><span class=cl>  √ Case2：访问归档栏目 <span class=o>(</span><span class=m>4011</span> ms<span class=o>)</span>
+</span></span><span class=line><span class=cl>  √ Case3：获取文章清单 <span class=o>(</span><span class=m>2464</span> ms<span class=o>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Test Suites: <span class=m>1</span> passed, <span class=m>1</span> total
+</span></span><span class=line><span class=cl>Tests:       <span class=m>3</span> passed, <span class=m>3</span> total
+</span></span><span class=line><span class=cl>Snapshots:   <span class=m>0</span> total
+</span></span><span class=line><span class=cl>Time:        14.578 s, estimated <span class=m>15</span> s
+</span></span><span class=line><span class=cl>Ran all <span class=nb>test</span> suites.
+</span></span></code></pre></td></tr></table></div></div><h2 id=conclusion>Conclusion</h2><p>The above is an introduction to the basic usage of Puppeteer. As we can see, Puppeteer, as a browser control library produced officially by Chrome, is powerful and can perform many control operations at the underlying browser level. Whether for UI automation or as a web scraper, it has plenty of uses. It runs directly on the Node.js environment and is simple to install and run. For E2E testing that targets the browser front end, Puppeteer is an excellent choice.</p><p>However, as a control library, Puppeteer is fairly limited when it comes to the framework side of test automation itself, and generally needs to be used together with other frameworks.</p><hr><p>Follow Chengxia Qiucao, and you&rsquo;ll never get lost in testing techniques~~</p></section><footer class=article-footer><section class=article-tags><a href=/en/tags/test-automation/>Test Automation</a>
+<a href=/en/tags/puppeteer/>Puppeteer</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/en/post/152-self-healing-locator-architecture/><div class=article-image><img src=/post/152-self-healing-locator-architecture/cover.a6e576c781637efd1c2fe973a9ca6883_hu_c8df04097fa1f814.webp width=250 height=150 loading=lazy alt="Featured image of post The Locator Broke but the Test Stayed Green - Runtime Self-Healing and Its Three Audit Gates" data-hash="md5-puV2x4Fjfv0cL+lzqcpogw=="></div><div class=article-details><h2 class=article-title>The Locator Broke but the Test Stayed Green - Runtime Self-Healing and Its Three Audit Gates</h2></div></a></article><article class=has-image><a href=/en/post/142-browser-extension-testing/><div class=article-image><img src=/post/142-browser-extension-testing/cover.891a12f9804045abdd702672b2599790_hu_4e0d6478098b6f69.webp width=250 height=150 loading=lazy alt="Featured image of post Automated Testing for Browser Extensions - From Install to Popup to Version Migration" data-hash="md5-iRoS+YBARavdcCZyslmXkA=="></div><div class=article-details><h2 class=article-title>Automated Testing for Browser Extensions - From Install to Popup to Version Migration</h2></div></a></article><article><a href=/en/post/136-anti_automation/><div class=article-details><h2 class=article-title>Antipatterns in Test Automation</h2></div></a></article><article><a href=/en/post/134-playwright_unstable/><div class=article-details><h2 class=article-title>Handling Retries for Unstable Tests in Playwright</h2></div></a></article><article class=has-image><a href=/en/post/133-playwright_multi_users/><div class=article-image><img src=/post/133-playwright_multi_users/Pasted-20251105.72cc30345ef6c859ef07d1d164e5aeb2_hu_64b438dde2a64e2e.webp width=250 height=150 loading=lazy alt="Featured image of post Supporting Multiple Users and Different Contexts with Playwright Fixtures" data-hash="md5-cswwNF72yFnvB9HRZOWusg=="></div><div class=article-details><h2 class=article-title>Supporting Multiple Users and Different Contexts with Playwright Fixtures</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2023 -
+2026 |by Daniel Wei</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

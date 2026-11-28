@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MCP on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/mcp/</link><description>Recent content in MCP on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Thu, 12 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/mcp/index.xml" rel="self" type="application/rss+xml"/><item><title>Seven Steps to Testing an MCP Server Without an AI Model</title><link>https://chengxiaqiucao.github.io/en/post/153-mcp-server-direct-test/</link><pubDate>Thu, 12 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/153-mcp-server-direct-test/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/cover.webp" alt="Featured image of post Seven Steps to Testing an MCP Server Without an AI Model" />&lt;p>An &lt;code>MCP&lt;/code> server that starts without errors and one that actually works are two different things. Whether each tool accepts the arguments you think it does, whether the return value has the structure the model expects, and whether a failure counts as a tool error or a protocol error &amp;ndash; these are things you often cannot find out by plugging the server into an AI client and asking the model. That chain is slow, and the model sits between you and the bug.&lt;/p>
+&lt;p>A more direct approach is to take the model out: connect a local web UI straight to the server, list the tools, resources and prompts it provides, call them one by one by hand, and read every &lt;code>JSON-RPC&lt;/code> frame in full. Below are the seven steps of one complete debugging session, from startup to connecting your own service.&lt;/p>
+&lt;h2 id="first-take-the-model-out-of-the-chain">First, Take the Model Out of the Chain
+&lt;/h2>&lt;p>Most people troubleshoot by connecting a client, sending an instruction and watching the result. The trouble is that when the result is wrong, you cannot tell whether the tool arguments were wrong, the server did not respond, or the model misunderstood.&lt;/p>
+&lt;p>That is where direct connection pays off: you send the call, you fill in the arguments, and you get the response verbatim. Four questions become decidable &amp;ndash; did the tool receive the expected arguments, is the return structure correct, in what form is failure expressed, and is the latency abnormal. The model should only appear in the very last step.&lt;/p>
+&lt;h2 id="one-command-to-start-a-local-debugging-console">One Command to Start a Local Debugging Console
+&lt;/h2>&lt;p>No install and no build needed:&lt;/p>
+&lt;p>&lt;code>npx mcp-master-tester&lt;/code>&lt;/p>
+&lt;p>Open &lt;code>http://127.0.0.1:6280&lt;/code> in a browser. If the port is taken, change it:&lt;/p>
+&lt;p>&lt;code>PORT=7000 npx mcp-master-tester&lt;/code>&lt;/p>
+&lt;p>The backend is &lt;code>Express&lt;/code>, the front end is vanilla JavaScript, it starts in seconds and follows the system&amp;rsquo;s light or dark theme. The only prerequisite is &lt;code>Node.js 20&lt;/code> or newer.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig1_hu_1b1963078691f52f.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig1_hu_e143bef9c28290dc.webp 480w, https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig1_hu_1b1963078691f52f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+Figure 1 | The three layers of caller, protocol layer and service under test; when troubleshooting, look at the frames in the middle first&lt;/p>
+&lt;h2 id="connect-the-reference-implementation-first-to-see-what-a-healthy-service-looks-like">Connect the Reference Implementation First to See What a Healthy Service Looks Like
+&lt;/h2>&lt;p>The connection form comes pre-filled with a &lt;code>stdio&lt;/code> connection to the official reference server:&lt;/p>
+&lt;p>&lt;code>npx -y @modelcontextprotocol/server-everything&lt;/code>&lt;/p>
+&lt;p>After clicking connect, the backend launches the server as a child process, completes the &lt;code>initialize&lt;/code> handshake, and the sidebar lists all the capabilities it provides: tools, resources, resource templates, prompts.&lt;/p>
+&lt;p>Connecting the reference implementation rather than your own code first makes sense because it exercises every feature in the protocol. Once you have seen what a healthy service looks like, anomalies in your own service stand out. This step is also good for confirming that your client environment itself is fine.&lt;/p>
+&lt;h2 id="forms-are-generated-from-the-schema-required-fields-blocked-before-sending">Forms Are Generated From the Schema, Required Fields Blocked Before Sending
+&lt;/h2>&lt;p>Select a tool and the interface reads its &lt;code>inputSchema&lt;/code> to generate a form automatically: strings, numbers and integers become text inputs, booleans become toggles, &lt;code>enum&lt;/code> (including oneOf / const with titles) becomes a dropdown, arrays become multi-select, and objects get a JSON editor.&lt;/p>
+&lt;p>Required fields are validated before the request goes out, so a missing argument is caught at the form layer instead of turning into a vague server error. When the form gets in the way, switch to &lt;code>Edit as JSON&lt;/code> and write the arguments directly. Set a timeout for slow tools; long tasks stream progress back through &lt;code>notifications/progress&lt;/code>; tools marked destructive ask for confirmation first.&lt;/p>
+&lt;p>The result viewer breaks the response apart: text (JSON gets formatted), images and audio, resource links and embedded resources, &lt;code>structuredContent&lt;/code>, and how long the call took. Each tool also keeps its own call history, so you can rerun with different arguments and compare directly.&lt;/p>
+&lt;h2 id="two-kinds-of-failure-must-be-looked-at-separately">Two Kinds of Failure Must Be Looked at Separately
+&lt;/h2>&lt;p>This is the single most memorable point of the whole session. A tool failure can be expressed in two ways:&lt;/p>
+&lt;ul>
+&lt;li>Returning a result with &lt;code>isError: true&lt;/code>, meaning the tool ran and reported failure&lt;/li>
+&lt;li>The call itself throwing a &lt;code>JSON-RPC&lt;/code> error, meaning the protocol layer broke&lt;/li>
+&lt;/ul>
+&lt;p>The console displays the two separately, and this is not pedantry. If a scenario that should return &lt;code>isError&lt;/code> instead throws a protocol error, the model on the other end gets far less information and may well just see a failure without knowing why. This is listed as one of the most common bugs in &lt;code>MCP&lt;/code> servers and deserves its own line in your self-test checklist.&lt;/p>
+&lt;h2 id="resources-prompts-and-mid-call-elicitation">Resources, Prompts and Mid-Call Elicitation
+&lt;/h2>&lt;p>Static resources are read with one click. Resource templates with variables (of the form &lt;code>file:///{path}&lt;/code>) give each variable an input box, and you read after filling them in; both text and blob content can be displayed, so you can confirm a binary resource was not corrupted in transit.&lt;/p>
+&lt;p>Prompts work the same way: select one, fill in the arguments, and the interface shows the full message the template returns &amp;ndash; the fastest way to check that argument substitution behaves as expected.&lt;/p>
+&lt;p>Some servers ask the user for information mid-call through &lt;code>elicitation/create&lt;/code>. The console generates a form from the &lt;code>requestedSchema&lt;/code>, sends your answer back, and also supports URL mode. If your service uses elicitation, this is the simplest way to test the full round trip without connecting a real client.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig2_hu_28faf266d31f73b8.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig2_hu_9f3765da60d3ed87.webp 480w, https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig2_hu_28faf266d31f73b8.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+Figure 2 | Distinguishing the three branches of a normal response, &lt;code>isError&lt;/code> and a protocol error, with mid-call elicitation still inside the same session&lt;/p>
+&lt;h2 id="when-the-result-looks-wrong-read-the-frames-before-the-code">When the Result Looks Wrong, Read the Frames Before the Code
+&lt;/h2>&lt;p>The protocol log records from oldest to newest: every &lt;code>JSON-RPC&lt;/code> frame in both directions, request-to-response latency, the server&amp;rsquo;s stderr, notifications/message log entries, and it can adjust the server log level with &lt;code>logging/setLevel&lt;/code>.&lt;/p>
+&lt;p>Order matters. When a result looks wrong, read the raw frames before going back to your code: what exactly did the client send, did the server respond, how long did it take. A lot of &amp;ldquo;the tool is broken&amp;rdquo; turns out to be a mismatch you can see at a glance here &amp;ndash; a misspelled argument name, a missing field in the response, or a process crash that dumped its stack to &lt;code>stderr&lt;/code>.&lt;/p>
+&lt;h2 id="it-can-work-manually-and-still-be-misused-by-the-model">It Can Work Manually and Still Be Misused by the Model
+&lt;/h2>&lt;p>A tool can be called perfectly by hand and still be misused by a model, because the model only knows what is written in the definition. The &lt;code>Lint&lt;/code> report checks every tool definition against the specification and good practice:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>inputSchema&lt;/code> and &lt;code>outputSchema&lt;/code> must be of type object&lt;/li>
+&lt;li>Every required field must actually be defined&lt;/li>
+&lt;li>properties should carry a type and a description&lt;/li>
+&lt;li>Tool names must be well formed and unique&lt;/li>
+&lt;li>Tools should carry annotations (for example whether they are read-only or destructive)&lt;/li>
+&lt;/ul>
+&lt;p>Lint results should be treated as bugs: without a description, the model can only guess what an argument is for; without annotations, the client cannot warn the user before a destructive operation. Fix the definition, reconnect, run lint again, until it is clean.&lt;/p>
+&lt;h2 id="connecting-your-own-service">Connecting Your Own Service
+&lt;/h2>&lt;p>Choose the connection method by deployment shape:&lt;/p>
+&lt;ul>
+&lt;li>Local npm package (&lt;code>stdio&lt;/code>): command &lt;code>npx&lt;/code>, arguments &lt;code>-y @modelcontextprotocol/server-filesystem /path/to/dir&lt;/code>&lt;/li>
+&lt;li>Local script (&lt;code>stdio&lt;/code>): command &lt;code>python&lt;/code>, arguments &lt;code>my_server.py&lt;/code>, plus a working directory if needed&lt;/li>
+&lt;li>Needs a secret (&lt;code>stdio&lt;/code>): click &lt;code>+ var&lt;/code>, for example &lt;code>GITHUB_PERSONAL_ACCESS_TOKEN&lt;/code>&lt;/li>
+&lt;li>Remote, current spec (&lt;code>Streamable HTTP&lt;/code>): enter &lt;code>https://host/mcp&lt;/code>, with a Bearer token if needed&lt;/li>
+&lt;li>Remote, older spec (&lt;code>SSE&lt;/code>): enter &lt;code>https://host/sse&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>Remote traffic is relayed through the Node backend and will not hit browser &lt;code>CORS&lt;/code>. There are fallbacks when credentials are missing: a remote 401 prompts you to enter a token and retry; a &lt;code>stdio&lt;/code> process that crashes with stderr mentioning a missing secret gets a suggestion to add it as an environment variable and reconnect; variables whose names contain KEY, TOKEN, SECRET or PASSWORD are masked automatically.&lt;/p>
+&lt;p>Once connected you can save it as a profile, but profiles store only names and not secrets, so you still re-enter them on each connection.&lt;/p>
+&lt;h2 id="the-boundaries-of-a-local-tool">The Boundaries of a Local Tool
+&lt;/h2>&lt;p>This console can execute any command you type into the &lt;code>stdio&lt;/code> form, so it is deliberately kept local by design: the backend listens only on &lt;code>127.0.0.1&lt;/code> and rejects any request whose Host header is not the local machine or localhost (blocking DNS rebinding from malicious sites), secrets exist only in the browser tab and the backend process memory, and nothing executes before you click Run.&lt;/p>
+&lt;p>Two gaps to keep in mind: the &lt;code>OAuth&lt;/code> login flow for remote servers is not yet supported, so you need a Bearer token or custom headers; and &lt;code>sampling/createMessage&lt;/code> and roots are not declared to the server.&lt;/p>
+&lt;h2 id="the-fixed-routine-after-every-change">The Fixed Routine After Every Change
+&lt;/h2>&lt;p>Connect, run lint, call each changed tool once, and scan the protocol log for errors and slow responses &amp;ndash; these four steps can be codified as the closing routine for every server change.&lt;/p>
+&lt;p>What it solves is really a plain problem: debugging an &lt;code>MCP&lt;/code> server should not require dragging a model into the loop. Calls are direct, arguments are generated from the schema, frames are visible one by one, definitions are checked against the specification, and the description the model relies on gets verified along the way.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig3_hu_62beebd114205859.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig3_hu_508fa6402f812942.webp 480w, https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig3_hu_62beebd114205859.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+Figure 3 | Reconnect, validate definitions, re-call changed tools and scan the protocol log &amp;ndash; a repeatable closing routine&lt;/p></description></item></channel></rss>

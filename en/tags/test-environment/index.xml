@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Test Environment on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/test-environment/</link><description>Recent content in Test Environment on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Thu, 15 May 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/test-environment/index.xml" rel="self" type="application/rss+xml"/><item><title>Building a Personal Knowledge Base - Deploying DeepSeek with WSL + Ollama and Integrating It with VS Code</title><link>https://chengxiaqiucao.github.io/en/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/</link><pubDate>Thu, 15 May 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-3.webp" alt="Featured image of post Building a Personal Knowledge Base - Deploying DeepSeek with WSL + Ollama and Integrating It with VS Code" />&lt;p>At present, large-model applications are in full swing. Major LLMs such as &lt;code>Deepseek&lt;/code> also provide online assistant services, and combined with &lt;code>mcp-server&lt;/code> they can further extend into local tool capabilities.&lt;/p>
+&lt;p>But for materials strongly tied to local business and data, online large-model training datasets generally cannot cover them, especially some sensitive data or data with high security requirements, for which using online large models is impractical. Therefore, in both personal use and real work, deploying large models locally and adding a local knowledge base is also a rigid requirement.&lt;/p>
+&lt;p>This article records and shares the process of building a local large model in WSL through Ollama and CherryStudio, and integrating the local model into VS Code&amp;rsquo;s AI assistant.&lt;/p>
+&lt;h2 id="ollama-introduction">Ollama Introduction
+&lt;/h2>&lt;p>Ollama is a simple, easy-to-use local large language model runtime framework developed in Go, designed specifically for conveniently deploying and running large language models (LLMs) on local machines. Ollama is short for &lt;strong>Omni-Layer Learning Language Acquisition Model (all-round learning language acceptance model)&lt;/strong>.&lt;/p>
+&lt;h2 id="deepseek-local-models-and-runtime-configuration">Deepseek Local Models and Runtime Configuration
+&lt;/h2>&lt;p>Deepseek currently comes in multiple versions based on the size of the parameter set used for local deployment, ranging from &lt;strong>1.5B&lt;/strong> to &lt;strong>671B&lt;/strong> and beyond. The larger the parameter set, the more intelligent the AI, but the higher the hardware requirements accordingly.&lt;/p>
+&lt;p>Generally, the recommended hardware configurations for different Deepseek model versions are as follows:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Model&lt;/th>
+&lt;th>CPU&lt;/th>
+&lt;th>Memory&lt;/th>
+&lt;th>Disk&lt;/th>
+&lt;th>VRAM&lt;/th>
+&lt;th>Use Case&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>DeepSeek-R1-1.5B&lt;/td>
+&lt;td>4 cores&lt;/td>
+&lt;td>8 GB+&lt;/td>
+&lt;td>3 GB+&lt;/td>
+&lt;td>Not required (GTX 1650 optional for CPU acceleration)&lt;/td>
+&lt;td>Personal use, such as laptops and desktops&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-7B&lt;/td>
+&lt;td>8 cores&lt;/td>
+&lt;td>16 GB+&lt;/td>
+&lt;td>8 GB+&lt;/td>
+&lt;td>8 GB+ VRAM (e.g. RTX 3070/4060)&lt;/td>
+&lt;td>Local development for small and medium enterprises&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-8B&lt;/td>
+&lt;td>8 cores&lt;/td>
+&lt;td>16 GB+&lt;/td>
+&lt;td>8 GB+&lt;/td>
+&lt;td>8 GB+ VRAM&lt;/td>
+&lt;td>Local development for SMEs (lightweight tasks with improved accuracy)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-14B&lt;/td>
+&lt;td>12 cores&lt;/td>
+&lt;td>32 GB+&lt;/td>
+&lt;td>15 GB+&lt;/td>
+&lt;td>16 GB+ VRAM (e.g. RTX 4090 or A5000)&lt;/td>
+&lt;td>Local development for SMEs (medium-weight tasks)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-32B&lt;/td>
+&lt;td>16 cores&lt;/td>
+&lt;td>64 GB+&lt;/td>
+&lt;td>30 GB+&lt;/td>
+&lt;td>24 GB+ VRAM (e.g. A100 40 GB or RTX 3090)&lt;/td>
+&lt;td>Professional domain tasks, such as healthcare, research, and law&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-70B&lt;/td>
+&lt;td>32 cores&lt;/td>
+&lt;td>128 GB+&lt;/td>
+&lt;td>70 GB+&lt;/td>
+&lt;td>Multi-GPU parallel (e.g. 2x A100 80GB or 4x RTX 4090)&lt;/td>
+&lt;td>Large enterprises or research institutions, professional domain tasks&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DeepSeek-R1-671B (Full Version)&lt;/td>
+&lt;td>64 cores&lt;/td>
+&lt;td>512 GB+&lt;/td>
+&lt;td>300 GB+&lt;/td>
+&lt;td>Multi-GPU parallel (e.g. 8x A100/H100)&lt;/td>
+&lt;td>National-level research tasks&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>For individual users like us, we usually choose from 1.5B to 14B based on our own computer configuration. Of course, if you do not use local models frequently, my personal suggestion is to match one tier lower in both configuration and recommended model.&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="deploying-local-deepseek-in-wsl-with-ollama">Deploying Local Deepseek in WSL with Ollama
+&lt;/h2>&lt;p>Because the author currently mainly wants to connect some local data to Deepseek and has no need to use local LLMs frequently, here I choose to deploy &lt;strong>DeepSeek-R1-14B&lt;/strong>. In addition, to avoid the LLM consuming large amounts of resources every time the computer starts up, I want to run the LLM under WSL on a Windows machine.&lt;/p>
+&lt;h3 id="wsl-configuration">WSL Configuration
+&lt;/h3>&lt;p>If WSL is not yet enabled on the current system, you can enable it first (the process will not be described in detail; in Windows 11, running WSL install [corresponding Linux distribution] is sufficient to install it).&lt;/p>
+&lt;p>Check the &lt;strong>WSL&lt;/strong> status from the command line:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">C&lt;span class="p">:&lt;/span>&lt;span class="nl">\qiucao&lt;/span>&lt;span class="c1">&amp;gt;wsl --status&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Default Distribution: Ubuntu-24.04
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Default Version: 2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>WSL&amp;rsquo;s default network mode is NAT. Here you can use the &lt;code>WSL Setting&lt;/code> program to modify the current configuration and change it to &lt;code>Mirrored&lt;/code> mode, sharing the host network.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-1_hu_c0aec88b4901f7c9.webp"
+width="1024"
+height="617"
+srcset="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-1_hu_c9a189f1a5c9e75c.webp 480w, https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-1_hu_c0aec88b4901f7c9.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="165"
+data-flex-basis="398px"
+>
+&lt;/p>
+&lt;h3 id="installing-ollama">Installing Ollama
+&lt;/h3>&lt;p>Go to the Ollama official website (&lt;a class="link" href="https://ollama.com/" target="_blank" rel="noopener"
+>https://ollama.com/&lt;/a>) download page. Because we are deploying in WSL, choose the Linux installation.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419_hu_384914324e87dc5e.webp"
+width="1024"
+height="508"
+srcset="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419_hu_cd1b689f9bb6a91b.webp 480w, https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419_hu_384914324e87dc5e.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="201"
+data-flex-basis="483px"
+>
+&lt;/p>
+&lt;p>Execute the following command and wait for the download and automatic installation to complete.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">curl -fsSL https://ollama.com/install.sh &lt;span class="p">|&lt;/span> sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Check the version after installation&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">~$ ollama --version
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ollama version is 0.6.5
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="deploying-deepseek">Deploying Deepseek
+&lt;/h3>&lt;p>After Ollama is installed, you can select the corresponding large model to install from the list of large models provided by Ollama. The currently supported model list can be found at the following address on the official website: &lt;a class="link" href="https://ollama.com/library" target="_blank" rel="noopener"
+>https://ollama.com/library&lt;/a>&lt;/p>
+&lt;p>Execute the following command to download and run Deepseek.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">ollama run deepseek-r1:14b
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_deepseek_hu_658fb0f6c9a8fd17.webp"
+width="1024"
+height="209"
+srcset="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_deepseek_hu_72e5171ab0ef0d81.webp 480w, https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_deepseek_hu_658fb0f6c9a8fd17.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="490"
+data-flex-basis="1178px"
+>
+&lt;/p>
+&lt;p>After a successful installation, you can ask a question to test whether Deepseek is providing service normally.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-2_hu_4bae2e8f62d8f2bf.webp"
+width="1024"
+height="115"
+srcset="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-2_hu_808f18f03c643d04.webp 480w, https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-2_hu_4bae2e8f62d8f2bf.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="888"
+data-flex-basis="2132px"
+>
+&lt;/p>
+&lt;h3 id="adding-a-knowledge-base-analysis-model">Adding a Knowledge Base Analysis Model
+&lt;/h3>&lt;p>At this point, Deepseek is actually deployed locally. But if we want to use local data and documents through Deepseek, we also need to deploy a &lt;strong>semantic vector model&lt;/strong> (Embedding Model) to convert local data into knowledge base data that the large model can analyze. Here we choose the &lt;strong>bge-m3&lt;/strong> model, a general-purpose vector model that supports multiple languages, long texts, and a variety of retrieval methods.&lt;/p>
+&lt;p>Execute:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">ollama pull bge-m3
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_bge_hu_d88878aa76f5f5ad.webp"
+width="1024"
+height="178"
+srcset="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_bge_hu_a53ecd7c9e2fb6b6.webp 480w, https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/ollama_bge_hu_d88878aa76f5f5ad.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="576"
+data-flex-basis="1383px"
+>
+&lt;/p>
+&lt;h2 id="managing-the-knowledge-base-and-providing-a-local-interface-with-cherry-studio">Managing the Knowledge Base and Providing a Local Interface with Cherry Studio
+&lt;/h2>&lt;p>After installing Deepseek, although we can interact with Deepseek from the command line, it is still not friendly enough, and managing the local knowledge base is not convenient either. So here we can also install Cherry Studio, an open-source local AI assistant and knowledge base client. Just download the Windows version from the official website (&lt;a class="link" href="https://cherry-ai.com" target="_blank" rel="noopener"
+>https://cherry-ai.com&lt;/a>) and install it.
+&lt;img src="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-3_hu_5bc6c662290996b6.webp"
+width="1024"
+height="472"
+srcset="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-3_hu_dfe9fd0678b8fbb1.webp 480w, https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/snap_20250419-3_hu_5bc6c662290996b6.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="217"
+data-flex-basis="520px"
+>
+&lt;/p>
+&lt;p>Open Cherry Studio and follow the steps below to add the Deepseek we just deployed through Ollama.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry_hu_8f63401f090a0a07.webp"
+width="1024"
+height="629"
+srcset="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry_hu_49a630e5e64cbdfe.webp 480w, https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry_hu_8f63401f090a0a07.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="162"
+data-flex-basis="390px"
+>
+&lt;/p>
+&lt;p>You will see the already installed model; add it in.
+&lt;img src="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry_model_hu_85f7b6ff325ab5da.webp"
+width="1024"
+height="694"
+srcset="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry_model_hu_2086e4f3a5e5df0e.webp 480w, https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/cherry_model_hu_85f7b6ff325ab5da.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="147"
+data-flex-basis="353px"
+>
+Then you can use Cherry Studio&amp;rsquo;s knowledge base management to bring the local documents we want to add into the large model&amp;rsquo;s dataset. This includes methods such as adding files directly, specifying a directory directly, and collecting from websites, which is very convenient.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/add_knowledge_hu_b3fb53dfd217be9e.webp"
+width="1024"
+height="629"
+srcset="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/add_knowledge_hu_78d09a45838d4d91.webp 480w, https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/add_knowledge_hu_b3fb53dfd217be9e.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="162"
+data-flex-basis="390px"
+>
+&lt;/p>
+&lt;h2 id="integrating-local-deepseek-into-vs-code">Integrating Local Deepseek into VS Code
+&lt;/h2>&lt;p>Once we have a local LLM, if we want to use it in VS Code, we can use VS Code&amp;rsquo;s &lt;code>AI Toolkit&lt;/code> extension to add the local LLM as follows.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_1_hu_1ae13ebc1a2661dd.webp"
+width="1024"
+height="513"
+srcset="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_1_hu_230244637f7e1dfa.webp 480w, https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_1_hu_1ae13ebc1a2661dd.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="199"
+data-flex-basis="478px"
+>
+&lt;/p>
+&lt;p>Test the capabilities of the local library in VS Code.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_2_hu_db60771e5812785.webp"
+width="1024"
+height="721"
+srcset="https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_2_hu_7b2b7e3e9d687df6.webp 480w, https://chengxiaqiucao.github.io/post/093-deepseek%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2/vs_code_2_hu_db60771e5812785.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="142"
+data-flex-basis="340px"
+>
+&lt;/p>
+&lt;p>The above is our hands-on sharing of deploying local Deepseek.&lt;/p></description></item><item><title>Setting Up a Private Docker Registry over HTTPS</title><link>https://chengxiaqiucao.github.io/en/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/</link><pubDate>Tue, 11 Feb 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/docker%E4%BB%93%E5%BA%93.webp" alt="Featured image of post Setting Up a Private Docker Registry over HTTPS" />&lt;h2 id="preface">Preface
+&lt;/h2>&lt;p>In our daily work, rapidly deploying and managing development and test environments based on Docker technology has become very common. And for our own product development, we inevitably cannot do without managing many private Docker images. Add to that the difficulty of accessing Docker&amp;rsquo;s official image registry, and setting up a private Docker image registry in our development environment has become a widespread requirement.&lt;/p>
+&lt;h2 id="the-basic-method-for-building-a-private-docker-image-registry---http">The Basic Method for Building a Private Docker Image Registry - HTTP
+&lt;/h2>&lt;p>The basic method for building a private Docker image registry is actually very simple, and it is also the solution most easily found when searching online.&lt;/p>
+&lt;p>You simply start its registry image, &lt;code>registry&lt;/code>, directly through Docker&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">docker&lt;/span> &lt;span class="n">run&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">d&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">restart&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">always&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">name&lt;/span> &lt;span class="n">registry&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span>&lt;span class="n">p&lt;/span> &lt;span class="mi">5100&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">5000&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span>&lt;span class="n">v&lt;/span> &lt;span class="n">registry&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="k">var&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">lib&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">registry&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">registry&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>&amp;ndash;restart&lt;/strong> Automatically restarts the registry if it fails, ensuring availability
+&lt;strong>&amp;ndash;name&lt;/strong> Sets the registry name
+&lt;strong>&amp;ndash;p&lt;/strong> Maps the internal registry service port 5000 to host port 5100
+&lt;strong>&amp;ndash;v&lt;/strong> Persists registry storage to a data volume&lt;/p>
+&lt;p>Once the image is up and running, accessing the &lt;code>v2&lt;/code> endpoint on port 5100 of this host through a browser will normally display an empty json string, indicating that the registry is ready to provide service&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212_hu_cb2c7004e77ac9c5.webp"
+width="1024"
+height="292"
+srcset="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212_hu_5b974bac59d52410.webp 480w, https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212_hu_cb2c7004e77ac9c5.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="351"
+data-flex-basis="842px"
+>
+&lt;/p>
+&lt;p>But at this point, if we use the &lt;code>docker push&lt;/code> command to upload an image to this private registry, we will get a prompt indicating that the default protocol https does not match.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-1_hu_ac63882a27fe335b.webp"
+width="1024"
+height="72"
+srcset="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-1_hu_ad362da8cb11aa84.webp 480w, https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-1_hu_ac63882a27fe335b.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="1414"
+data-flex-basis="3393px"
+>
+&lt;/p>
+&lt;p>Here we also need to configure Docker to accept the http protocol. On Linux systems this is usually done in the Docker daemon configuration file &lt;code>/etc/docker/daemon.json&lt;/code>.&lt;/p>
+&lt;p>Add the private image server address to it:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;insecure-registries&amp;#34;&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;192.168.101.67:5100&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="err">,&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>If you are using Docker Desktop on Windows, configure it in Docker Engine&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-2_hu_ce9905d53573f46.webp"
+width="1024"
+height="476"
+srcset="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-2_hu_8e212999de42d546.webp 480w, https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-2_hu_ce9905d53573f46.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="215"
+data-flex-basis="516px"
+>
+&lt;/p>
+&lt;p>After restarting the Docker engine, you can perform push and pull operations on the private registry you just built normally.&lt;/p>
+&lt;p>However, although a basic image registry based on the http protocol can meet our everyday basic usage requirements, if our product project is not a small one and involves the coordination of multiple Docker images and multiple nodes, a Docker cluster is generally required.&lt;/p>
+&lt;p>Docker&amp;rsquo;s official clustering system, Docker Swarm, is also very simple to use, but in Docker Swarm, for security reasons, access to private image registries is mandatory through the &lt;code>https&lt;/code> protocol. Therefore, the focus of this article is still to introduce how to build a private image registry based on the &lt;code>https&lt;/code> protocol&lt;/p>
+&lt;h2 id="requirements-for-an-https-protocol-image-registry">Requirements for an HTTPS-Protocol Image Registry
+&lt;/h2>&lt;p>Compared with the &lt;code>http&lt;/code> protocol, the &lt;code>https&lt;/code> protocol mainly provides protection for transport security. For a detailed explanation of the principles of the https protocol, please refer to my earlier article&lt;/p>
+&lt;p>&lt;a class="link" href="https://chengxiaqiucao.github.io/post/21-%E5%82%BB%E7%93%9C%E5%BC%8F%E7%90%86%E8%A7%A3https%E5%8D%8F%E8%AE%AE/" target="_blank" rel="noopener"
+>A Plain-Language Guide to HTTPS: Understanding the Relationship Between SSL, TLS, and HTTP&lt;/a>&lt;/p>
+&lt;p>Therefore, to build an image registry based on the https protocol, the complicated part is mainly satisfying the authentication and authorization requirements imposed by the https protocol. These mainly include:&lt;/p>
+&lt;ul>
+&lt;li>Generate certificates and access keys; non-production environments generally use self-signed certificates.&lt;/li>
+&lt;li>Configure the image registry to mount certificates at startup&lt;/li>
+&lt;li>Configure access nodes to trust the certificates&lt;/li>
+&lt;li>Join the cluster, and push and pull Docker images&lt;/li>
+&lt;/ul>
+&lt;h2 id="deploying-a-private-image-registry-in-a-cluster">Deploying a Private Image Registry in a Cluster
+&lt;/h2>&lt;p>Below, we describe the deployment process step by step in detail&lt;/p>
+&lt;h3 id="generating-a-self-signed-certificate">Generating a Self-Signed Certificate
+&lt;/h3>&lt;h4 id="generating-the-root-ca-private-key-and-certificate">Generating the Root CA Private Key and Certificate
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">openssl req -newkey rsa:4096 -nodes -sha256 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -keyout ca.key -x509 -days &lt;span class="m">3650&lt;/span> -out ca.crt &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -subj &lt;span class="s2">&amp;#34;/C=CN/ST=Beijing/L=Beijing/O=Qiucao Inc./CN=Qiucao Root CA&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="generating-the-server-private-key-and-csr">Generating the Server Private Key and CSR
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">openssl req -newkey rsa:4096 -nodes -sha256 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -keyout registry.key -out registry.csr &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -subj &lt;span class="s2">&amp;#34;/C=CN/ST=Beijing/L=Beijing/O=Qiucao Inc./CN=qiucao.com&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="signing-the-server-certificate-with-the-root-ca">Signing the Server Certificate with the Root CA
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">openssl x509 -req -days &lt;span class="m">3650&lt;/span> -in registry.csr -CA ca.crt -CAkey ca.key &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -CAcreateserial -out registry.crt -extfile &amp;lt;&lt;span class="o">(&lt;/span>&lt;span class="nb">printf&lt;/span> &lt;span class="s2">&amp;#34;subjectAltName=DNS:qiucao.com&amp;#34;&lt;/span>&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The above operations will generate the list of certificates we need&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>ca.crt&lt;/code>: Root certificate&lt;/li>
+&lt;li>&lt;code>registry.crt&lt;/code>: Server certificate&lt;/li>
+&lt;li>&lt;code>registry.key&lt;/code>: Server private key&lt;/li>
+&lt;/ul>
+&lt;h3 id="configuring-the-image-registry">Configuring the Image Registry
+&lt;/h3>&lt;p>To enable the Registry in a Swarm cluster, you can use &lt;code>docker compose&lt;/code>; first configure the compose startup file&lt;/p>
+&lt;p>docker-compose.yml&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">services&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">registry&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">registry:2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ports&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s2">&amp;#34;5100:5000&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">environment&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">REGISTRY_HTTP_TLS_CERTIFICATE&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/certs/registry.crt&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">REGISTRY_HTTP_TLS_KEY&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/certs/registry.key&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/var/lib/registry&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">volumes&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">./certs:/certs&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">/var/docker-registry:/var/lib/registry&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">networks&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">registry-net&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">networks&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">registry-net&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">driver&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">overlay&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Then enable the registry in the cluster through &lt;code>docker stack&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Create the overlay network&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker network create -d overlay registry-net
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Deploy the Registry service&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker stack deploy -c docker-compose.yml registry
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>In this way, we have enabled a registry that supports authentication&lt;/p>
+&lt;h3 id="configuring-access-nodes-to-trust-the-certificate">Configuring Access Nodes to Trust the Certificate
+&lt;/h3>&lt;p>But even though the registry supports authentication, to properly authenticate the service when accessing it, there is one more operation on client nodes, namely trusting the registry&amp;rsquo;s self-signed certificate&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">mkdir -p /etc/docker/certs.d/qiucao.com:5100
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp ca.crt /etc/docker/certs.d/qiucao.com:5100/ca.crt
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Restart the local Docker service to load the trusted certificate&lt;/p>
+&lt;h3 id="verifying-image-pull-from-the-registry">Verifying Image Pull from the Registry
+&lt;/h3>&lt;p>Then, on the client machine, we can pull images through the private registry&lt;/p>
+&lt;p>There is one more step here: the registry address we configured is &lt;code>qiucao.com&lt;/code>, which is not an actually existing public network domain name, so we should also add local resolution for the domain name in &lt;code>/etc/hosts&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">192.168.101.67 qiucao.com
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Then run the &lt;code> docker pull&lt;/code> command to pull the image from the registry, and the image pull can be completed successfully&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-3_hu_62911e748e784725.webp"
+width="1024"
+height="337"
+srcset="https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-3_hu_455fb64710733b73.webp 480w, https://chengxiaqiucao.github.io/post/025-%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8Ehttps%E7%9A%84docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/Pasted-20250212-3_hu_62911e748e784725.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="303"
+data-flex-basis="728px"
+>
+&lt;/p>
+&lt;hr>
+&lt;p>For more on using Docker and systematically improving your testing skills, you can learn about my testing course; reply &lt;code>outline&lt;/code> for detailed course content.&lt;/p></description></item></channel></rss>

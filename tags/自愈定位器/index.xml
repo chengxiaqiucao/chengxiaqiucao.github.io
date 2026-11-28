@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>自愈定位器 on 秋草观测台</title><link>https://chengxiaqiucao.github.io/tags/%E8%87%AA%E6%84%88%E5%AE%9A%E4%BD%8D%E5%99%A8/</link><description>Recent content in 自愈定位器 on 秋草观测台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号：秋草说测试）</copyright><lastBuildDate>Wed, 04 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E8%87%AA%E6%84%88%E5%AE%9A%E4%BD%8D%E5%99%A8/index.xml" rel="self" type="application/rss+xml"/><item><title>定位器坏了但测试没红：运行时自愈的工程实现与三道审计闸门</title><link>https://chengxiaqiucao.github.io/post/152-self-healing-locator-architecture/</link><pubDate>Wed, 04 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/152-self-healing-locator-architecture/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/152-self-healing-locator-architecture/cover.webp" alt="Featured image of post 定位器坏了但测试没红：运行时自愈的工程实现与三道审计闸门" />&lt;p>前端重构改了一个类名、挪了一个按钮，应用照常工作，一半选择器却不再匹配。传统做法是让人逐个改定位器，改完再跑一遍。运行时自愈提供了另一条路：选择器失效时，让模型从页面&lt;strong>实际存在&lt;/strong>的元素里判断你指的是哪一个，验证通过后继续执行，并把修复缓存下来，下次运行不再调用模型。&lt;/p>
+&lt;p>这个思路听起来像&amp;quot;让测试不那么脆&amp;quot;，但真正的工程难点不在&amp;quot;修好&amp;quot;，而在&lt;strong>修错了也会绿&lt;/strong>。如果结算按钮被删掉、模型却自信地点了另一个按钮，套件全绿，没人发现产品出了问题。因此值得拆解的不是模型提示词，而是整套验证、审计与成本控制的机制——它们决定了自愈是提效手段，还是一个新的静默失败源。&lt;/p>
+&lt;h2 id="一次自愈走完的六步">一次自愈走完的六步
+&lt;/h2>&lt;p>以 Playwright 生态里一套可运行的实现为例，一次自愈的流程是固定的、可观测的：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>原定位器先跑。&lt;/strong> 给它一个很短的超时（默认 1 秒），元素正常出现就直接执行动作，自愈逻辑完全不介入——匹配正常时，套件行为与未接入前一致。&lt;/li>
+&lt;li>&lt;strong>查缓存。&lt;/strong> 之前在同一页面路径、同一动作、同一描述下修好过的定位器，先拿来试。命中就不调用模型。&lt;/li>
+&lt;li>&lt;strong>收窄候选。&lt;/strong> 从页面收集最多 1,000 个可交互元素，按关键词匹配、元素类型、ARIA role 与 test id 打分排序，只把前 40 个送给模型。这一步是为了防止目标元素因 DOM 顺序靠后被截断。&lt;/li>
+&lt;li>&lt;strong>模型给出候选策略。&lt;/strong> 最多返回三条 Playwright 定位策略——test id、role 与 name、label、placeholder、text、alt text、title 或 CSS，每条带置信度；输出必须符合固定 JSON schema，不是自由文本。&lt;/li>
+&lt;li>&lt;strong>逐条验证。&lt;/strong> 一条建议要被采纳，必须同时满足：只匹配到唯一一个元素、该元素可见、置信度不低于 &lt;code>minConfidence&lt;/code>。&lt;/li>
+&lt;li>&lt;strong>执行并落盘。&lt;/strong> 生效的定位器写入缓存文件，本次自愈以一行 JSONL 记入事件日志，包含模型的理由、置信度与 token 消耗。&lt;/li>
+&lt;/ol>
+&lt;p>&amp;ldquo;每个元素只调用一次模型，而不是每次运行调用一次&amp;quot;是成本控制的核心。缓存按动作、页面路径与描述组织，提交进仓库后团队与 CI 共享同一份修复。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/152-self-healing-locator-architecture/06-fig1_hu_5d0602477b153178.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/152-self-healing-locator-architecture/06-fig1_hu_4e93e1d0f0437916.webp 480w, https://chengxiaqiucao.github.io/post/152-self-healing-locator-architecture/06-fig1_hu_5d0602477b153178.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>从短超时判定、缓存命中、候选收窄到唯一性校验与落盘的完整链路&lt;/p>
+&lt;h2 id="验证比生成重要但验证本身不够">验证比生成重要，但验证本身不够
+&lt;/h2>&lt;p>第 4、5 步是这套设计里最有价值的部分：模型不是凭空编一个选择器，而是从页面上真实存在的候选元素里选，答案必须能落回一个具体的、可见的、唯一的元素。相比之下，&amp;ldquo;让模型直接写一个新 CSS 选择器&amp;quot;几乎不可控。&lt;/p>
+&lt;p>但唯一性与可见性都只保证&amp;quot;这个元素存在且唯一&amp;rdquo;，不保证&amp;quot;它是你要的那个&amp;rdquo;。原文把风险说得很直白：删除结算按钮后，模型如果自信地挑了另一个按钮，测试依然通过，缺陷被静默吞掉。对质量保障来说，一个不会误报的自愈机制，比一个会偶尔失败的更危险。&lt;/p>
+&lt;p>因此需要三道闸门，把&amp;quot;自愈发生过&amp;quot;这件事强制变成可见信号。&lt;/p>
+&lt;h3 id="闸门一置信度阈值">闸门一：置信度阈值
+&lt;/h3>&lt;p>&lt;code>minConfidence&lt;/code> 的默认值为 0，也就是接受任何分数的建议。生产环境里应显式设到 0.8 一类水平：模型不够确定时，宁可让动作失败，也不要猜。这个开关把&amp;quot;不确定&amp;quot;重新变成红灯。&lt;/p>
+&lt;h3 id="闸门二只报告不修复的模式">闸门二：只报告不修复的模式
+&lt;/h3>&lt;p>&lt;code>warn&lt;/code> 模式会记录&amp;quot;原本会怎么修&amp;quot;，但保留原始失败；&lt;strong>缓存里的修复也只报告、不应用&lt;/strong>。后一点尤其关键：否则一份被提交进仓库的缓存文件，就能把审计运行悄悄刷成全绿，团队再也看不到哪些选择器其实早该更新。&lt;/p>
+&lt;h3 id="闸门三让构建为自愈负责">闸门三：让构建为自愈负责
+&lt;/h3>&lt;p>提供运行级汇总接口，统计本次运行发生了多少次自愈，在全局 teardown 里列出待修的选择器，并让构建失败：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// global-teardown.ts
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">healed&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">entries&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">getHealSummary&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">healed&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">error&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">healed&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb"> 个定位器需要修复，请更新以下选择器：`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">e&lt;/span> &lt;span class="k">of&lt;/span> &lt;span class="nx">entries&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">filter&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">outcome&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s1">&amp;#39;healed&amp;#39;&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">error&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">` &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">action&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb"> &amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">contextName&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">&amp;#34; → &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">JSON&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">stringify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">strategy&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">process&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">exitCode&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这里有个进程模型上的坑：测试跑在 worker 进程，teardown 跑在 runner 进程，内存里的数据不共享，所以每次结果都要额外写进一个 JSONL 汇总文件，由汇总接口从文件读取；并且只统计当前运行——如果 runner 在两次运行之间不退出（UI 模式、watch 模式），要在 globalSetup 里显式重置计数。&lt;/p>
+&lt;p>三道闸门合起来的语义很清楚：&lt;strong>自愈是让构建不中断的临时手段，不是让选择器免于维护的许可。&lt;/strong>&lt;/p>
+&lt;h2 id="成本速度与隐私怎么控住">成本、速度与隐私怎么控住
+&lt;/h2>&lt;p>每次自愈都要调用一次模型，如果放任不管，成本和延迟会随失败选择器数量线性上升。可复用的优化有四条：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>候选属性压缩&lt;/strong>：只发送有值的属性，并用短键（如 &lt;code>tid&lt;/code> 表示 test id、&lt;code>txt&lt;/code> 表示文本）；&lt;/li>
+&lt;li>&lt;strong>隐藏元素标记而非丢弃&lt;/strong>：真实应用常把目标元素刻意隐藏（自定义样式的复选框、仅 hover 出现的按钮），因此这类元素带着 &lt;code>hid: true&lt;/code> 一起送；&lt;/li>
+&lt;li>&lt;strong>先排序再截断&lt;/strong>：按关键词、元素类型、ARIA role、test id 打分后只取前 &lt;code>maxCandidates&lt;/code> 个，默认 40；简单页面可降到 15，密集页面可升到 80；&lt;/li>
+&lt;li>&lt;strong>限制输出长度&lt;/strong>：模型最多返回三条策略，token 消耗在每次自愈时打印并记录到事件日志，便于按团队核算。&lt;/li>
+&lt;/ul>
+&lt;p>发送范围也需要明确：给模型的是结构化候选元素列表（标签名、role、ARIA 标签、文本、test id 等）与页面 URL，&lt;strong>不发送截图，也不发送完整页面 HTML&lt;/strong>。若 DOM 可能含个人信息、财务数据或内部地址，可选的路径包括使用本地模型让数据不出机器、指向自建网关、限定只在非生产环境启用，以及定期复核事件日志里实际发出去的内容。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/152-self-healing-locator-architecture/06-fig2_hu_600ab10795af6ac9.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/152-self-healing-locator-architecture/06-fig2_hu_9d1d4d0015ba507d.webp 480w, https://chengxiaqiucao.github.io/post/152-self-healing-locator-architecture/06-fig2_hu_600ab10795af6ac9.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>三道审计闸门与成本控制点在流程中的位置&lt;/p>
+&lt;h3 id="本地模型的实测取舍">本地模型的实测取舍
+&lt;/h3>&lt;p>在完全离线的本地推理方案上，公开记录过一组对比数据，很适合作为选型参考：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>模型&lt;/th>
+&lt;th>体积&lt;/th>
+&lt;th>测试结果&lt;/th>
+&lt;th>特点&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>llama3.2:3b&lt;/code>&lt;/td>
+&lt;td>2.0 GB&lt;/td>
+&lt;td>5/5 通过&lt;/td>
+&lt;td>综合最优：快、准、体积小&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>mistral&lt;/code>&lt;/td>
+&lt;td>4.1 GB&lt;/td>
+&lt;td>5/5 通过&lt;/td>
+&lt;td>最准也最慢，约 1.4 分钟每次运行&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>gemma3:4b&lt;/code>&lt;/td>
+&lt;td>3.3 GB&lt;/td>
+&lt;td>4/5 通过&lt;/td>
+&lt;td>比 mistral 快（约 53 秒），准确率略低&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>1B 到 4B 的小模型在&amp;quot;一排长得几乎一样的复选框&amp;quot;这类场景里会吃力；准确率优先时应选更大的模型。本地方案的代价是每次自愈的模型延迟通常高于云端（云端约 1–2 秒），但换来零 API 密钥、零外发数据、零调用费。&lt;/p>
+&lt;p>还有一类不走&amp;quot;生成文本&amp;quot;的模型值得单独说：它不写选择器，而是回答带校准概率的判断题——在收集到的候选元素里，哪个是你描述的元素，以及这个元素到底在不在页面上。答案只能是页面上真实存在过的元素，其概率直接作为 &lt;code>minConfidence&lt;/code> 检查的置信度，定位器再由代码根据该元素自身属性构造。在一套包含 76 个故意损坏定位器的评测集上（覆盖按钮、链接、输入框、复选框、ARIA 部件与隐藏控件），这种方式全部修复；单次成本约 0.0001 美元，40 个候选的往返不到四分之一秒。当描述与页面上任何元素都不匹配时，它会明确回答&amp;quot;没有&amp;quot;，并把最佳猜测连同分数一起放进错误信息，因此描述写得不对也容易被发现。&lt;/p>
+&lt;h2 id="配置项里最该调的四个">配置项里最该调的四个
+&lt;/h2>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>配置项&lt;/th>
+&lt;th>默认值&lt;/th>
+&lt;th>调整建议&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>quickTimeout&lt;/code>&lt;/td>
+&lt;td>1000 ms&lt;/td>
+&lt;td>刻意设短以便坏选择器快速失败；若应用确实有慢渲染区域要调高，否则会把&amp;quot;慢&amp;quot;误判成&amp;quot;坏&amp;quot;，白花一次模型调用&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>minConfidence&lt;/code>&lt;/td>
+&lt;td>0&lt;/td>
+&lt;td>设为 0.8 左右，让不确定变成失败&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>maxCandidates&lt;/code>&lt;/td>
+&lt;td>40&lt;/td>
+&lt;td>简单页降到 15，密集页升到 80，直接决定 token 与准确率&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>maxAiTries&lt;/code>&lt;/td>
+&lt;td>4&lt;/td>
+&lt;td>放弃前最多验证多少条建议，配合三条策略的输出上限使用&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>产物文件要分清职责：缓存文件（修好的定位器，按动作／页面路径／描述组织）建议提交进仓库，让团队与 CI 共享；事件日志（每次尝试的理由、置信度、token 数）与汇总日志加入忽略列表；锁文件与临时文件同样忽略。也可以选择整目录不提交，让每台机器各自维护修复，代价是 CI 每次都要重新调用模型。&lt;/p>
+&lt;h2 id="已知限制">已知限制
+&lt;/h2>&lt;ul>
+&lt;li>云端模型需要密钥与网络，本地模型两者都不需要，但延迟更高；&lt;/li>
+&lt;li>只搜索主 frame，iframe 内的元素还不是候选，开放 shadow root 可以搜到；&lt;/li>
+&lt;li>&lt;code>force: true&lt;/code> 的点击直接派发事件，不带指针坐标，无法覆盖依赖真实指针位置的交互；&lt;/li>
+&lt;li>并行 worker 通过锁文件共享缓存，属于 best effort，不是数据库；&lt;/li>
+&lt;li>自愈默认关闭，只有显式打开开关后才生效，因此接入初期套件行为不变，风险可控。&lt;/li>
+&lt;/ul>
+&lt;h2 id="建议的接入顺序">建议的接入顺序
+&lt;/h2>&lt;ol>
+&lt;li>保持自愈关闭，先以 &lt;code>warn&lt;/code> 模式跑一到两周，收集&amp;quot;哪些选择器最常坏&amp;quot;的清单——这份清单本身就是自动化资产的债务表；&lt;/li>
+&lt;li>对高频失效的选择器先做人工修复，剩下的才交给自愈，避免把架构问题藏进缓存；&lt;/li>
+&lt;li>打开自愈时同步设置 &lt;code>minConfidence&lt;/code>，并在全局 teardown 里启用&amp;quot;有自愈即失败&amp;quot;的规则；&lt;/li>
+&lt;li>缓存文件的每一次变更都走代码评审，把它当测试代码而不是构建产物；&lt;/li>
+&lt;li>只在非生产环境启用，涉及敏感 DOM 时改用本地模型或自建端点；&lt;/li>
+&lt;li>定期看事件日志里的 token 消耗与理由分布，判断是&amp;quot;重构变多了&amp;quot;还是&amp;quot;描述写得含糊&amp;quot;。&lt;/li>
+&lt;/ol>
+&lt;p>自愈机制真正解决的，是重构期间大量用例同时红掉、人来不及修的排队问题。它没有解决、也不应该试图解决的是&amp;quot;测试到底在验证什么&amp;quot;。把每一次自愈都变成一条需要被看见、被评审、最终被消除的记录，这个能力才不会退化成把真实缺陷一并抹平的绿灯。&lt;/p></description></item></channel></rss>

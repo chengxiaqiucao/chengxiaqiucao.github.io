@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>浏览器扩展 on 秋草观测台</title><link>https://chengxiaqiucao.github.io/tags/%E6%B5%8F%E8%A7%88%E5%99%A8%E6%89%A9%E5%B1%95/</link><description>Recent content in 浏览器扩展 on 秋草观测台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号：秋草说测试）</copyright><lastBuildDate>Wed, 28 Oct 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E6%B5%8F%E8%A7%88%E5%99%A8%E6%89%A9%E5%B1%95/index.xml" rel="self" type="application/rss+xml"/><item><title>浏览器扩展的自动化测试：从安装、弹窗到版本迁移</title><link>https://chengxiaqiucao.github.io/post/142-browser-extension-testing/</link><pubDate>Wed, 28 Oct 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/142-browser-extension-testing/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/142-browser-extension-testing/cover.webp" alt="Featured image of post 浏览器扩展的自动化测试：从安装、弹窗到版本迁移" />&lt;p>测试浏览器扩展，和测试一个网页不是同一件事。除了页面渲染，你可能还要准备扩展自己的存储数据、打开它的弹窗（popup）、选项页（options）或侧边栏（side panel）、触发浏览器级事件，并且验证版本升级时旧数据能否正确迁移。官方的扩展指南给出了起点：启动浏览器时加载扩展、等待它的 service worker、拿到扩展 ID。但真正与扩展相关的测试逻辑，仍然需要一套 fixture 和辅助函数来支撑。&lt;/p>
+&lt;p>本文用一个具体的扩展作为样本，覆盖三类最常见也最容易漏测的场景：安装行为、弹窗交互、版本升级的数据迁移。&lt;/p>
+&lt;h2 id="样本一个待办清单扩展">样本：一个待办清单扩展
+&lt;/h2>&lt;p>样本扩展是一个简单的待办清单。用户打开弹窗后可以看到任务列表、新增条目、删除已完成的条目：&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig1_hu_5765199b59c0be45.webp"
+width="1024"
+height="676"
+srcset="https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig1_hu_9a3473616f69f579.webp 480w, https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig1_hu_5765199b59c0be45.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="151"
+data-flex-basis="363px"
+>
+&lt;/p>
+&lt;p>弹窗中的待办清单示例，任务数据保存在 chrome.storage.local 中&lt;/p>
+&lt;p>任务保存在 &lt;code>chrome.storage.local&lt;/code> 里，弹窗每次打开时读取已保存的列表并渲染。这个结构很典型：一个后台脚本（background / service worker）负责安装与升级时的逻辑，一个弹窗页面负责交互，存储作为二者之间的状态载体。测试要覆盖的正是这三者之间的联动。&lt;/p>
+&lt;h2 id="环境准备">环境准备
+&lt;/h2>&lt;p>先安装依赖：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">npm install -D @playwright/test playwright-webext
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npx playwright install chromium
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>然后把扩展构建到 &lt;code>dist&lt;/code> 目录，并在 Playwright 配置里指向构建产物：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// playwright.config.ts
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">defineConfig&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@playwright/test&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="kr">type&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">WebextOptions&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;playwright-webext&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="nx">defineConfig&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">WebextOptions&lt;/span>&lt;span class="p">&amp;gt;({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">testDir&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;./test&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">use&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">extensionPath&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;./dist&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这里体现出的第一个价值点：扩展路径进入配置之后，测试用例本身不再需要关心&amp;quot;怎么把扩展装进浏览器&amp;quot;。官方方案里需要自己处理的部分——以持久化上下文启动浏览器、等待 service worker 就绪、解析扩展 ID——被收敛进了 fixture。&lt;/p>
+&lt;p>需要提醒的是，扩展只能在持久化上下文里加载，这是 Playwright 官方扩展方案的前提。在 CI 环境使用无头模式时，要先确认所用的无头模式支持加载扩展，否则会出现扩展未安装但断言仍&amp;quot;通过&amp;quot;的假绿。&lt;/p>
+&lt;h2 id="用例一安装行为">用例一：安装行为
+&lt;/h2>&lt;p>最基础的一类场景是安装时的副作用。样本扩展在安装时会把当前日期写入 storage，用于统计：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// background.js
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">chrome&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">runtime&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">onInstalled&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">addListener&lt;/span>&lt;span class="p">(({&lt;/span> &lt;span class="nx">reason&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">reason&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s1">&amp;#39;install&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">chrome&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">storage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">set&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">installationDate&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nb">Date&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="nx">toISOString&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>对应的测试只有一行断言：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// test/install.spec.ts
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">test&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;playwright-webext&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;saves the installation date&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">extension&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">extension&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">storage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;installationDate&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">toMatch&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sr">/^\d{4}-\d{2}-\d{2}/&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>extension&lt;/code> fixture 会在每个测试前自动安装扩展；&lt;code>storage.local.expect()&lt;/code> 则会等待安装回调把值写入，再匹配以 &lt;code>YYYY-MM-DD&lt;/code> 开头的时间戳。这个&amp;quot;等待&amp;quot;很关键——安装回调是异步触发的，直接读存储几乎必然读到空值，这也是手写扩展测试时最常见的假失败来源。&lt;/p>
+&lt;p>运行：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">npx playwright &lt;span class="nb">test&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>默认以无头模式运行 Chromium，结果直接输出到终端。想看真实浏览器里的执行过程，加 &lt;code>--headed&lt;/code>：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">npx playwright &lt;span class="nb">test&lt;/span> --headed
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>如果扩展没有按预期写入安装日期，测试会明确报错并指出断言内容。相比&amp;quot;跑一遍看看有没有报错&amp;quot;，这类断言把安装时序变成了可回归的行为契约。&lt;/p>
+&lt;h2 id="用例二弹窗交互">用例二：弹窗交互
+&lt;/h2>&lt;p>第二类场景是弹窗。做法是先在存储里准备两条任务，打开弹窗验证它们被渲染出来，再删除第一条，最后验证存储里只剩第二条：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// test/popup.spec.ts
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">expect&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@playwright/test&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">test&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;playwright-webext&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;shows saved tasks in the popup&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">extension&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// prepare 2 tasks in storage
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">extension&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">storage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">set&lt;/span>&lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">todos&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;Buy groceries&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;Read a book&amp;#39;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// open the popup and check the tasks are visible
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">popup&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">extension&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">openPopup&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">popup&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByRole&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;listitem&amp;#39;&lt;/span>&lt;span class="p">)).&lt;/span>&lt;span class="nx">toContainText&lt;/span>&lt;span class="p">([&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;Buy groceries&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;Read a book&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// delete the task
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">popup&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getByRole&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;button&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Delete Buy groceries&amp;#39;&lt;/span> &lt;span class="p">}).&lt;/span>&lt;span class="nx">click&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// check the storage for remaining task
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">extension&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">storage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;todos&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">toEqual&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="s1">&amp;#39;Read a book&amp;#39;&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>extension.openPopup()&lt;/code> 返回一个普通的 Playwright &lt;code>Page&lt;/code> 实例，因此弹窗内部可以继续使用熟悉的定位器与断言。&lt;code>toContainText&lt;/code> 会自动等待任务出现在弹窗里，并且允许列表里有额外条目，但要求这两条按给定顺序出现。&lt;/p>
+&lt;p>这个用例同时建立了一条跨接口的验证链：写入存储 → 渲染 UI → 交互 → 回写存储。只断言 UI 会漏掉&amp;quot;数据没保存&amp;quot;的缺陷，只断言存储会漏掉&amp;quot;渲染坏了&amp;quot;的缺陷，两者一起才完整。&lt;/p>
+&lt;p>跑完之后可以打开 HTML 报告，用 trace viewer 逐步骤回看，并查看每一步的页面截图：&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig2_hu_5e8efc642e6b6411.webp"
+width="1024"
+height="677"
+srcset="https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig2_hu_ad46e3f2cd0b6d92.webp 480w, https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig2_hu_5e8efc642e6b6411.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="151"
+data-flex-basis="363px"
+>
+&lt;/p>
+&lt;p>trace viewer 中的弹窗截图，可逐步回放每个测试步骤&lt;/p>
+&lt;p>有一个实现细节需要知道：弹窗是以普通标签页的形式打开的，而不是浏览器原生的弹窗气泡。这是对 Playwright 限制的绕行方案——它支持的 Page API 无法把原生弹窗暴露出来供交互。绝大多数情况下用普通标签页完全可以接受，反而让弹窗内容可以用完整的定位器能力去测试。&lt;/p>
+&lt;h2 id="用例三版本升级与数据迁移">用例三：版本升级与数据迁移
+&lt;/h2>&lt;p>第三类场景更进阶，也是线上事故高发区：发布 v2 时改变了存储格式。&lt;/p>
+&lt;p>v1 里任务保存为字符串数组：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="nt">&amp;#34;todos&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;Buy groceries&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Read a book&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>v2 里改为对象数组：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="nt">&amp;#34;todos&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[{&lt;/span> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Buy groceries&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;done&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">false&lt;/span> &lt;span class="p">},&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Read a book&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;done&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">false&lt;/span> &lt;span class="p">}]&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>迁移逻辑写在升级回调里，测试可以这样写：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// test/migration.spec.ts
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">test&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;playwright-webext&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">test&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">use&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">extensionAutoInstall&lt;/span>: &lt;span class="kt">false&lt;/span> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;migrates todos from v1 to v2&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">extension&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// install the old version
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">extension&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">install&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;./test/dist-v1&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// populate the storage
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">extension&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">storage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">set&lt;/span>&lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">todos&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;Buy groceries&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;Read a book&amp;#39;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// upgrade to the new version
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">extension&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">upgrade&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// check the migrated data
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">extension&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">storage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">expect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;todos&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">toEqual&lt;/span>&lt;span class="p">([&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Buy groceries&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">done&lt;/span>: &lt;span class="kt">false&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Read a book&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">done&lt;/span>: &lt;span class="kt">false&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>两个关键点：把 v1 的构建产物放在单独目录（如 &lt;code>test/dist-v1&lt;/code>），v2 仍放在配置里的 &lt;code>dist&lt;/code>；用 &lt;code>test.use({ extensionAutoInstall: false })&lt;/code> 关掉自动安装，让测试先手动安装旧版本。&lt;code>extension.upgrade()&lt;/code> 会保留扩展已存储的数据并触发升级回调，v2 在回调里把字符串转成对象，存储断言等待结果出现。&lt;/p>
+&lt;p>这条用例保证的是&amp;quot;老用户升级后任务还在&amp;quot;。这类缺陷一旦漏到线上，影响的是全部存量用户，而且通常不可回滚——数据已经被新版本改写了。&lt;/p>
+&lt;p>三个测试一起跑，得到标准的 HTML 报告，包含结果、截图与每个测试的 trace：&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig3_hu_98f1bcca895cc787.webp"
+width="1024"
+height="650"
+srcset="https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig3_hu_f0f67c91d64e76a7.webp 480w, https://chengxiaqiucao.github.io/post/142-browser-extension-testing/02-fig3_hu_98f1bcca895cc787.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="157"
+data-flex-basis="377px"
+>
+&lt;/p>
+&lt;p>三个测试全部通过后的 HTML 报告&lt;/p>
+&lt;h2 id="扩展测试的四个难点以及对应打法">扩展测试的四个难点，以及对应打法
+&lt;/h2>&lt;p>把上面三类场景抽象一下，扩展测试区别于普通 Web 测试的难点主要有四个，每个都有对应的处理方式。&lt;/p>
+&lt;p>&lt;strong>状态在浏览器侧，不在页面里。&lt;/strong> 扩展的数据在 &lt;code>chrome.storage&lt;/code>、&lt;code>IndexedDB&lt;/code> 或 &lt;code>chrome.runtime&lt;/code> 的上下文中，页面刷新不会重置，测试用例之间容易互相污染。处理方式是把&amp;quot;准备存储数据&amp;quot;变成显式的测试步骤（如上面的 &lt;code>storage.local.set&lt;/code>），并让 fixture 在每个测试前重新安装扩展，保证起点干净。&lt;/p>
+&lt;p>&lt;strong>异步回调没有可观测的完成信号。&lt;/strong> 安装与升级回调什么时候执行完，UI 上没有任何提示。处理方式是使用带等待语义的存储断言（&lt;code>expect(...).toMatch(...)&lt;/code> 会轮询直到匹配或超时），而不是一次性的读取断言。&lt;/p>
+&lt;p>&lt;strong>原生界面无法直接交互。&lt;/strong> 弹窗、侧边栏、选项页各有各的打开方式，原生弹窗还无法用标准 Page API 操作。处理方式是使用封装好的打开方法，并接受&amp;quot;弹窗以标签页打开&amp;quot;这一折中；同时把断言重心放在数据侧，UI 侧只验证关键渲染结果。&lt;/p>
+&lt;p>&lt;strong>版本迁移缺少历史数据。&lt;/strong> 迁移逻辑只在旧数据存在时才执行，全新安装的测试永远覆盖不到。处理方式是把旧版本构建产物作为测试资源保留在仓库里（如 &lt;code>test/dist-v1&lt;/code>），在用例里先装旧版、灌数据、再升级。&lt;/p>
+&lt;h2 id="与官方扩展指南的分工">与官方扩展指南的分工
+&lt;/h2>&lt;p>官方指南解决的是&amp;quot;把扩展装进浏览器&amp;quot;这一件事，具体是三步：以持久化上下文启动 Chromium、等待扩展的 service worker 就绪、解析出这次安装生成的扩展 ID（每次安装都可能不同）。这三步一个都绕不过去，也是手写扩展测试时最先卡住的地方。&lt;/p>
+&lt;p>封装库做的是把这三步沉到 fixture 里，再补上扩展场景真正缺的那部分能力：对 &lt;code>chrome.storage&lt;/code> 的读写与带等待的断言、打开弹窗这类原生界面的方法、以及安装旧版本再升级的版本迁移流程。分工可以这样判断——如果只需要在已加载扩展的普通页面上跑几个用例，用官方方案加一点胶水代码就够；一旦涉及存储断言、弹窗交互或版本迁移，胶水代码的量会迅速超过业务断言本身，这时候就该用封装。&lt;/p>
+&lt;p>反过来说，也不要指望封装解决所有问题。跨浏览器支持受限于扩展加载能力本身（Chromium 系可行，其余内核需要先验证）；原生弹窗气泡、浏览器工具栏按钮、右键菜单这类不在 Page API 覆盖范围内的界面，依然只能靠间接断言或人工验证。把这些边界写进测试策略，比事后踩坑再返工便宜得多。&lt;/p>
+&lt;h2 id="什么该自动化什么不该">什么该自动化，什么不该
+&lt;/h2>&lt;p>扩展测试的投入应该集中在三类高杠杆场景上：安装与升级时的数据副作用（一旦出错影响全量用户且不可回滚）、存储与 UI 的一致性（写入与渲染任意一个断链都是严重缺陷）、以及跨版本迁移（线上事故高发区）。这三类都具备&amp;quot;重复发生 + 失败代价高 + 可确定性断言&amp;quot;的特征。&lt;/p>
+&lt;p>相反，弹窗的视觉细节、动画过渡、一次性配置验证，以及需要真实账号体系或第三方登录的流程，自动化的投入产出比很低，更适合保留在人工回归清单里。判断标准很直接：这条用例失败时，能不能在不打开浏览器的情况下说清哪里坏了？说不清的，先别自动化。&lt;/p>
+&lt;h2 id="落地到-ci-的几个注意事项">落地到 CI 的几个注意事项
+&lt;/h2>&lt;p>构建产物必须先于测试生成，并且路径在配置里显式声明，避免&amp;quot;测的是上一版代码&amp;quot;。迁移测试需要同时保留多个版本的构建产物，这会让产物目录变大，建议按版本命名并只保留必要的历史版本。&lt;/p>
+&lt;p>无头模式要先验证能否加载扩展；如果不行，CI 里改用带虚拟显示的有头模式。测试之间必须串行或严格隔离，因为它们共享同一个浏览器 profile 的存储区——这一点与普通 Playwright 测试&amp;quot;每个用例独立上下文&amp;quot;的直觉相反，是最容易踩的坑。&lt;/p>
+&lt;p>保留 trace 与截图作为失败产物。扩展测试失败时，往往既没有 UI 报错也没有控制台日志，trace viewer 里的存储快照与页面截图是唯一的线索来源。&lt;/p>
+&lt;p>最后，把&amp;quot;安装—弹窗—迁移&amp;quot;这三条用例作为最小基线，再加业务相关的具体场景。它们覆盖的是扩展这种形态特有的风险，而业务场景覆盖的是产品逻辑本身，两者不能互相替代。&lt;/p></description></item></channel></rss>

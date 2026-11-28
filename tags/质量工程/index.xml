@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>质量工程 on 秋草观测台</title><link>https://chengxiaqiucao.github.io/tags/%E8%B4%A8%E9%87%8F%E5%B7%A5%E7%A8%8B/</link><description>Recent content in 质量工程 on 秋草观测台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号：秋草说测试）</copyright><lastBuildDate>Wed, 04 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E8%B4%A8%E9%87%8F%E5%B7%A5%E7%A8%8B/index.xml" rel="self" type="application/rss+xml"/><item><title>当"翻出漏洞"的速度超过修复节奏：质量工程要补的四门课</title><link>https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/</link><pubDate>Wed, 04 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/cover.webp" alt="Featured image of post 当"翻出漏洞"的速度超过修复节奏：质量工程要补的四门课" />&lt;p>中小型团队里，应用安全测试常常落在质量工程师身上；大公司有专门的安全团队负责设定和解释安全要求，但&amp;quot;确保这些要求真的被测过&amp;quot;这件事，往往仍由测试角色牵头。角色边界可以不同，责任却绕不开：作为质量把关者，必须把安全纳入可验证的范围。&lt;/p>
+&lt;p>近期一批公开安全事件把这件事推到了台前——从被广泛利用的脚本环境漏洞、证书校验相关的实现问题，到大型服务机构的数据泄露。技术复盘已经很多：怎么发生的、为什么可能、如何修补。更值得质量团队带走的，是&lt;strong>下一轮该怎么测&lt;/strong>。以下四条不是趋势判断，而是可以直接排进迭代的检查点。&lt;/p>
+&lt;h2 id="一概率仍要算但不再是排序的第一依据">一、概率仍要算，但不再是排序的第一依据
+&lt;/h2>&lt;p>经典的基于风险的测试会让你做一张矩阵：业务影响乘以发生概率，按乘积排优先级。这套方法有个隐含假设：一个存在很久、一直没人利用的旧缺陷，概率低，可以往后放。&lt;/p>
+&lt;p>这个假设正在失效。自动化工具让&amp;quot;从公开信息到可用攻击路径&amp;quot;的时间被大幅压缩，一个陈年缺陷可能在很短时间内突然变得可被批量利用。有从业者把话说得很准：风险等于可能性乘以影响，缺陷的年代并不改变这个式子，这一周真正变化的是&lt;strong>可能性&lt;/strong>。&lt;/p>
+&lt;p>风险模型本身也早有争议。行为决策研究指出，人做判断时普遍存在主观性、方差与偏差，这类&amp;quot;噪声&amp;quot;会污染决策过程，让后续一系列动作带上系统性偏差。把&amp;quot;概率&amp;quot;这一列交给直觉估计，本来就不够稳。&lt;/p>
+&lt;p>更实用的做法是在保留业务重要性排序的同时，补上一列&lt;strong>暴露可行性（或利用成熟度）&lt;/strong>，并按它拉开梯度：&lt;/p>
+&lt;ul>
+&lt;li>直接暴露在公网、无需前置条件即可触达的组件；&lt;/li>
+&lt;li>需要一定访问权限与上下文才能利用的依赖库问题；&lt;/li>
+&lt;li>位于封闭系统、只在极特殊条件下成立的小众缺陷。&lt;/li>
+&lt;/ul>
+&lt;p>这一列比&amp;quot;概率&amp;quot;更容易取得客观证据：是否有外网入口、是否在物料清单里、是否存在公开利用代码、修补版本是否已发布。当暴露可行性足够高时，即使估计概率低，也应当优先排进验证队列——因为&amp;quot;可能没人来打&amp;quot;不再是一个可以长期依赖的假设。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig1_hu_9dd60f54405b106d.webp"
+width="1024"
+height="783"
+srcset="https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig1_hu_5f8a39f462f69a18.webp 480w, https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig1_hu_9dd60f54405b106d.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="130"
+data-flex-basis="313px"
+>
+&lt;/p>
+&lt;p>在业务影响之外补充&amp;quot;暴露可行性&amp;quot;维度，形成更贴近当前威胁节奏的排序&lt;/p>
+&lt;h2 id="二把安全卫生当成可测试的产品要求">二、把安全卫生当成可测试的产品要求
+&lt;/h2>&lt;p>如果组织里没人牵头基本卫生，质量团队就该把它接过来。这件事不 glamorous，但投入产出比极高，而且每一项都能写成验收条件。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>坚持 Definition of Ready 与 Definition of Done 不是形式。&lt;/strong> 需求进入开发前是否写清安全约束、完成前是否核对过这些约束，本身就是可审计的检查点。&lt;/li>
+&lt;li>&lt;strong>口令、PIN 与凭据的强度及存储方式。&lt;/strong> 不只是&amp;quot;密码要复杂&amp;quot;，还要验证是否以合适方式保存、重置流程是否会绕过强度要求。&lt;/li>
+&lt;li>&lt;strong>维护一份物料清单（SBOM）。&lt;/strong> 清楚知道各站点跑的是哪个框架、哪个版本，是否仍受支持。持续小步升级的成本，远低于从某个大版本一次性跨到多年后的版本——那已经不是技术债，而是尽失主动权。&lt;/li>
+&lt;li>&lt;strong>用 CIA 三要素做风险枚举。&lt;/strong> 机密性：信息不流向未授权的人或系统；完整性：信息不被篡改，且改动可追溯可信；可用性：需要时系统可用，且不可用时能恢复。三个维度都能导出具体测试用例，也都能导出需要建设的控制措施。&lt;/li>
+&lt;/ul>
+&lt;p>沟通同样属于质量工作。有个值得记住的细节：某地电信运营商发生个人用户数据泄露后，同时通知了&lt;strong>并未受影响&lt;/strong>的商业客户。原因很现实——商业客户有管理层、监督委员会和审计方，会直接向 CEO 追问&amp;quot;是否可控&amp;quot;。提前准备好清晰、有依据的说明，帮管理者回答这个问题，本身就是一次交付。&lt;/p>
+&lt;h2 id="三把安全需求自动化测试让合规左移">三、把安全需求自动化测试，让合规左移
+&lt;/h2>&lt;p>公司的安全策略与运行手册很像备份：不演练、不调用，就等于没有。等审计临近再临时补材料，代价最高、收益最低。&lt;/p>
+&lt;p>摆在面前的通常有两个选项：一年集中一周做灾难恢复演练、其余时间靠文档；或者从需求阶段就把安全要求写成可执行的测试。后者并不遥远——确认安全要求所需的机制，和成熟的质量工程实践几乎是同一套东西：把条文转成断言、把断言接进流水线、把结果留成证据。合规工程化（GRC engineering）是继&amp;quot;测试左移&amp;quot;之后，下一个应该被推到前面的环节。&lt;/p>
+&lt;p>具体可以从这几处入手，都不需要新建平台：&lt;/p>
+&lt;ul>
+&lt;li>把安全策略里可判定的条款逐条转成自动检查，例如会话超时、传输加密、敏感字段脱敏、权限边界；&lt;/li>
+&lt;li>让依赖版本与已知漏洞清单在每次构建时比对，而不是等到季度扫描；&lt;/li>
+&lt;li>把&amp;quot;恢复&amp;quot;也纳入验证：备份能否还原、预案能否在规定时间内执行完、执行记录能否自动生成；&lt;/li>
+&lt;li>每次检查产出可归档的结果，审计时提供的是运行记录而不是截图集合。&lt;/li>
+&lt;/ul>
+&lt;p>关键在于把&amp;quot;我们有一条政策&amp;quot;变成&amp;quot;我们有一条会失败的流水线&amp;quot;。政策只有能被触发红灯，才算真正生效。&lt;/p>
+&lt;h2 id="四进入事件响应团队并把演练当正式测试">四、进入事件响应团队，并把演练当正式测试
+&lt;/h2>&lt;p>质量人员在事件响应中的价值常被低估。有公开的实践是：质量从业者直接参与修复社区站点、应用补丁，并作为响应小组成员监控修复效果、推动相关合并请求；也见过质量负责人同时是三人值班响应与升级经理之一。这些不是越界，而是测试能力在压力场景下的自然延伸——最懂怎么验证一个修复是否真的生效的人，本来就该在现场。&lt;/p>
+&lt;p>但&amp;quot;临时凑人&amp;quot;不够。响应需要预案（runbook）与针对预案的训练，而且训练要按正式测试来做：有测试计划、有用例、有缺陷跟踪记录。&lt;/p>
+&lt;p>一个反例很有说服力：某公共部门经济系统的业务连续性演练，把关键客户人员全部集中起来，模拟站点整体不可用，流程文档齐全、形式上也完全是一次正式测试。结果参与者在&lt;strong>模拟压力&lt;/strong>下就无法按预案执行，演练最终不得不重跑，且重跑时要求管理层与关键岗位人员同处一室。参与者当时多半更希望去做别的事，但正是这种不适，换来了真实危机出现时的可预期性。&lt;/p>
+&lt;p>演练要测的从来不是系统，而是人、流程与信息通路：谁先知道、谁有权决策、通知链是否完整、外部说明由谁发出。把这些写成可观察的判定项，演练才会暴露问题，而不是变成一次签到。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig2_hu_7d966233c916fbb1.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig2_hu_7e4e277eaafc5fec.webp 480w, https://chengxiaqiucao.github.io/post/150-qe-lessons-ai-exploits/04-fig2_hu_7d966233c916fbb1.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>从策略条文到可执行验证、再到事件响应演练的闭环&lt;/p>
+&lt;h2 id="一份可以排进季度的清单">一份可以排进季度的清单
+&lt;/h2>&lt;p>把上面四条收敛成可交付的动作，一个季度内可以完成：&lt;/p>
+&lt;ol>
+&lt;li>在风险登记表里新增&amp;quot;暴露可行性&amp;quot;列，对公网可达组件重新排一次序，优先验证那些证据充分、但概率估计偏低的条目；&lt;/li>
+&lt;li>产出或更新物料清单，确认框架与依赖版本，列出无法近期升级的例外并给出补偿性监控；&lt;/li>
+&lt;li>按 CIA 三维度各补一组测试用例，至少覆盖未授权访问、数据被篡改、服务不可用时能否恢复；&lt;/li>
+&lt;li>挑三条最常见的安全策略条款自动化，接入主流水线并要求失败即阻断；&lt;/li>
+&lt;li>组织一次带测试计划与缺陷记录的业务连续性演练，明确响应角色中质量人员的职责；&lt;/li>
+&lt;li>把演练结果和流水线运行记录整理成可提交给管理层与审计方的证据包。&lt;/li>
+&lt;/ol>
+&lt;p>这些动作没有一项依赖新工具，也不要求质量工程师转型为安全专家。它们只要求把&amp;quot;安全&amp;quot;从一份由别人维护的清单，变成自己套件里会失败、会被修复、会留下记录的测试。当外部把漏洞翻出来的速度越来越快，能缩短差距的不是更多告警，而是更早、更可验证的那几条断言。&lt;/p></description></item></channel></rss>

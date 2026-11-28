@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>缺陷分析 on 秋草观测台</title><link>https://chengxiaqiucao.github.io/tags/%E7%BC%BA%E9%99%B7%E5%88%86%E6%9E%90/</link><description>Recent content in 缺陷分析 on 秋草观测台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号：秋草说测试）</copyright><lastBuildDate>Thu, 12 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E7%BC%BA%E9%99%B7%E5%88%86%E6%9E%90/index.xml" rel="self" type="application/rss+xml"/><item><title>以一例高危问题的发现看探索式测试方法</title><link>https://chengxiaqiucao.github.io/post/162-exploratory-session-charter/</link><pubDate>Thu, 12 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/162-exploratory-session-charter/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/162-exploratory-session-charter/cover.webp" alt="Featured image of post 以一例高危问题的发现看探索式测试方法" />&lt;p>一次会话笔记里记着这样一条：0:31，结算页显示支付失败，刷新订单状态后，后端却查到了一个订单 ID。界面和系统对不上，而这类分歧几乎不会出现在脚本用例里——脚本只会问「支付成功了吗」，不会去追一个失败之后系统到底留下了什么。&lt;/p>
+&lt;p>脚本测试能找到的，是你事先想到的 bug。你设想了一种坏法、写下一条检查，那条检查从此守住这一种情况。这有价值，也是天花板：全绿只说明你预测过的失败没有发生，没预测到的那些依然隐形。登录用例通过，用户改完密码却被卡住；结算用例通过，购物车变了总价却没跟着变；主流程在测试环境正常，真机上按钮卡到让人点了两次。&lt;/p>
+&lt;p>探索性测试就是用来找这些的。它是有技术的调查：用产品、跟着观察到的东西走、不断问脚本没被交代去问的问题。不是随便点，是一场有任务、有笔记、结尾有证据的会话。&lt;/p>
+&lt;h2 id="学习设计和执行同时发生">学习、设计和执行同时发生
+&lt;/h2>&lt;p>一个至今仍好用的定义是：学习、测试设计、测试执行在同一时间发生。&lt;/p>
+&lt;p>容易被跳过的是最后半句。探索不是把结构扔掉，而是用上一条测试刚教给你的东西，设计下一条。如果支付按钮禁用状态持续了四秒，不要继续照原清单往下走，而是问它为什么像卡住：换更慢的网络、点一次然后等、连点两次、在支付请求中把应用切到后台、再查订单被创建了一次还是两次。&lt;/p>
+&lt;p>会话因为产品反馈而改变，这是它和 &lt;code>ad-hoc&lt;/code> 测试的分界。后者没有记忆；探索性会话有任务、有笔记、有证据，结束时得能交代清楚：测了什么、发现了什么、哪些没覆盖到、还有什么不放心、哪些要转成脚本用例、缺陷报告或产品问题。答不上来，刚才就只是在点。&lt;/p>
+&lt;h2 id="先写一句话章程不是写一套脚本">先写一句话章程，不是写一套脚本
+&lt;/h2>&lt;p>动手之前不写长脚本，写 &lt;code>charter&lt;/code>——这次会话的任务。一句话就够，比如：在慢速移动网络下探查游客结算，准备一件商品、一张过期卡、一张被拒卡，确认支付失败是否提示清楚、能否恢复、会不会产生重复订单。&lt;/p>
+&lt;p>这一句同时给出了目标、风险和需要的证据类型。会话因此有了形状：章程指方向，探索时产品反馈决定下一步，收尾落到笔记和复盘。&lt;/p>
+&lt;p>还要在碰产品之前记下环境。听起来琐碎，但等开发问「哪个构建、哪台设备、什么数据」时，不该靠回忆重建：构建版本、设备与浏览器视口、网络限速档位、账号状态、测试数据、以及本次主风险。示例里写的是 build 482、&lt;code>Pixel 7a&lt;/code>、慢速 3G、游客账号、过期卡与拒付卡，主风险是用户无法从支付失败中恢复，或被重复扣款。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/162-exploratory-session-charter/03-fig1_hu_c74f11e9ce8b0090.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/162-exploratory-session-charter/03-fig1_hu_7f784e6039b7efba.webp 480w, https://chengxiaqiucao.github.io/post/162-exploratory-session-charter/03-fig1_hu_c74f11e9ce8b0090.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 1｜章程定方向与风险，环境项托住可复现性，收尾统一落到笔记与复盘&lt;/p>
+&lt;h2 id="用一张真实界面逼出可检验的断言">用一张真实界面逼出可检验的断言
+&lt;/h2>&lt;p>为什么要用足够真实的界面，而不是一段&lt;code>支付失败处理说明&lt;/code>？因为界面会把具体声明摆到你面前：购物车仍已保存、按钮可以再次点击、总价是 $18.25、支付失败所以不该有订单、提示足够让真实用户恢复。&lt;/p>
+&lt;p>每一条声明都是一个可以立刻去核对的断言。一段抽象描述只能让人点头，界面才能让人注意到&lt;code>这里承诺了什么&lt;/code>。于是观察点变成一串明确问题：用户知不知道卡被拒了、重试会不会丢购物车、按钮看起来是不是卡死、后端有没有建单、连点会不会出两笔订单。&lt;/p>
+&lt;h2 id="60-到-90-分钟然后开始制造变化">60 到 90 分钟，然后开始制造变化
+&lt;/h2>&lt;p>会话要设时间盒，60 或 90 分钟比较合适：够追一条线索，又不至于散成一个下午。&lt;/p>
+&lt;p>第一遍走通主链路：加商品、以游客身份继续、填配送信息、试过期卡、试拒付卡、用有效卡重试、再核对确认页、邮件、订单历史或能拿到的 API 响应。之后才进入真正值钱的部分——主动改变可能暴露风险的条件：&lt;/p>
+&lt;ul>
+&lt;li>慢速网络：支付流程常常在技术上失败之前，先让人感觉坏了&lt;/li>
+&lt;li>连点支付：重复订单和重复扣款最容易在这里出现&lt;/li>
+&lt;li>支付请求途中切后台：移动端用户天天这么做，产品必须能恢复&lt;/li>
+&lt;li>支付失败后改购物车：总价和支付状态可能失同步&lt;/li>
+&lt;li>会话过期：游客态或登录态在流程中间失效时，结算是高危区&lt;/li>
+&lt;li>结算途中商品售罄：系统无法履约，界面却可能还在展示&lt;/li>
+&lt;/ul>
+&lt;p>目标很朴素：持续问自己，什么会让你不敢发这个版本。&lt;/p>
+&lt;h2 id="时间戳笔记要让别人能接着查">时间戳笔记要让别人能接着查
+&lt;/h2>&lt;p>笔记不需要好看，需要诚实，而且要能被开发、产品、另一位测试直接读懂，最好能让他们明天接着查下去。一份能直接照着写的会话笔记长这样：&lt;/p>
+&lt;ul>
+&lt;li>0:00 在 build 482、慢速 3G、过期卡条件下开始结算，购物车与 $18.25 总价基线正常&lt;/li>
+&lt;li>0:08 提交过期卡，拒付提示清楚、购物车保留，恢复信号良好，转去试拒付卡&lt;/li>
+&lt;li>0:15 提交拒付卡，支付按钮无 spinner 禁用约 4 秒，提一条易用性缺陷&lt;/li>
+&lt;li>0:24 慢速支付中切后台，回来显示处理中，随后收到确认邮件，去查是否建单&lt;/li>
+&lt;li>0:31 刷新订单状态，界面说支付失败，后端有订单 ID，提高危缺陷&lt;/li>
+&lt;li>0:48 失败后改数量，购物车变了但屏幕总价仍停在 $18.25，提数据缺陷&lt;/li>
+&lt;/ul>
+&lt;p>每一行都包含动作、观察、决定和证据。还有一个可对照的真实案例：在一个大型零售平台的购物车上，脚本用例全绿，探索时却发现跨过促销门槛后「再买多少可升下一档」的提示没有跟着更新——脚本只验证了折扣确实生效，没有问边界处那个数字是否仍然正确。&lt;/p>
+&lt;p>找到高危问题不能让它埋在笔记里。转成缺陷报告时要写全：标题、构建与环境、复现步骤、预期（失败支付不产生订单）、实际（界面失败但后端有订单 ID）、证据（截图、网络请求、订单 ID、时间戳）、影响（游客可能以为没付成功，实际订单已存在）。探索负责发现问题，报告负责让问题可修。&lt;/p>
+&lt;h2 id="卡住不知道从哪下手时用透镜">卡住不知道从哪下手时，用透镜
+&lt;/h2>&lt;p>透镜只是防止自己只测最明显那条路的提问框架。数据：哪些值会在我脚下变化（数量、税费、运费、售罄、优惠码）。时间：动作之前、之中、之后各发生什么。状态：用户和系统各处于什么状态（游客、会话过期、购物车已改）。接口：依赖了哪些系统（支付提供方、邮件服务、订单服务）。平台：哪里体验会不同（真机、移动浏览器、弱网）。恢复：用户能不能安全脱身（重试、换卡、回购物车、取消订单）。&lt;/p>
+&lt;p>其中数据、时间和恢复最容易挖到真正疼的 bug。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/162-exploratory-session-charter/03-fig2_hu_db88a01a829e702d.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/162-exploratory-session-charter/03-fig2_hu_72dd842ae66281b.webp 480w, https://chengxiaqiucao.github.io/post/162-exploratory-session-charter/03-fig2_hu_db88a01a829e702d.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 2｜把注意力从主路径分散到数据、时间、状态、依赖、平台与恢复六个方向&lt;/p>
+&lt;h2 id="哪些发现该变成自动化">哪些发现该变成自动化
+&lt;/h2>&lt;p>会话常常正好告诉你什么值得自动化。判断依据不是&lt;code>看起来厉害&lt;/code>，而是能不能给团队带来可重复的发布信心：过期卡给出清晰提示且保留购物车，该自动化，是稳定且重要的恢复行为；失败支付不得建单，该自动化（前提是能通过 API 或测试工具核验订单状态），它保护钱和信任；按钮卡了四秒，更适合作为 UX 问题、性能预算或视觉评审，不必硬写成功能用例；总价在改购物车后不变，该自动化，是可能回归的数据准确性 bug；一句「这个提示有点绕」，保持人工评审，除非文案有明确硬性要求。&lt;/p>
+&lt;p>AI 在这里能帮上忙，但判断不该交出去。可以让代理把需求文档汇成风险区、起草初始章程、生成测试数据组合、探索时帮忙看网络请求与日志、把笔记整理成规范缺陷报告、推荐值得自动化的候选。不该指望它替代整场会话——屏幕让人觉得卡住、恢复路径让真实用户迷惑、错误提示和实际发生的事对不上，这些仍然要靠人。&lt;/p>
+&lt;h2 id="一张轻量的会话表和十分钟复盘">一张轻量的会话表和十分钟复盘
+&lt;/h2>&lt;p>表格太重大家就不用了，但该有的字段得有：章程与所追风险、构建与环境、覆盖到与没覆盖到的区域、带时间戳的动作与观察、已提缺陷及单号、阻碍确定性的疑问、后续动作（自动化、复测、继续探索、改进测试环境）。每次会话填一份、格式固定，攒起来才可横向比较。&lt;/p>
+&lt;p>结束时留十分钟复盘，自己或拉一位同事都行，平实地回答五个问题：学到了什么、证明了什么、还有哪里不放心、什么证据能让我们安心发布、什么该变成可重复的检查。&lt;/p>
+&lt;p>好的会话结束时，团队手里的证据比开始时更好。章程让它聚焦，笔记让它可信，好奇心负责找出脚本没被交代去找的那个 bug。挑一个高风险功能，写一句话章程，框一小时，边测边记——这就够开始了。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/162-exploratory-session-charter/03-fig3_hu_6f7c30ae282522fe.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/162-exploratory-session-charter/03-fig3_hu_61890b1c5a409460.webp 480w, https://chengxiaqiucao.github.io/post/162-exploratory-session-charter/03-fig3_hu_6f7c30ae282522fe.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 3｜一份固定格式的记录加五个收尾问题，让单次会话的结论可以被团队复用&lt;/p></description></item><item><title>被重试掩盖的失败：把 CI 里"第二次通过"变成可排查的缺陷队列</title><link>https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/</link><pubDate>Wed, 04 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/cover.webp" alt="Featured image of post 被重试掩盖的失败：把 CI 里"第二次通过"变成可排查的缺陷队列" />&lt;p>一次失败、一次通过、最终绿灯。这是大多数启用自动重试的 CI 流水线每天产生的结果，也是最容易丢失信息的结果：失败的那次尝试在日志里被覆盖、在成功任务的清理中被删除，团队只看到&amp;quot;这次构建是绿的&amp;quot;。真正的问题在于，能让第二次通过的原因往往不是&amp;quot;随机抖动&amp;quot;，而是某个具体的状态、时序或数据条件——它同样会在生产环境里被用户撞上。&lt;/p>
+&lt;p>有一套做法值得完整拆解：在测试套件结束时把每次重试写成结构化记录并单独留存，按周汇成一份按影响面排序的清单，再让编码代理沿着记录进入代码去定位根因。它不追求&amp;quot;让 CI 更绿&amp;quot;，而是反过来，把被重试压下去的失败重新暴露出来。&lt;/p>
+&lt;h2 id="第一步让失败的那次尝试活过成功清理">第一步：让失败的那次尝试活过成功清理
+&lt;/h2>&lt;p>多数 CI 配置会在任务成功后删除应用日志与诊断产物，这是合理的成本控制，但恰好会删掉排查间歇性失败最需要的证据。解决办法不是保留全部日志，而是在套件结束时，为每个发生过重试的测试节点写一个很小的 JSON 文件：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;./spec/features/report_spec.rb[1:2]&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;location&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;./spec/features/report_spec.rb:20&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;description&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;renders a synthetic report&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;failed_attempts&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;final_result&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;passed&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;first_error&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;expected the default window size&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>里面有两个字段值得单独说。&lt;code>id&lt;/code> 是测试框架给出的唯一示例编号，&lt;code>location&lt;/code> 是源码行号。共享示例（shared examples）会让多个不同测试用例指向同一行，只按行号聚合会把互不相关的失败合并成一团，两个都留才能正确分组。&lt;/p>
+&lt;p>这份 JSON 要写到一个&lt;strong>独立于成功任务清理范围&lt;/strong>的目录，并作为构建产物上传。以常见的 CI 服务为例，只需要在配置里加一行把该目录声明为 artifacts；换任何 CI 平台，等价机制都能做到。核心约束只有一条：即便这次测试最终通过，重试历史也必须保留下来。&lt;/p>
+&lt;p>重试策略本身也要写清楚：普通用例给一次重试，涉及 JavaScript 浏览器的用例给两次。次数不是重点，重点是&lt;strong>每次重试都要留下为什么结果会变&lt;/strong>的线索。单纯增加重试次数只会让报告更安静，不会回答问题。&lt;/p>
+&lt;h2 id="第二步把记录汇成一份有优先级的周度队列">第二步：把记录汇成一份有优先级的周度队列
+&lt;/h2>&lt;p>有了记录，下一步是聚合。一个定时任务通过 CI 平台 API 读取过去一周的重试产物，按示例编号分组，然后按&lt;strong>出现过&amp;quot;先失败后通过&amp;quot;的不同流水线数量&lt;/strong>降序排列。&lt;/p>
+&lt;p>这里有个容易做错的细节：同一个流水线里某用例失败两次，排名只算一条流水线。因为排序想衡量的是&amp;quot;这个不稳定问题影响过多少次独立构建&amp;quot;，而不是&amp;quot;它一共失败了多少次&amp;quot;。同时保留首次错误信息、分支名与失败尝试次数，供后续阅读。&lt;/p>
+&lt;p>还有一类要单独计数：&lt;strong>所有尝试都失败&lt;/strong>的用例。这个区分只描述观测到的运行结果，并不等于&amp;quot;根因是确定性的&amp;quot;——一个间歇性问题同样可能把重试次数耗尽，所以不能据此把两类问题贴上不同标签。&lt;/p>
+&lt;p>当某个示例超过设定的周度预算阈值时，让摘要任务本身失败，借用团队已有的 CI 失败通知把清单推到人面前。此时把报告交给能读取代码仓库与构建产物的编码代理，就进入定位环节。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig1_hu_83cb9ef2bd28c4d1.webp"
+width="1024"
+height="820"
+srcset="https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig1_hu_ed4aa59c7fcf933b.webp 480w, https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig1_hu_83cb9ef2bd28c4d1.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="124"
+data-flex-basis="299px"
+>
+&lt;/p>
+&lt;p>重试记录从产生、留存到形成周度优先级队列的完整链路&lt;/p>
+&lt;h2 id="第三步看清第二次为什么通过四个真实案例">第三步：看清&amp;quot;第二次为什么通过&amp;quot;——四个真实案例
+&lt;/h2>&lt;p>下面几类问题有个共同点：重试并不是让测试自己恢复了，而是&lt;strong>重试机制顺手重置了出错的那个状态&lt;/strong>。如果不看第一次失败，根本不会知道产品里有缺陷。&lt;/p>
+&lt;h3 id="浏览器重启抹掉了上一个用例留下的窗口尺寸">浏览器重启抹掉了上一个用例留下的窗口尺寸
+&lt;/h3>&lt;p>一组截图比对失败，报的是截图尺寸变化，重试通常就过了。根因在更早的用例：计费相关测试把浏览器窗口改成了非默认尺寸，却没有还原，后面的截图用例继承了这个 viewport。而重试配置会在重跑前重启浏览器，窗口回到默认尺寸，于是第二次通过。&lt;/p>
+&lt;p>修复方式是在每个浏览器用例开始前显式设定默认窗口尺寸，需要其他尺寸的用例自己再改。这个案例里，&amp;ldquo;重试通过了&amp;quot;恰好提供了关键线索：既然换一个新浏览器就好，说明状态是外部带进来的，不是被测逻辑自己恢复的。&lt;/p>
+&lt;h3 id="一个撇号打断自动生成的-curl-命令">一个撇号打断自动生成的 cURL 命令
+&lt;/h3>&lt;p>某仪表盘会根据模板 schema 生成示例 cURL 命令，测试用生成数据执行这些命令。生成的假姓名里偶尔带撇号，而内联命令用单引号包住 JSON 请求体——撇号提前结束了 shell 字符串，命令就断了。下一次尝试生成了另一个名字，命令又能跑通。&lt;/p>
+&lt;p>同一功能还有一个可下载的 Bash 脚本，把 JSON 放在带引号的 heredoc 里，却错误地套用了为单引号参数准备的转义，结果改坏了请求体。两处需要完全不同的处理：内联命令要为 shell 上下文转义撇号，heredoc 里的 JSON 则必须原样保留。&lt;/p>
+&lt;p>对应的回归测试很值得借鉴：把 &lt;code>curl&lt;/code> 替换成一个函数，在 Bash 里真实执行生成的脚本，用该函数捕获本该发出的请求体，再解析校验原始值，全程不发起网络请求。用 &lt;code>Editor's proof&lt;/code> 这类带撇号的合成值回放修复前后两个版本：修复前内联命令在 Bash 里直接失败，可下载脚本能跑但请求体无法解析为 JSON；修复后两者都保留了原文。&lt;/p>
+&lt;p>这里最容易被选错的&amp;quot;捷径&amp;quot;是改测试数据、不让姓名里出现撇号。那会让测试更稳定，同时让产品对所有合法输入继续出错。&lt;/p>
+&lt;h3 id="临时文件在渲染进程读取前被回收">临时文件在渲染进程读取前被回收
+&lt;/h3>&lt;p>一个内联的 HTML 转 PDF 渲染器，会把页眉页脚 HTML 写入临时文件，再把路径交给渲染进程。代码在构造命令时把临时文件对象放在局部变量里；方法返回后，命令字符串还留着路径，但已经没有任何引用持有那个对象。&lt;/p>
+&lt;p>Ruby 的 &lt;code>Tempfile&lt;/code> 把清理挂在垃圾回收上。如果 GC 恰好在渲染进程打开文件之前触发，文件就已经不在了。测试是否通过，取决于垃圾回收发生的时机——这是最典型的&amp;quot;看似随机&amp;quot;的失败。&lt;/p>
+&lt;p>修复是把页眉页脚对象保存在服务实例上，直到渲染完成，再在 &lt;code>ensure&lt;/code> 块里关闭并删除。回归测试在&amp;quot;构造命令&amp;quot;与&amp;quot;模拟渲染进程读取文件&amp;quot;之间&lt;strong>强制触发 GC&lt;/strong>，断言文件内容仍然可读、且结束后被清理。主动制造确定性的失败条件，比等着在某个 PDF 用例里&amp;quot;撞运气&amp;quot;要可靠得多。&lt;/p>
+&lt;h3 id="冻结了-ruby-的时钟redis-的时钟还在走">冻结了 Ruby 的时钟，Redis 的时钟还在走
+&lt;/h3>&lt;p>限流测试用的计数器按固定时间窗口统计。用例一旦跨过窗口边界，请求就被计到新窗口里，预期阈值永远达不到。第一版修复是冻结进程时钟，但计数器存在 Redis 里并带过期时间，Redis 仍在按真实时间流逝。如果在窗口末尾附近冻结，计数器的剩余存活时间极短，问题依旧。&lt;/p>
+&lt;p>最终做法是冻结在整点起始处，与这批用例使用的时间窗口对齐，让计数器拥有完整过期周期；同时仍需保证用例在该周期内跑完。这个案例的价值在于：评审在第一版修复之后发现了第二个时钟，第一次的解释只覆盖了系统里的一半计时机制。&lt;/p>
+&lt;p>同一轮排查还带出另外几类问题：数据库清理开始时后台 worker 仍在运行、测试辅助函数对共享时钟库的冻结状态相互覆盖、样本数据生成器用真值判断跳过了下界为零时的边界调整（在 JavaScript 里 0 是 falsy，但它在这个 schema 里是合法下界）。每一类都属于&amp;quot;重试会让它消失、用户却可能遇到&amp;quot;的范畴。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig2_hu_81b443d809eab84c.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig2_hu_2bea94c3ea199544.webp 480w, https://chengxiaqiucao.github.io/post/147-flaky-retry-ci-digest/01-fig2_hu_81b443d809eab84c.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>四类被重试掩盖的真实缺陷：状态泄漏、转义上下文、对象生命周期、双时钟&lt;/p>
+&lt;h2 id="第四步给编码代理划清任务边界">第四步：给编码代理划清任务边界
+&lt;/h2>&lt;p>把周度报告交给编码代理时，任务描述应当明确到可验收，而不是&amp;quot;帮忙看看这些失败&amp;rdquo;。一套可复用的要求是：&lt;/p>
+&lt;ul>
+&lt;li>找到对应的 CI 运行记录并读取失败产物，沿着测试代码追到应用代码；&lt;/li>
+&lt;li>能在本地复现的先复现，再补一条回归测试，要求修复前失败、修复后通过；&lt;/li>
+&lt;li>互不相关的根因拆成独立提交，便于逐条评审与回滚；&lt;/li>
+&lt;li>跑完受影响的检查并自查 diff，无法复现的项目明确列出，不得含糊带过；&lt;/li>
+&lt;li>推送之前停下来等待人工审批。&lt;/li>
+&lt;/ul>
+&lt;p>之所以强调&amp;quot;产物与代码要一起读&amp;quot;，是因为单看任一边都得不出结论：截图尺寸不匹配本身解释不了 viewport 是被谁改的，文件不存在本身解释不了那个 Ruby 对象为什么会变成可回收状态。代理真正的价值是把这两类信息串起来，而不是替代人做最终判断。&lt;/p>
+&lt;p>排查结论里凡是&amp;quot;后续开发必须遵守&amp;quot;的规则，写进离代码最近的 &lt;code>AGENTS.md&lt;/code>（或等价的团队约定文件）。比如&amp;quot;浏览器用例可以改自己的 viewport，但下一个用例必须从已知尺寸开始&amp;quot;——setup 代码负责强制，注释负责解释原因。更进一步，能把规则做成静态检查的就别靠记忆：为常见的 flaky 写法补一条自定义 lint 规则，让 CI 直接拦下，比指望有人记得半年前那次排查更有效。&lt;/p>
+&lt;h2 id="落地清单">落地清单
+&lt;/h2>&lt;p>如果你的套件已经在重试，不必先重构整套体系，按下面的顺序做即可：&lt;/p>
+&lt;ol>
+&lt;li>在套件结束时为每次重试写一条结构化记录，字段至少包含唯一示例编号、源码位置、失败尝试次数、最终结果和首次错误；&lt;/li>
+&lt;li>把记录放到成功任务清理不到的目录，并配置为构建产物上传；&lt;/li>
+&lt;li>每周按&amp;quot;出现过先失败后通过的不同流水线数&amp;quot;聚合排序，设一个预算阈值，超了就让摘要任务失败并通知；&lt;/li>
+&lt;li>挑一条反复出现的问题，要求给出&amp;quot;第二次为什么通过&amp;quot;的明确解释，而不是简单加重试次数；&lt;/li>
+&lt;li>修复必须附带能确定性复现的回归测试，审查通过后再合入常规 CI、QA 与发布流程。&lt;/li>
+&lt;/ol>
+&lt;p>这套流程目前还没有公开的工时节省数据，修复轮次也太新，暂时无法判断长期能把复发率压到多少，后续几周的周报才能回答。但它的直接效果已经很清楚：过去需要人专门腾出半天去追、且经常追到一半线索就消失的问题，现在可以在启动排查后并行去做别的事，回来只需评估解释是否成立、审查改动是否合理。&lt;/p>
+&lt;p>也正因如此，代理写出的代码质量变得更重要：一个可复现的失败、一条断言真实意图的测试，是它能锚住的具体目标。而把重试历史保留下来，等于把更多这类目标摆到了桌面上。&lt;/p></description></item></channel></rss>

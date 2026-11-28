@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Open Source Project on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/open-source-project/</link><description>Recent content in Open Source Project on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Mon, 23 Sep 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/open-source-project/index.xml" rel="self" type="application/rss+xml"/><item><title>Creating a Product Demo with SeleniumBase</title><link>https://chengxiaqiucao.github.io/en/post/019-%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/</link><pubDate>Mon, 23 Sep 2024 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/019-%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/019-%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/seleniumBase.webp" alt="Featured image of post Creating a Product Demo with SeleniumBase" />&lt;p>Selenium, as the most popular open-source web Test Automation framework today, has been developed for 20 years. It is powerful, and its webdriver protocol has also become a de facto standard in the field of Test Automation. Based on the Selenium framework, many extension frameworks built on top of it have emerged. One example is SeleniumBase, which we introduce in this article.&lt;/p>
+&lt;h2 id="what-is-seleniumbase">What Is SeleniumBase?
+&lt;/h2>&lt;p>SeleniumBase is a Python library built on top of the Selenium framework that further enhances scripting.
+On top of Selenium&amp;rsquo;s original functionality, it simplifies the way automation scripts are written and invoked, and it is deeply integrated with the &lt;code>pytest&lt;/code> framework. Most importantly, it provides a variety of different script modes, including script recording, slowed-down execution, in-run debugging, and the demo feature we are going to introduce in this article.&lt;/p>
+&lt;p>Although SeleniumBase is very powerful, the underlying implementation logic of the automation still follows the main characteristics of Selenium. So here we will not specifically introduce SeleniumBase&amp;rsquo;s wrappers for writing automation scripts. But one excellent thing about this library is that, through JS injection, it makes the automation running process more intuitive and easier to demonstrate.&lt;/p>
+&lt;p>For example, the demo creation we will see below.&lt;/p>
+&lt;h2 id="advantages-of-completing-a-demo-through-automation-scripts">Advantages of Completing a Demo Through Automation Scripts
+&lt;/h2>&lt;p>As test engineers, especially with the popularity of agile development nowadays, the end of an iteration usually includes an iteration review and demo session. And as test engineers, a lot of the feature demos within iterations are done by us.&lt;/p>
+&lt;p>This also includes the fact that, when introducing product features to customers or leaders, explaining the features through actual product operations is essential as well.&lt;/p>
+&lt;p>But in practice, if we can display in advance the key points that need to be explained while the automated test is executing, the effect is very good, and it can also avoid some accidental misoperations on the spot.&lt;/p>
+&lt;p>So this feature of SeleniumBase can really play to its strengths here.&lt;/p>
+&lt;h2 id="the-process-of-creating-a-product-demo-with-seleniumbase">The Process of Creating a Product Demo with SeleniumBase
+&lt;/h2>&lt;p>First, take a look at a demo of the open-source update information on my blog site, completed with SeleniumBase&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/019-%E7%94%A8seleniumbase%E5%88%B6%E4%BD%9C%E4%BA%A7%E5%93%81demo/demo.gif"
+width="1677"
+height="968"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="173"
+data-flex-basis="415px"
+>
+&lt;/p>
+&lt;p>In fact, its principle is fairly simple: through its wrapped &lt;code>BaseCase&lt;/code> class, while the corresponding operation steps are being executed, it injects pre-packaged JS to highlight the elements being operated on and give some guidance hints.&lt;/p>
+&lt;p>The corresponding &lt;code>create_introjs_tour()&lt;/code> method in the base class creates the demo tour. It also offers different JS theme choices here, which is very powerful.&lt;/p>
+&lt;p>Then &lt;code>add_tour_step()&lt;/code> adds the steps, and &lt;code>play_tour() &lt;/code> executes the steps.&lt;/p>
+&lt;p>The corresponding demo generation code:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">seleniumbase&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">BaseCase&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">BaseCase&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="vm">__name__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="vm">__file__&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">MyTourClass&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">BaseCase&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">test_blog_tour&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;https://chengxiaqiucao.github.io/&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">wait_for_element&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[class=&amp;#34;site-logo&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">set_introjs_colors&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;#f34565&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;#c55409&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">create_introjs_tour&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="c1">#&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_tour_step&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;Selenium Base制作Demo演示&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">title&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;城下秋草的Demo&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_tour_step&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;查看热门开源项目&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;#main-menu &amp;gt; li:nth-child(6) &amp;gt; a&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">play_tour&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">highlight_click&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;#main-menu &amp;gt; li:nth-child(6) &amp;gt; a&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">wait_for_element&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[class=&amp;#34;article-title&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">create_introjs_tour&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_tour_step&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;选择Selenium项目查看&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;#seleniumpageselenium-10 &amp;gt; a&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">play_tour&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">highlight_click&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;#seleniumpageselenium-10 &amp;gt; a&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ad_block&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">wait_for_element&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[class=&amp;#34;section-title&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">create_introjs_tour&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_tour_step&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;返回主页&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;[class=&amp;#34;site-logo&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">play_tour&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">highlight_click&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[class=&amp;#34;site-logo&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">wait_for_element&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;[title=&amp;#34;搜索&amp;#34;]&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">create_introjs_tour&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_tour_step&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;3秒停顿后继续...&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_tour_step&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;开始下一个演示:&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">play_tour&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">interval&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>As for the JS injected in the actual demo, we can also export the corresponding JS script through the &lt;code>self.export_tour&lt;/code> statement, so that it can be used directly later.&lt;/p>
+&lt;p>Similarly, there is also its Demo mode, which is actually quite similar to the guided tour mode, except that it more often automatically slows down and highlights the automation execution steps to emphasize the verification points.&lt;/p>
+&lt;p>The above is my sharing on this cool feature of the SeleniumBase library~&lt;/p></description></item></channel></rss>

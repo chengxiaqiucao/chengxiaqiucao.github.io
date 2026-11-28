@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Architecture on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/architecture/</link><description>Recent content in Architecture on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Thu, 05 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/architecture/index.xml" rel="self" type="application/rss+xml"/><item><title>The Load Test Passed and the Big Sale Still Crashed - Four Capacity Estimates to Do Before Release</title><link>https://chengxiaqiucao.github.io/en/post/154-capacity-before-load-test/</link><pubDate>Thu, 05 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/154-capacity-before-load-test/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/154-capacity-before-load-test/cover.webp" alt="Featured image of post The Load Test Passed and the Big Sale Still Crashed - Four Capacity Estimates to Do Before Release" />&lt;p>A health and wellness e-commerce platform was opening a winter flash sale at midnight the next day. Marketing was ready and the business side expected a clear traffic lift. The tester opened a load testing tool, configured 3,000 virtual users and ran a round: response times within target, error rate very low, the application running smoothly, so the conclusion came back &amp;ndash; performance passes, we can ship.&lt;/p>
+&lt;p>The moment midnight arrived, thousands of users poured in at once, product pages stopped responding, checkout requests failed one after another, and finally the application crashed entirely.&lt;/p>
+&lt;p>The load test did run, and the report really was green. The problem is that the round proved only &amp;ldquo;the application can still run with 3,000 virtual users configured&amp;rdquo;; it did not answer &amp;ldquo;can the whole system absorb the traffic the business expects&amp;rdquo;. What sits between those two questions is not more virtual users but a few estimates that should have been done before testing began. In engineering this kind of rough arithmetic is called back-of-the-envelope calculation: not aiming for precision, just getting the magnitude, the headroom and the likely bottleneck onto the table before you start.&lt;/p>
+&lt;h2 id="one-the-first-estimate--peak-is-not-average">One: The First Estimate &amp;ndash; Peak Is Not Average
+&lt;/h2>&lt;p>The business side says &amp;ldquo;we expect 5,000 customers in one hour&amp;rdquo;. Spread over 3,600 seconds that is about one person per second, which sounds effortless. But promotional traffic is never evenly distributed: if those 5,000 all arrive in the five minutes before the opening, the average arrival rate in those five minutes is about 10 per second; and even &amp;ldquo;average&amp;rdquo; understates the real shape &amp;ndash; several hundred requests arriving within two or three seconds.&lt;/p>
+&lt;p>Treating the average as the load test model is the most common and most insidious mistake. It makes the script look reasonable while leaving the system completely untested during the tens of seconds it most needs to survive.&lt;/p>
+&lt;p>Before testing, at least these questions must be answered clearly and written into the scenario design:&lt;/p>
+&lt;ul>
+&lt;li>What is the expected total traffic, and on what basis &amp;ndash; sign-ups, historical data for the same event, or a marketing estimate?&lt;/li>
+&lt;li>What is the expected number of concurrent users, rather than &amp;ldquo;how many people will come within an hour&amp;rdquo;?&lt;/li>
+&lt;li>What is the possible peak in the first few minutes, and at what magnitude is the per-second burst estimated?&lt;/li>
+&lt;li>Have all four scenario classes been run: normal load, peak load, spike load and beyond-limit stress?&lt;/li>
+&lt;li>Does user behaviour in the script resemble real customers &amp;ndash; browsing, adding to cart, changing quantity, checking out &amp;ndash; or does it hit the checkout API immediately?&lt;/li>
+&lt;li>Is &amp;ldquo;simultaneous&amp;rdquo; simulated, not just &amp;ldquo;high frequency&amp;rdquo;?&lt;/li>
+&lt;/ul>
+&lt;p>The tool&amp;rsquo;s job is only to generate traffic; whether the scenario represents the real business is a human responsibility. The output of this step should not be a thread count but a set of scenario descriptions with assumptions attached.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/154-capacity-before-load-test/01-fig1_hu_c757eb45775d12c0.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/154-capacity-before-load-test/01-fig1_hu_87f73272c5542683.webp 480w, https://chengxiaqiucao.github.io/post/154-capacity-before-load-test/01-fig1_hu_c757eb45775d12c0.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>Spreading &amp;ldquo;5,000 people in an hour&amp;rdquo; into an average versus modelling the five-minute opening spike produces two completely different load test scripts&lt;/p>
+&lt;h2 id="two-the-second-estimate--is-there-enough-memory-headroom">Two: The Second Estimate &amp;ndash; Is There Enough Memory Headroom
+&lt;/h2>&lt;p>A shop that can hold 3,000 people suddenly takes 5,000: the door jams first, then the whole shop stops working. Application servers are the same: every active request and session occupies memory and CPU, and those resources have hard limits.&lt;/p>
+&lt;p>The rough calculation is plain; put three numbers side by side and the risk appears: available machine memory, average memory cost per active request, peak concurrent requests. An order-of-magnitude example: 8 GB available memory, about 9 MB per request, 3,000 concurrent requests means the requests alone are in the 27 GB range, already far beyond this machine&amp;rsquo;s capacity. Even if the real cost is lower than that product because of reuse, caching and connection pooling, the conclusion does not change &amp;ndash; server capacity can become the bottleneck before expected traffic reaches its peak, and it usually is not &amp;ldquo;calculated&amp;rdquo; but announced by OOM logs.&lt;/p>
+&lt;p>Once resources are exhausted, the system does not simply slow down but goes through a chain reaction: memory usage keeps climbing, response times degrade first, requests start timing out or failing, and finally the process is killed for running out of memory. Worse is whether it can recover after load drops &amp;ndash; if memory does not fall back, there is a leak, and the second wave of traffic will crash sooner.&lt;/p>
+&lt;p>So the observation checklist during load testing must cover behaviour, not just &amp;ldquo;the service is still alive&amp;rdquo;:&lt;/p>
+&lt;ul>
+&lt;li>How much RAM and CPU is available, and what is the baseline before the test?&lt;/li>
+&lt;li>How much memory does the application actually consume under load, and is the curve linear as concurrency grows?&lt;/li>
+&lt;li>Does memory keep rising and fail to fall back after load drops &amp;ndash; is there a leak?&lt;/li>
+&lt;li>At which load level does performance start to degrade, and where is the knee?&lt;/li>
+&lt;li>Can the application return to baseline after traffic subsides, and how long does recovery take?&lt;/li>
+&lt;/ul>
+&lt;p>The value of these numbers is not in the report but in handing &amp;ldquo;infrastructure risk&amp;rdquo; to development and operations early, instead of letting production announce the answer.&lt;/p>
+&lt;h2 id="three-the-third-estimate--can-queues-flatten-the-surge">Three: The Third Estimate &amp;ndash; Can Queues Flatten the Surge
+&lt;/h2>&lt;p>Suppose 5,000 customers add to cart and order at almost the same moment, while the cart and payment paths can only handle 100 requests at a time. Feed all 5,000 in as they are, and overload, checkout latency, payment failures and even duplicate transactions all arrive together.&lt;/p>
+&lt;p>The role of a queue is to accept tasks suitable for asynchronous handling first and then feed them to workers at a controlled rate. Background operations such as order notifications and inventory updates suit this path; but cart updates and payment authorization generally need immediate processing or immediate confirmation and cannot all be dumped into a queue. Which can be asynchronous and which must be synchronous is itself a design decision that should be settled before load testing, not changed after a problem appears.&lt;/p>
+&lt;p>A queue has its own limits too. If the enqueue rate stays above the consumption rate, messages pile up; whether it drops, blocks or rejects at maximum capacity depends on configuration and directly determines what users see. The real risk concentrates at the boundary of failure and retry: if a worker crashes halfway, is the message lost? When a failed message is retried, does it produce a second order? If the user clicks pay again after a timeout, is the card charged twice? After the queue is overloaded, can the system recover by itself, and is order state still consistent?&lt;/p>
+&lt;p>Only some of these can be seen from status codes. What must be verified is the end-to-end result: orders not lost, not duplicated, state consistent, payment not charged twice.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/154-capacity-before-load-test/01-fig2_hu_fb427825a872726b.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/154-capacity-before-load-test/01-fig2_hu_16ec400275ab6ecc.webp 480w, https://chengxiaqiucao.github.io/post/154-capacity-before-load-test/01-fig2_hu_fb427825a872726b.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>From traffic spikes through memory, queues and database connection pools, four layers of capacity constraint narrow one after another, and any layer can become the real bottleneck&lt;/p>
+&lt;h2 id="four-the-fourth-estimate--the-database-connection-pool-is-that-single-checkout-counter">Four: The Fourth Estimate &amp;ndash; The Database Connection Pool Is That Single Checkout Counter
+&lt;/h2>&lt;p>5,000 people have picked their items and are ready to pay, and the shop has one checkout counter. Application servers can scale horizontally to thousands of concurrent requests, but the connections and transactions a database can handle at once are often fixed. For example, the application receives 5,000 requests while the connection pool allows only 500 active connections, so the remaining thousands can only queue for a connection, then start timing out, and finally report connection pool exhaustion or connection timeout.&lt;/p>
+&lt;p>This kind of bottleneck has a special trait: adding application servers does not relieve it, it just pushes more requests onto the same pool. So a load test that only watches API response codes can be green throughout, right up until production fills the pool.&lt;/p>
+&lt;p>Things to confirm in advance include:&lt;/p>
+&lt;ul>
+&lt;li>What is the database&amp;rsquo;s maximum connection count, and what was the peak used during the test?&lt;/li>
+&lt;li>Are connections released correctly after use, and how are the pool&amp;rsquo;s wait queue and timeout configured?&lt;/li>
+&lt;li>Are there slow queries or missing indexes, and do long transactions hold connections for a long time?&lt;/li>
+&lt;li>What is the application&amp;rsquo;s behaviour at the connection ceiling: fast failure, queueing, or dragging down the whole upstream?&lt;/li>
+&lt;li>Which repeated reads can be absorbed by a cache, and which background operations can move to a queue?&lt;/li>
+&lt;/ul>
+&lt;p>The conclusion at the database layer is usually not &amp;ldquo;pass / fail&amp;rdquo; but an acceptable concurrency ceiling, and whether degradation beyond that ceiling is controllable.&lt;/p>
+&lt;h2 id="five-turning-the-four-estimates-into-one-page-of-pre-test-checklist">Five: Turning the Four Estimates Into One Page of Pre-Test Checklist
+&lt;/h2>&lt;p>The four estimates actually map onto four parties to ask: the business side gives traffic expectations, development gives architecture and dependency boundaries, operations gives current resources and configuration, and testing assembles the three into scenarios and criteria. The order matters too &amp;ndash; align assumptions first, then set thresholds, then run the load test, and finally check recovery.&lt;/p>
+&lt;p>A pre-test checklist you can use directly:&lt;/p>
+&lt;ul>
+&lt;li>Traffic and spikes: what is the expected peak concurrency, are all four load scenario classes present, does the script replicate real user paths?&lt;/li>
+&lt;li>Server headroom: memory and CPU baseline, cost per request, the degradation knee, does it recover after load drops?&lt;/li>
+&lt;li>Queues and retries: which tasks are asynchronous, the queue limit and full-queue behaviour, will failed retries produce duplicate orders or duplicate charges?&lt;/li>
+&lt;li>Database: connection pool ceiling, peak usage, slow queries and indexes, degradation behaviour at connection exhaustion?&lt;/li>
+&lt;li>Shared criteria: what are the performance thresholds per layer, is exceeding a threshold a failure or an observation item, and has recovery been verified after the test?&lt;/li>
+&lt;/ul>
+&lt;p>Walking this checklist through with development and operations before the load test makes many bottlenecks surface before the first line of the script is written. They should never have been discovered by production in the first place.&lt;/p>
+&lt;h2 id="six-from-running-the-test-to-owning-readiness">Six: From &amp;ldquo;Running the Test&amp;rdquo; to &amp;ldquo;Owning Readiness&amp;rdquo;
+&lt;/h2>&lt;p>Knowing how to use a load testing tool, being able to configure virtual users and produce a handsome report &amp;ndash; all of that is the execution layer. What really decides whether a big sale crashes is whether someone is willing to understand the business expectation, interrogate the capacity structure behind the system, challenge default assumptions like &amp;ldquo;average equals peak&amp;rdquo;, and state risk clearly when information is insufficient.&lt;/p>
+&lt;p>This does not require becoming a system architect first; it requires asking all the questions that should be asked before the system goes live. What a load test hands over should not be &amp;ldquo;tests passed&amp;rdquo; but &amp;ldquo;we have enough confidence in how the system behaves under expected traffic, and we know where it will break first&amp;rdquo;.&lt;/p>
+&lt;p>The tester&amp;rsquo;s responsibility does not end when the report turns green. It ends when confidence has been built.&lt;/p></description></item><item><title>250,000 Test Runs a Day - Architecture and Trade-offs of a Centralized Test Execution Platform</title><link>https://chengxiaqiucao.github.io/en/post/144-centralized-test-platform/</link><pubDate>Wed, 28 Oct 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/144-centralized-test-platform/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/144-centralized-test-platform/cover.webp" alt="Featured image of post 250,000 Test Runs a Day - Architecture and Trade-offs of a Centralized Test Execution Platform" />&lt;p>Test automation is usually discussed as a framework problem. But when thousands of repositories all need to run their own suites, the nature of the problem changes &amp;ndash; it becomes an infrastructure problem. When every team pushes at nine in the morning, who gets execution capacity? When the nightly full regression collides with the pre-merge check blocking some developer, which one runs first? And when a good portion of failures are not real defects, on what basis do you declare a build &amp;ldquo;certified&amp;rdquo;?&lt;/p>
+&lt;p>One class of platform grows out of exactly this pressure: it does not help you write tests, it provides a shared execution and certification infrastructure. This article breaks down the architecture, key policies and real trade-offs of such a platform, with data from an instance that runs about 250,000 automated test executions a day across four Amazon EKS clusters and serves all engineering repositories of a large financial institution.&lt;/p>
+&lt;h2 id="start-by-seeing-the-five-characteristics-of-the-workload">Start by Seeing the Five Characteristics of the Workload
+&lt;/h2>&lt;p>Before designing, you must acknowledge that a test execution workload has several properties that break naive designs:&lt;/p>
+&lt;p>&lt;strong>Extreme bursts.&lt;/strong> Demand spikes during working hours and release windows, while capacity sits idle the rest of the time &amp;ndash; always swinging between &amp;ldquo;not enough&amp;rdquo; and &amp;ldquo;wasted&amp;rdquo;.&lt;/p>
+&lt;p>&lt;strong>Mixed urgency.&lt;/strong> A pre-merge check holds up one engineer&amp;rsquo;s time, the nightly full regression holds up nobody&amp;rsquo;s, yet both compete for the same pool of resources with completely different latency requirements.&lt;/p>
+&lt;p>&lt;strong>Heterogeneous tenants.&lt;/strong> Different teams bring different runtimes, browser stacks and data dependencies; a suite with no resource constraints can starve every other suite.&lt;/p>
+&lt;p>&lt;strong>Untrustworthy signals.&lt;/strong> Empirical research shows that async waits, concurrency and test order dependencies keep producing flaky results. Public engineering experience reports that about 1.5% of test runs produced flaky results and nearly 16% of tests showed some degree of instability. Apply that ratio to 250,000 executions a day and 1.5% is about 3,750 misleading results &amp;ndash; if retries, classification and quarantine are not platform-level policies but per-team improvisation, then &amp;ldquo;red&amp;rdquo; loses its meaning entirely.&lt;/p>
+&lt;p>&lt;strong>Audit requirements.&lt;/strong> In a regulated environment, &amp;ldquo;this build passed certification&amp;rdquo; must be reproducible from records, not from memory.&lt;/p>
+&lt;h2 id="three-kubernetes-primitives-carry-most-of-the-design">Three Kubernetes Primitives Carry Most of the Design
+&lt;/h2>&lt;p>Such a platform usually relies on only a few Kubernetes capabilities:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Job&amp;rsquo;s Indexed completion mode&lt;/strong>: each Pod gets a stable index, which maps naturally onto a test shard;&lt;/li>
+&lt;li>&lt;strong>PriorityClass&lt;/strong>: a high-priority Pod that cannot be scheduled can preempt lower-priority Pods;&lt;/li>
+&lt;li>&lt;strong>ResourceQuota and LimitRange&lt;/strong>: limit how much a namespace can consume and set default requests, avoiding unbounded containers on a shared cluster.&lt;/li>
+&lt;/ul>
+&lt;p>On top of that, queue managers such as Kueue provide queue-level quota, deciding whether a job waits, is admitted or is preempted; autoscalers such as Karpenter provision nodes directly for Pods that cannot be scheduled.&lt;/p>
+&lt;h2 id="architecture-control-plane-execution-plane-results-plane">Architecture: Control Plane, Execution Plane, Results Plane
+&lt;/h2>&lt;p>The platform separates three things: &amp;ldquo;deciding what to run&amp;rdquo; (control plane), &amp;ldquo;actually running it&amp;rdquo; (execution plane) and &amp;ldquo;turning execution into decisions&amp;rdquo; (results plane).&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/144-centralized-test-platform/04-fig1_hu_93a37452f58422c9.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/144-centralized-test-platform/04-fig1_hu_33329837ce4e233a.webp 480w, https://chengxiaqiucao.github.io/post/144-centralized-test-platform/04-fig1_hu_93a37452f58422c9.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>Control plane, execution plane and results plane are separated, yet the three must be built as one system&lt;/p>
+&lt;p>&lt;strong>Submission.&lt;/strong> Each team&amp;rsquo;s CI system triggers a run, declaring the suite, the target environment and an urgency class. Teams never touch Kubernetes directly &amp;ndash; the submission API is the contract, so execution details can be replaced without affecting callers.&lt;/p>
+&lt;p>&lt;strong>Admission and queuing.&lt;/strong> Each tenant gets a namespace with a quota and a local queue. The queue manager suspends workloads until quota is available, and performs preemption and fair sharing within a cohort (capacity pool): idle capacity borrowed by one team can be reclaimed when another team needs its own share. A borrowing cap prevents a single tenant from swallowing the whole pool during a release sprint.&lt;/p>
+&lt;p>&lt;strong>Shard planning.&lt;/strong> Large suites are cut into shards and executed as an Indexed Job, with the shard index exposed to the runner through an environment variable &amp;ndash; the same contract as Bazel&amp;rsquo;s &lt;code>TEST_TOTAL_SHARDS&lt;/code> / &lt;code>TEST_SHARD_INDEX&lt;/code>.&lt;/p>
+&lt;p>&lt;strong>Execution plane.&lt;/strong> Four EKS clusters host the platform&amp;rsquo;s 40 applications plus a large number of ephemeral test Pods. Multiple clusters trade higher control-plane and tooling costs for isolation and a smaller blast radius &amp;ndash; a trade-off explicitly documented in multi-tenant designs. Placement policy needs deliberate design: give each tenant a &amp;ldquo;home cluster&amp;rdquo; where image caches and test data stay warm; when the home cluster&amp;rsquo;s queue time exceeds a threshold, the control plane spills the &lt;strong>entire run&lt;/strong> to another cluster rather than splitting one run across clusters &amp;ndash; splitting makes result collection and infrastructure failure attribution extremely hard.&lt;/p>
+&lt;p>&lt;strong>Results and certification.&lt;/strong> Each shard sends structured result messages to a reporting and insights service, which decides pass/fail per suite, identifies flakes, and registers a certification verdict on the release. The most important contract in the whole platform is this event schema:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;runId&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;checkout-regression-7f3a&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;shardIndex&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">17&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;attempt&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;test&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;CheckoutFlowTest.appliesPromoCode&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;outcome&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;passed&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;failureCause&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">null&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;previousAttemptCause&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;environment&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;node&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;ip-10-0-42-7&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;durationMs&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">48210&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>failureCause&lt;/code> (test / environment / platform) and &lt;code>attempt&lt;/code> are what let the results layer distinguish &amp;ldquo;a flaky test&amp;rdquo; from &amp;ldquo;a node was lost&amp;rdquo;, and they are also the basis for charging infrastructure failures to the platform&amp;rsquo;s account rather than the team&amp;rsquo;s.&lt;/p>
+&lt;h2 id="what-the-configuration-looks-like">What the Configuration Looks Like
+&lt;/h2>&lt;p>A tenant&amp;rsquo;s queue and quota are declared once by the platform team:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">apiVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">kueue.x-k8s.io/v1beta1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">kind&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ClusterQueue&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">metadata&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">team-payments }&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">cohort&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">shared-test-capacity&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">preemption&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">reclaimWithinCohort&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Any&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">withinClusterQueue&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">LowerPriority&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">resourceGroups&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">coveredResources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;cpu&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;memory&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">flavors&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">default&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- {&lt;span class="w"> &lt;/span>&lt;span class="nt">name: cpu, nominalQuota: 200, borrowingLimit&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">100&lt;/span>&lt;span class="w"> &lt;/span>}&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- {&lt;span class="w"> &lt;/span>&lt;span class="nt">name: memory, nominalQuota&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">800Gi }&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The cohort lets teams borrow idle capacity, &lt;code>reclaimWithinCohort&lt;/code> lets the owner take capacity back, and &lt;code>borrowingLimit&lt;/code> stops any single tenant from draining the whole pool during a release sprint.&lt;/p>
+&lt;p>A sharded suite is then an ordinary Indexed Job with a priority class:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">apiVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">batch/v1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">kind&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Job&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">metadata&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">checkout-regression-7f3a&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">labels&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="w"> &lt;/span>&lt;span class="nt">kueue.x-k8s.io/queue-name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">team-payments }&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">completionMode&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Indexed&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">completions&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">40&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">parallelism&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">40&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">backoffLimitPerIndex&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">template&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">priorityClassName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">premerge-high&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">restartPolicy&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Never&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">containers&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">runner&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">registry.internal/test-runner:2.14&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">env&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- {&lt;span class="w"> &lt;/span>&lt;span class="nt">name: TEST_TOTAL_SHARDS, value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;40&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>}&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- {&lt;span class="w"> &lt;/span>&lt;span class="nt">name: TEST_SHARD_INDEX, valueFrom&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="w"> &lt;/span>&lt;span class="nt">fieldRef&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="w"> &lt;/span>&lt;span class="nt">fieldPath&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">metadata.annotations[&amp;#39;batch.kubernetes.io/job-completion-index&amp;#39;] } } }&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">requests&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="w"> &lt;/span>&lt;span class="nt">cpu&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;2&amp;#34;&lt;/span>&lt;span class="nt">, memory&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">4Gi }&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">limits&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="w"> &lt;/span>&lt;span class="nt">memory&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">4Gi }&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>A few details are worth copying directly: &lt;code>backoffLimitPerIndex&lt;/code> retries only the shard that failed and does not rerun the other 39, which matters a lot when a shard hits an infrastructure failure; memory must have a limit, because one OOM runner on a shared node drags its neighbours down; CPU has no ceiling above the request, to absorb short bursts.&lt;/p>
+&lt;p>One more thing that is easily overlooked: &lt;strong>shards should be cut by historical execution time, not by test count&lt;/strong>. A suite&amp;rsquo;s completion time depends on its slowest shard, not on how many cases a shard contains.&lt;/p>
+&lt;h2 id="latency-comes-from-three-waits-each-with-its-own-lever">Latency Comes From Three Waits, Each With Its Own Lever
+&lt;/h2>&lt;p>Run latency is basically made up of three segments of waiting, and each has a different optimisation lever and cost:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Wait&lt;/th>
+&lt;th>Lever&lt;/th>
+&lt;th>Cost&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Queueing&lt;/td>
+&lt;td>Raise nominal quota, cohort borrowing&lt;/td>
+&lt;td>Reserved idle capacity&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Node provisioning&lt;/td>
+&lt;td>Warm buffer nodes, pre-pull runner images&lt;/td>
+&lt;td>Paying for idle nodes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Slowest shard&lt;/td>
+&lt;td>Time-based sharding, more shards&lt;/td>
+&lt;td>Per-Pod startup overhead&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Autoscalers do well on this kind of spiky and varied demand, because they provision nodes directly against pending Pod requirements; traditional node-group approaches still work when designed properly. Whichever you choose, keep the runner image small and cacheable &amp;ndash; at this scale, image pull time is paid tens of thousands of times a day.&lt;/p>
+&lt;h2 id="security-test-code-is-semi-trusted-code">Security: Test Code Is &amp;ldquo;Semi-Trusted Code&amp;rdquo;
+&lt;/h2>&lt;p>Test code executes whatever a repository commits, so it cannot be treated as a trusted workload. Practical points include: have Pods follow the Restricted security standard as far as possible; use namespaces plus RBAC to ensure one team&amp;rsquo;s service account cannot read another team&amp;rsquo;s jobs; access cloud resources through IAM Roles for Service Accounts or EKS Pod Identity rather than long-lived keys; keep test credentials in a secrets management system with least-privilege access; scan runner images and pin their versions. In regulated settings, test environments must also be isolated from production data through network policies rather than by convention.&lt;/p>
+&lt;h2 id="a-typical-failure-scenario-release-day-morning">A Typical Failure Scenario: Release-Day Morning
+&lt;/h2>&lt;p>Three teams submit full regression suites just before the release cutoff, while dozens of engineers are running pre-merge checks.&lt;/p>
+&lt;p>Without quotas, the first regression suite to arrive would fill every available node, pre-merge checks would queue, and development across the whole organisation would stall. With the design above: each regression suite runs within its team&amp;rsquo;s nominal quota plus a limited borrowing allowance; pre-merge Pods carry a higher priority class and preempt overnight-grade work when nodes run short; the autoscaler adds capacity for the remaining backlog. The result is that regression suites finish later than they would on an empty cluster, but no single team can slam the brakes on everyone. That is the trade-off a shared platform offers.&lt;/p>
+&lt;h2 id="trade-offs-and-limits-which-must-be-stated-up-front">Trade-offs and Limits, Which Must Be Stated Up Front
+&lt;/h2>&lt;p>Centralization creates a team everyone depends on: its roadmap becomes the bottleneck and one of its failures stops every release at once. Multiple clusters reduce the blast radius but multiply upgrades, plugin versions and configuration drift. How much each team should get is fundamentally an organisational question &amp;ndash; the scheduler does not solve it.&lt;/p>
+&lt;p>Automatic retries also mask real intermittent problems: a race condition in production code looks exactly like a flaky test. If you retry everything, the two can never be separated.&lt;/p>
+&lt;p>Why not use the parallelism built into the CI system? Because runners allocated per pipeline serve one repository at a time; they cannot achieve organisation-level fair scheduling, cannot attribute infrastructure failures uniformly, and cannot produce a single certification report. A centralized platform solves these things at the cost of team autonomy. For a small team with few repositories, or for jobs that need special hardware and cannot stay warm in a shared pool, it is the wrong choice.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/144-centralized-test-platform/04-fig2_hu_de42ba8d20771171.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/144-centralized-test-platform/04-fig2_hu_3d2757c65d2f0434.webp 480w, https://chengxiaqiucao.github.io/post/144-centralized-test-platform/04-fig2_hu_de42ba8d20771171.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>The lifecycle of one run: admission, sharded execution, failure classification, single-shard retry, certification after quarantine&lt;/p>
+&lt;h2 id="five-lessons-from-production">Five Lessons From Production
+&lt;/h2>&lt;p>&lt;strong>Distinguish infrastructure failure from test failure at the source.&lt;/strong> If a node eviction and a failed assertion produce the same shade of red, teams stop trusting the platform fast. The runner should report the failure cause as a first-class field: test, environment or platform.&lt;/p>
+&lt;p>&lt;strong>Retry once, on a different Pod, and record it.&lt;/strong> Retrying once on different infrastructure separates environmental noise from deterministic failure. Silent, repeated retries only raise cost and bury genuine concurrency defects &amp;ndash; and concurrency is the number one root cause of flakiness.&lt;/p>
+&lt;p>&lt;strong>Quarantine is a workflow, not a switch.&lt;/strong> A quarantined test must have an owner, a ticket and an expiry date, otherwise the quarantine list keeps growing until the word &amp;ldquo;certification&amp;rdquo; means nothing.&lt;/p>
+&lt;p>&lt;strong>The reporting layer is the product itself.&lt;/strong> Teams judge the platform by the results view, not by the scheduler. The reporting and insights service deserves a dedicated engineering team rather than being treated as an accessory.&lt;/p>
+&lt;p>&lt;strong>Onboarding is part of the platform too.&lt;/strong> When every repository depends on the same execution platform, misuse &amp;ndash; unbounded suites, missing resource declarations, retry loops baked into test code &amp;ndash; is paid for by everyone. Running continuous delivery onboarding for newcomers is, in effect, as much a platform control as any quota.&lt;/p>
+&lt;h2 id="best-practices-you-can-copy-directly">Best Practices You Can Copy Directly
+&lt;/h2>&lt;ul>
+&lt;li>Expose a stable submission API and never let tenants depend on cluster internals;&lt;/li>
+&lt;li>Give every tenant a quota, a queue and default resource limits from day one;&lt;/li>
+&lt;li>Shard by historical duration; retry by shard, never by whole suite;&lt;/li>
+&lt;li>Publish the flake rate of every suite and trace every run end to end.&lt;/li>
+&lt;/ul>
+&lt;p>Observability must be built at the platform level, not just the test level: instrument the whole path from submission through admission and scheduling to result ingest, so that &amp;ldquo;why is my run slow&amp;rdquo; can be answered stage by stage. The core service-level metrics are four: admission time, time to first result, infrastructure failure rate (counted separately from test failure rate), and per-suite flake rate. Delivery impact can be tracked with DORA metrics to see whether the platform really shortened lead time and reduced change failure rate.&lt;/p>
+&lt;h2 id="the-two-most-valuable-directions-next">The Two Most Valuable Directions Next
+&lt;/h2>&lt;p>One is change-based test selection. Public data shows that the vast majority of tests rarely fail, so &amp;ldquo;which ones to run&amp;rdquo; remains the biggest cost lever. The other is AI-assisted triage: it can cluster failures by likely cause, but it should assist the owner rather than auto-quarantine tests &amp;ndash; misclassification directly undermines the credibility of certification.&lt;/p>
+&lt;p>The conclusion can be compressed into one sentence: a centralized test orchestration platform does more than scheduling. It also isolates tenants safely and provides an authoritative record of quality. Kubernetes provides usable primitives &amp;ndash; Indexed Jobs, priorities, quotas, queue managers &amp;ndash; but what really determines value is policy: which teams get capacity, how failures are classified, and what counts as &amp;ldquo;certified&amp;rdquo;. Queues, the failure taxonomy and the reporting layer must be built as one system; if any one of the three is untrustworthy, so are the other two.&lt;/p></description></item></channel></rss>

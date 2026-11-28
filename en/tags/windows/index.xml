@@ -1,0 +1,693 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Windows on Testing Observation</title><link>https://chengxiaqiucao.github.io/en/tags/windows/</link><description>Recent content in Windows on Testing Observation</description><generator>Hugo -- gohugo.io</generator><language>en</language><copyright>|by Daniel Wei</copyright><lastBuildDate>Tue, 29 Apr 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/en/tags/windows/index.xml" rel="self" type="application/rss+xml"/><item><title>AutoHotKey - A Desktop Automation Powerhouse That Doubles Your Efficiency</title><link>https://chengxiaqiucao.github.io/en/post/085-autohotkey/</link><pubDate>Tue, 29 Apr 2025 00:00:00 +0000</pubDate><guid>https://chengxiaqiucao.github.io/en/post/085-autohotkey/</guid><description>&lt;h2 id="preface">Preface
+&lt;/h2>&lt;p>In an earlier article about image handling in Markdown documents 【&lt;a class="link" href="https://mp.weixin.qq.com/s/Mom021usUHUFwE8aGXVtVg" target="_blank" rel="noopener"
+>How Should Images Be Handled When Publishing Locally Written Markdown Documents to the Web?&lt;/a>】, we introduced the use of &lt;strong>AutoHotKey&lt;/strong> to assist with screenshots and automatic link generation. Some readers sent private messages asking about the concrete usage of this tool.&lt;/p>
+&lt;p>Below, we will introduce this tool in a fairly systematic way and see how the scripting magic of AHK can make repetitive operations happen with a single keystroke!&lt;/p>
+&lt;h2 id="ahk-introduction">AHK Introduction
+&lt;/h2>&lt;p>In software development and technical work that pursues efficiency, &lt;strong>repetitive operations&lt;/strong> often devour precious time. AutoHotkey (AHK), as a lightweight, open-source &lt;strong>Windows desktop automation tool&lt;/strong>, can free users from tedious, repetitive keyboard and mouse operations through concise scripts, significantly boosting productivity.&lt;/p>
+&lt;p>The key to understanding AHK lies in its &lt;strong>scripting language&lt;/strong>. Core features include simulating keyboard input (&lt;code>Send&lt;/code>), mouse operations (&lt;code>Click&lt;/code>), running programs (&lt;code>Run&lt;/code>), conditional judgment (&lt;code>If&lt;/code>), and loop control (&lt;code>Loop&lt;/code>), among others. Users need no compilation environment; script files (&lt;code>.ahk&lt;/code>) can run directly with extremely low resource usage.&lt;/p>
+&lt;p>AHK&amp;rsquo;s application scenarios are extremely broad. Simple ones include auto-filling forms and quickly inserting preset phrases; more advanced ones include batch-renaming files, automated software testing, and customizing dedicated workflows; it can even be used to develop small tools with a graphical user interface (GUI). Its power lies in &lt;strong>deep integration with the Windows system&lt;/strong>, enabling it to manipulate windows, read and write the registry, and access the file system for a high degree of customized automation.&lt;/p>
+&lt;p>Simply put, AutoHotKey gives users the ability to &lt;strong>command the computer with scripts&lt;/strong>. Whether you are a developer, an office worker, or an everyday user who values efficiency, you can use it to customize your own &amp;ldquo;shortcut magic,&amp;rdquo; turning repetitive labor into automation that completes in an instant.&lt;/p>
+&lt;h2 id="ahk-core-syntax-and-common-functions">AHK Core Syntax and Common Functions
+&lt;/h2>&lt;h3 id="basic-hotkeys">**Basic Hotkeys
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>Hotkey Definition&lt;/strong> - Consists of a hotkey followed by a double colon.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-autohotkey" data-lang="autohotkey">&lt;span class="line">&lt;span class="cl">&lt;span class="o">^&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="c1"> ; Ctrl+J hotkey&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Send&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Hello&lt;/span> &lt;span class="n">World&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="c1"> ; send text&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">return&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>If there is only a single line of action to execute, &lt;code>return&lt;/code> can also be omitted.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Symbol&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>#&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Win key (Windows logo key)&lt;br>- Send text after Win is released (Vista+)&lt;br>- May cause extra simulated keystrokes (see &lt;code>#MenuMaskKey&lt;/code>)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>!&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Alt key&lt;br>- May cause extra simulated keystrokes (see &lt;code>#MenuMaskKey&lt;/code>)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>^&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Ctrl key&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>+&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Shift key&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>&amp;amp;&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Combine any two keys/mouse buttons to create a custom hotkey&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>&amp;lt;&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Use the left key of a pair (e.g. &lt;code>&amp;lt;!a&lt;/code> triggers only with left Alt)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>&amp;gt;&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Use the right key of a pair&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>&amp;lt;^&amp;gt;!&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>AltGr key (alternate graphic key)&lt;br>- Represents AltGr combinations (e.g. &lt;code>&amp;lt;^&amp;gt;!m&lt;/code>)&lt;br>- Used alone: &lt;code>LControl &amp;amp; RAlt&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>*&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Wildcard: triggers even when extra modifier keys are held&lt;br>- Example: &lt;code>*#c&lt;/code> (Win+C / Shift+Win+C etc. all trigger)&lt;br>- Forces use of the keyboard hook&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>~&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Keeps the key&amp;rsquo;s native function (does not block OS events)&lt;br>- Example: &lt;code>~RButton&lt;/code> (right-click is still sent to the window)&lt;br>- Affects all combination behavior&lt;br>- Forces use of the keyboard hook&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>$&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Forces use of the keyboard hook to prevent the Send command from triggering itself&lt;br>- Has no effect on mouse hotkeys&lt;br>- Alternative: &lt;code>#InputLevel&lt;/code> / &lt;code>SendLevel&lt;/code> (v1.1.06+)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>UP&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Triggers on key release (not on press)&lt;br>- Example: &lt;code>^!r Up::&lt;/code> (triggers on releasing Ctrl+Alt+R)&lt;br>- Limitations:&lt;br> 1) Does not apply to controller buttons&lt;br> 2) Must be paired with a normal hotkey to avoid stuck keys&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>&lt;strong>Example&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-autohotkey" data-lang="autohotkey">&lt;span class="line">&lt;span class="cl">&lt;span class="nl">#a::&lt;/span>&lt;span class="n">Run&lt;/span> &lt;span class="n">Calculator&lt;/span>&lt;span class="c1"> ; Win+A launches Calculator&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="o">^!+&lt;/span>&lt;span class="n">s&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Send&lt;/span> &lt;span class="n">Hello&lt;/span> &lt;span class="n">World&lt;/span>&lt;span class="c1"> ; Ctrl+Alt+Shift+S sends text&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="o">~&lt;/span>&lt;span class="n">RButton&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">MsgBox&lt;/span> &lt;span class="n">Right&lt;/span> &lt;span class="n">Click&lt;/span>&lt;span class="c1"> ; Message box that keeps the right button&amp;#39;s native function&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="n">LWin&lt;/span> &lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">R&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Reload&lt;/span>&lt;span class="c1"> ; Left Win+R reloads the script&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">#c&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Run&lt;/span> &lt;span class="n">cmd&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exe&lt;/span>&lt;span class="c1"> ; Any modifier + Win+C launches the command prompt&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="o">^!&lt;/span>&lt;span class="n">r&lt;/span> &lt;span class="n">Up&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">MsgBox&lt;/span> &lt;span class="n">Released&lt;/span>&lt;span class="c1"> ; Triggers when the combination is released&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="hotstrings">Hotstrings
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>Hotstring&lt;/strong> - Consists of a colon, zero or more options, another colon, the abbreviation characters, and a double colon.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-autohotkey" data-lang="autohotkey">&lt;span class="line">&lt;span class="cl">&lt;span class="o">:*:&lt;/span>&lt;span class="n">btw&lt;/span>&lt;span class="o">::&lt;/span> &lt;span class="n">by&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">way&lt;/span>&lt;span class="c1"> ; replaces after typing btw and pressing space/enter&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Alternatively, you can also use hotstrings to perform somewhat more complex operations.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-autohotkey" data-lang="autohotkey">&lt;span class="line">&lt;span class="cl">&lt;span class="o">:*:&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="c1"> ; This hotstring uses the following commands to replace &amp;#34;]d&amp;#34; with the current date and time.&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">FormatTime&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">CurrentDateTime&lt;/span>&lt;span class="p">,,&lt;/span> &lt;span class="n">M&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">yyyy&lt;/span> &lt;span class="n">h&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="n">mm&lt;/span> &lt;span class="n">tt&lt;/span>&lt;span class="c1"> ; &lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">SendInput&lt;/span> &lt;span class="nv">%CurrentDateTime%&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">return&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="core-commands-and-functions">&lt;strong>Core Commands and Functions&lt;/strong>
+&lt;/h3>&lt;p>Some commonly used core functions include the following:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Function Name&lt;/th>
+&lt;th>Category&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>FileExist&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>File operations&lt;/td>
+&lt;td>Checks whether a file/folder exists and returns its attributes (e.g. &amp;ldquo;D&amp;rdquo; means a directory)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>GetKeyState&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Input detection&lt;/td>
+&lt;td>Detects keyboard/mouse key state, returning 1 (pressed) or 0 (released)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>InStr&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>String processing&lt;/td>
+&lt;td>Finds the position of a substring in a string, supporting search from left/right&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>StrLen&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>String processing&lt;/td>
+&lt;td>Gets the string length (in bytes or characters)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>SubStr&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>String processing&lt;/td>
+&lt;td>Extracts a substring starting at a specified position&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>WinActive&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Window control&lt;/td>
+&lt;td>Detects whether a specified window is active, returning the window handle (HWND)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>WinExist&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Window control&lt;/td>
+&lt;td>Detects whether a specified window exists, returning the first matching window handle&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>Format&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Data processing&lt;/td>
+&lt;td>Formats strings (similar to sprintf)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>DllCall&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>System interaction&lt;/td>
+&lt;td>Calls external DLL functions such as the Windows API&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>&lt;code>Run&lt;/code>&lt;/strong>&lt;/td>
+&lt;td>Process control&lt;/td>
+&lt;td>Launches programs / executes commands (listed in the first draft, full description added here)&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>&lt;strong>Example:&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-autohotkey" data-lang="autohotkey">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">; Combined usage example&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">if &lt;/span>&lt;span class="nf">WinActive&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ahk_exe chrome.exe&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nf">GetKeyState&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Ctrl&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;P&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">FileAppend&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">%&lt;/span>&lt;span class="n">Format&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%time%] Ctrl pressed in Chrome`n&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">%&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nf">log&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">txt&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">Send&lt;/span> &lt;span class="o">^&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">t&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="c1"> ; open a new tab in Chrome&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="variables-and-expressions">&lt;strong>Variables and Expressions&lt;/strong>
+&lt;/h3>&lt;ul>
+&lt;li>Variables need no declaration; assign directly (e.g. &lt;code>count := 10&lt;/code>)&lt;/li>
+&lt;li>Supports string concatenation (the &lt;code>.&lt;/code> operator) and mathematical operations&lt;/li>
+&lt;/ul>
+&lt;h2 id="practical-use-cases">Practical Use Cases
+&lt;/h2>&lt;h3 id="case-1---automatically-generate-markdown-image-links-from-screenshots">Case 1 - Automatically Generate Markdown Image Links from Screenshots
+&lt;/h3>&lt;p>&lt;strong>Pain point&lt;/strong> - Manual screenshot → save → copy path → insert into Markdown is tedious
+&lt;strong>Solution&lt;/strong> - Complete the screenshot and generate a standard link with one key&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-autohotkey" data-lang="autohotkey">&lt;span class="line">&lt;span class="cl">&lt;span class="nl">#s::&lt;/span>&lt;span class="c1"> ; Win+S shortcut&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Run&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nv">%A_WinDir%&lt;/span>\&lt;span class="n">System32&lt;/span>\&lt;span class="n">SnippingTool&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exe&lt;/span>&lt;span class="c1"> ; launch the screenshot tool&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">WinWaitActive&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Snip&lt;/span> &lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">Sketch&lt;/span>&lt;span class="c1"> ; wait for the window to become active&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Send&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">^+&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="c1"> ; simulate the new-screenshot shortcut (Ctrl+Shift+N)&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">WinWaitActive&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ahk_class&lt;/span> &lt;span class="n">Microsoft&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ScreenSketch&lt;/span>&lt;span class="c1"> ; wait for the screenshot to complete&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Send&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">^&lt;/span>&lt;span class="n">s&lt;/span>&lt;span class="c1"> ; save the screenshot&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">WinWaitActive&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Save&lt;/span> &lt;span class="n">As&lt;/span>&lt;span class="c1"> ; wait for the save dialog&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">FormatTime&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">CurrentTime&lt;/span>&lt;span class="p">,,&lt;/span> &lt;span class="n">yyyyMMdd_HHmmss&lt;/span>&lt;span class="c1"> ; generate a timestamp filename&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">SendInput&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nv">%CurrentTime%&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">png&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">Enter&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="c1"> ; enter the filename&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Sleep&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1000&lt;/span>&lt;span class="c1"> ; wait for the save to complete&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nv">clipboard&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="s">&amp;#34;![](&amp;#34;&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="nv">A_Desktop&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="s">&amp;#34;\&amp;#34;&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="n">CurrentTime&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="s">&amp;#34;.webp)&amp;#34;&lt;/span>&lt;span class="c1"> ; generate the MD link&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">MsgBox&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Markdown&lt;/span> &lt;span class="n">screenshot&lt;/span> &lt;span class="n">link&lt;/span> &lt;span class="n">copied&lt;/span> &lt;span class="n">to&lt;/span> &lt;span class="nv">clipboard&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">return&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>Effect&lt;/strong> - Press Win+S → screenshot → automatically save as a timestamped PNG → the clipboard generates a link in the &lt;code>![](路径)&lt;/code> format.&lt;/p>
+&lt;h3 id="case-2---execute-a-complex-command-sequence-with-one-key">Case 2 - Execute a Complex Command Sequence with One Key
+&lt;/h3>&lt;p>&lt;strong>Pain point&lt;/strong> - Deploying an environment requires repeatedly entering multiple commands
+&lt;strong>Solution&lt;/strong> - Trigger a command combination with a single key&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-autohotkey" data-lang="autohotkey">&lt;span class="line">&lt;span class="cl">&lt;span class="o">^!&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="c1"> ; Ctrl+Alt+D&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Run&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">cmd&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exe&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="o">:&lt;/span>\&lt;span class="n">MyProject&lt;/span>&lt;span class="c1"> ; open CMD and enter the project directory&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">WinWaitActive&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ahk_class&lt;/span> &lt;span class="n">ConsoleWindowClass&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Send&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">git&lt;/span> &lt;span class="n">pull&lt;/span> &lt;span class="n">origin&lt;/span> &lt;span class="n">main&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">Enter&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Sleep&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2000&lt;/span>&lt;span class="c1"> ; wait for git pull to complete&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Send&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">mvn&lt;/span> &lt;span class="n">clean&lt;/span> &lt;span class="n">install&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">Enter&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Sleep&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5000&lt;/span>&lt;span class="c1"> ; wait for the Maven build&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Send&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">docker&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">compose&lt;/span> &lt;span class="n">up&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">Enter&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">MsgBox&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Environment&lt;/span> &lt;span class="n">deployment&lt;/span> &lt;span class="n">commands&lt;/span> &lt;span class="n">executed&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">return&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>Effect&lt;/strong> - Complete code pulling, project building, and container startup with one key.&lt;/p>
+&lt;h3 id="case-3---automated-test-data-generation">Case 3 - Automated Test Data Generation
+&lt;/h3>&lt;p>&lt;strong>Pain point&lt;/strong> - Manually creating large amounts of test data is inefficient
+&lt;strong>Solution&lt;/strong> - Scripts batch-generate structured data&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-autohotkey" data-lang="autohotkey">&lt;span class="line">&lt;span class="cl">&lt;span class="nl">F9::&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">testData&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="s">&amp;#34;&amp;#34;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Loop&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">100&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="c1"> ; generate 100 records&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">name&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="s">&amp;#34;User&amp;#34;&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="nv">A_Index&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">email&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="s">&amp;#34;user&amp;#34;&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="nv">A_Index&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="s">&amp;#34;@test.com&amp;#34;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">age&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="n">Random&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">18&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">60&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="c1"> ; custom Random function generates a random number&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">testData&lt;/span> &lt;span class="o">.=&lt;/span> &lt;span class="n">name&lt;/span> &lt;span class="s">&amp;#34;,&amp;#34;&lt;/span> &lt;span class="n">email&lt;/span> &lt;span class="s">&amp;#34;,&amp;#34;&lt;/span> &lt;span class="n">age&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">`n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="c1"> ; concatenate in CSV format&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">FileAppend&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nv">%testData%&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="o">:&lt;/span>\&lt;span class="n">TestData&lt;/span>\&lt;span class="n">users&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">csv&lt;/span>&lt;span class="c1"> ; write to file&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Run&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">notepad&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exe&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="o">:&lt;/span>\&lt;span class="n">TestData&lt;/span>\&lt;span class="n">users&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">csv&lt;/span>&lt;span class="c1"> ; open to view&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="nb">return&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">Random&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">min&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">max&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">Random&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">rand&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">min&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">max&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="nb">return&lt;/span> &lt;span class="n">rand&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>Effect&lt;/strong> - Press F9 to automatically generate 100 CSV test records containing username, email, and age.&lt;/p>
+&lt;hr>
+&lt;h2 id="summary---why-use-autohotkey">Summary - Why Use AutoHotKey?
+&lt;/h2>&lt;ol>
+&lt;li>&lt;strong>Minimal learning curve&lt;/strong> - Syntax close to natural language, no compilation environment needed&lt;/li>
+&lt;li>&lt;strong>Resource friendly&lt;/strong> - Lightweight (installer &amp;lt; 3MB), negligible background footprint&lt;/li>
+&lt;li>&lt;strong>Deep integration&lt;/strong> - Seamlessly manipulate windows, the registry, and the file system&lt;/li>
+&lt;li>&lt;strong>Rich ecosystem&lt;/strong> - The official forum offers a vast script library and plugin support&lt;/li>
+&lt;li>&lt;strong>Cross-scenario&lt;/strong> - Full coverage from text processing to GUI automation&lt;/li>
+&lt;/ol>
+&lt;blockquote>
+&lt;p>Further learning:&lt;/p>
+&lt;ul>
+&lt;li>Official documentation: &lt;a class="link" href="https://www.autohotkey.com/docs/" target="_blank" rel="noopener"
+>https://www.autohotkey.com/docs/&lt;/a>&lt;/li>
+&lt;li>Script repository: &lt;a class="link" href="https://github.com/AutoHotkey" target="_blank" rel="noopener"
+>https://github.com/AutoHotkey&lt;/a>&lt;/li>
+&lt;/ul>&lt;/blockquote>
+&lt;p>&lt;strong>Which pain point is your next automation script going to solve?&lt;/strong>&lt;/p></description></item><item><title>The For Command in Windows Batch Scripts</title><link>https://chengxiaqiucao.github.io/en/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/</link><pubDate>Sat, 01 Mar 2025 15:13:59 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/%E6%89%B9%E5%A4%84%E7%90%86For%E5%91%BD%E4%BB%A4_%E5%85%AC%E4%BC%97%E5%8F%B7.webp" alt="Featured image of post The For Command in Windows Batch Scripts" />&lt;h2 id="introduction">Introduction
+&lt;/h2>&lt;p>In our daily work, if you use Windows, making good use of batch commands, especially for bulk file and text processing, can greatly boost productivity and get twice the result with half the effort!&lt;/p>
+&lt;p>However, many people&amp;rsquo;s use of batch scripts stops at combining several commands to run together, saving the time of repeatedly typing commands and waiting. This is actually just the most basic way to use batch scripts.&lt;/p>
+&lt;p>But to unlock the full power of batch scripts, the &lt;code>for&lt;/code> command is truly the core. As a tool that handles both loop processing and text-column processing, nothing rivals it when it comes to improving batch script efficiency!&lt;/p>
+&lt;p>Yet the &lt;code>for&lt;/code> command is relatively complex to use, and many people may not have mastered it well. So in this article, we bring you a systematic introduction to this core command in batch scripting.&lt;/p>
+&lt;blockquote>
+&lt;p>There&amp;rsquo;s also an Easter egg that Qiucao discovered: Microsoft actually has an official, long-standing bug that has never been fixed 😂😂😂&lt;/p>&lt;/blockquote>
+&lt;h2 id="introduction-to-the-for-command">Introduction to the For Command
+&lt;/h2>&lt;p>Let&amp;rsquo;s now take a detailed look at this heavyweight command in Windows batch scripting.&lt;/p>
+&lt;h3 id="basic-syntax">&lt;strong>Basic Syntax&lt;/strong>
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="k">FOR&lt;/span> %variable &lt;span class="k">IN&lt;/span> &lt;span class="p">(&lt;/span>set&lt;span class="p">)&lt;/span> &lt;span class="k">DO&lt;/span> command [command-parameters]
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>%variable&lt;/strong>: the for-loop variable; use &lt;code>%%&lt;/code> in batch scripts and &lt;code>%&lt;/code> when running directly from the command line&lt;/li>
+&lt;li>(&lt;strong>set)&lt;/strong>: can be a file, a directory, a string, or command output..&lt;/li>
+&lt;li>&lt;strong>command&lt;/strong>: the command to execute for each iteration.&lt;/li>
+&lt;li>&lt;strong>command-parameters&lt;/strong>: control loop behavior (such as &lt;code>/R&lt;/code>, &lt;code>/D&lt;/code>, &lt;code>/L&lt;/code>, &lt;code>/F&lt;/code>, etc.)&lt;/li>
+&lt;/ul>
+&lt;p>For example, to iterate over a set:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="p">@&lt;/span>&lt;span class="k">echo&lt;/span> off
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="se">%%&lt;/span>a &lt;span class="k">in&lt;/span> &lt;span class="p">(&lt;/span>苹果 香蕉 &lt;span class="s2">&amp;#34;西瓜 芒果&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">do&lt;/span> &lt;span class="k">echo&lt;/span> 水果：&lt;span class="se">%%&lt;/span>a
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>Output&lt;/strong>:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">水果：苹果
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">水果：香蕉
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">水果：&amp;#34;西瓜 芒果&amp;#34;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>Note&lt;/strong>: by default, elements are separated by spaces, and a quoted string is treated as a whole.&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h3 id="-the-r-option-recursively-traverse-files">** The &lt;code>/R&lt;/code> Option: Recursively Traverse Files**
+&lt;/h3>&lt;p>This option is used to recursively traverse files in a directory and its subdirectories.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="p">@&lt;/span>&lt;span class="k">echo&lt;/span> off
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> /R &lt;span class="s2">&amp;#34;C:\Chengxiaqiucao&amp;#34;&lt;/span> &lt;span class="se">%%&lt;/span>a &lt;span class="k">in&lt;/span> &lt;span class="p">(&lt;/span>*.txt&lt;span class="p">)&lt;/span> &lt;span class="k">do&lt;/span> &lt;span class="k">echo&lt;/span> 找到文件：&lt;span class="se">%%&lt;/span>a
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>Features&lt;/strong>:&lt;/p>
+&lt;ul>
+&lt;li>Traverse all &lt;code>.txt&lt;/code> files under &lt;code>C:\Chengxiaqiucao&lt;/code> and its subdirectories.&lt;/li>
+&lt;li>&lt;code>%%a&lt;/code> will contain the full file path (e.g. &lt;code>C:\Chengxiaqiucao\test\file.txt&lt;/code>).&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h3 id="d">&lt;strong>&lt;code>/D&lt;/code>: Process Directories&lt;/strong>
+&lt;/h3>&lt;p>This option traverses directories only (not files).&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="p">@&lt;/span>&lt;span class="k">echo&lt;/span> off
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> /D &lt;span class="se">%%&lt;/span>a &lt;span class="k">in&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;C:\*&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">do&lt;/span> &lt;span class="k">echo&lt;/span> 目录：&lt;span class="se">%%&lt;/span>a
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>Features&lt;/strong>:&lt;/p>
+&lt;ul>
+&lt;li>List all first-level directories under &lt;code>C:\&lt;/code> (such as &lt;code>Program Files&lt;/code>, &lt;code>Users&lt;/code>, etc.).&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h4 id="4">&lt;strong>4. &lt;code>/L&lt;/code>: Generate a Number Sequence&lt;/strong>
+&lt;/h4>&lt;p>This option is similar to controlling the number of loop iterations when programming.&lt;/p>
+&lt;p>&lt;strong>Syntax&lt;/strong>: &lt;code>for /L %%a in (start, step, end)&lt;/code>&lt;/p>
+&lt;p>The following example generates an arithmetic sequence:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="p">@&lt;/span>&lt;span class="k">echo&lt;/span> off
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="k">/L&lt;/span> &lt;span class="se">%%&lt;/span>a &lt;span class="k">in&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>, &lt;span class="mi">2&lt;/span>, &lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">do&lt;/span> &lt;span class="k">echo&lt;/span> 当前数字：&lt;span class="se">%%&lt;/span>a
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>Output&lt;/strong>:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">当前数字：1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">当前数字：3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">当前数字：5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">当前数字：7
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">当前数字：9
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;h3 id="f">&lt;strong>&lt;code>/F&lt;/code>: Advanced Text Parsing (The Core Option)&lt;/strong>
+&lt;/h3>&lt;p>This option can be considered the most core option of the For command; in most cases, it&amp;rsquo;s what lets the For command truly shine.&lt;/p>
+&lt;p>It is mainly used to parse text, strings, or command output line by line, and it supports complex rules.&lt;/p>
+&lt;h5 id="syntax">&lt;strong>Syntax&lt;/strong>:
+&lt;/h5>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="k">/F&lt;/span> [&lt;span class="s2">&amp;#34;选项&amp;#34;&lt;/span>] &lt;span class="se">%%&lt;/span>a &lt;span class="k">in&lt;/span> &lt;span class="p">(&lt;/span>数据源&lt;span class="p">)&lt;/span> &lt;span class="k">do&lt;/span> 命令
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>Data source&lt;/strong>: a file, a string, or command output (wrapped in backticks &lt;code>`&lt;/code>).&lt;/li>
+&lt;li>&lt;strong>Options&lt;/strong>: &lt;code>delims&lt;/code>, &lt;code>tokens&lt;/code>, &lt;code>skip&lt;/code>, &lt;code>eol&lt;/code>, &lt;code>usebackq&lt;/code>, etc.&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h4 id="common-options-of">&lt;strong>Common Options of &lt;code>/F&lt;/code>&lt;/strong>
+&lt;/h4>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Option&lt;/th>
+&lt;th>Purpose&lt;/th>
+&lt;th>Example&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>delims=xyz&lt;/code>&lt;/td>
+&lt;td>Define delimiters (default space/tab)&lt;/td>
+&lt;td>&lt;code>delims=,&lt;/code> split by comma&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>tokens=n&lt;/code>&lt;/td>
+&lt;td>Extract the nth column (separate multiple columns with commas, e.g. &lt;code>1,3&lt;/code>)&lt;/td>
+&lt;td>&lt;code>tokens=2&lt;/code> extract the second column&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>skip=n&lt;/code>&lt;/td>
+&lt;td>Skip the first n lines&lt;/td>
+&lt;td>&lt;code>skip=2&lt;/code> skip the first two lines&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>eol=;&lt;/code>&lt;/td>
+&lt;td>Define the line comment character (default &lt;code>;&lt;/code>)&lt;/td>
+&lt;td>&lt;code>eol=#&lt;/code> ignore lines starting with &lt;code>#&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>usebackq&lt;/code>&lt;/td>
+&lt;td>Change how the data source is quoted (see below)&lt;/td>
+&lt;td>Handle paths with spaces or command output&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;hr>
+&lt;h4 id="the-role-of">&lt;strong>The Role of &lt;code>usebackq&lt;/code>&lt;/strong>
+&lt;/h4>&lt;h5 id="easter-egg-here-a-bug-in-the-official-documentation">Easter Egg Here: A Bug in the Official Documentation
+&lt;/h5>&lt;p>In the Chinese official Windows help, the description of the &lt;code>-F&lt;/code> option is actually wrong.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/Pasted-20250303_hu_aeab27828869de65.webp"
+width="1024"
+height="837"
+srcset="https://chengxiaqiucao.github.io/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/Pasted-20250303_hu_2fedcf24ce9887cd.webp 480w, https://chengxiaqiucao.github.io/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/Pasted-20250303_hu_aeab27828869de65.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="122"
+data-flex-basis="293px"
+>
+&lt;/p>
+&lt;p>As you can see, the description here for using &lt;code>usebackq&lt;/code> is exactly the same as for not using it, and the Chinese translation is very awkward and hard to understand.&lt;/p>
+&lt;p>However, by running the &lt;code>chcp 65001&lt;/code> command to switch the command-line code page to UTF-8, the help is then displayed in English.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/Pasted-20250303-1_hu_53dafe2e36f08e22.webp"
+width="1024"
+height="1180"
+srcset="https://chengxiaqiucao.github.io/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/Pasted-20250303-1_hu_f662bbbb5abdc1ac.webp 480w, https://chengxiaqiucao.github.io/post/063-%E6%89%B9%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC%E4%B9%8Bfor%E5%91%BD%E4%BB%A4/Pasted-20250303-1_hu_53dafe2e36f08e22.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="86"
+data-flex-basis="208px"
+>
+&lt;/p>
+&lt;p>As you can see, this is much clearer. &lt;code>usebackq&lt;/code> solves the problems in the following scenarios:&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>Handle file paths with spaces&lt;/strong>: quote the filename with double quotes.&lt;/li>
+&lt;li>&lt;strong>Execute a command and parse its output&lt;/strong>: quote the system command with backticks &lt;code>`&lt;/code>.&lt;/li>
+&lt;li>&lt;strong>Parse a string directly&lt;/strong>: quote the string with single quotes &lt;code>'&lt;/code>.&lt;/li>
+&lt;/ol>
+&lt;h5 id="case-1">&lt;strong>Case 1&lt;/strong>:
+&lt;/h5>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="p">@&lt;/span>&lt;span class="k">echo&lt;/span> off
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="k">/F&lt;/span> &lt;span class="s2">&amp;#34;usebackq delims=&amp;#34;&lt;/span> &lt;span class="se">%%&lt;/span>a &lt;span class="k">in&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;C:\My Files\data.txt&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">do&lt;/span> &lt;span class="k">echo&lt;/span> &lt;span class="se">%%&lt;/span>a
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Without &lt;code>usebackq&lt;/code>, the spaces in the path would cause a parsing error.&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h5 id="-case-2">** Case 2**
+&lt;/h5>&lt;p>Parse &lt;code>data.csv&lt;/code> (format: &lt;code>name,age,city&lt;/code>), skip the header line, and extract the name and city.&lt;/p>
+&lt;p>&lt;strong>Input file &lt;code>data.csv&lt;/code>&lt;/strong>:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">姓名,年龄,城市
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">张三,25,北京
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">李四,30,上海
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Batch script:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="p">@&lt;/span>&lt;span class="k">echo&lt;/span> off
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="k">/F&lt;/span> &lt;span class="s2">&amp;#34;usebackq skip=1 delims=, tokens=1,3&amp;#34;&lt;/span> &lt;span class="se">%%&lt;/span>a &lt;span class="k">in&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;data.csv&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">do&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">echo&lt;/span> 姓名：&lt;span class="se">%%&lt;/span>a，城市：&lt;span class="se">%%&lt;/span>b
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>Output&lt;/strong>:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">姓名：张三，城市：北京
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">姓名：李四，城市：上海
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;h2 id="application-scenario-summary">&lt;strong>Application Scenario Summary&lt;/strong>
+&lt;/h2>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Option&lt;/th>
+&lt;th>Applicable Scenario&lt;/th>
+&lt;th>Typical Command Example&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>None&lt;/td>
+&lt;td>Iterate over a simple list of files or strings&lt;/td>
+&lt;td>&lt;code>for %%a in (*.txt) do echo %%a&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>/R&lt;/code>&lt;/td>
+&lt;td>Recursively process files under a directory&lt;/td>
+&lt;td>&lt;code>for /R %%a in (*.log) do del %%a&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>/D&lt;/code>&lt;/td>
+&lt;td>Process directories only&lt;/td>
+&lt;td>&lt;code>for /D %%a in (C:\*) do echo %%a&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>/L&lt;/code>&lt;/td>
+&lt;td>Generate a number sequence (e.g. a fixed number of loops)&lt;/td>
+&lt;td>&lt;code>for /L %%a in (1,1,5) do echo %%a&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>/F&lt;/code>&lt;/td>
+&lt;td>Parse text files, command output, or complex strings&lt;/td>
+&lt;td>&lt;code>for /F &amp;quot;tokens=2&amp;quot; %%a in (data.txt)&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>So by mastering these options and techniques of the For command, you can fully turn it into a &amp;ldquo;Swiss Army knife&amp;rdquo; for handling files, text, and system tasks in batch scripts.&lt;/p>
+&lt;hr></description></item><item><title>Two Useful Windows 11 Operation Tips</title><link>https://chengxiaqiucao.github.io/en/post/010-windows-system-tips/</link><pubDate>Thu, 22 Aug 2024 15:40:10 +0800</pubDate><guid>https://chengxiaqiucao.github.io/en/post/010-windows-system-tips/</guid><description>&lt;h2 id="restore-classic-right-click-menu-in-windows-11">Restore Classic Right-Click Menu in Windows 11
+&lt;/h2>&lt;p>Windows 11 has introduced many interface optimizations compared to previous versions. However, one optimization has caused some inconvenience - the right-click menu now folds non-system menu items by default, requiring an extra click on &amp;ldquo;Show more options&amp;rdquo; to reveal the full menu.&lt;/p>
+&lt;img src="Pasted-20240822.webp" alt="Right-click menu" width=300 />
+&lt;p>There are actually two methods to restore the classic menu style:&lt;/p>
+&lt;ol>
+&lt;li>Hold the Shift key while clicking the menu - this will directly show the full menu (&lt;strong>Recommended&lt;/strong>)&lt;/li>
+&lt;li>Alternatively, you can permanently restore the classic menu by adding a registry entry:&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Console" data-lang="Console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> reg.exe add &lt;span class="s2">&amp;#34;HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32&amp;#34;&lt;/span> /f /ve
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>After executing this command, you&amp;rsquo;ll need to restart File Explorer:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Console" data-lang="Console">&lt;span class="line">&lt;span class="cl">&lt;span class="go">taskkill /f /im explorer.exe &amp;amp; start explorer.exe
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>This will completely restore the right-click menu to its classic style. To revert back, simply delete the registry entry.&lt;/p>
+&lt;h2 id="clipboard-history-tool">Clipboard History Tool
+&lt;/h2>&lt;p>Windows 11 includes a very useful built-in tool that keeps a history of your clipboard items. You can access it by pressing &lt;code>Win+V&lt;/code>.&lt;/p>
+&lt;img src="Pasted-20240822-2.webp" alt="Clipboard tool" width=350 />
+&lt;p>In addition to conveniently storing multiple clipboard entries, this tool also provides:&lt;/p>
+&lt;ul>
+&lt;li>Easy insertion of emoji&lt;/li>
+&lt;li>Kaomoji (Japanese emoticons)&lt;/li>
+&lt;li>Commonly used special characters&lt;/li>
+&lt;li>GIF search functionality&lt;/li>
+&lt;/ul>
+&lt;p>❤️👍😎🏠🕍❄️ (●ˇ∀ˇ●)(❤️´艸｀❤️)◀▶◯◻&lt;/p>
+&lt;p>To disable clipboard history, go to &lt;strong>System Settings &amp;gt; System &amp;gt; Clipboard&lt;/strong> and turn it off.&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/010-windows-system-tips/Pasted-20240822-1_hu_ed8e7d8d13833699.webp"
+width="1024"
+height="147"
+srcset="https://chengxiaqiucao.github.io/post/010-windows-system-tips/Pasted-20240822-1_hu_2bbf064ce95eecc1.webp 480w, https://chengxiaqiucao.github.io/post/010-windows-system-tips/Pasted-20240822-1_hu_ed8e7d8d13833699.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="696"
+data-flex-basis="1672px"
+>
+&lt;/p>
+&lt;hr></description></item></channel></rss>

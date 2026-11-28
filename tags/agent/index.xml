@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Agent on 秋草观测台</title><link>https://chengxiaqiucao.github.io/tags/agent/</link><description>Recent content in Agent on 秋草观测台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号：秋草说测试）</copyright><lastBuildDate>Thu, 19 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/agent/index.xml" rel="self" type="application/rss+xml"/><item><title>测试交给 AI 之后，工程师应做些什么</title><link>https://chengxiaqiucao.github.io/post/169-n06-what-stayed-human/</link><pubDate>Thu, 19 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/169-n06-what-stayed-human/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/169-n06-what-stayed-human/cover.webp" alt="Featured image of post 测试交给 AI 之后，工程师应做些什么" />&lt;p>几周前，一家做企业软件的小团队遇到一个新瓶颈：手工验证。写代码变快了，测试这边跟不上。当时的判断是，测试要跟上越来越多的改动，唯一的办法是把 AI 引进来；具体做法是用风险评估决定哪些活完全交给机器、哪些留给人。当时答应回头汇报，下面就是后续。&lt;/p>
+&lt;p>先看压力是怎么来的。三件事同时发生，全砸在测试头上。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/169-n06-what-stayed-human/02-fig1_hu_f944568c8d66742.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/169-n06-what-stayed-human/02-fig1_hu_33f28d065f3c4aeb.webp 480w, https://chengxiaqiucao.github.io/post/169-n06-what-stayed-human/02-fig1_hu_f944568c8d66742.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 1｜产能涨、代码涨，人手却在收缩&lt;/p>
+&lt;h2 id="活变多了">活变多了
+&lt;/h2>&lt;p>用 &lt;code>Jira&lt;/code> 和 &lt;code>GitHub&lt;/code> 的数据画了一张图。活跃开发者的定义是一个月合并超过五个 PR。&lt;/p>
+&lt;p>数字有点噪声，因为工单的写法变了：过去大多由产品负责人手写，后来用 &lt;code>ChatGPT&lt;/code> 润色，现在人人都在用 Claude 加 &lt;code>Jira MCP&lt;/code>：Claude 写第一版，人来检查和修改。&lt;/p>
+&lt;p>趋势很清楚。三年里，同样六七个人的团队，交付量大致持平。一月把工具从 &lt;code>Cursor&lt;/code> 换成 &lt;code>Claude&lt;/code> 之后，2026 年同一个团队每月完成的工单比 2025 年多了约 44%（不算缺陷），每月合并的 PR 大致翻倍。从五月起，每个工单携带的代码量约是过去的三倍：工单变大了，单个工单里塞进的功能多了。&lt;/p>
+&lt;h2 id="人变少了">人变少了
+&lt;/h2>&lt;p>同一时期，测试团队从 2.5 人缩到 2 人：其中一位测试工程师有一半时间在做别的岗位。活涨、人降，手工验证的口子就是这么撕开的。&lt;/p>
+&lt;h2 id="到达测试之前的评审变少了">到达测试之前的评审变少了
+&lt;/h2>&lt;p>数据同样有噪声。2024 年 12 月为什么突然跳了一下，现在已经记不清了，但趋势清楚。2025 年，约四分之一的 PR 在没有其他开发者评审的情况下被合并。2026 年，这个比例到了一半，评审只由提交者自己借助 AI 完成。&lt;/p>
+&lt;p>由于代码评审不得不适应开发速度，测试因此成了主要的人工检查环节。即然提交者自己就能合并，到测试手里的东西就更需要有人兜底。活更多、人更少、到手之前评审更少。如果还坚持大部分靠手工测，结果不难想象。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/169-n06-what-stayed-human/02-fig2_hu_c65b98987c334eeb.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/169-n06-what-stayed-human/02-fig2_hu_19508539b965fd9f.webp 480w, https://chengxiaqiucao.github.io/post/169-n06-what-stayed-human/02-fig2_hu_c65b98987c334eeb.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 2｜agent 管执行，人守着最终裁决&lt;/p>
+&lt;h2 id="搭了什么">搭了什么
+&lt;/h2>&lt;p>这套东西由一位叫 Javier 的测试工程师用 &lt;code>Claude Code&lt;/code> 搭起来。春天还只是一个技能，后来长成了一整套测试工具箱，布署进了日常流程。几个原则撑起了这套流程。&lt;/p>
+&lt;p>每天从排好序的队列开始。早上第一件事，测试工程师启动一次扫描：一个 &lt;code>agent&lt;/code> 走查每个待做工单，梳理每处改动碰到了哪些地方，跑已有测试，然后把队列排好序。&lt;/p>
+&lt;p>接下来由人决定测什么。agent 会提议这一轮怎么花时间：一组碰到同一块产品的工单、风险最高的那个，或者几个能快速拿下的。提议归提议，选哪一组由人定。&lt;/p>
+&lt;p>先拿最便宜的证据。agent 把验收标准拆成小断言，每个用能判定它的最省事的方式去查：一个已有的测试，或者直接看代码。剩下的才送到浏览器里。&lt;/p>
+&lt;h2 id="对着断言反着来">对着断言反着来
+&lt;/h2>&lt;p>一个被要求&lt;strong>验证&lt;/strong>工作的 AI，倾向于确认工作本身，因为需求和代码用的是同一批词。所以针对每个断言，agent 必须说出什么能证明它是错的。然后去看没人盯的地方：空值、最大值、两个开关同时打开、流程走到一半刷新。&lt;/p>
+&lt;p>结论留给人。测试工程师复核查了什么，回答 agent 提出的问题，要求补测更多场景。最终判断留在人这里，即便所有检查都通过。agent 永远不能把工单推进到 &lt;code>Done&lt;/code>，未经允许也不能提缺陷单。&lt;/p>
+&lt;p>那块看板本地运行，也是用一个 Claude 技能搭的，是测试工程师管理测试的唯一入口：查过的场景、证据（视频和截图）、agent 的问题、要求补测的请求都在上面。上面那句话最贴切：“结论是你的，永远不会替你填。”&lt;/p>
+&lt;p>按团队自己的估算，agent 现在承担了一个工单上约 75% 到 85% 的动手执行，每张工单跑 16 到 29 个场景，测试工程师回答大约五个问题。这是一周会话的估算，不是精确测量。&lt;/p>
+&lt;h2 id="没发生的事">没发生的事
+&lt;/h2>&lt;p>低风险工单的完全自动化还没实现。原因有两个：一是测试团队不愿意完全放手，团队仍想看到查了什么，不想彻底外包给 AI、和产品失去接触；二是这事优先级不高，当前分类器很少把工单标成低风险，能外包的本来就不多。&lt;/p>
+&lt;p>现在的状态是：测试团队跟上了验证的浪头，但很勉强。左移（&lt;code>shift-left&lt;/code>）的需求测试已经放弃，没时间做。团队忙，而且比主动更偏被动。工单处理不及时，队列就开始失控。&lt;/p>
+&lt;p>九月十月发现并修掉的缺陷数量猛增。一部分是新这套东西找出来的，一部分可能是夏天那些评审变少的代码带进来的；两者怎么分，目前还不清楚。这套做法很难长期持续，因为 AI 越好、工程侧的 &lt;code>harness&lt;/code> 越强，工程产出还会继续加速。&lt;/p>
+&lt;h2 id="下一步押在哪">下一步押在哪
+&lt;/h2>&lt;p>几个可能的方向。测试这边可以让多个 agent 并行跑，人不停切换、不停做决定。也可以把测试做成一门 &lt;code>quality-harness engineering&lt;/code>：设计上下文、工具和 agent 的交互方式，在安全的地方把人从循环里拿掉。还有一个是加州的风险投资商不再替小企业补贴 AI 订阅，大家回去手写代码。&lt;/p>
+&lt;p>押注落在第二个方向。瓶颈一直在移动，这一次穿过去的办法不是多招测试，而是把现有这些人周围的系统做扎实。&lt;/p></description></item><item><title>花了42 分钟、用了92000 个 token，AI才跑完一次登录</title><link>https://chengxiaqiucao.github.io/post/170-n10-local-llm-android/</link><pubDate>Thu, 19 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/170-n10-local-llm-android/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/170-n10-local-llm-android/cover.webp" alt="Featured image of post 花了42 分钟、用了92000 个 token，AI才跑完一次登录" />&lt;p>一个无聊的问题，配一个无聊的答案：一台现成的 Mac mini 上跑一个 300 亿参数的本地模型，能不能给自家金融 App 写 Android UI 测试，哪怕只写其中最枯燥的那部分。不接云，不订订阅，就一台已有的机器和一个已经下载好的模型。短答案是&amp;quot;有时候&amp;quot;。长答案花了好几周，产出一份 198 页、自己跟自己打架的报告。&lt;/p>
+&lt;h2 id="设备与模型">设备与模型
+&lt;/h2>&lt;p>装置本身很具体：M4 Pro 的 Mac mini，48 GB 统一内存；Pixel 模拟器跑 Android 13（API 33）；Java 21、Maven，测试栈是 TestNG 7.11.0、Appium Java Client 10.0.0、Appium Server 3.0.2、UiAutomator2 5.0.4、Selenide 7.0.6，报告交给 Allure。模型侧是 Ollama 加 OpenCode 1.17.11，主模型 &lt;code>Qwen3-Coder-30B&lt;/code>，混合专家，305 亿总参数、33 亿激活，量化到 &lt;code>Q4_K_M&lt;/code>，约 18.5 GB。第二个是 278 亿的稠密模型，约 17 GB；文档把它写成 Qwen3.6 27B，这个名字没核实过。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/170-n10-local-llm-android/03-fig1_hu_6dd5327ba02debf2.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/170-n10-local-llm-android/03-fig1_hu_9f40a6235273760d.webp 480w, https://chengxiaqiucao.github.io/post/170-n10-local-llm-android/03-fig1_hu_6dd5327ba02debf2.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 1｜设备与模型清单，先看清实验装置&lt;/p>
+&lt;h2 id="第一次尝试是把它累垮了">第一次尝试，是把它累垮了
+&lt;/h2>&lt;p>第一次把整套活一次派下去：架构、Maven 工程、依赖版本、Appium 与模拟器配置、driver 生命周期、Page Object、测试、编译、端到端运行、Git，一个提示里全要。模型在 3.1 万到 3.3 万 token 附近忘了开头给的约束。编造依赖版本、用不兼容的 API，把 driver 生命周期写两遍，加了没人要的抽象，在该写测试的地方写了 &lt;code>assertTrue(true)&lt;/code>，在任何东西通过之前就提交了代码。&lt;/p>
+&lt;p>由于一次请求里塞进了太多彼此耦合的任务，模型不是变蠢，是被塞垮的。于是把范围砍到一个 DriverManager、一个 BaseTest、一个冒烟测试。就在这里发生了没预料到的事：那个 278 亿的模型评审这一小片代码时抓到一个真实的 bug，&lt;code>AndroidDriver&lt;/code> 从没通过 &lt;code>WebDriverRunner&lt;/code> 注册到 Selenide，Selenide 其实什么都没在驱动。这个漏网之鱼此前没人看见。修掉之后冒烟测试第二次就过了。算不上胜利，但一个本以为没用的模型给出了真结果。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/170-n10-local-llm-android/03-fig2_hu_ea38cd2670fa0c5c.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/170-n10-local-llm-android/03-fig2_hu_8baa9991bebda634.webp 480w, https://chengxiaqiucao.github.io/post/170-n10-local-llm-android/03-fig2_hu_ea38cd2670fa0c5c.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 2｜一次登录烧掉 42 分钟和九万多 token&lt;/p>
+&lt;h2 id="42-分钟一次登录">42 分钟，一次登录
+&lt;/h2>&lt;p>完整场景通过 Appium MCP 跑：引导页、登录、关掉快速登录的底部弹层、在主界面翻一翻。只用一个 MCP server，不是一大群。耗时 42 分 24 秒，约 9.2 万 token。四十二分钟，为一次登录。&lt;/p>
+&lt;p>时序拆开看更枯燥，索性压缩着列：找到跳过引导的按钮约 8 秒，一次点击 15 到 16 秒，一次截图 7 到 14 秒，一次层级 dump 9 到 30 秒，找到登录框 17 到 18 秒，点元素 18 到 19 秒，输入一个值约 4 秒。有些查找能到 35 秒，查找失败一次约一分钟，收尾关停 38 秒。除此之外，模型反复索要本来就有的截图和层级、来回滑动、点坐标、按返回键、重新分析已经查过的状态。&lt;/p>
+&lt;p>慢本身不算错。慢叠加错才是问题：有一轮报告 &lt;code>BUILD SUCCESS&lt;/code>，实际跑的是 LoginIT 而不是 &lt;code>LogoutIT&lt;/code>。绿灯并没有确认真正要跑的那个测试。这更像验证设计的 bug，而不是模型的 bug，可它把&amp;quot;42 分钟&amp;quot;变成了&amp;quot;42 分钟且没有结果&amp;quot;。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/170-n10-local-llm-android/03-fig3_hu_59b9c93d5b88c631.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/170-n10-local-llm-android/03-fig3_hu_d9268e63e4a0f257.webp 480w, https://chengxiaqiucao.github.io/post/170-n10-local-llm-android/03-fig3_hu_59b9c93d5b88c631.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 3｜链上多处一起断，不只是模型不够聪明&lt;/p>
+&lt;h2 id="失败来自不同层面">失败来自不同层面
+&lt;/h2>&lt;p>还有几类失败，性质各不相同。模型把 MASKED 这串字面文本输进登录框，因为它把规格里的脱敏策略当成了一个要输入的值。密码跑到了登录框里，因为调 &lt;code>set_value&lt;/code> 时没带上密码框的 &lt;code>elementUUID&lt;/code>。&lt;/p>
+&lt;p>用 &lt;code>touch_outside&lt;/code> 关掉快速登录弹层一直不稳，直到换成系统的 Android 返回键。&lt;/p>
+&lt;p>多加上下文、再塞一个 agent 都解决不了这些，由于这些失败分属不同层面：数据策略、工具契约，以及一个不会安静下来的界面。&lt;/p>
+&lt;p>报告本身也是个问题。198 页，约 14800 词，由大概二十几份文档拼贴而成，没有封面、没有日期、没有作者，开头是一份报告的中段，结尾停在一个 YAML 块上。认证流程被描述了十五六遍，touch_outside 十三遍，MASKED 十六遍。结论还互相打架。一页说&amp;quot;没有创建出可用的 Android 测试框架&amp;quot;，另一页说&amp;quot;最小框架：可用。LoginIT：可用&amp;quot;，第三页说&amp;quot;代码生成：禁止&amp;quot;。没有一句是谎话，每一句都来自不同阶段、各有各的完成定义。第一句是大自治那次，第二句是最小切片，第三句出自 locators 还没建立之前。可读者分不清该信哪一句：翻开开头是失败，翻到中间是能用，翻到结尾是禁止。&lt;/p>
+&lt;p>教训很无聊，是踩坑换来的：每一条结论都标日期，只维护一张状态表，别把不同阶段的报告订成一个 PDF。否则，一次诚实的实验读起来会像一份自我推翻的宣传册。文档里原本带着内部名称、主机和测试数据，发表前全清掉了。&lt;/p>
+&lt;h2 id="外部证据怎么说">外部证据怎么说
+&lt;/h2>&lt;p>人们最先引用的是 SWE-bench Verified。官方的 OpenHands 加 Qwen3-Coder-30B-A3B-Instruct 提交解出了 500 个实例里的 258 个，51.6%，pass@1，不给提示、不给测试知识。&lt;/p>
+&lt;p>这是真结果，不该一笔带过。可这个基准测的是 Python 仓库、简单的工具集、确定性的测试，没有模拟器、没有设备，也没有登陆界面。模型有一半时间能解对一道简短、隔离、可测试验证的 bug，另一半解不对。&lt;/p>
+&lt;p>自治工作里一半失败不可接受；对人会先读一遍的草稿，可能有用。这个基准告诉边界在哪，没告诉你模型擅长移动端测试。差一点就写成那样。&lt;/p>
+&lt;p>移动端的研究更薄，指向却一致。2023 年一篇 QRS 论文发现，ChatGPT 写出的 Appium 脚本语法正确，却用了不兼容或已废弃的 API，还处理不好输入焦点和弹窗。2024 年一项覆盖 9 个模型、115 个真实 App 的研究，用文本或 XML 时页面通过率约 71%，用截图时约 65%，缺陷发现接近 51%，而提升大多来自人去打磨输入。ScenGen 用五个分工不同的 agent 拿到结果，那是一套架构，不是一句&amp;quot;生成个测试&amp;quot;的提示词。&lt;/p>
+&lt;h2 id="工具调用才是断掉的地方">工具调用才是断掉的地方
+&lt;/h2>&lt;p>Qwen3-Coder 常丢掉工具调用的开标签；另有报告说经 Ollama 的 qwen3-coder:30b 把工具调用当纯文本返回。即然一步出错会让后面全跟着错，二十步在每步 95% 可靠率下只剩约 36% 成功，90% 时只有 12%。&lt;/p>
+&lt;p>上下文也是一团乱。Ollama 按显存挑默认值：24 GiB 以下 4K，24 到 48 GiB 之间是 32K，48 及以上 256K。第一次跑是 32K，提到 128K 之后更稳，没更快，多余的动作还在。&amp;ldquo;分配了 128K&amp;quot;不等于&amp;quot;用好了 128K&amp;rdquo;，长上下文模型从输入中部检索的能力还会变差。&lt;/p>
+&lt;p>真正断掉的地方，是五层叠在一起：丢失的工具调用；一段满是动画和系统弹窗的长循环，早期错误一路传递；9.2 万 token 的日志和 XML，有用的那点可能藏在任意位置；每个动作 8 到 35 秒，&amp;ldquo;试一次、读结果、改&amp;quot;不再划算；再加上没有确定性的验证。最后那层最危险，因为 BUILD SUCCESS 会凭空制造信心。&lt;/p>
+&lt;h2 id="分析里的三个错">分析里的三个错
+&lt;/h2>&lt;p>复盘下来，有三个分析错误，而且是同一个毛病。把&amp;quot;一个文件、一个模板、自动检查就够了&amp;quot;当成结论写出来，读过的任何研究都不支持。一个文件里有三十次设备交互，比十个文件、每个一条命令加确定性结果更难。真正救你的是短的反馈回路，不是文件小。&lt;/p>
+&lt;p>第二个错，是写到&amp;quot;几十个 MCP 工具&amp;rdquo;。其实只有一个 server。一个看起来合理的细节比&amp;quot;不知道&amp;quot;更糟，因为它听着对，而且没人去核。&lt;/p>
+&lt;p>第三个错，是差点把 SWE-bench 的 51.6% 读成&amp;quot;适合移动端&amp;quot;。那个基准测的就是带测试的短 Python 任务，仅此而已。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/170-n10-local-llm-android/03-fig4_hu_fa031afb986b996c.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/170-n10-local-llm-android/03-fig4_hu_83d1bbd02c05a1a9.webp 480w, https://chengxiaqiucao.github.io/post/170-n10-local-llm-android/03-fig4_hu_fa031afb986b996c.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 4｜把模型当函数，用编译关卡和止损线兜底&lt;/p>
+&lt;h2 id="一套收敛的配置长什么样">一套收敛的配置长什么样
+&lt;/h2>&lt;p>收敛出的配置小得多。模型是一个函数，不是 agent：输入一份 &lt;code>login_page.xml&lt;/code> 快照，再加一个现成的 ProfilePage.java 当样式范例，输出一个 &lt;code>LoginPage.java&lt;/code>。模型从不调用 Appium，不挑工具，不持有状态，从而把不确定的设备交互挡在外面。这套配置搭好后做了 dry run，全部主张就这些：一次预演，不是生产记录。&lt;/p>
+&lt;p>Modelfile 的关键参数：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">FROM qwen3-coder:30b
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">PARAMETER num_ctx 32768
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">PARAMETER temperature 0.15
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">PARAMETER top_p 0.8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">PARAMETER repeat_penalty 1.05
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">PARAMETER num_predict 2048
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>为什么是 32K 不是 128K？一页源码加一个例子轻松放得下，128K 是一次长 MCP 会话的体量，不是这个任务的。更多上下文不自动等于更好。&lt;/p>
+&lt;p>主要的保险是一个 locator 检查，模型不许自己编 id：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">re&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">xml_ids&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">page_source&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">re&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">findall&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">r&lt;/span>&lt;span class="s1">&amp;#39;resource-id=&amp;#34;([^&amp;#34;]+)&amp;#34;&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">page_source&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">java_ids&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">java&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nb">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">re&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">findall&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">r&lt;/span>&lt;span class="s1">&amp;#39;AppiumBy\.id\(&amp;#34;([^&amp;#34;]+)&amp;#34;\)&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">java&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">unknown&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">java_ids&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">java&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">xml_ids&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">page_source&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>unknown 非空就是错误，不是&amp;quot;差不多对&amp;quot;。错误回灌进提示词，最多试三次，然后过编译关卡：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">subprocess&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;mvn&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;-q&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;-DskipTests&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;test-compile&amp;#34;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">cwd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">project_root&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这些检查抓得住语法、编造的 id 和编译问题，抓不住含义：错误的等待、错误的 API、一个匹配到两个元素的 locator。&lt;/p>
+&lt;p>还有些局限没有解决。iOS 上的 XCUITest 没有 resource-id，只有 name、label、value；没设 accessibility identifier 就只剩文本，而文本随语言变。屏幕外元素、系统告警、键盘、WebView、React Native 或 Flutter 的内容，常常根本不出现在快照里。&lt;/p>
+&lt;p>Android 上 Compose 常给出空的 resource-id，testTag 不开 &lt;code>testTagsAsResourceId&lt;/code> 就不可见，合并语义还会藏起子元素。手势从 XML 里根本读不出来：是 click、longClick、swipe 还是 drag？模型默认 &lt;code>click()&lt;/code>，能编译，但是错的。&lt;/p>
+&lt;p>所以定位器不需要模型，需要一个解析器：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">xml.etree.ElementTree&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">ET&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">root&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">ET&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">parse&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;login_page.xml&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">getroot&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="n">node&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">root&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">iter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;node&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">rid&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">node&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;resource-id&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">text&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">node&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;text&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">desc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">node&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;content-desc&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">cls&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">node&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;class&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">rid&lt;/span> &lt;span class="ow">or&lt;/span> &lt;span class="n">text&lt;/span> &lt;span class="ow">or&lt;/span> &lt;span class="n">desc&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">rid&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">text&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">desc&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="bp">cls&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">node&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;bounds&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>iOS 上对 &lt;code>XCUIElementType*&lt;/code> 用 name、label、value 做同样的事。元素不在快照里，工具就该说&amp;quot;不在快照里，滚动后重新 dump&amp;quot;，而不是编一个 id。解析器更快、更稳，而且不会幻觉。&lt;/p>
+&lt;p>分工可以按这个来布署：locator 由解析器或 Appium Inspector 出，绝不由模型出；Page Object 草稿的结构来自本地模型、locator 来自解析器，然后过 locator 检查和编译；失败分诊交给拿得到日志和页面源码的模型，人来拍板；自主设备控制交给云端模型或人。真正该盯的指标是从场景描述到被接受的可用测试的耗时，旁边并列编译次数、人工修正次数、假 BUILD SUCCESS 次数、真实界面上缺失的 locator 数。&lt;/p>
+&lt;p>还要有一条止损线，免得争论变成口味之争：拿十个真实界面，如果少于七个能走完&amp;quot;快照、生成、locator 检查、编译、冒烟，且最多人工修一次&amp;quot;就停。别加 agent，别加上下文，别重写提示词。停下来本身也是一个结果。&lt;/p>
+&lt;p>本地模型没有取代人。这个模型找到了一个此前漏掉的 bug，帮着写草稿，加速了一部分体力活；也为一次登录花了 42 分钟，对着错的测试打出了绿灯。两件事都成立。模型不是系统，系统才是那个检查输出的东西。在让模型碰测试之前，先问清楚什么能证明它做对了。答案是&amp;quot;人会看一眼&amp;quot;，那是草稿；是&amp;quot;编译并跑测试&amp;quot;，那是工程；是&amp;quot;模型自己会搞清楚&amp;quot;，那就是在为一次登录付 42 分钟和 9.2 万个 token。&lt;/p></description></item><item><title>把修复和回归分开，Agent测试实践</title><link>https://chengxiaqiucao.github.io/post/165-regression-hunt-plugins/</link><pubDate>Thu, 12 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/165-regression-hunt-plugins/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/165-regression-hunt-plugins/cover.webp" alt="Featured image of post 把修复和回归分开，Agent测试实践" />&lt;p>AI 代理修 bug 的速度上来了，另一头的问题跟着冒出来：它修好的这一处，有没有把别处弄坏？一家长期做安全补丁的团队把这件事拆成了两个可安装的插件——一个负责复现缺陷、开发并验证补丁，另一个专门检查这次改动是否破坏了原先正常且受支持的行为。工程师指挥流程并复核结果，维护者可以注入自己的安全假设与补丁要求，让代理在项目规则内工作。&lt;/p>
+&lt;p>这不是凭感觉设计的产品。它来自一个开源安全补丁计划里合写的数百个补丁，以及对已合并补丁、数千次工程师编码会话的复盘。&lt;/p>
+&lt;h2 id="先把回归定义死">先把回归定义死
+&lt;/h2>&lt;p>团队复核了自己工程师撰写、被维护者合入上游的每一个补丁：130 多个 &lt;code>PR&lt;/code> 里确认了 21 个回归，其中 16 个功能问题、1 个性能问题、4 个构建/测试问题，没有一个破坏安全防护。&lt;/p>
+&lt;p>这里的回归有严格边界：由某次改动引入的新缺陷，破坏了此前正确且受支持的行为，并且位于真实用户或攻击者能走到的路径上。定义里最关键的其实是后半句——它同时排除了&lt;code>本来就有的问题&lt;/code>和&lt;code>没人会走到的路径&lt;/code>。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/165-regression-hunt-plugins/06-fig1_hu_92f29d48848bb6b5.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/165-regression-hunt-plugins/06-fig1_hu_cadef876675b9b15.webp 480w, https://chengxiaqiucao.github.io/post/165-regression-hunt-plugins/06-fig1_hu_92f29d48848bb6b5.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 1｜误报、修复不完整、潜在缺陷、既有缺陷都被挡在报告之外，只有可到达路径上的新缺陷才算数&lt;/p>
+&lt;p>复核过程是：让代理找出潜在回归，每个都用改动前后各跑一次 &lt;code>PoC&lt;/code> 来确认，再把结果交给工程师复核。结果很吵：21 个确认回归是从一轮跑出的 58 个候选里挑出来的，精度约 36%。而代理每次思路不同、结果不同，每跑一轮就多一批要人工分拣的候选。&lt;/p>
+&lt;p>于是得到两个结论：要少引入回归，得有一套每次都执行同样检查的标准写法；要抓住仍然漏出去的回归，得有一套判定&lt;code>什么算回归&lt;/code>的成文标准。两者标准化之后，每次运行才可重复、可比较。&lt;/p>
+&lt;p>顺带一个很务实的做法：没有哪份固定清单能抓全所有回归，所以他们收集工程师补丁会话里的代理轨迹，把上一版失败的任务当作下一版的基准题。&lt;/p>
+&lt;h2 id="四条设计原则">四条设计原则
+&lt;/h2>&lt;p>两个插件的设计来自两处材料：所有已合入上游补丁的复盘，以及写这些补丁时用过的数千次编码会话。归纳出四条原则。&lt;/p>
+&lt;ul>
+&lt;li>用尽可能少的词给出强观点：给代理充分自由度，只把&lt;code>什么算好补丁、什么算真回归&lt;/code>的判断写进去&lt;/li>
+&lt;li>步骤模块化：两个插件都不必端到端跑完，各自拆出多个技能，可组合也可单独使用&lt;/li>
+&lt;li>严格的输入输出 &lt;code>schema&lt;/code>：每一步都接收并返回含声明、代码版本、要求检查项、原始证据、待解疑问的结构，固定结构既压低运行间的波动，也让后一步能核验前一步的工作，而不是信任它的摘要&lt;/li>
+&lt;li>每个结论都要活体 &lt;code>PoC&lt;/code>：结论必须落在真实构建、真实运行的实例上，通过真实用户会用的接口验证。复现缺陷、证明修复、确认回归，任一步给不出活体 PoC，结果就判为&lt;code>未定&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>第三条尤其值得抄：让代理核验上一步的原始证据，而不是读上一步自己写的总结。&lt;/p>
+&lt;h2 id="查回归的那个插件怎么工作">查回归的那个插件怎么工作
+&lt;/h2>&lt;p>&lt;code>regression-hunt&lt;/code> 的流程有四步：沿改动的 diff 追踪到它的调用方、再追到真实接口，枚举候选回归；在活体部署上复现每个候选；用全新上下文的代理在该部署上重放 &lt;code>PoC&lt;/code>；最后统一裁决，检查证据是否满足回归定义。&lt;/p>
+&lt;p>除了四条原则，还有两个决定性设定。一是把举证责任压给代理：在裁决那一步，它必须证明这个疑似回归不是误报、不是修复不完整、不是潜在缺陷、不是既有问题，全部闸门通过才上报。二是如果有 &lt;code>THREAT_MODEL.md&lt;/code>，编排器会把它作为全局上下文传给每一个代理步骤，要求每一步下结论前都回看威胁模型。&lt;/p>
+&lt;p>效果用那 21 个已确认回归做了对照：相比一个只被要求「审查这个 PR 有没有回归」的基线代理，该插件的误报少 25%，95% 置信区间 14% 到 38%。但代价也写得很清楚——严格的证据要求让部分已知回归停在&lt;code>边界&lt;/code>状态：插件识别到疑似回归，却没攒够证据确认。误报更少，换来的是能自信上报的已知回归变少。团队下一步就是查这些边界案例，改进取证策略。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/165-regression-hunt-plugins/06-fig2_hu_6bd868b704d16116.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/165-regression-hunt-plugins/06-fig2_hu_db0bc882d64230c3.webp 480w, https://chengxiaqiucao.github.io/post/165-regression-hunt-plugins/06-fig2_hu_6bd868b704d16116.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 2｜证据门槛抬高后误报下降，同时部分真实回归落入待确认区，两者需要一起度量&lt;/p>
+&lt;h2 id="写补丁的插件里最硬的是三臂证明">写补丁的插件里，最硬的是三臂证明
+&lt;/h2>&lt;p>&lt;code>patching-bugs&lt;/code> 把数千次会话里的实践沉淀成流程。除了传统的活体复现与独立对抗评审，它强调三件事。&lt;/p>
+&lt;p>三臂证明：同一份复现要跑三个版本——原始代码必须失败、打了补丁必须通过、把补丁完整回滚后必须再次失败。把 bug 用&lt;code>移除补丁&lt;/code>重新请回来，能更有力地说明确实是这个补丁修好了它，而不是环境或某处测试改动碰巧让它消失。&lt;/p>
+&lt;p>不变量导向修复：补丁尝试修复被违反的底层安全不变量，而不是只堵住这一个 bug，这样对同类别的变体也更可能生效。&lt;/p>
+&lt;p>强制跑回归检查：插件要求任何补丁都必须经过同一条标准回归流水线，不允许「这次改动小，跳过」。&lt;/p>
+&lt;p>三条合起来指向同一件事：让&lt;code>修好了&lt;/code>这个结论有可复核的证据结构，而不是一句代理自述。&lt;/p>
+&lt;h2 id="要让插件好用得先给仓库补两份文件">要让插件好用，得先给仓库补两份文件
+&lt;/h2>&lt;p>插件效果取决于两类项目知识，而这两类恰好是很多仓库缺的。&lt;/p>
+&lt;p>&lt;code>THREAT_MODEL.md&lt;/code> 告诉代理什么算漏洞或回归，会被传给每一步。它应当写清：哪些资产被破坏才算事、信任边界、访问控制、受支持的配置、关于&lt;code>什么算/不算漏洞&lt;/code>的规约，以及一份有效缺陷报告需要哪些证据。&lt;/p>
+&lt;p>&lt;code>PATCHING_GUIDELINES.md&lt;/code>（或 &lt;code>AGENTS.md&lt;/code>）告诉代理项目希望怎么写修复：如何构建与测试、修复该多大、代码应落在哪、改动如何呈现、以及一条回归测试必须证明什么。&lt;/p>
+&lt;p>这些文件越贴近项目自身的约定与运作方式，输出越好。团队举了几个开源项目的例子：工程师为其中一个写了威胁模型和项目专属补丁技能，把维护者对缺陷复现、修复证据、补丁必须保留什么的期待都写进去；另两个项目也按同样指引公开了威胁模型。&lt;/p>
+&lt;h2 id="可以照着改的三件事">可以照着改的三件事
+&lt;/h2>&lt;p>不用装这两个插件，也能把结论搬到日常流程里：&lt;/p>
+&lt;ul>
+&lt;li>给&lt;code>修好了&lt;/code>加一条三臂证明：改前失败、改后通过、回退再失败，避免把环境抖动当成修复&lt;/li>
+&lt;li>给回归检查写成文标准，并让举证责任在检查方——先排除误报、既有缺陷、修复不完整，再上报&lt;/li>
+&lt;li>把威胁模型与补丁规约放进仓库，让每个自动化步骤都能读到，而不是只写在 wiki 里&lt;/li>
+&lt;/ul>
+&lt;p>背景是速度：AI 让缺陷发现变快，把发现变成可信赖修复的能力必须同样快。代理需要读懂报告、判断该改什么、并验证补丁修好问题且没引入回归。真正决定能不能放心合入的，不是它写得多快，而是它交出了什么样的证据。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/165-regression-hunt-plugins/06-fig3_hu_b38ff1eb80723e8f.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/165-regression-hunt-plugins/06-fig3_hu_3654d2d1e351237b.webp 480w, https://chengxiaqiucao.github.io/post/165-regression-hunt-plugins/06-fig3_hu_b38ff1eb80723e8f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 3｜复现、三臂证明、不变量修复、独立回归检查依次串联，每一环都留下可复核材料&lt;/p></description></item><item><title>让Agent学会当Bug猎手</title><link>https://chengxiaqiucao.github.io/post/164-agent-hunt-experiment/</link><pubDate>Thu, 12 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/164-agent-hunt-experiment/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/164-agent-hunt-experiment/cover.webp" alt="Featured image of post 让Agent学会当Bug猎手" />&lt;p>给 AI 代理的指令里加上&lt;code>写下假设和预测&lt;/code>，再要求它每观察一步就记录异常信号，它会不会找到更多缺陷？有人把这个想法做成了一次可判定的实验，并且事先写好了预测。结果预测没成立：三组条件下的中位数都是 6 个植入缺陷里找到 3 个，一项都没提升。&lt;/p>
+&lt;p>更有价值的不是&lt;code>加提示词没用&lt;/code>这句结论，而是数据逼出来的一个区分：一份工整的调查日志、调查本身、找到的缺陷、以及没被测到的风险，是四件不同的事。漂亮的日志只证明第一件。&lt;/p>
+&lt;h2 id="实验问的是一个很窄的问题">实验问的是一个很窄的问题
+&lt;/h2>&lt;p>前一篇的论点是：能顺利执行步骤的代理，并不等于在做探索性测试。探索是调查，不是脚本；一条用例可以在主路径上全绿，同时漏掉双击产生的重复订单。&lt;/p>
+&lt;p>于是争论被换成一个可测量的版本：给一个通过浏览器工具工作的通用代理加两处指令结构，看它找到的植入缺陷在数量和类型上是否变化。测的不是&lt;code>代理有没有学会像人一样思考&lt;/code>，只是这两处改动的效果。&lt;/p>
+&lt;h2 id="先做-pilot再重做一个应用">先做 Pilot，再重做一个应用
+&lt;/h2>&lt;p>第一轮每条件只跑一次，在一个带植入缺陷和诱饵的小型购物应用上，约 40 次工具调用预算。两组都找到 5 个里的 2 个，都漏掉了全部三个时序与并发缺陷，两份报告也都没提到围绕它们的订单延迟。&lt;/p>
+&lt;p>一次运行分不清是脚手架起作用还是运气好，调用上限还可能决定了它在哪停下。所以第一轮只当 pilot，第二轮&lt;strong>换了一个新应用&lt;/strong>，而不是针对已经看熟的系统调参数——这个决定值得单独记下来， evaluation 里最常见的自欺就是拿见过的题调参。&lt;/p>
+&lt;h2 id="六个缺陷四个诱饵三组条件">六个缺陷、四个诱饵、三组条件
+&lt;/h2>&lt;p>新应用是一个小型订票 Web 应用，植入 6 个缺陷、4 个诱饵（看起来可疑但行为正确的设计）：&lt;/p>
+&lt;ul>
+&lt;li>订 60 张票被截断成 59&lt;/li>
+&lt;li>旧报价覆盖新报价&lt;/li>
+&lt;li>两个买家同时拿到最后一张票（检查后才执行的竞态）&lt;/li>
+&lt;li>重复提交产生两笔订单&lt;/li>
+&lt;li>非数字数量返回 HTTP 200 且金额为 &lt;code>NaN&lt;/code>&lt;/li>
+&lt;li>被拒绝的订单在界面上什么都不显示&lt;/li>
+&lt;/ul>
+&lt;p>中间三个属于时序与并发缺陷。三组条件分别是：A 默认章程（探索下单流程并报告任何不正确或可疑之处，附复现步骤）；B 在 A 之上要求每个假设都先写预测与可证伪条件；C 在 B 之上增加必做的&lt;code>信号&lt;/code>步骤，每次观察后、选下一个假设前，记下延迟、顺序、状态码等意外之处。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/164-agent-hunt-experiment/05-fig1_hu_2cda6d5db2026135.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/164-agent-hunt-experiment/05-fig1_hu_6edae7dfb908dec6.webp 480w, https://chengxiaqiucao.github.io/post/164-agent-hunt-experiment/05-fig1_hu_2cda6d5db2026135.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 1｜A/B/C 逐层叠加指令结构，缺陷按&lt;code>单输入可暴露&lt;/code>与&lt;code>需时序触发&lt;/code>分开归类&lt;/p>
+&lt;p>设计相当克制：每条件 5 次、共 15 次，分 5 波、每波 3 个并发会话且各含一组条件，槽位与波次顺序用记录下来的随机种子生成。每次会话有独立的应用实例、端口、种子和浏览器配置，统一模型、20 分钟上限。预测、指标、评分规则与判定规则在应用建成、任何运行开始之前就固定下来。两名独立 AI 评分员只看报告、对条件盲评，按答案键打分，90 个判定里分歧 4 个，且在揭盲前裁定完毕。&lt;/p>
+&lt;p>还差点出事的地方也全部公开：应用前端 JavaScript 的注释里写了三个缺陷，浏览器可直接读到；读权限能拿到缺陷清单和其他条件的提示词；会话之间能互相访问端口；挂起进程可能阻塞结果保存。这四处都在开跑前修掉。跑完之后，评测脚本又把 15 次会话全部标成基础设施失败，原因是它匹配到了每份记录里都会出现的一条常规状态消息——这次是误报。&lt;/p>
+&lt;h2 id="预测没成立逐缺陷的数字更有意思">预测没成立，逐缺陷的数字更有意思
+&lt;/h2>&lt;p>事先写下的预期是：脚手架会有帮助，信号步骤对时序缺陷帮助最大。实际结果：&lt;/p>
+&lt;ul>
+&lt;li>6 个缺陷的中位发现数，预测 A/B/C 为 3 / 4 / 4，实际 3 / 3 / 3&lt;/li>
+&lt;li>3 个时序缺陷的中位发现数，预测 0 / 1 / 2，实际 1 / 1 / 1&lt;/li>
+&lt;/ul>
+&lt;p>按预先登记的判定规则：B 的中位数不高于 A 就算脚手架无效；C 的时序中位数要超过 B 才算信号步骤有效。两个条件都没达到。这不等于证明脚手架完全没效果，只说明它没有跨过事先设好的门槛。&lt;/p>
+&lt;p>评分也做了交代：两名评分员单独给出 2/2/3 与 3/3/3 的不同总中位数（两个缺陷处在边界判定上），但都不改变上述两个预登记决策。C 在其中一名评分员下总数更高属于探索性观察，不是预登记指标，不能拿来当&lt;code>信号步骤有效&lt;/code>的证据。&lt;/p>
+&lt;p>真正稳的结论藏在逐缺陷命中数里（每组 5 次运行，需带可复现触发与证据）：&lt;/p>
+&lt;ul>
+&lt;li>60 张被截成 59：5 / 5 / 5，也就是 15 次全中&lt;/li>
+&lt;li>旧报价覆盖新报价：3 / 3 / 3&lt;/li>
+&lt;li>最后一张票竞态：0 / 0 / 1&lt;/li>
+&lt;li>重复提交：0 / 0 / 0&lt;/li>
+&lt;li>非数字数量返回 &lt;code>NaN&lt;/code>：5 / 3 / 5&lt;/li>
+&lt;li>被拒订单无提示：0 / 2 / 3&lt;/li>
+&lt;/ul>
+&lt;p>单输入或单屏幕就能暴露的缺陷几乎次次被找到：上限边界 15/15，&lt;code>NaN&lt;/code> 金额 13/15。需要特定交互序列或时序的缺陷极少被找到：竞态 1/15，重复提交 0/15，两名评分员对这两个数字完全一致。旧报价缺陷（需要响应乱序到达）居中，9/15，其中一次判定在边界上。指令结构并没有消掉这道沟。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/164-agent-hunt-experiment/05-fig2_hu_f6c135a9a760cb54.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/164-agent-hunt-experiment/05-fig2_hu_bc33cb2210aa9095.webp 480w, https://chengxiaqiucao.github.io/post/164-agent-hunt-experiment/05-fig2_hu_f6c135a9a760cb54.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 2｜边界值与异常金额几乎全中，竞态与重复提交近乎全漏，两类缺陷之间出现明显断层&lt;/p>
+&lt;p>耗时中位数 A/B/C 为 155 / 194 / 172 秒，单次成本约 0.16 / 0.23 / 0.22 美元，远在 20 分钟上限之内。这些只作完整性记录，不说明哪种条件更高效。&lt;/p>
+&lt;h2 id="两种解释这次实验分不开">两种解释，这次实验分不开
+&lt;/h2>&lt;p>低命中率至少有两种说得通的原因，而数据无法区分：&lt;/p>
+&lt;p>一是能力上限——通过浏览器工具，代理难以构造或推理并发交互；二是策略选择——提示词告诉它「继续投入不值得时就停」，还说有个它看不见的时间上限，而会话其实在两三分钟就结束了，预算根本没用完。&lt;/p>
+&lt;p>浏览器工具本身是否让并发交互更难触发，也没测过。另外，低发现率只说明结果不够好，不说明调查是在哪一步开始出问题的：可能压根没想到要试并发，可能想到了但没投入，可能触发了却没能识别证据。每一种对应的修法都不同。&lt;code>停止&lt;/code>同样得拆成三件事：允许使用的预算（20 分钟）、代理实际的停止行为、以及被写进提示词的停止策略。这次只能确认预算没被用尽。&lt;/p>
+&lt;h2 id="把四种证据分开看">把四种证据分开看
+&lt;/h2>&lt;p>可以把证据拆成四层（这是提议中的框架，不是已验证模型）：&lt;code>process&lt;/code> 是代理有没有记下假设、预测与可证伪条件；&lt;code>investigation&lt;/code> 是它有没有真的跑一个能区分可能性的实验；&lt;code>outcome&lt;/code> 是它有没有找到并复现缺陷；&lt;code>coverage&lt;/code> 是哪些重要风险根本没被测到。&lt;/p>
+&lt;p>一份整齐的调查日志是 &lt;code>process&lt;/code> 的证据，不是覆盖充分的证据。四者指向不同的修复动作：从没考虑并发，是优先级问题；考虑了但触发不了竞态，看工具或执行策略；触发了却没认出来，看证据解读。这次实验并没有把四个维度都测到。&lt;/p>
+&lt;p>旁证也支持把日志只当流程证据：B、C 被要求在每个实验前记录预测与可证伪条件，而 77 条已记录的预测里，只有 25 条是在浏览器动作之前写入的，其余 52 条首次出现在与观察同一次日志写入中，无法证明预测在先。&lt;/p>
+&lt;h2 id="一个没被验证的提案人先定章程">一个没被验证的提案：人先定章程
+&lt;/h2>&lt;p>于是问题收窄成一句：谁决定代理在获准停止之前必须查什么？&lt;/p>
+&lt;p>提案是由人在会话前设定、会话后复核的章程，包含三项：最低风险覆盖（一份必须测试或明确说明为何跳过短清单，如并发下单与重复提交，并规定什么证据算覆盖，由人判定；一个说得通的解释不能替代调查）；不由代理自行判断的停止条件；以及被放弃假设的记录与理由，由人阅读。&lt;/p>
+&lt;p>要强调的是：这是设计提案、不是发现：让代理&lt;code>必须测并发&lt;/code>本身仍是一次提示词改动。如果它有效，说明缺口主要在要求与停止策略上，覆盖决策该留在人手里；如果无效，说明缺口比提示词更深。两种结果都能给出当前数据给不了的信息。而且，人能决定并发是否在范围内、什么算调查充分，并不代表代理就能构造出正确的并发交互、稳定触发或认出竞态。&lt;/p>
+&lt;h2 id="不依赖代理的那条结论">不依赖代理的那条结论
+&lt;/h2>&lt;p>实验最实用的输出，其实与用什么模型无关：一份测试章程不该只写要探索哪个功能或哪条旅程，还要写明重要的风险类别、什么证据算一次发现、以及哪些风险不允许跳过。无论执行者是人、浏览器代理，还是两者混合，这一条都成立。&lt;/p>
+&lt;p>边界也要如实说清：每条件 5 次运行、一个模型、一个专门造的应用，只报描述性数字，不主张统计显著；评分员与被测代理来自同一模型家族；C 的提示词点名了延迟、顺序与状态码，提升即便出现也可能来自这个提示而非步骤本身；其中三次会话共用一台内存有限的机器，波次设计只能平衡、不能消除；提示词本身要求填写&lt;code>未调查&lt;/code>部分、告诉代理在不值得时停止、还提到一个它看不见的时间限制。至于换个模型、换个应用、拉长会话会怎样，这次数据一句也说明不了。&lt;/p>
+&lt;p>下一步该一次只改一个变量：固定模型、应用与评分标准，以 B 为基线，只把明确要求并发与重复提交测试加进去，停止策略保持不变，并记录代理是否考虑到每个风险、是否尝试交互、是否触发缺陷、是否读懂证据；之后再单独改模型或停止策略，并增加运行次数。&lt;/p>
+&lt;p>给代理加上调查结构，不等于给了它调查能力。真正决定结果的，还包括我们要求它查什么、接受什么当证据，以及它停下来时，还有多少未知留在桌上。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/164-agent-hunt-experiment/05-fig3_hu_b62e984dfa2fafde.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/164-agent-hunt-experiment/05-fig3_hu_5b60816c6e4de239.webp 480w, https://chengxiaqiucao.github.io/post/164-agent-hunt-experiment/05-fig3_hu_b62e984dfa2fafde.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 3｜整齐的日志只落在最上层，向下每一层对应不同的修复动作，不能合并成一个分数&lt;/p></description></item><item><title>让Agent执行测试，可以开始了</title><link>https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/</link><pubDate>Thu, 12 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/cover.webp" alt="Featured image of post 让Agent执行测试，可以开始了" />&lt;p>很多团队已经在用编码代理写自动化测试，却很少让代理真的去测应用。二者不是一回事：前者产出的是脚本，后者是在功能还没定型时跑一轮探索，把反馈交回到开发手里。&lt;/p>
+&lt;p>这篇要说的就是这条分界线，以及为什么值得在现有自动化体系旁边加一层自主质量检查。&lt;/p>
+&lt;h2 id="两种循环差别在下一步谁定">两种循环，差别在下一步谁定
+&lt;/h2>&lt;p>脚本自动化的形状很熟悉：动作、动作、断言。路径是我们事先知道的，用例只负责按这条路径走完并核对结果。&lt;/p>
+&lt;p>代理测试不需要这条路径。它检查应用当前的状态，据此决定下一步做什么，然后在一个循环里不断行动、评估，直到达成目标：动作、调用模型并对照目标评估当前状态、下一个动作。&lt;/p>
+&lt;p>灵活是它的长处，短处也同源：它永远不会像预定义脚本那样快、那样可复现、那样准确。所以正确用法不是替换，是分层——脚本留在 &lt;code>CI&lt;/code> 里做快速可靠的回归，代理放在开发和探索环节补脚本覆盖不到的地方。&lt;/p>
+&lt;h2 id="最值钱的位置是开发过程中">最值钱的位置是开发过程中
+&lt;/h2>&lt;p>在 20 多场关于智能体的工作坊里，一个反复出现的现象是：不少人想开始但不知道从哪下手；很多团队用 AI 写自动化用例，真正用智能体做测试的很少。原因之一在于价值落点不直观。&lt;/p>
+&lt;p>其实落点很明确：新功能还在开发时。代理可以探索一个尚未定型的特性、对它看到的东西作出反应、自己造出所需的测试数据、去查那些事先根本没被写进脚本的场景。它比一条脚本用例慢，但比等功能做完再安排人工检查快得多。&lt;/p>
+&lt;p>这就是 &lt;code>shift-left&lt;/code> 一直想要而很难做到的部分：不用等特性完成，实现到一半就能让代理验一遍，在建 PR 之前以很小代价跑很多轮检查。功能测试之外，还可以让它看键盘导航、无障碍行为、校验状态、错误处理这些平时容易分不到时间的维度。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/08-fig1_hu_7f9b88b65e82a739.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/08-fig1_hu_92c682efc8a6a948.webp 480w, https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/08-fig1_hu_7f9b88b65e82a739.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 1｜开发阶段由代理覆盖未知路径，合并与 CI 阶段由脚本守住已知的回归路径&lt;/p>
+&lt;h2 id="测试变成可对话的事">测试变成可对话的事
+&lt;/h2>&lt;p>开发一个用户故事时，可以让代理先测当前已实现的部分。它通常从主路径开始，回报发现了什么；看完结果，再要求它多探几个边界、聚焦某个特定场景，或者追一下刚才看着可疑的地方。&lt;/p>
+&lt;p>这个反馈回路把探索性测试的成本压下来了。过去时间有限，只能在&lt;code>测哪些、跳过哪些&lt;/code>之间取舍；有了自主代理，多跑很多场景变成现实。这不意味着测试必须由开发独占：在更传统的流程里，功能进了测试环境之后，测试人员同样可以用这套方式——让代理负责执行与探索，人负责指挥和判断证据。&lt;/p>
+&lt;h2 id="信任来自证据不是来自结论">信任来自证据，不是来自结论
+&lt;/h2>&lt;p>代理会出错、会补全空白、会不严格遵循指令。那凭什么信它给出的测试结果？&lt;/p>
+&lt;p>答案是别信结论，看证据。需要看到它执行了哪些场景、走了哪些路径、观察到什么、以及凭什么判定行为正确。有了这些，人才能自己决定给这份结果多大信任。另一个好处是它更难抄捷径：不能只声称某场景通过，得展示实际做了什么。&lt;/p>
+&lt;p>角色因此发生变化：从&lt;code>每条测试自己执行&lt;/code>变成审阅检查是否充分、证据是否支撑结论。检查不够，就让它再探几个边界、专门测某个用例，或者补上下文重跑一轮。&lt;/p>
+&lt;p>这一点和前面那篇实验的结论正好对上：一份工整的调查日志只证明流程，不证明覆盖。让代理交证据，本质是让人保留对&lt;code>什么算查够了&lt;/code>的判断权。&lt;/p>
+&lt;h2 id="一个可落地的最小实现">一个可落地的最小实现
+&lt;/h2>&lt;p>一套能直接照搬的做法长这样：一个 &lt;code>test-user-story&lt;/code> 技能，输入是用户故事或功能描述，由它完成探索性测试，并能复用现有 E2E 体系里的测试数据、账号和环境地址。流程大致五步：&lt;/p>
+&lt;ul>
+&lt;li>接收用户故事或功能描述&lt;/li>
+&lt;li>推导出一组相关测试用例&lt;/li>
+&lt;li>询问本次要执行哪些用例、针对哪个环境、需要保留什么类型的证据&lt;/li>
+&lt;li>用 &lt;code>playwright-cli&lt;/code> 执行选中的场景&lt;/li>
+&lt;li>生成格式一致的测试报告，附结果与支撑证据&lt;/li>
+&lt;/ul>
+&lt;p>报告模板只是一个 HTML 文件加一小段脚本，用运行结果把模板填满；每次需要出报告时，代理调用这个脚本即可。好处不是好看，而是输出稳定、便于扫读，更重要的是留下了一份说明&lt;code>代理实际测了什么&lt;/code>的产物，而不只是最终结论。&lt;/p>
+&lt;p>这套东西搬到自己团队时，最小起点可以很低：选一个正在开发的用户故事、把环境和可用测试数据列清楚、规定报告里必须有哪些字段、跑一轮并人工复核证据。先验证&lt;code>证据是否够判断&lt;/code>，再谈扩场景。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/08-fig2_hu_3de37f7f26600ffb.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/08-fig2_hu_4f437f44cffc8a06.webp 480w, https://chengxiaqiucao.github.io/post/167-agentic-testing-shift-left/08-fig2_hu_3de37f7f26600ffb.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 2｜从故事到用例、执行、留证、人工复核，结论只是链条末端的一小段&lt;/p>
+&lt;h2 id="四条可以带走的判断">四条可以带走的判断
+&lt;/h2>&lt;ul>
+&lt;li>代理测试不替代脚本自动化，二者互补；快速可靠的回归检查仍归 &lt;code>CI&lt;/code> 里的脚本&lt;/li>
+&lt;li>它的增量价值在探索新功能、覆盖边界场景、把反馈提前到开发阶段，现代测试策略应当两者都有&lt;/li>
+&lt;li>关键不是盲信代理，而是审它交出的证据；报告要能回答测了什么、看到什么、凭什么这么判&lt;/li>
+&lt;li>在更传统的流程里，测试人员同样可以用它，把执行与探索交给代理，把指挥和判定留在人这边&lt;/li>
+&lt;/ul>
+&lt;p>没有量化数据可引，价值在于把落点说清楚了：脚本守住已知，代理去走未知，而人守住最后那道&lt;code>这些检查够不够&lt;/code>的判断。&lt;/p></description></item><item><title>把变更点交给 Agent 盯：生产监控的精度与延迟可以不再二选一</title><link>https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/</link><pubDate>Wed, 04 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/cover.webp" alt="Featured image of post 把变更点交给 Agent 盯：生产监控的精度与延迟可以不再二选一" />&lt;p>运维领域流传很久的一个经验数字是：约 70% 的线上故障由对运行中系统的变更引起——二进制发布、配置推送、开关切换。既然如此，把监控资源集中投到这些变更点附近，理论上能以最小代价压住大部分回归的影响面。但这件事在工程上被公认为难啃：不是不会写告警，而是很难同时做到&amp;quot;看得准&amp;quot;和&amp;quot;发现得早&amp;quot;，更难让它在一个组织里自发运转起来。&lt;/p>
+&lt;p>大模型智能体正在改变这个等式。真正值得关注的不是&amp;quot;AI 运维&amp;quot;这类概念，而是一套具体的工程形态：让模型读代码、写监控规格，由确定性程序执行规格，再由模型调查被触发的监控项。这套结构在原型阶段就能在自己完全不熟悉的系统上发现回归，精度和延迟都优于一年前的做法。&lt;/p>
+&lt;h2 id="变更点监控为什么一直难以落地">变更点监控为什么一直难以落地
+&lt;/h2>&lt;p>先看清旧办法卡在哪。变更点监控不是技术问题，而是平台工程里的&amp;quot;起飞&amp;quot;问题，有三条典型困境。&lt;/p>
+&lt;p>第一条是&lt;strong>选错了第一批用户&lt;/strong>。最自然的做法是找运维基础最好、意愿最强的团队试点。但这些团队的发布本来就比较安全，平台并没有真正抬高整体的运维水位；能提供的价值主要是减少手工劳动（toil reduction），属于&amp;quot;有更好&amp;quot;，不是一阶的安全改进。更麻烦的是，这类团队精度容易做上去，于是新系统实际上是在和已有告警比召回率与延迟，胜算不大。&lt;/p>
+&lt;p>第二条是&lt;strong>铺得太宽就被噪声淹没&lt;/strong>。换成面向全部服务、只选一小组通用健康指标，覆盖面是够了，但这类指标本身带有不可消除的噪声，结果就是精度很差、告警疲劳，平台很快被关掉。&lt;/p>
+&lt;p>第三条是&lt;strong>精度与延迟的结构性权衡&lt;/strong>。在大模型介入之前，可用的信号大致排成一条谱系：结构化日志精确但慢，指标粗粒度但快，告警更粗、召回与精度都不理想，但&amp;quot;至少有个东西&amp;quot;。想在变更窗口内既快又准，只能靠人提前把指标打好标、把信号定义清楚——这依赖长期组织投入和资深工程师的经验，而这类经验恰恰需要多年一线运维才能养成。&lt;/p>
+&lt;p>还有一层背景值得计入：随着代码产出与发布量快速增长，任何单个运维人员对系统&amp;quot;读过的代码&amp;quot;所占的比例都在下降。系统越来越像被&amp;quot;养&amp;quot;出来的，而不是被完整设计出来的，人对内部状态的心智模型在持续变薄。这反而放大了自动调查的价值。&lt;/p>
+&lt;h2 id="有效的形态写规格的智能体--执行规格的确定性系统">有效的形态：写规格的智能体 + 执行规格的确定性系统
+&lt;/h2>&lt;p>智能体在这个场景里之所以有效，原因很朴素：它乐于发起大量查询，可以针对某一次具体变更临时写出查询，也不厌其烦地扫日志。过去为了省钱省人力而必须做的取舍——查多少、查多细、查多久——被大幅放宽，于是精度与召回可以同时拿到。&lt;/p>
+&lt;p>一个可运行的最小原型由三部分组成：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>计划生成器&lt;/strong>：读取服务代码（尤其是配置消费逻辑），针对本次变更提出一份监控计划，明确该盯哪些信号、窗口多长、什么条件算异常；&lt;/li>
+&lt;li>&lt;strong>执行脚手架&lt;/strong>：把计划编译成确定性的监控任务并按节奏运行，负责采集、比对与触发，不依赖模型持续在线；&lt;/li>
+&lt;li>&lt;strong>调查智能体&lt;/strong>：只在监控项被触发时介入，读代码、查指标与日志，给出解释，并保留一条升级到人的通道。&lt;/li>
+&lt;/ul>
+&lt;p>这里最关键的工程判断是：&lt;strong>纯智能体循环不是最优形状&lt;/strong>。让模型写一份&amp;quot;如何监控&amp;quot;的规格，再交给确定性系统去执行，比让模型自己循环查询效果更干净，token 消耗也低得多。原型里真正需要打磨的&amp;quot;秘方&amp;quot;并不在模型能力，而在三处很传统的工程活：降噪启发式、能让模型写出高质量规格的提示词，以及一套足够大的标注评测集，用来验证后续每次调整是否真的更好。&lt;/p>
+&lt;p>换句话说，监控智能体和编码智能体一样需要脚手架。软件开发生命周期为编码智能体做过的那轮适配，在监控领域还没有发生。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/03-fig1_hu_ea27462131ccf318.webp"
+width="1024"
+height="538"
+srcset="https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/03-fig1_hu_41834e95bea975d.webp 480w, https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/03-fig1_hu_ea27462131ccf318.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="190"
+data-flex-basis="456px"
+>
+&lt;/p>
+&lt;p>计划生成、确定性执行、触发后调查三段式结构，以及人工升级通道&lt;/p>
+&lt;h2 id="三个结构上的人类做不到或做不起的优势">三个结构上的人类做不到、或做不起的优势
+&lt;/h2>&lt;p>一旦接受&amp;quot;智能体可以比人更胜任监控&amp;quot;，以及&amp;quot;监控智能体需要脚手架&amp;quot;这两个前提，几项优势就会变得很具体。&lt;/p>
+&lt;p>&lt;strong>全时段、全量跟踪。&lt;/strong> 如果推理成本足够低，那么任何一个关心的指标出现回归、任何一行可疑日志，都可以被调查，而不必先越过&amp;quot;值得占用人类注意力&amp;quot;的那条切线。传统值班需要跨时区接力，智能体不需要。&lt;/p>
+&lt;p>&lt;strong>并行扇出调查。&lt;/strong> 事故分诊时可以同时派出多个调查线程，各查一条可能的原因链，再快速汇总。这已经是很多团队 Incident Triage 的实际用法——人手动起一批调查任务；完全可以把启动动作也交给智能体，让&amp;quot;事故响应者&amp;quot;这个角色按需弹性扩容。安全事件尤其如此：攻击侧已经在用智能体集群，防守侧自然需要对应能力。&lt;/p>
+&lt;p>&lt;strong>理解时间更短。&lt;/strong> 模型读代码、查询并消化指标与日志的速度都快于人。速度不总能直接换算成更短的检测时间——对系统理解极深的人仍可能更快凭直觉找到关键信号——但只要隐性知识被写下来并可被检索，智能体在&amp;quot;从零到理解&amp;quot;这件事上会稳定占优。对于运维经验不足、或没人真正熟悉的系统，这个差距会更明显。&lt;/p>
+&lt;h2 id="从只读走向行动一条可以分级放权的路径">从只读走向行动：一条可以分级放权的路径
+&lt;/h2>&lt;p>上面讨论的多是只读监控。真正的价值增量在写路径，但放权要分级，每一级都要有对应的护栏。&lt;/p>
+&lt;p>&lt;strong>第一级：更勤勉的观察。&lt;/strong> 过去不会付钱让一个全职工程师逐个翻服务的所有提交、挑出该监控的点、只为这些变更临时挂一批快触发告警。按当前推理成本，这件事变得可行。同理，模型可以盯性能数据、读 heap dump、栈轨迹与 CPU profile，从模式里提出优化建议；建议照常放进 A/B 实验，并像对待任何其他变更一样监控它。一个被记录过的例子是：几轮模型调查在一个已经被人工认真优化过的公共热点库上，又找到约 50% 的堆内存节省和 30% 的延迟下降。给足够强的模型一台虚拟机和一组基准，它在局部最优上&amp;quot;爬坡&amp;quot;的能力相当可观。&lt;/p>
+&lt;p>&lt;strong>第二级：确定性的处置动作。&lt;/strong> 扩缩容实例、轮换计算池、回滚某次配置或二进制——这些动作范围明确、可预期、易回滚，适合最先交给智能体。&lt;/p>
+&lt;p>&lt;strong>第三级：开放式修复。&lt;/strong> 定位缺陷、提出补丁、重新部署。风险随授权范围上升，但随着能力扩展，可被负责任下放的写路径工作会越来越多。自愈系统的吸引力正在于此，前提是每一级都有审计与回滚。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/03-fig2_hu_ed3dda194caa0a4b.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/03-fig2_hu_ce2d582339374e61.webp 480w, https://chengxiaqiucao.github.io/post/149-agentic-change-monitoring/03-fig2_hu_ed3dda194caa0a4b.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>从只读观察到开放式修复的三级放权，每一级对应不同的护栏与回滚要求&lt;/p>
+&lt;h2 id="成本不再是约束但评测集是">成本不再是约束，但评测集是
+&lt;/h2>&lt;p>以当前轻量模型的能力，盯图表、比对趋势这类工作已经足够。一家中等规模的技术公司，对整支服务机队做持续监控的量级大约落在每天百美元级别，创业公司规模的机队只是其中一小部分。相比人力值班，甚至相比可观测性基础设施本身的开销，这个数字并不构成决策障碍——有团队做过一轮优化就省下年化数百万美元的可观测性支出，而这还只是单个团队该项支出的一小部分。&lt;/p>
+&lt;p>成本下来了，瓶颈就转移到&amp;quot;怎么知道监控是不是变好了&amp;quot;。这也是标注评测集不能省的原因：没有它，改提示词、改降噪规则、换模型都只能凭感觉，而监控系统的失败模式恰恰是静默的——没报出来的问题不会有人发现。&lt;/p>
+&lt;p>由此还能形成一个正循环：编码智能体让团队能交付更多系统，监控智能体让团队能支撑更多系统，两者共同释放的人力又被投去建设更多东西。工程师的时间越来越多地花在&amp;quot;建工厂&amp;quot;和&amp;quot;照看花园&amp;quot;上，而不是盯着仪表盘。&lt;/p>
+&lt;h2 id="落地顺序">落地顺序
+&lt;/h2>&lt;p>如果打算试，建议按这个顺序推进，避免在第一步就把写权限交出去。&lt;/p>
+&lt;ol>
+&lt;li>挑一类高频变更点（发布或配置推送）作为唯一入口，先把变更事件、服务代码、遥测与日志三路数据接通；&lt;/li>
+&lt;li>让模型只做两件事：为每次变更生成监控规格、在触发后解释现象，全程只读，所有结论保留人工复核与升级通道；&lt;/li>
+&lt;li>把规格执行交给确定性程序，模型不参与常驻循环，顺手记录每次调用的 token 与耗时；&lt;/li>
+&lt;li>积累标注评测集：把已确认的真实回归、误报、无问题变更分别标好，用它来检验降噪启发式和提示词的每次改动；&lt;/li>
+&lt;li>评测稳定后再逐级放权，从确定性回滚动作开始，每级都配审计日志与一键回收；&lt;/li>
+&lt;li>用&amp;quot;发现时间&amp;quot;和&amp;quot;误报率&amp;quot;两个指标复盘，而不是用&amp;quot;调查了多少条日志&amp;quot;这类过程量。&lt;/li>
+&lt;/ol>
+&lt;p>需要提前说清的两个前提是：智能体确实能比人做得更好，以及它必须被脚手架约束。跳过第一个前提，会把它做成昂贵的聊天窗口；跳过第二个，就会得到一个持续烧钱、信号却越来越脏的循环。&lt;/p>
+&lt;p>在行业把这套做法变成标配之前，现在开始积累评测集和降噪经验的团队，拿到的会是一段真实的时间差。按当前趋势，不久之后&amp;quot;没有任何智能体在盯你的系统&amp;quot;本身就会被视为一种运维上的冒进。&lt;/p></description></item></channel></rss>

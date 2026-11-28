@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>瓶颈分析 on 秋草观测台</title><link>https://chengxiaqiucao.github.io/tags/%E7%93%B6%E9%A2%88%E5%88%86%E6%9E%90/</link><description>Recent content in 瓶颈分析 on 秋草观测台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号：秋草说测试）</copyright><lastBuildDate>Thu, 05 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E7%93%B6%E9%A2%88%E5%88%86%E6%9E%90/index.xml" rel="self" type="application/rss+xml"/><item><title>开发变快之后，队列停在了 QA：把被转移的成本说清楚</title><link>https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/</link><pubDate>Thu, 05 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/cover.webp" alt="Featured image of post 开发变快之后，队列停在了 QA：把被转移的成本说清楚" />&lt;p>一个用了半年 AI 编码助手的团队，冲刺末尾周四下午的看板长这样：「进行中」比从前瘦了，「代码评审」在动，唯独「待测试」那一列连续三个冲刺没怎么动过。&lt;/p>
+&lt;p>复盘会上有人很小心地提了一句：测试「好像变慢了」。测试同学知道诚实的答案是什么——测试没有变慢，只是送过来的东西变多了。但在一个其他人都变快了的房间里，这句话听起来像借口。&lt;/p>
+&lt;p>这是老故事的新版本。开发延期时，测试被压缩，QA 承担了不是自己制造的成本；开发提速时，同一件事从反方向发生了一遍。成本在上游产生，账单寄到了生产环境前最后一道关口。&lt;/p>
+&lt;h2 id="一速度没有消失只是换了位置">一、速度没有消失，只是换了位置
+&lt;/h2>&lt;p>2024 年一项关于 DevOps 交付效能的研究给过一组反直觉的数字：使用 AI 的开发者在个人效率、文档与代码质量上确实报告了提升，但到了交付层面，画面翻转——AI 采用率每提高 25%，交付吞吐量估计下降约 1.5%，交付稳定性下降约 7.2%。&lt;/p>
+&lt;p>研究者没有把这归咎于「AI 写的代码质量差」。最可能的解释是变更批量：AI 帮忙写代码之后，单次变更变大，而更大的变更更难评审、更难测试、也更容易在生产引发失败。&lt;/p>
+&lt;p>从「待测试」那一列看这个结论，它一点也不抽象。「更大、更频繁地到达的变更」正是测试关口工作量增加的定义。任何用过约束理论看交付的人都熟悉下一步：给一个从来不是约束的环节提速，约束不会消失，只会移动。周四下午那块看板，就是这个移动从内部看过去的模样。没有谁决定让 QA 成为瓶颈，他们只是让编码变快了，队列自己搬了家。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig1_hu_ca40dc9fc5869375.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig1_hu_11070783fb6862f5.webp 480w, https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig1_hu_ca40dc9fc5869375.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>编码环节提速后，变更批量变大，交付约束自动移到发布前的验证关口&lt;/p>
+&lt;h2 id="二给-qa-配同样的工具往往让队列跑得更快而不是更安全">二、给 QA 配同样的工具，往往让队列跑得更快而不是更安全
+&lt;/h2>&lt;p>几乎所有团队的第一反应都是把同样的工具也给测试：让模型生成用例，几分钟就有几十条，大多首次运行就绿。列清空了，复盘会有了好消息，看上去问题解决了。&lt;/p>
+&lt;p>变的是「存在多少条测试」，没变的是「它们往哪儿看」。生成测试的模型读的是代码，所以它测的是代码做了什么。而一次大的 AI 辅助变更里，风险常常在别处：代码对生产环境既有数据作了什么假设、这次工单没碰的那个集成、各环境之间不一致的配置项。这些假设不在 diff 里，因此也不会出现在由 diff 生成的测试里。&lt;/p>
+&lt;p>于是出现一种没有底板的速度：团队在每一个能计数的步骤上都变快了，速度底下的东西一点没变强。「本迭代写了多少条测试」一旦成为被盯着的指标，按古德哈特定律，它在成为目标的那一刻就不再度量任何东西。变更失败率——那个衡量「一次部署引发生产故障的频率」的指标——根本不关心存在多少条测试，它只在测试看向故障真正来源时才会动。&lt;/p>
+&lt;p>那份研究自己的结论也指向同一处：AI 的收益出现在&lt;strong>基本功已经在位&lt;/strong>的团队里——小批量变更、可靠的持续集成、团队真正信任的自动化测试。AI 放大的是既有的东西。没有这层底座的团队，被更快放大的是缺口。&lt;/p>
+&lt;h2 id="三把机械部分交出去把判断留下来">三、把机械部分交出去，把判断留下来
+&lt;/h2>&lt;p>这不是让 QA 远离这些工具。拒绝工具的测试工程师照样是瓶颈，只是思考时间更少。有用的切分在机械与判断之间。&lt;/p>
+&lt;p>机械部分很大，模型确实擅长：&lt;/p>
+&lt;ul>
+&lt;li>为一个有几十个必填字段的实体造测试数据&lt;/li>
+&lt;li>写一个新页面对象或 API 客户端的样板代码&lt;/li>
+&lt;li>把一早上失败的流水线按可能原因分组&lt;/li>
+&lt;li>读一份很长的 diff，列出它真正触碰了哪些模块、契约与配置文件&lt;/li>
+&lt;/ul>
+&lt;p>这些过去按小时计的工作，现在按分钟计。&lt;/p>
+&lt;p>判断部分不会这样压缩：这次发布里被触碰的模块哪些真要紧、哪种风险值得跑一次慢的端到端、哪种用契约测试就够、这一轮可以诚实地不测什么、以及到底签不签字。这些判断依赖对业务、系统历史上季度哪里崩过的了解，模型拿不到，也无法替你承担。&lt;/p>
+&lt;p>两种用法因此走向完全不同的结果：用两分钟让模型总结一份大 diff，把省下的一小时用来判断「这个改动可能在哪儿击穿系统」的人，是在借 AI 从队列里脱身；用它再多产几十条用例的人，是在让队列流动得更快。&lt;/p>
+&lt;h2 id="四把转移变成可以摆到桌面上的数字">四、把「转移」变成可以摆到桌面上的数字
+&lt;/h2>&lt;p>「待测试」这一列背后的，是团队做过但没人明说的一个决定：加快代码的产出速度，而不加快任何验证它的东西。把它当成「测试速度问题」处理，等于把这个决定藏起来，并把成本压在唯一没参与决策的角色身上。&lt;/p>
+&lt;p>出路是按「喂给队列的东西」来报告队列，而不是按队列本身：&lt;/p>
+&lt;ul>
+&lt;li>本迭代进入测试环节的变更量，相比三个迭代前是多少？&lt;/li>
+&lt;li>每个变更平均多大，最大的是多少？&lt;/li>
+&lt;li>有多少工单本可以拆开，却捆绑着一起到达？&lt;/li>
+&lt;/ul>
+&lt;p>这几个数字把「测试慢」翻译成一场关于变更批量的对话，而批量恰好是上游能动手的杠杆。它同时改变了谁该坐在桌前：一个测试工程师争取更多时间，听起来像在防守；一个测试工程师展示「进入测试的平均变更变大了多少」，是在描述系统，而系统属于团队里的每一个人。&lt;/p>
+&lt;p>最轻的起步动作小到近乎不值一提：给那一列里的每张卡片加一个数字，标出这个改动触碰多少行。第一个冲刺没人会看它。然后某个下午，会有开发者在把卡片移过来之前，先顺手把工单拆成两半。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig2_hu_e54bf4d2edd8d683.webp"
+width="1024"
+height="683"
+srcset="https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig2_hu_d10b170e8436beda.webp 480w, https://chengxiaqiucao.github.io/post/155-qa-bottleneck-after-ai/04-fig2_hu_e54bf4d2edd8d683.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="360px"
+>
+&lt;/p>
+&lt;p>机械工作交给工具、判断工作留给人；两侧所需的时间与信息完全不同&lt;/p>
+&lt;h2 id="五一个还没解决的分辨问题">五、一个还没解决的分辨问题
+&lt;/h2>&lt;p>有个地方必须承认没想清楚：从角色内部看，「因为坚持判断而成为瓶颈」和「因为始终没改变工作方式而成为瓶颈」，感受完全一样。两者都表现为一列不动的卡片，都会在复盘会上带来同样尴尬的沉默。&lt;/p>
+&lt;p>目前找到的最接近可用的自检，是拿出上一个在列里等待的工单，问它真正需要 QA 的是什么。如果答案是一个只有测试能做的决定，那这段等待就是工作本身；如果答案是一次没人读的回归跑，加一份本来就会通过的清单，那这段等待只是习惯，而这部分本该被工具吸收掉。目前还没有一个指标能把两者干净地分开，也许并不存在。&lt;/p>
+&lt;p>这也是为什么更值得去量上游而不是量自己：当「变更批量」被摆到明处，讨论就从「测试够不够快」变成了「我们打算一次交付多少东西」。前者只能靠测试加班回应，后者是团队可以共同调整的设计选择。&lt;/p>
+&lt;h2 id="六结语">六、结语
+&lt;/h2>&lt;p>队列停在 QA，不是测试环节突然退步了，是速度被重新分配之后留下的账。把它当成效率问题，会导向「让测试也生成更多」；把它当成系统问题，才会导向批量、评审密度与验证能力这些真正可动的杠杆。&lt;/p>
+&lt;p>对测试来说，最有力的动作往往不是把列清空，而是说清楚这一列为什么满、是谁的决策让它变满，以及那些不能用生成速度换掉的部分究竟是什么。&lt;/p></description></item></channel></rss>

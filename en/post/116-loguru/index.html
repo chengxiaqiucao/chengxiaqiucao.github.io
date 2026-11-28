@@ -1,0 +1,724 @@
+<!doctype html><html lang=en dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Introducing a Python logging library"><title>A New Way to Log in Python - Using the Loguru Library</title>
+<link rel=canonical href=https://chengxiaqiucao.github.io/en/post/116-loguru/><link rel=stylesheet href=/scss/style.min.1ff05243156c6b1fe33c54e504d4d763b1955737a95e17034967a679a1f192c8.css><meta property='og:title' content="A New Way to Log in Python - Using the Loguru Library"><meta property='og:description' content="Introducing a Python logging library"><meta property='og:url' content='https://chengxiaqiucao.github.io/en/post/116-loguru/'><meta property='og:site_name' content='Testing Observation'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Testing Tools'><meta property='article:tag' content='Open Source'><meta property='article:published_time' content='2025-07-31T17:09:06+08:00'><meta property='article:modified_time' content='2025-07-31T17:09:06+08:00'><meta property='og:image' content='https://chengxiaqiucao.github.io/post/116-loguru/Pasted-20250801-2.webp'><meta name=twitter:title content="A New Way to Log in Python - Using the Loguru Library"><meta name=twitter:description content="Introducing a Python logging library"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://chengxiaqiucao.github.io/post/116-loguru/Pasted-20250801-2.webp'><script async src="https://www.googletagmanager.com/gtag/js?id=G-0SZVJZGMHX"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-0SZVJZGMHX")}</script><meta name=google-adsense-account content="ca-pub-8076532964743402"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8076532964743402" crossorigin=anonymous></script><script type=application/ld+json>{"@context":"https://schema.org","@graph":[{"@id":"https://chengxiaqiucao.github.io/#website","@type":"WebSite","alternateName":["秋草观测台","城下秋草","秋草说测试","秋草"],"inLanguage":"en","name":"Testing Observation","url":"https://chengxiaqiucao.github.io/"},{"@id":"https://chengxiaqiucao.github.io/#person","@type":"Person","alternateName":["城下秋草","秋草","秋草说测试","Daniel Wei"],"name":"城下秋草","sameAs":["https://github.com/chengxiaqiucao","https://www.zhihu.com/people/qiucao","https://space.bilibili.com/472272606"],"url":"https://chengxiaqiucao.github.io/page/about/"}]}</script><meta name=author content="城下秋草"></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/en/><img src=/img/automnGrass_hu_47f1e3d9e082e7bd.webp width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/en>Testing Observation</a></h1><h2 class=site-description>Testing is not just checking...</h2></div></header><ol class=menu-social><li><a href=https://github.com/chengxiaqiucao target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://space.bilibili.com/472272606 target=_blank title=Bilibili rel=me><!doctype html><svg t="1750732982440" class="icon" viewBox="0 0 1024 1024" p-id="4593" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632 444.330667 256h135.296l138.368-138.325333A42.666667 42.666667.0 01778.368 178.048L700.330667 256H789.333333A149.333333 149.333333.0 01938.666667 405.333333v341.333334A149.333333 149.333333.0 01789.333333 896H234.666667A149.333333 149.333333.0 0185.333333 746.666667V405.333333A149.333333 149.333333.0 01234.666667 256h88.96L245.632 177.962667a42.666667 42.666667.0 0160.373333-60.373334zm483.328 223.701333H234.666667a64 64 0 00-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0057.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0063.701334-57.856L853.333333 746.666667V405.333333a64 64 0 00-64-64zm-448 128A42.666667 42.666667.0 01384 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666666-42.666667zm341.333334.0A42.666667 42.666667.0 01725.333333 512v85.333333a42.666667 42.666667.0 01-85.333333.0V512a42.666667 42.666667.0 0142.666667-42.666667z" p-id="4594" fill="#8a8a8a"/></svg></a></li><li><a href=https://www.zhihu.com/people/qiucao target=_blank title=zhihu rel=me><!doctype html><svg t="1750733049138" class="icon" viewBox="0 0 1024 1024" p-id="5820" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M570.581333 806.272h61.952L652.928 876.117333 764.074667 806.272h130.986666V230.186667h-324.48V806.272zM636.501333 292.693333h192.64V743.68h-73.898666l-73.813334 46.378667L668.032 743.808l-31.530667-.128V292.736zM515.754667 493.738667H377.429333a2999.466667 2999.466667.0 005.802667-194.56h135.338667S523.776 239.445334 495.872 240.128H261.76c9.216-34.730667 20.821333-70.613333 34.688-107.690667.0.0-63.701333.0-85.333333 57.130667C202.112 213.12 176.128 303.786667 129.877333 396.416c15.573333-1.706667 67.114667-3.114667 97.450667-58.794667 5.589333-15.616 6.656-17.621333 13.568-38.485333h76.373333c0 27.776-3.157333 177.109333-4.437333 194.474667h-138.24c-31.104.0-41.173333 62.549333-41.173333 62.549333h173.482666C295.253333 688.256 232.789333 799.573333 119.466667 887.466667c54.186667 15.488 108.202667-2.432 134.912-26.197334.0.0 60.8-55.338667 94.122666-183.381333L491.264 849.834667s20.906667-71.168-3.285333-105.856c-20.053333-23.637333-74.24-87.552-97.322667-110.72l-38.698667 30.72c11.52-36.992 18.474667-72.96 20.821334-107.690667h163.072s-.213333-62.549333-20.053334-62.549333z" p-id="5821" fill="#8a8a8a"/></svg></a></li><li><a href=mailto:%20danmyw@qq.com target=_blank title=e-mail rel=me><!doctype html><svg t="1750733089669" class="icon" viewBox="0 0 1451 1024" p-id="6983" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759.0 97.881301C0 3.997201 71.046997.0 71.046997.0H474.477909 961.649408h399.992405s71.046998 3.997201 71.046998 97.881301L771.345323 681.472759S764.482731 685.154773 753.594283 688.65053V688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858V688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759zm53.281707 130.131124C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633.0 212.052267.0 212.052267V942.809523S0 1024 83.726336 1024H682.532949 753.579947h595.368192C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523V212.052267S893.138176 701.759633 817.019477 767.734955c-39.771477 34.470494-74.671786 43.295855-98.955861 43.868928z" fill="#8a8a8a" p-id="6984"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/en/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/en/page/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/en/page/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/en/page/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li><a href=/en/page/about/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>About..</span></a></li><li><a href=/en/page/releases/><svg class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M9.828 9.172a4 4 0 100 5.656A10 10 0 0012 12a10 10 0 012.172-2.828 4 4 0 110 5.656A10 10 0 0112 12 10 10 0 009.828 9.172"/></svg>
+<span>OpenSources</span></a></li><li><a href=/en/page/privacy/><!doctype html><svg t="1750733089669" class="icon" viewBox="0 0 1451 1024" p-id="6983" xmlns:xlink="http://www.w3.org/1999/xlink" width="283.3984375" height="200"><path d="M664.781909 681.472759.0 97.881301C0 3.997201 71.046997.0 71.046997.0H474.477909 961.649408h399.992405s71.046998 3.997201 71.046998 97.881301L771.345323 681.472759S764.482731 685.154773 753.594283 688.65053V688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858V688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759zm53.281707 130.131124C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633.0 212.052267.0 212.052267V942.809523S0 1024 83.726336 1024H682.532949 753.579947h595.368192C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523V212.052267S893.138176 701.759633 817.019477 767.734955c-39.771477 34.470494-74.671786 43.295855-98.955861 43.868928z" fill="#8a8a8a" p-id="6984"/></svg>
+<span>Privacy Policy</span></a></li><li class=menu-bottom-section><ol class=menu><li id=i18n-switch><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg>
+<select name=language title=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://chengxiaqiucao.github.io/post/116-loguru/>中文</option><option value=https://chengxiaqiucao.github.io/en/post/116-loguru/ selected>English</option></select></li><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#introduction>Introduction</a></li><li><a href=#using-loguru>Using Loguru</a><ol><li><a href=#1-installation-and-quick-start>1. Installation and Quick Start</a></li><li><a href=#2-log-levels>2. Log Levels</a></li><li><a href=#3-custom-log-levels>3. Custom Log Levels</a></li></ol></li><li><a href=#advanced-usage>Advanced Usage</a><ol><li><a href=#1-log-handler-configuration>1. Log Handler Configuration</a></li><li><a href=#2-file-logging>2. File Logging</a></li><li><a href=#3-log-formatting>3. Log Formatting</a></li><li><a href=#4-log-filtering>4. Log Filtering</a></li><li><a href=#5-structured-logging-json-format>5. Structured Logging (JSON Format)</a></li><li><a href=#6-exception-handling-and-debugging>6. Exception Handling and Debugging</a></li></ol></li><li><a href=#summary>Summary</a></li></ol><ol><li><a href=#introduction-1>Introduction</a></li><li><a href=#caplog-in-pytest><code>caplog</code> in Pytest</a></li><li><a href=#solving-the-compatibility-problem>Solving the Compatibility Problem</a><ol><li><a href=#solution-1-pytest-loguru>Solution 1: pytest-loguru</a></li><li><a href=#solution-2-redirect-loguru-log-output-to-standard-logging-output>Solution 2: Redirect loguru log output to standard logging output</a></li></ol></li></ol><ol><li><a href=#configuration-complexity-comparison>Configuration Complexity Comparison</a></li><li><a href=#api-simplicity-comparison>API Simplicity Comparison</a></li><li><a href=#feature-comparison>Feature Comparison</a></li><li><a href=#user-experience-comparison>User Experience Comparison</a></li><li><a href=#performance-and-memory-usage-comparison>Performance and Memory Usage Comparison</a></li><li><a href=#migration-cost-comparison>Migration Cost Comparison</a></li><li><a href=#conclusion>Conclusion</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/en/post/116-loguru/><img src=/post/116-loguru/Pasted-20250801-2_hu_d9748f0f9414bd34.webp srcset="/post/116-loguru/Pasted-20250801-2_hu_d9748f0f9414bd34.webp 800w, /post/116-loguru/Pasted-20250801-2_hu_9c25cb3021a9ae15.webp 1600w" width=800 height=250 loading=lazy alt="Featured image of post A New Way to Log in Python - Using the Loguru Library"></a></div><div class=article-details><header class=article-category><a href=/en/categories/testing-tools/>Testing Tools</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/en/post/116-loguru/>A New Way to Log in Python - Using the Loguru Library</a></h2><h3 class=article-subtitle>Introducing a Python logging library</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Jul 31, 2025</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>13 minute read</time></div></footer><footer class=article-translations><svg class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg><div><a href=https://chengxiaqiucao.github.io/post/116-loguru/ class=link>中文</a></div></footer></div></header><section class=article-content><p><img src=/post/116-loguru/Pasted-20250801-2_hu_b7ce6273f0229986.webp width=1024 height=321 srcset="/post/116-loguru/Pasted-20250801-2_hu_1e864c7259c9e9ac.webp 480w, /post/116-loguru/Pasted-20250801-2_hu_b7ce6273f0229986.webp 1024w" loading=lazy class=gallery-image data-flex-grow=319 data-flex-basis=766px></p><h2 id=introduction>Introduction</h2><p>Anyone who has developed Python programs or written automation scripts in Python knows how important logging is to a program. Python has a built-in standard library for logging, <code>logging</code>, but this library is relatively complicated to use.</p><p>In this article we introduce a currently very popular third-party logging framework, <code>Loguru</code>, which has over 22K stars on GitHub. It is a more intuitive and easier-to-use alternative to <code>logging</code>. Developers can focus on business logic instead of the tedious details of logging configuration.</p><h2 id=using-loguru>Using Loguru</h2><h3 id=1-installation-and-quick-start>1. Installation and Quick Start</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>pip install loguru
+</span></span></code></pre></td></tr></table></div></div><p>The simplest way to use it:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>debug</span><span class=p>(</span><span class=s2>&#34;Happy logging with Loguru!&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>Output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>2025-08-01 14:00:51.069 | DEBUG    | __main__:&lt;module&gt;:3 - Happy logging with Loguru!
+</span></span></code></pre></td></tr></table></div></div><h3 id=2-log-levels>2. Log Levels</h3><p>Loguru provides 7 built-in log levels and sets a different default color for each level:</p><div class=table-wrapper><table><thead><tr><th>Level</th><th>Method</th><th>Value</th><th>Purpose</th></tr></thead><tbody><tr><td>TRACE</td><td>logger.trace()</td><td>5</td><td>Extremely detailed debug information</td></tr><tr><td>DEBUG</td><td>logger.debug()</td><td>10</td><td>Development debugging information</td></tr><tr><td>INFO</td><td>logger.info()</td><td>20</td><td>General information</td></tr><tr><td>SUCCESS</td><td>logger.success()</td><td>25</td><td>Success operation notification</td></tr><tr><td>WARNING</td><td>logger.warning()</td><td>30</td><td>Warning information</td></tr><tr><td>ERROR</td><td>logger.error()</td><td>40</td><td>Error information</td></tr><tr><td>CRITICAL</td><td>logger.critical()</td><td>50</td><td>Critical error</td></tr></tbody></table></div><p>Example code:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>trace</span><span class=p>(</span><span class=s2>&#34;A trace message.&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>debug</span><span class=p>(</span><span class=s2>&#34;A debug message.&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;An info message.&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>success</span><span class=p>(</span><span class=s2>&#34;A success message.&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>warning</span><span class=p>(</span><span class=s2>&#34;A warning message.&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>error</span><span class=p>(</span><span class=s2>&#34;An error message.&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>critical</span><span class=p>(</span><span class=s2>&#34;A critical message.&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>Output:
+<img src=/post/116-loguru/Pasted-20250801_hu_11e236ab762d1cbc.webp width=1024 height=262 srcset="/post/116-loguru/Pasted-20250801_hu_246aac54999a8d84.webp 480w, /post/116-loguru/Pasted-20250801_hu_11e236ab762d1cbc.webp 1024w" loading=lazy class=gallery-image data-flex-grow=390 data-flex-basis=936px></p><h3 id=3-custom-log-levels>3. Custom Log Levels</h3><p>It is also extremely convenient to create custom levels with <code>loguru</code>, for example, creating a <code>FATAL</code> level log:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># create a custom level</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>level</span><span class=p>(</span><span class=s2>&#34;FATAL&#34;</span><span class=p>,</span> <span class=n>no</span><span class=o>=</span><span class=mi>60</span><span class=p>,</span> <span class=n>color</span><span class=o>=</span><span class=s2>&#34;&#34;</span><span class=p>,</span> <span class=n>icon</span><span class=o>=</span><span class=s2>&#34;!!!&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>log</span><span class=p>(</span><span class=s2>&#34;FATAL&#34;</span><span class=p>,</span> <span class=s2>&#34;A fatal error occurred.&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=advanced-usage>Advanced Usage</h2><h3 id=1-log-handler-configuration>1. Log Handler Configuration</h3><p>Loguru uses the <code>add()</code> method to add handlers:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>sys</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># remove the default handler</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>remove</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># add a custom handler</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>sys</span><span class=o>.</span><span class=n>stderr</span><span class=p>,</span> <span class=n>level</span><span class=o>=</span><span class=s2>&#34;INFO&#34;</span><span class=p>,</span> <span class=nb>format</span><span class=o>=</span><span class=s2>&#34;{time:YYYY-MM-DD HH:mm:ss} | </span><span class=si>{level}</span><span class=s2> | </span><span class=si>{message}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>log</span><span class=p>(</span><span class=s2>&#34;INFO&#34;</span><span class=p>,</span><span class=s2>&#34;Configuration complete, start logging&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=2-file-logging>2. File Logging</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># basic file logging</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=s2>&#34;app.log&#34;</span><span class=p>,</span> <span class=n>rotation</span><span class=o>=</span><span class=s2>&#34;500 MB&#34;</span><span class=p>,</span> <span class=n>retention</span><span class=o>=</span><span class=s2>&#34;10 days&#34;</span><span class=p>,</span> <span class=n>compression</span><span class=o>=</span><span class=s2>&#34;zip&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># advanced file logging configuration</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;app_{time:YYYY-MM-DD}.log&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>rotation</span><span class=o>=</span><span class=s2>&#34;00:00&#34;</span><span class=p>,</span>  <span class=c1># rotate at midnight every day</span>
+</span></span><span class=line><span class=cl>    <span class=n>retention</span><span class=o>=</span><span class=s2>&#34;30 days&#34;</span><span class=p>,</span>  <span class=c1># keep for 30 days</span>
+</span></span><span class=line><span class=cl>    <span class=n>compression</span><span class=o>=</span><span class=s2>&#34;gz&#34;</span><span class=p>,</span>  <span class=c1># compression format</span>
+</span></span><span class=line><span class=cl>    <span class=n>level</span><span class=o>=</span><span class=s2>&#34;INFO&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;Just testing the log&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>After execution, according to the code you will get two log files, <code>app.log</code>, <code>app_2025-08-01.log</code></p><h3 id=3-log-formatting>3. Log Formatting</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>sys</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>remove</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># custom format</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>sys</span><span class=o>.</span><span class=n>stderr</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nb>format</span><span class=o>=</span><span class=s2>&#34;&lt;green&gt;{time:YYYY-MM-DD HH:mm:ss}&lt;/green&gt; | &#34;</span>
+</span></span><span class=line><span class=cl>           <span class=s2>&#34;&lt;level&gt;</span><span class=si>{level: &lt;8}</span><span class=s2>&lt;/level&gt; | &#34;</span>
+</span></span><span class=line><span class=cl>           <span class=s2>&#34;&lt;cyan&gt;</span><span class=si>{name}</span><span class=s2>&lt;/cyan&gt;:&lt;cyan&gt;</span><span class=si>{function}</span><span class=s2>&lt;/cyan&gt;:&lt;cyan&gt;</span><span class=si>{line}</span><span class=s2>&lt;/cyan&gt; | &#34;</span>
+</span></span><span class=line><span class=cl>           <span class=s2>&#34;&lt;level&gt;</span><span class=si>{message}</span><span class=s2>&lt;/level&gt;&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># you can also use a function for dynamic formatting</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>custom_formatter</span><span class=p>(</span><span class=n>record</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>record</span><span class=p>[</span><span class=s2>&#34;level&#34;</span><span class=p>]</span><span class=o>.</span><span class=n>no</span> <span class=o>&gt;=</span> <span class=mi>40</span><span class=p>:</span>  <span class=c1># ERROR and above</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s2>&#34;</span><span class=si>{time}</span><span class=s2> | </span><span class=si>{level}</span><span class=s2> | </span><span class=si>{thread}</span><span class=s2> | </span><span class=si>{message}</span><span class=se>\n</span><span class=si>{exception}</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s2>&#34;</span><span class=si>{time}</span><span class=s2> | </span><span class=si>{level}</span><span class=s2> | </span><span class=si>{message}</span><span class=se>\n</span><span class=si>{exception}</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>sys</span><span class=o>.</span><span class=n>stderr</span><span class=p>,</span> <span class=nb>format</span><span class=o>=</span><span class=n>custom_formatter</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;Just testing the log&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>This will produce output defined as follows:
+<img src=/post/116-loguru/Pasted-20250801-1_hu_74301ec2c8e50487.webp width=1024 height=115 srcset="/post/116-loguru/Pasted-20250801-1_hu_ba94b08a3468402c.webp 480w, /post/116-loguru/Pasted-20250801-1_hu_74301ec2c8e50487.webp 1024w" loading=lazy class=gallery-image data-flex-grow=889 data-flex-basis=2135px></p><h3 id=4-log-filtering>4. Log Filtering</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># filtering by level</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>level_filter</span><span class=p>(</span><span class=n>level</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>is_level</span><span class=p>(</span><span class=n>record</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>record</span><span class=p>[</span><span class=s2>&#34;level&#34;</span><span class=p>]</span><span class=o>.</span><span class=n>name</span> <span class=o>==</span> <span class=n>level</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>is_level</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>sys</span><span class=o>.</span><span class=n>stderr</span><span class=p>,</span> <span class=nb>filter</span><span class=o>=</span><span class=n>level_filter</span><span class=p>(</span><span class=n>level</span><span class=o>=</span><span class=s2>&#34;WARNING&#34;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># filtering by module</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=s2>&#34;app.log&#34;</span><span class=p>,</span> <span class=nb>filter</span><span class=o>=</span><span class=s2>&#34;my_module&#34;</span><span class=p>)</span>  <span class=c1># only log from my_module</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=s2>&#34;error.log&#34;</span><span class=p>,</span> <span class=nb>filter</span><span class=o>=</span><span class=k>lambda</span> <span class=n>record</span><span class=p>:</span> <span class=n>record</span><span class=p>[</span><span class=s2>&#34;level&#34;</span><span class=p>]</span><span class=o>.</span><span class=n>no</span> <span class=o>&gt;=</span> <span class=mi>40</span><span class=p>)</span>  <span class=c1># only errors and above</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=5-structured-logging-json-format>5. Structured Logging (JSON Format)</h3><p>loguru supports JSON-format serialized output by default</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># JSON format logging</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>sys</span><span class=o>.</span><span class=n>stderr</span><span class=p>,</span> <span class=n>serialize</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;Just testing the log&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>This gives the following output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span><span class=nt>&#34;text&#34;</span><span class=p>:</span> <span class=s2>&#34;2025-08-01 14:25:44.560 | INFO     | __main__:&lt;module&gt;:8 - Just testing the log\n&#34;</span><span class=p>,</span> <span class=nt>&#34;record&#34;</span><span class=p>:</span> <span class=p>{</span><span class=nt>&#34;elapsed&#34;</span><span class=p>:</span> <span class=p>{</span><span class=nt>&#34;repr&#34;</span><span class=p>:</span> <span class=s2>&#34;0:00:00.00 &#34;</span><span class=err>seconds</span><span class=s2>&#34;: 0.003698}, &#34;</span><span class=err>exception</span><span class=s2>&#34;: null, &#34;</span><span class=err>extra</span><span class=s2>&#34;: {}, &#34;</span><span class=err>file</span><span class=s2>&#34;: {&#34;</span><span class=err>name</span><span class=s2>&#34;: &#34;</span><span class=err>demo.py</span><span class=s2>&#34;, &#34;</span><span class=err>path</span><span class=s2>&#34;: &#34;</span><span class=err>E</span><span class=p>:</span><span class=err>\\qiucao\\dev\\loguruDemo\\demo.py</span><span class=s2>&#34;}, &#34;</span><span class=err>function</span><span class=s2>&#34;: &#34;</span><span class=err>&lt;module&gt;</span><span class=s2>&#34;, &#34;</span><span class=err>level</span><span class=s2>&#34;: {&#34;</span><span class=err>icon</span><span class=s2>&#34;: &#34;</span><span class=err>ℹ️</span><span class=s2>&#34;, &#34;</span><span class=err>name</span><span class=s2>&#34;: &#34;</span><span class=err>INFO</span><span class=s2>&#34;, &#34;</span><span class=err>no</span><span class=s2>&#34;: 20}, &#34;</span><span class=err>line</span><span class=s2>&#34;: 8, &#34;</span><span class=err>message</span><span class=s2>&#34;: &#34;</span><span class=err>Just</span> <span class=err>testing</span> <span class=err>the</span> <span class=err>log</span><span class=s2>&#34;, &#34;</span><span class=err>module</span><span class=s2>&#34;: &#34;</span> <span class=s2>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;__main__&#34;</span><span class=p>,</span> <span class=nt>&#34;process&#34;</span><span class=p>:</span> <span class=p>{</span><span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=mi>4580</span><span class=p>,</span> <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;MainProcess&#34;</span><span class=p>},</span> <span class=nt>&#34;thread&#34;</span><span class=p>:</span> <span class=p>{</span><span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=mi>5680</span><span class=p>,</span> <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;MainThread&#34;</span><span class=p>},</span> <span class=nt>&#34;time&#34;</span><span class=p>:</span> <span class=p>{</span><span class=nt>&#34;repr&#34;</span><span class=p>:</span> <span class=s2>&#34;2025-08-01 14:25:44.560271+08:00&#34;</span><span class=p>,</span> <span class=nt>&#34;timestamp&#34;</span><span class=p>:</span> <span class=mf>1754029544.560271</span><span class=p>}}}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=6-exception-handling-and-debugging>6. Exception Handling and Debugging</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># control diagnostic information (should be set to False in production)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=s2>&#34;app.log&#34;</span><span class=p>,</span> <span class=n>diagnose</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># automatically catch exceptions</span>
+</span></span><span class=line><span class=cl><span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>result</span> <span class=o>=</span> <span class=mi>1</span> <span class=o>/</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl><span class=k>except</span> <span class=ne>ZeroDivisionError</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>logger</span><span class=o>.</span><span class=n>exception</span><span class=p>(</span><span class=s2>&#34;Division by zero occurred&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>loguru</code> can catch exceptions directly; here the <code>diagnose</code> parameter also automatically records local variable information when an exception is caught, making it easier for us to debug (in production it generally needs to be set to False)</p><h2 id=summary>Summary</h2><p>The above is a summary of the usage of the <code>loguru</code> library, which is excellent in terms of simplicity of configuration, richness of features, and support for custom extension and debugging.</p><p>So, when writing Python to handle logs, start using it right away~~</p><hr><h1 id=using-loguru-in-pytest---problems-and-solutions>Using loguru in pytest - Problems and Solutions</h1><h2 id=introduction-1>Introduction</h2><p>In the previous article, we recommended a third-party Python logging library, <code>loguru</code>, which is very simple to use and fully featured. See that article 【】</p><p>But for those of us doing test automation who often use the <code>pytest</code> framework, there is a small problem. The built-in log capture mechanism of <code>Pytest</code> is optimized on top of the standard library <code>logging</code>. So when we use the pytest framework, if pytest&rsquo;s own logging mechanism is involved - that is, pytest&rsquo;s built-in fixture <code>caplog</code> actually still uses the standard <code>logging</code> module - the logs defined by the <code>loguru</code> library are difficult to take effect.</p><p>Of course, the problem is not big. In this article we briefly discuss this problem and introduce a compatibility solution.</p><h2 id=caplog-in-pytest><code>caplog</code> in Pytest</h2><p>First let&rsquo;s introduce Pytest&rsquo;s logging.</p><p><code>caplog</code> is a built-in fixture provided by pytest for capturing and testing log output.</p><p>Because of this built-in plugin, when we run pytest tests, by default standard output and log information recorded by the <code>logging</code> module are only shown when a test case fails.</p><p>For example, the following code:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># test_cap.py</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_fail</span><span class=p>():</span>  
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=s2>&#34;This message is shown on failure&#34;</span><span class=p>)</span>  
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=kc>False</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_pass</span><span class=p>():</span>  
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=s2>&#34;This message is not shown on success&#34;</span><span class=p>)</span>  
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=kc>True</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_exception</span><span class=p>():</span>  
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>  
+</span></span><span class=line><span class=cl>        <span class=n>result</span> <span class=o>=</span> <span class=mi>1</span> <span class=o>/</span> <span class=mi>0</span>  
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=ne>ZeroDivisionError</span><span class=p>:</span>  
+</span></span><span class=line><span class=cl>        <span class=n>logging</span><span class=o>.</span><span class=n>error</span><span class=p>(</span><span class=s2>&#34;Division by zero occurred&#34;</span><span class=p>,</span> <span class=n>exc_info</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>  
+</span></span><span class=line><span class=cl>        <span class=n>result</span> <span class=o>=</span> <span class=kc>None</span>  
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=kc>False</span>
+</span></span></code></pre></td></tr></table></div></div><p>Running normally through <code>pytest</code>, we will see output like this:</p><p><img src=/post/116-loguru/Pasted-20250805_hu_1b3075de2aca621a.webp width=1024 height=623 srcset="/post/116-loguru/Pasted-20250805_hu_525f07c4f82cb7db.webp 480w, /post/116-loguru/Pasted-20250805_hu_1b3075de2aca621a.webp 1024w" loading=lazy class=gallery-image data-flex-grow=164 data-flex-basis=394px></p><p>And if we change the logging part above to use <code>loguru</code>&rsquo;s logging style:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_exception</span><span class=p>():</span>  
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>  
+</span></span><span class=line><span class=cl>        <span class=n>result</span> <span class=o>=</span> <span class=mi>1</span> <span class=o>/</span> <span class=mi>0</span>  
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=ne>ZeroDivisionError</span><span class=p>:</span>  
+</span></span><span class=line><span class=cl>        <span class=c1># logging.error(&#34;Division by zero occurred&#34;, exc_info=True)  </span>
+</span></span><span class=line><span class=cl>        <span class=n>logger</span><span class=o>.</span><span class=n>error</span><span class=p>(</span><span class=s2>&#34;Division by zero occurred&#34;</span><span class=p>)</span>  
+</span></span><span class=line><span class=cl>        <span class=n>result</span> <span class=o>=</span> <span class=kc>None</span>  
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=kc>False</span>
+</span></span></code></pre></td></tr></table></div></div><p>Running it, we can see the difference:</p><p><img src=/post/116-loguru/Pasted-20250805-1_hu_15e124fddb58abab.webp width=1024 height=416 srcset="/post/116-loguru/Pasted-20250805-1_hu_cb039465ed7b6764.webp 480w, /post/116-loguru/Pasted-20250805-1_hu_15e124fddb58abab.webp 1024w" loading=lazy class=gallery-image data-flex-grow=246 data-flex-basis=590px></p><p>That is, logs recorded by <code>loguru</code> cannot be captured by Pytest&rsquo;s <code>caplog</code>.</p><p>Naturally this means we <strong>cannot use some APIs provided by <code>caplog</code> such as <code>caplog.text</code>, <code>caplog.records</code></strong>, which creates some obstacles for us to make flexible use of <code>pytest</code>.</p><h2 id=solving-the-compatibility-problem>Solving the Compatibility Problem</h2><p>There are multiple solutions to this compatibility problem; here I share what I verified.</p><h3 id=solution-1-pytest-loguru>Solution 1: pytest-loguru</h3><p>When a problem exists, of course we can first check whether the community has an existing solution, and we find that someone has already provided one. It is the <code>pytest-loguru</code> plugin.</p><p>Just install it with the following command:</p><p><code>pip install pytest-loguru</code></p><p>But in my actual test, I found it reports a handle error on Windows systems.</p><p><img src=/post/116-loguru/Pasted-20250805-2_hu_c6624c632bd092df.webp width=1024 height=643 srcset="/post/116-loguru/Pasted-20250805-2_hu_8c9c1d069c508167.webp 480w, /post/116-loguru/Pasted-20250805-2_hu_c6624c632bd092df.webp 1024w" loading=lazy class=gallery-image data-flex-grow=159 data-flex-basis=382px></p><p>So here I recommend using solution two.</p><h3 id=solution-2-redirect-loguru-log-output-to-standard-logging-output>Solution 2: Redirect loguru log output to standard logging output</h3><p>We can use pytest&rsquo;s <code>conftest.py</code> configuration script and the following code to redirect loguru logs to logging:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># conftest.py</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>pytest</span>  
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>  
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>SafePropagateHandler</span><span class=p>(</span><span class=n>logging</span><span class=o>.</span><span class=n>Handler</span><span class=p>):</span>  
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>  
+</span></span><span class=line><span class=cl>        <span class=nb>super</span><span class=p>()</span><span class=o>.</span><span class=fm>__init__</span><span class=p>()</span>  
+</span></span><span class=line><span class=cl>        <span class=c1># ensure there is a basic formatter  </span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>setFormatter</span><span class=p>(</span><span class=n>logging</span><span class=o>.</span><span class=n>Formatter</span><span class=p>(</span><span class=s1>&#39;</span><span class=si>%(levelname)s</span><span class=s1> - </span><span class=si>%(message)s</span><span class=s1>&#39;</span><span class=p>))</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>emit</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>record</span><span class=p>):</span>  
+</span></span><span class=line><span class=cl>        <span class=k>try</span><span class=p>:</span>  
+</span></span><span class=line><span class=cl>            <span class=c1># get the standard logging logger  </span>
+</span></span><span class=line><span class=cl>            <span class=n>std_logger</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>getLogger</span><span class=p>(</span><span class=n>record</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>            <span class=c1># ensure the logger has a handler  </span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=ow>not</span> <span class=n>std_logger</span><span class=o>.</span><span class=n>handlers</span><span class=p>:</span>  
+</span></span><span class=line><span class=cl>                <span class=c1># add a null handler to avoid &#34;No handlers&#34; warning  </span>
+</span></span><span class=line><span class=cl>                <span class=n>std_logger</span><span class=o>.</span><span class=n>addHandler</span><span class=p>(</span><span class=n>logging</span><span class=o>.</span><span class=n>NullHandler</span><span class=p>())</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>            <span class=c1># handle the record safely  </span>
+</span></span><span class=line><span class=cl>            <span class=n>std_logger</span><span class=o>.</span><span class=n>handle</span><span class=p>(</span><span class=n>record</span><span class=p>)</span>  
+</span></span><span class=line><span class=cl>        <span class=k>except</span> <span class=ne>Exception</span><span class=p>:</span>  
+</span></span><span class=line><span class=cl>            <span class=c1># if propagation fails, ignore silently to avoid affecting the test  </span>
+</span></span><span class=line><span class=cl>            <span class=k>pass</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=nd>@pytest.fixture</span><span class=p>(</span><span class=n>scope</span><span class=o>=</span><span class=s2>&#34;session&#34;</span><span class=p>,</span> <span class=n>autouse</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>  
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>setup_safe_loguru_integration</span><span class=p>():</span>  
+</span></span><span class=line><span class=cl>    <span class=c1># remove Loguru&#39;s default handler  </span>
+</span></span><span class=line><span class=cl>    <span class=n>logger</span><span class=o>.</span><span class=n>remove</span><span class=p>()</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>    <span class=n>safe_handler</span> <span class=o>=</span> <span class=n>SafePropagateHandler</span><span class=p>()</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>    <span class=c1># add the propagation handler to Loguru  </span>
+</span></span><span class=line><span class=cl>    <span class=n>handler_id</span> <span class=o>=</span> <span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span>  
+</span></span><span class=line><span class=cl>        <span class=n>safe_handler</span><span class=p>,</span>  
+</span></span><span class=line><span class=cl>        <span class=nb>format</span><span class=o>=</span><span class=s2>&#34;</span><span class=si>{message}</span><span class=s2>&#34;</span><span class=p>,</span>  <span class=c1># simplify format to avoid duplication  </span>
+</span></span><span class=line><span class=cl>        <span class=n>level</span><span class=o>=</span><span class=s2>&#34;DEBUG&#34;</span><span class=p>,</span>  
+</span></span><span class=line><span class=cl>        <span class=n>backtrace</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span>  
+</span></span><span class=line><span class=cl>        <span class=n>diagnose</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span>  
+</span></span><span class=line><span class=cl>        <span class=n>catch</span><span class=o>=</span><span class=kc>True</span>  <span class=c1># catch exceptions in the handler  </span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>    <span class=c1># configure standard logging to avoid conflicts  </span>
+</span></span><span class=line><span class=cl>    <span class=n>logging</span><span class=o>.</span><span class=n>basicConfig</span><span class=p>(</span>  
+</span></span><span class=line><span class=cl>        <span class=n>level</span><span class=o>=</span><span class=n>logging</span><span class=o>.</span><span class=n>INFO</span><span class=p>,</span>  
+</span></span><span class=line><span class=cl>        <span class=nb>format</span><span class=o>=</span><span class=s1>&#39;</span><span class=si>%(levelname)s</span><span class=s1> - </span><span class=si>%(message)s</span><span class=s1>&#39;</span><span class=p>,</span>  
+</span></span><span class=line><span class=cl>        <span class=n>handlers</span><span class=o>=</span><span class=p>[</span><span class=n>logging</span><span class=o>.</span><span class=n>NullHandler</span><span class=p>()]</span>  
+</span></span><span class=line><span class=cl>    <span class=p>)</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>    <span class=k>yield</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>    <span class=c1># cleanup  </span>
+</span></span><span class=line><span class=cl>    <span class=n>logger</span><span class=o>.</span><span class=n>remove</span><span class=p>(</span><span class=n>handler_id</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>Running again, we can see that <code>caplog</code> can now correctly capture logs recorded by loguru.</p><p><img src=/post/116-loguru/Pasted-20250805-3_hu_eb3ecace333aa98.webp width=1024 height=700 srcset="/post/116-loguru/Pasted-20250805-3_hu_6dc19e72f343ac8e.webp 480w, /post/116-loguru/Pasted-20250805-3_hu_eb3ecace333aa98.webp 1024w" loading=lazy class=gallery-image data-flex-grow=146 data-flex-basis=351px></p><hr><h1 id=more-on-pythons-logging-library-loguru---a-full-comparison-with-the-standard-library-logging>More on Python&rsquo;s logging library loguru - A Full Comparison with the Standard Library logging</h1><p>In earlier articles, we recommended Python&rsquo;s third-party logging library <code>loguru</code>, mainly introducing loguru&rsquo;s basic usage. In this article we compare it in detail with the standard library <code>logging</code> from multiple angles, to understand its advantages more intuitively.</p><h2 id=configuration-complexity-comparison>Configuration Complexity Comparison</h2><p><strong>Python standard logging configuration:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># standard logging requires multiple configuration steps</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>getLogger</span><span class=p>(</span><span class=vm>__name__</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>setLevel</span><span class=p>(</span><span class=n>logging</span><span class=o>.</span><span class=n>DEBUG</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># create a console handler</span>
+</span></span><span class=line><span class=cl><span class=n>console_handler</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>StreamHandler</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>console_handler</span><span class=o>.</span><span class=n>setLevel</span><span class=p>(</span><span class=n>logging</span><span class=o>.</span><span class=n>INFO</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># create a file handler</span>
+</span></span><span class=line><span class=cl><span class=n>file_handler</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>FileHandler</span><span class=p>(</span><span class=s1>&#39;app.log&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>file_handler</span><span class=o>.</span><span class=n>setLevel</span><span class=p>(</span><span class=n>logging</span><span class=o>.</span><span class=n>DEBUG</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># create formatters</span>
+</span></span><span class=line><span class=cl><span class=n>console_formatter</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>Formatter</span><span class=p>(</span><span class=s1>&#39;</span><span class=si>%(asctime)s</span><span class=s1> - </span><span class=si>%(name)s</span><span class=s1> - </span><span class=si>%(levelname)s</span><span class=s1> - </span><span class=si>%(message)s</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>file_formatter</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>Formatter</span><span class=p>(</span><span class=s1>&#39;</span><span class=si>%(asctime)s</span><span class=s1> - </span><span class=si>%(name)s</span><span class=s1> - </span><span class=si>%(levelname)s</span><span class=s1> - </span><span class=si>%(filename)s</span><span class=s1>:</span><span class=si>%(lineno)d</span><span class=s1> - </span><span class=si>%(message)s</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># set the formatters</span>
+</span></span><span class=line><span class=cl><span class=n>console_handler</span><span class=o>.</span><span class=n>setFormatter</span><span class=p>(</span><span class=n>console_formatter</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>file_handler</span><span class=o>.</span><span class=n>setFormatter</span><span class=p>(</span><span class=n>file_formatter</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># add the handlers</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>addHandler</span><span class=p>(</span><span class=n>console_handler</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>addHandler</span><span class=p>(</span><span class=n>file_handler</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># only now can we start using it</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;Configuration complete, start logging&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>Loguru&rsquo;s configuration:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Loguru accomplishes the same thing in one line</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>sys</span><span class=o>.</span><span class=n>stdout</span><span class=p>,</span> <span class=n>level</span><span class=o>=</span><span class=s2>&#34;INFO&#34;</span><span class=p>,</span> <span class=nb>format</span><span class=o>=</span><span class=s2>&#34;</span><span class=si>{time}</span><span class=s2> - </span><span class=si>{name}</span><span class=s2> - </span><span class=si>{level}</span><span class=s2> - </span><span class=si>{message}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=s2>&#34;app.log&#34;</span><span class=p>,</span> <span class=n>level</span><span class=o>=</span><span class=s2>&#34;DEBUG&#34;</span><span class=p>,</span> <span class=nb>format</span><span class=o>=</span><span class=s2>&#34;</span><span class=si>{time}</span><span class=s2> - </span><span class=si>{name}</span><span class=s2> - </span><span class=si>{level}</span><span class=s2> - </span><span class=si>{file}</span><span class=s2>:</span><span class=si>{line}</span><span class=s2> - </span><span class=si>{message}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;Configuration complete, start logging&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>Advantage comparison:</strong></p><ul><li><strong>Standard logging</strong>: Needs multiple objects such as logger, handler, formatter to be created and configured in multiple layers</li><li><strong>Loguru</strong>: All configuration is done through a simple <code>add()</code> method, reducing code by more than 70%</li></ul><h2 id=api-simplicity-comparison>API Simplicity Comparison</h2><p><strong>Python standard logging API:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># need to import multiple modules and classes</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging.handlers</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging.config</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># different levels need different method calls</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>debug</span><span class=p>(</span><span class=s2>&#34;Debug message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;Info message&#34;</span><span class=p>)</span> 
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>warning</span><span class=p>(</span><span class=s2>&#34;Warning message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>error</span><span class=p>(</span><span class=s2>&#34;Error message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>critical</span><span class=p>(</span><span class=s2>&#34;Critical message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># exception logging needs separate handling</span>
+</span></span><span class=line><span class=cl><span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=mi>1</span> <span class=o>/</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl><span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>logger</span><span class=o>.</span><span class=n>error</span><span class=p>(</span><span class=s2>&#34;An error occurred&#34;</span><span class=p>,</span> <span class=n>exc_info</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>Loguru&rsquo;s API:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># unified API, more intuitive method names</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>trace</span><span class=p>(</span><span class=s2>&#34;Trace message&#34;</span><span class=p>)</span>      <span class=c1># more detailed than debug</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>debug</span><span class=p>(</span><span class=s2>&#34;Debug message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;Info message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>success</span><span class=p>(</span><span class=s2>&#34;Success message&#34;</span><span class=p>)</span>  <span class=c1># unique success level</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>warning</span><span class=p>(</span><span class=s2>&#34;Warning message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>error</span><span class=p>(</span><span class=s2>&#34;Error message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>critical</span><span class=p>(</span><span class=s2>&#34;Critical message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># exception logging is extremely simple</span>
+</span></span><span class=line><span class=cl><span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=mi>1</span> <span class=o>/</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl><span class=k>except</span> <span class=ne>Exception</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>logger</span><span class=o>.</span><span class=n>exception</span><span class=p>(</span><span class=s2>&#34;An error occurred&#34;</span><span class=p>)</span>  <span class=c1># automatically includes exception info</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>Advantage comparison:</strong></p><ul><li><strong>Standard logging</strong>: API is relatively cumbersome, exception handling needs extra parameters</li><li><strong>Loguru</strong>: API design is more human-friendly, provides SUCCESS level, exception handling is simpler</li></ul><h2 id=feature-comparison>Feature Comparison</h2><div class=table-wrapper><table><thead><tr><th>Feature</th><th>Python standard logging</th><th>Loguru</th><th>Advantage</th></tr></thead><tbody><tr><td><strong>Log rotation</strong></td><td>Requires <code>TimedRotatingFileHandler</code> or <code>RotatingFileHandler</code></td><td>Built-in support, one line of configuration</td><td>Loguru is simpler to configure and supports more rotation strategies</td></tr><tr><td><strong>Log compression</strong></td><td>Not supported, needs manual implementation</td><td>Built-in support for multiple compression formats</td><td>Loguru handles automatically, saving storage space</td></tr><tr><td><strong>Log filtering</strong></td><td>Needs creating a Filter class</td><td>Supports functions, strings, dicts and other filtering methods</td><td>Loguru is more flexible with less code</td></tr><tr><td><strong>Structured logging</strong></td><td>No native JSON format support</td><td>Built-in JSON serialization support</td><td>Loguru is more suitable for modern log analysis systems</td></tr><tr><td><strong>Color support</strong></td><td>Requires third-party libraries like <code>colorama</code></td><td>Built-in terminal color support</td><td>Loguru works out of the box with better visuals</td></tr><tr><td><strong>Context information</strong></td><td>Requires manual use of <code>LoggerAdapter</code></td><td>Easily achieved through <code>bind()</code> method</td><td>Loguru is more intuitive and more powerful</td></tr><tr><td><strong>Exception diagnosis</strong></td><td>Basic exception information</td><td>Detailed variable values and call stack</td><td>Loguru is more efficient for debugging</td></tr></tbody></table></div><p><strong>Code examples:</strong></p><p><strong>Standard logging implementing log rotation:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging.handlers</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>os</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># create a rotating file handler</span>
+</span></span><span class=line><span class=cl><span class=n>rotating_handler</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>handlers</span><span class=o>.</span><span class=n>RotatingFileHandler</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;app.log&#39;</span><span class=p>,</span> 
+</span></span><span class=line><span class=cl>    <span class=n>maxBytes</span><span class=o>=</span><span class=mi>10</span><span class=o>*</span><span class=mi>1024</span><span class=o>*</span><span class=mi>1024</span><span class=p>,</span>  <span class=c1># 10MB</span>
+</span></span><span class=line><span class=cl>    <span class=n>backupCount</span><span class=o>=</span><span class=mi>5</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># need to handle compression manually</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>compress_old_logs</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=c1># complex compression logic...</span>
+</span></span><span class=line><span class=cl>    <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>addHandler</span><span class=p>(</span><span class=n>rotating_handler</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>Loguru implementing log rotation:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># one line handles rotation and compression</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;app.log&#34;</span><span class=p>,</span> 
+</span></span><span class=line><span class=cl>    <span class=n>rotation</span><span class=o>=</span><span class=s2>&#34;10 MB&#34;</span><span class=p>,</span>        <span class=c1># rotate by file size</span>
+</span></span><span class=line><span class=cl>    <span class=n>retention</span><span class=o>=</span><span class=s2>&#34;10 days&#34;</span><span class=p>,</span>     <span class=c1># keep for 10 days</span>
+</span></span><span class=line><span class=cl>    <span class=n>compression</span><span class=o>=</span><span class=s2>&#34;zip&#34;</span>        <span class=c1># automatic compression</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=user-experience-comparison>User Experience Comparison</h2><p><strong>Pain points of Python standard logging:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># pain point 1: global configuration affects all modules</span>
+</span></span><span class=line><span class=cl><span class=n>logging</span><span class=o>.</span><span class=n>basicConfig</span><span class=p>(</span><span class=n>level</span><span class=o>=</span><span class=n>logging</span><span class=o>.</span><span class=n>DEBUG</span><span class=p>)</span>  <span class=c1># affects the whole program</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># pain point 2: duplicate log problem</span>
+</span></span><span class=line><span class=cl><span class=n>logger1</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>getLogger</span><span class=p>(</span><span class=s1>&#39;app&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger2</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>getLogger</span><span class=p>(</span><span class=s1>&#39;app.module&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1># if configured improperly, duplicate logs easily occur</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># pain point 3: format strings need %</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;User </span><span class=si>%s</span><span class=s2> logged in from </span><span class=si>%s</span><span class=s2>&#34;</span><span class=p>,</span> <span class=n>username</span><span class=p>,</span> <span class=n>ip_address</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1># not as intuitive as f-string</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># pain point 4: hard to get caller information</span>
+</span></span><span class=line><span class=cl><span class=c1># need complex format strings to show filename and line number</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>Loguru&rsquo;s solutions:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># advantage 1: singleton pattern, avoiding configuration confusion</span>
+</span></span><span class=line><span class=cl><span class=c1># no need to worry about configuration of multiple logger instances</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># advantage 2: automatically avoids duplicate logs</span>
+</span></span><span class=line><span class=cl><span class=c1># smart handler management, no duplicate output</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># advantage 3: supports modern string formatting</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;User </span><span class=si>{</span><span class=n>username</span><span class=si>}</span><span class=s2> logged in from </span><span class=si>{</span><span class=n>ip_address</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1># also supports {} formatting</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;User </span><span class=si>{}</span><span class=s2> logged in from </span><span class=si>{}</span><span class=s2>&#34;</span><span class=p>,</span> <span class=n>username</span><span class=p>,</span> <span class=n>ip_address</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># advantage 4: automatically includes rich context information</span>
+</span></span><span class=line><span class=cl><span class=c1># shows time, level, module, function, line number by default</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=performance-and-memory-usage-comparison>Performance and Memory Usage Comparison</h2><p><strong>Performance test code:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>time</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># test standard logging performance</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_standard_logging</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=n>std_logger</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>getLogger</span><span class=p>(</span><span class=s1>&#39;test&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>std_logger</span><span class=o>.</span><span class=n>setLevel</span><span class=p>(</span><span class=n>logging</span><span class=o>.</span><span class=n>DEBUG</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>handler</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>StreamHandler</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>handler</span><span class=o>.</span><span class=n>setLevel</span><span class=p>(</span><span class=n>logging</span><span class=o>.</span><span class=n>DEBUG</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>std_logger</span><span class=o>.</span><span class=n>addHandler</span><span class=p>(</span><span class=n>handler</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>start</span> <span class=o>=</span> <span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>10000</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>std_logger</span><span class=o>.</span><span class=n>debug</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;Test message </span><span class=si>{</span><span class=n>i</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>end</span> <span class=o>=</span> <span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>end</span> <span class=o>-</span> <span class=n>start</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># test Loguru performance</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>test_loguru</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=n>logger</span><span class=o>.</span><span class=n>remove</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>handler_id</span> <span class=o>=</span> <span class=n>logger</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>sys</span><span class=o>.</span><span class=n>stderr</span><span class=p>,</span> <span class=n>level</span><span class=o>=</span><span class=s2>&#34;DEBUG&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>start</span> <span class=o>=</span> <span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>10000</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>logger</span><span class=o>.</span><span class=n>debug</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;Test message </span><span class=si>{</span><span class=n>i</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>end</span> <span class=o>=</span> <span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>logger</span><span class=o>.</span><span class=n>remove</span><span class=p>(</span><span class=n>handler_id</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>end</span> <span class=o>-</span> <span class=n>start</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>Performance comparison results:</strong></p><ul><li><strong>Standard logging</strong>: Slightly better performance in simple scenarios, but limited features</li><li><strong>Loguru</strong>: Performance close to standard logging when advanced features (such as async, formatting) are enabled, but more powerful</li></ul><p><strong>Memory usage comparison:</strong></p><ul><li><strong>Standard logging</strong>: Each logger instance uses more memory</li><li><strong>Loguru</strong>: Singleton pattern, more efficient memory usage</li></ul><h2 id=migration-cost-comparison>Migration Cost Comparison</h2><p><strong>Migrating from standard logging to Loguru:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># original code</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span> <span class=o>=</span> <span class=n>logging</span><span class=o>.</span><span class=n>getLogger</span><span class=p>(</span><span class=vm>__name__</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;This is a log message&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># migrated code</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>loguru</span> <span class=kn>import</span> <span class=n>logger</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&#34;This is a log message&#34;</span><span class=p>)</span>  <span class=c1># API is almost fully compatible</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>Migration advantages:</strong></p><ol><li><strong>API compatibility</strong>: Loguru&rsquo;s API design is similar to standard logging, low learning cost</li><li><strong>Incremental migration</strong>: Both can be used together in a project, migrating gradually</li><li><strong>Backward compatibility</strong>: Loguru provides integration solutions with standard logging</li></ol><h2 id=conclusion>Conclusion</h2><div class=table-wrapper><table><thead><tr><th>Comparison Dimension</th><th>Python standard logging</th><th>Loguru</th><th>Recommended Choice</th></tr></thead><tbody><tr><td><strong>Learning curve</strong></td><td>Steep, requires understanding multiple concepts</td><td>Gentle, intuitive and easy to use</td><td><strong>Loguru</strong></td></tr><tr><td><strong>Configuration complexity</strong></td><td>High, requires multiple steps</td><td>Low, one line of code</td><td><strong>Loguru</strong></td></tr><tr><td><strong>Feature completeness</strong></td><td>Basic features, needs extension</td><td>Advanced features out of the box</td><td><strong>Loguru</strong></td></tr><tr><td><strong>Code conciseness</strong></td><td>Verbose, lots of boilerplate</td><td>Concise, expressive</td><td><strong>Loguru</strong></td></tr><tr><td><strong>Debugging friendliness</strong></td><td>Average</td><td>Excellent, rich detailed information</td><td><strong>Loguru</strong></td></tr><tr><td><strong>Performance</strong></td><td>Slightly better (simple scenarios)</td><td>Close, more powerful features</td><td><strong>Loguru</strong></td></tr><tr><td><strong>Community support</strong></td><td>Official support, long history</td><td>Active community, fast iteration</td><td><strong>Loguru</strong></td></tr></tbody></table></div><p><strong>Conclusion:</strong>
+Loguru outperforms Python&rsquo;s standard logging library on almost all comparison dimensions. It not only greatly simplifies the complexity of logging configuration, but also provides richer features and a better user experience. For new projects, it is strongly recommended to use Loguru directly; for existing projects, you can also consider gradually migrating to Loguru to improve development efficiency and log management capabilities.</p></section><footer class=article-footer><section class=article-tags><a href=/en/tags/testing-tools/>Testing Tools</a>
+<a href=/en/tags/open-source/>Open Source</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/en/post/011-%E5%A6%82%E4%BD%95%E5%8F%8A%E6%97%B6%E6%8E%8C%E6%8F%A1%E5%90%84%E7%A7%8D%E5%B8%B8%E7%94%A8%E6%A1%86%E6%9E%B6%E7%9A%84%E6%9C%80%E6%96%B0%E5%8F%98%E5%8C%96/><div class=article-image><img src=/post/011-%E5%A6%82%E4%BD%95%E5%8F%8A%E6%97%B6%E6%8E%8C%E6%8F%A1%E5%90%84%E7%A7%8D%E5%B8%B8%E7%94%A8%E6%A1%86%E6%9E%B6%E7%9A%84%E6%9C%80%E6%96%B0%E5%8F%98%E5%8C%96/Pasted-20240831-1.6d60b73bf3661d9aed7889753f38632a_hu_640ec9a09a031e60.webp width=250 height=150 loading=lazy alt="Featured image of post How to Keep Up with the Latest Changes in Common Frameworks?" data-hash="md5-bWC3O/NmHZrteIl1PzhjKg=="></div><div class=article-details><h2 class=article-title>How to Keep Up with the Latest Changes in Common Frameworks?</h2></div></a></article><article class=has-image><a href=/en/post/122-markitdown/><div class=article-image><img src=/post/122-markitdown/Pasted-20250907.a499b59e39e27449964c7fb17cffc423_hu_4b4b5fdfa85f3b50.webp width=250 height=150 loading=lazy alt="Featured image of post MarkItDown - A Document Conversion Tool Built for AI Input" data-hash="md5-pJm1njnidEmWTH+xfP/EIw=="></div><div class=article-details><h2 class=article-title>MarkItDown - A Document Conversion Tool Built for AI Input</h2></div></a></article><article class=has-image><a href=/en/post/121-playwright_adv_fixture/><div class=article-image><img src=/post/121-playwright_adv_fixture/playwright_logo.784bdb51842e76f8a0893b31270f8984_hu_b3903db931a059ec.webp width=250 height=150 loading=lazy alt="Featured image of post Advanced Fixture Techniques in Playwright" data-hash="md5-eEvbUYQudvigiTsxJw+JhA=="></div><div class=article-details><h2 class=article-title>Advanced Fixture Techniques in Playwright</h2></div></a></article><article class=has-image><a href=/en/post/119-autotestdata/><div class=article-image><img src=/post/119-autotestdata/title.5c3462f58cb3b208b84852551b748d4f_hu_60cdea9dd4db24a1.webp width=250 height=150 loading=lazy alt="Featured image of post A Data Helper Tool Recommended for Exploratory Page Testing" data-hash="md5-XDRi9Yyzsgi4SFJVG3SNTw=="></div><div class=article-details><h2 class=article-title>A Data Helper Tool Recommended for Exploratory Page Testing</h2></div></a></article><article class=has-image><a href=/en/post/117-pom_replacement/><div class=article-image><img src=/post/117-pom_replacement/Pasted-20250806.c991c5b42f7b7db1f927a86eb8737b52_hu_9da61416b96f9f2a.webp width=250 height=150 loading=lazy alt="Featured image of post UI Automation, Another Pattern Beyond POM" data-hash="md5-yZHFtC97fbH5J6huuHN7Ug=="></div><div class=article-details><h2 class=article-title>UI Automation, Another Pattern Beyond POM</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2023 -
+2026 |by Daniel Wei</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

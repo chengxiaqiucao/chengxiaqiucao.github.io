@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>测试策略 on 秋草观测台</title><link>https://chengxiaqiucao.github.io/tags/%E6%B5%8B%E8%AF%95%E7%AD%96%E7%95%A5/</link><description>Recent content in 测试策略 on 秋草观测台</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>|by 城下秋草（公众号：秋草说测试）</copyright><lastBuildDate>Thu, 12 Nov 2026 09:00:00 +0800</lastBuildDate><atom:link href="https://chengxiaqiucao.github.io/tags/%E6%B5%8B%E8%AF%95%E7%AD%96%E7%95%A5/index.xml" rel="self" type="application/rss+xml"/><item><title>小型自动化测试小组何以支持多个业务团队?</title><link>https://chengxiaqiucao.github.io/post/163-small-automation-group/</link><pubDate>Thu, 12 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/163-small-automation-group/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/163-small-automation-group/cover.webp" alt="Featured image of post 小型自动化测试小组何以支持多个业务团队?" />&lt;p>几个产品团队、一个很小的测试自动化组、一年四十多次发布。这个组合听起来像是质量必然失守，实际却跑了下来。原因不复杂：写测试的不是 QA 一个人群，而是整个研发组织，QA 负责的是把检查和证据组织成体系。&lt;/p>
+&lt;p>先看清规模。团队共 38 人，其中 11 人在 QA，接近 30%；8 名手工测试工程师内嵌在各产品团队，2 名自动化测试工程师组成共享自动化组，另有 1 名 DevOps 支撑，这 3 人同时也接功能开发。代码分布在 50 多个仓库，自动化测试超过 5 万条。产品包括带自助模式的桌面应用、支付服务、带 Web 应用的云平台、两个移动应用和若干内部工具，桌面端与云平台大约每三周发一版。&lt;/p>
+&lt;p>关键问题是：这 5 万条测试谁写的？大部分是开发。单元测试和契约测试加起来接近九成，都由开发负责。一个两人自动化组写不了也养不起近 4.7 万条用例，QA 同样不行。&lt;/p>
+&lt;h2 id="一次变更从-pr-走到生产">一次变更从 PR 走到生产
+&lt;/h2>&lt;p>流程的起点不是测试，是开发自己写的第一道检查。&lt;/p>
+&lt;ul>
+&lt;li>在主产品仓库里，每个 &lt;code>pull request&lt;/code> 都要有人评审、要通过测试；多数仓库还要求测试覆盖至少 80% 的改动行，也就是 &lt;code>diff coverage&lt;/code>。桌面端开发的反馈在半小时内返回&lt;/li>
+&lt;li>&lt;code>contract test&lt;/code> 检查两个应用是否仍就消息格式达成一致，覆盖桌面应用、支付服务、其中一个移动应用和云平台之间，避免一个团队无意中改坏另一个团队的应用&lt;/li>
+&lt;li>每晚跑 &lt;code>E2E&lt;/code> 测试，从界面一路走到数据库；因为基础设施重，不放进每个 PR。夜间有 1060 条按重要性排序的用例点击桌面应用&lt;/li>
+&lt;li>发布前约 120 条 E2E 发布用例在并行流水线步骤里跑完，另有独立步骤针对真实桌面后端跑公开 API 测试；支付设备用行为一致的 &lt;code>mock&lt;/code> 替代。随后由人复核结果、批准构建进入最终验收，测试工程师手工检查；进生产前再校验一次契约&lt;/li>
+&lt;/ul>
+&lt;p>分层这么多，不是堆数量。每一层检查都是一片带孔的奶酪，只有所有孔对齐时缺陷才会漏过去——这也是为什么没有任何单层能省掉。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/163-small-automation-group/04-fig1_hu_c2e6f698bcbefb05.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/163-small-automation-group/04-fig1_hu_44db3c6a97192fb0.webp 480w, https://chengxiaqiucao.github.io/post/163-small-automation-group/04-fig1_hu_c2e6f698bcbefb05.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 1｜PR 门禁、契约、夜间端到端、发布前验收逐层收窄，人的复核落在两端&lt;/p>
+&lt;h2 id="手工测试也有自己的结构">手工测试也有自己的结构
+&lt;/h2>&lt;p>不是所有东西都进流水线。每个故事、缺陷或任务在测试管理工具里都有一份对应的测试清单，也就是这个工单要跑的用例集合。&lt;/p>
+&lt;p>大功能另外配一份功能检查表，覆盖跨产品依赖、本地化、功能分支上的自动化测试以及合并环节，实际上充当了团队之间的黏合剂。桌面端每次发布固定四份手工清单：两份发布检查表、手工回归、自助模式清单。&lt;/p>
+&lt;p>这套结构解决的是多团队场景里最容易丢的东西：谁该验什么、验到哪一步算完。清单挂在工单上，而不是挂在某个人脑子里。&lt;/p>
+&lt;h2 id="一年里真正变化的三组数字">一年里真正变化的三组数字
+&lt;/h2>&lt;p>2025 年 12 月定下的年度目标，到 2026 年 10 月有五分之四推进了，多数仍在进行中。最实在的是三组数字。&lt;/p>
+&lt;p>发布前的手工工作量明显下降。该先自动化什么？问测试工程师——他们每个版本都走同一条路，最清楚坑在哪。年初他们指向订单和支付，团队照做，春夏两季把这些检查搬进自动化发布用例，手工回归的用例数因此少了 60%。应用升级、数据迁移、数据库操作和部分在线订单检查暂时保留手工。与此同时，自助模式有了自己的夜间运行：一年前它的 E2E 数量是 0，现在每晚 106 条。&lt;/p>
+&lt;p>测试用例与 UI 自动化框架各自归一。2025 年秋各团队把用例和发布检查表统一迁到同一个测试管理工具，到夏天，所有 UI 端到端测试都跑在 &lt;code>Playwright&lt;/code> 上。&lt;/p>
+&lt;p>给人的规则变成了给 AI 的规则。一年前团队写过一份用例编写指南，里面有「每条用例必须独立」「正向用例优先」这类要求；今年同一批规则被写成编码代理的 QA 插件指令，用来从需求起草测试策略、计划和用例，并评审、重写既有用例。自 2026 年 9 月起，测试管理工具里每条新增或修改的用例都过一遍这个插件，且仍由人逐条复核。&lt;/p>
+&lt;p>还有一条组织规则值得单列：每个大功能设三个负责人——后端、前端、QA，其中两个是开发。QA 负责人写测试策略、确保每个故事可测，没有这个签字，功能不合并。&lt;/p>
+&lt;h2 id="两个还没修好的地方">两个还没修好的地方
+&lt;/h2>&lt;p>真正可信的复盘，通常体现在承认什么没做好。&lt;/p>
+&lt;p>第一个是 &lt;code>flaky test&lt;/code>。团队给不稳定的用例加了自动重跑，结果重跑也把一些真实失败盖住了：夜间一片绿，并不总代表构建健康。这个比喻很贴切——像仪表盘上的故障灯亮了一下又自己熄灭，看着没事，问题还在引擎盖下面。第一步是 10 月按优先级拆分夜间用例；下一步是&lt;code>重跑后仍失败&lt;/code>直接把构建标红并告警。&lt;/p>
+&lt;p>第二个是发布检查表。它让发布变得可预测，但其中多数条目是流程步骤（合并、版本号之类），不是真正的测试。团队计划把它们自动化。&lt;/p>
+&lt;p>再往前看，希望 AI 代理参与 UI 用例维护、以及从测试用例起草端到端测试。注意这里的顺序：先把规则写清楚、把度量口径定下来，再让代理接手。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/163-small-automation-group/04-fig2_hu_2d8ec8cb23b2009d.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/163-small-automation-group/04-fig2_hu_eddfc89ce719be8d.webp 480w, https://chengxiaqiucao.github.io/post/163-small-automation-group/04-fig2_hu_2d8ec8cb23b2009d.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 2｜绿灯与构建健康之间被重跑切断，按优先级拆分与失败即告警是两步修复&lt;/p>
+&lt;h2 id="可以带走的四条判断">可以带走的四条判断
+&lt;/h2>&lt;p>如果只留结论，是这四条。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>quality is a team sport&lt;/code>：质量不是靠检验注入产品的，得在构建过程中长出来；软件里开发承担了大部分构建工作，把开发真正拉进来，QA 独自扛不动&lt;/li>
+&lt;li>把强检查放在每次合并之前，并且让反馈足够快——半小时和第二天，行为完全不同&lt;/li>
+&lt;li>追问构建是怎么变绿的：是真修好了，还是重跑把失败盖住了&lt;/li>
+&lt;li>数一数发布检查表里有多少条是真测试；上面这套体系自己承认，目前仍以流程步骤为主&lt;/li>
+&lt;/ul>
+&lt;p>最后一条特别适合作为自查起点：把你们最近一次发布的检查表打开，逐条标上&lt;code>测试 / 流程&lt;/code>。比例往往比预期更偏向后者，而这份比例恰好说明了自动化下一步该往哪投。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/163-small-automation-group/04-fig3_hu_1624b9abe2600b6c.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/163-small-automation-group/04-fig3_hu_319e1a7d6ce879ab.webp 480w, https://chengxiaqiucao.github.io/post/163-small-automation-group/04-fig3_hu_1624b9abe2600b6c.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 3｜把条目分为真测试与流程步骤，比例直接指向下一轮自动化的优先级&lt;/p></description></item><item><title>移除AI模型来测试 MCP server的七个步骤</title><link>https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/</link><pubDate>Thu, 12 Nov 2026 09:00:00 +0800</pubDate><guid>https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/</guid><description>&lt;img src="https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/cover.webp" alt="Featured image of post 移除AI模型来测试 MCP server的七个步骤" />&lt;p>一个 &lt;code>MCP&lt;/code> server 能启动、不报错，跟它真的能用是两回事。每个工具是否接受你以为的参数，返回值是不是模型期望的结构，失败时究竟算工具报错还是协议报错——这几件事，靠把 server 挂进 AI 客户端再问模型，往往问不出来。那条链路慢，而且模型横在你和 bug 中间。&lt;/p>
+&lt;p>更直接的做法是把模型拿掉：用一个本地 Web UI 直连 server，把它提供的工具、资源、提示列出来，逐个手工调用，同时把每一帧 &lt;code>JSON-RPC&lt;/code> 报文看完整。下面是一整轮调试会话的七个步骤，从启动到接上自己的服务。&lt;/p>
+&lt;h2 id="先把模型从链路里摘出去">先把模型从链路里摘出去
+&lt;/h2>&lt;p>多数人的排查方式是接客户端、发指令、盯结果。问题在于，当结果不对，你分不清是工具参数写错了、server 没应答、还是模型自己理解偏了。&lt;/p>
+&lt;p>直连的价值就在这里：调用是你发的，参数是你填的，回包是原样的。需要回答的四个问题变得可判定——工具收没收到预期参数、返回结构对不对、失败以哪种形式表达、耗时是否异常。模型只在最后一步才该出现。&lt;/p>
+&lt;h2 id="一条命令起一个本地调试台">一条命令起一个本地调试台
+&lt;/h2>&lt;p>不需要安装，也不需要构建：&lt;/p>
+&lt;p>&lt;code>npx mcp-master-tester&lt;/code>&lt;/p>
+&lt;p>浏览器打开 &lt;code>http://127.0.0.1:6280&lt;/code>。端口被占用就换一个：&lt;/p>
+&lt;p>&lt;code>PORT=7000 npx mcp-master-tester&lt;/code>&lt;/p>
+&lt;p>后端是 &lt;code>Express&lt;/code>，前端是原生 JavaScript，几秒就能起来，还会跟随系统的深浅色主题。前置条件只有 &lt;code>Node.js 20&lt;/code> 或更高版本。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig1_hu_1b1963078691f52f.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig1_hu_e143bef9c28290dc.webp 480w, https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig1_hu_1b1963078691f52f.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 1｜调用方、协议层、被测服务三层关系，排查时先看中间的报文&lt;/p>
+&lt;h2 id="先连参考实现看健康的服务长什么样">先连参考实现，看健康的服务长什么样
+&lt;/h2>&lt;p>连接表单默认填好了一个 &lt;code>stdio&lt;/code> 连接到官方参考 server：&lt;/p>
+&lt;p>&lt;code>npx -y @modelcontextprotocol/server-everything&lt;/code>&lt;/p>
+&lt;p>点连接后，后端把 server 作为子进程拉起，跑完 &lt;code>initialize&lt;/code> 握手，侧栏就列出它提供的全部能力：tools、resources、resource templates、prompts。&lt;/p>
+&lt;p>先连参考实现而不是自己的代码，理由是它把协议里的每种特性都跑了一遍。见过健康的服务长什么样，自己服务里的异常才显眼。这一步也很适合用来确认你的客户端环境本身没问题。&lt;/p>
+&lt;h2 id="表单由-schema-生成必填项在发送前就拦住">表单由 schema 生成，必填项在发送前就拦住
+&lt;/h2>&lt;p>选中一个工具，界面会读它的 &lt;code>inputSchema&lt;/code> 自动生成表单：字符串、数字、整数变成输入框，布尔值变成开关，&lt;code>enum&lt;/code>（含 oneOf / const 带标题）变成下拉，数组变成多选，对象给一个 JSON 编辑器。&lt;/p>
+&lt;p>必填字段在请求发出前就校验，缺参数会在表单层被挡下，而不是变成一句含糊的 server 错误。表单碍事时可以切到 &lt;code>Edit as JSON&lt;/code> 直接写参数。工具慢就设超时，长任务会从 &lt;code>notifications/progress&lt;/code> 流式回传进度；带破坏性标注的工具会先要一次确认。&lt;/p>
+&lt;p>结果查看器把回包拆开显示：文本（JSON 会格式化）、图片和音频、资源链接与内嵌资源、&lt;code>structuredContent&lt;/code>，以及这次调用花了多久。每个工具还保留自己的调用历史，换参数重跑可以直接对照。&lt;/p>
+&lt;h2 id="两种失败必须分开看">两种失败必须分开看
+&lt;/h2>&lt;p>这是整轮调试里最值得记住的一点。工具失败有两种表达方式：&lt;/p>
+&lt;ul>
+&lt;li>返回 &lt;code>isError: true&lt;/code> 的结果，表示工具跑完了并报告失败&lt;/li>
+&lt;li>调用本身抛 &lt;code>JSON-RPC&lt;/code> error，表示协议层断了&lt;/li>
+&lt;/ul>
+&lt;p>调试台把两者分开显示，这不是洁癖。如果本该返回 &lt;code>isError&lt;/code> 的场景抛成了协议错误，另一端的模型能拿到的信息会少得多，很可能只看到一次失败而不知道原因。这被列为 &lt;code>MCP&lt;/code> server 里最常见的 bug 之一，值得在自测清单里单列一项。&lt;/p>
+&lt;h2 id="资源提示与中途追问">资源、提示与中途追问
+&lt;/h2>&lt;p>静态资源点一下就读。带变量的资源模板（形如 &lt;code>file:///{path}&lt;/code>）会给每个变量一个输入框，填完再读；文本和 blob 内容都能显示，可以确认二进制资源没有在传输中被破坏。&lt;/p>
+&lt;p>提示也一样，选中后填参数，界面给出模板返回的完整消息——这是检查参数替换是否符合预期最快的方式。&lt;/p>
+&lt;p>有些 server 会在调用中途通过 &lt;code>elicitation/create&lt;/code> 反过来问用户要信息。调试台会按 &lt;code>requestedSchema&lt;/code> 生成表单，把你的回答送回去，URL 模式也支持。如果服务用了 elicitation，这是不接真实客户端就能测完整往返的最简办法。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig2_hu_28faf266d31f73b8.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig2_hu_9f3765da60d3ed87.webp 480w, https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig2_hu_28faf266d31f73b8.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 2｜区分正常回包、&lt;code>isError&lt;/code> 与协议错误三条分支，中途追问仍在同一次会话内&lt;/p>
+&lt;h2 id="结果不对时先读报文再读代码">结果不对时，先读报文再读代码
+&lt;/h2>&lt;p>协议日志按时间从旧到新记录：双向每一帧 &lt;code>JSON-RPC&lt;/code>、请求到响应的耗时、server 的 stderr、notifications/message 日志条目，还能用 &lt;code>logging/setLevel&lt;/code> 调整服务端日志级别。&lt;/p>
+&lt;p>顺序很重要。结果看着不对时，先读原始帧再翻自己的代码：客户端到底发了什么、server 有没有应答、花了多久。很多「工具坏了」最后都是这里能一眼看出的错配——参数名写错、响应里少了字段、或者进程崩溃把堆栈打到了 &lt;code>stderr&lt;/code>。&lt;/p>
+&lt;h2 id="手工能跑通模型仍可能用错">手工能跑通，模型仍可能用错
+&lt;/h2>&lt;p>工具手工调用一切正常，模型却可能用错，因为模型只知道定义里写了什么。&lt;code>Lint&lt;/code> 报告按规范和良好实践逐条检查每个工具定义：&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>inputSchema&lt;/code> 与 &lt;code>outputSchema&lt;/code> 必须是 object 类型&lt;/li>
+&lt;li>每个 required 字段都得真实定义过&lt;/li>
+&lt;li>properties 应带 type 和 description&lt;/li>
+&lt;li>工具名格式规范且不重复&lt;/li>
+&lt;li>工具应带 annotations（例如是否只读、是否破坏性）&lt;/li>
+&lt;/ul>
+&lt;p>该把 lint 结果当 bug 处理：缺 description，模型就只能猜参数用途；缺 annotation，客户端没法在破坏性操作前提醒用户。改完定义、重连、再跑一次 lint，直到干净。&lt;/p>
+&lt;h2 id="接到自己的服务">接到自己的服务
+&lt;/h2>&lt;p>按部署形态选连接方式：&lt;/p>
+&lt;ul>
+&lt;li>本地 npm 包（&lt;code>stdio&lt;/code>）：命令 &lt;code>npx&lt;/code>，参数 &lt;code>-y @modelcontextprotocol/server-filesystem /path/to/dir&lt;/code>&lt;/li>
+&lt;li>本地脚本（&lt;code>stdio&lt;/code>）：命令 &lt;code>python&lt;/code>，参数 &lt;code>my_server.py&lt;/code>，按需填工作目录&lt;/li>
+&lt;li>需要密钥（&lt;code>stdio&lt;/code>）：点 &lt;code>+ var&lt;/code>，例如 &lt;code>GITHUB_PERSONAL_ACCESS_TOKEN&lt;/code>&lt;/li>
+&lt;li>远端现行规范（&lt;code>Streamable HTTP&lt;/code>）：填 &lt;code>https://host/mcp&lt;/code>，必要时加 Bearer token&lt;/li>
+&lt;li>远端旧规范（&lt;code>SSE&lt;/code>）：填 &lt;code>https://host/sse&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>远端流量经 Node 后端转发，不会撞上浏览器 &lt;code>CORS&lt;/code>。凭据缺失时也有兜底：远端返回 401 会提示输入 token 后重试；&lt;code>stdio&lt;/code> 进程崩溃且 stderr 提到缺密钥时，会建议把它加成环境变量重连；名字里含 KEY、TOKEN、SECRET、PASSWORD 的变量自动打码。&lt;/p>
+&lt;p>连通之后可以存成 profile，但 profile 只存名字、不存密钥，所以每次连接仍要重新输入。&lt;/p>
+&lt;h2 id="本地工具的边界">本地工具的边界
+&lt;/h2>&lt;p>这个调试台能执行你在 &lt;code>stdio&lt;/code> 表单里填的任何命令，因此设计上刻意只留在本地：后端只监听 &lt;code>127.0.0.1&lt;/code>，Host 头不是本机或 localhost 的请求一律拒绝（挡掉恶意站点的 DNS rebinding），密钥只存在于浏览器标签页和后端进程的内存里，点 Run 之前什么都不会执行。&lt;/p>
+&lt;p>还没覆盖的两处要心里有数：远端 server 的 &lt;code>OAuth&lt;/code> 登录流程尚不支持，得用 Bearer token 或自定义头；&lt;code>sampling/createMessage&lt;/code> 与 roots 不会向 server 声明。&lt;/p>
+&lt;h2 id="每次改动后的固定动作">每次改动后的固定动作
+&lt;/h2>&lt;p>连上、跑 lint、把改过的工具逐个调一遍、扫一遍协议日志里的报错和慢响应——这四步可以固化成每次改 server 的收尾动作。&lt;/p>
+&lt;p>它解决的其实是一个朴素的问题：调试 &lt;code>MCP&lt;/code> server 不该非得把模型拉进来。调用直连、参数由 schema 生成、报文逐帧可见、定义按规范校验，模型该依赖的那份描述也就顺带被验过了。&lt;/p>
+&lt;p>&lt;img src="https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig3_hu_62beebd114205859.webp"
+width="1024"
+height="576"
+srcset="https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig3_hu_508fa6402f812942.webp 480w, https://chengxiaqiucao.github.io/post/153-mcp-server-direct-test/01-fig3_hu_62beebd114205859.webp 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>
+图 3｜重连、校验定义、复调改动工具、扫协议日志，构成一个可重复的收尾动作&lt;/p></description></item></channel></rss>
